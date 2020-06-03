@@ -78,10 +78,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<td><input type="time" required></td>
 					<td colspan="2" id="weight">Вес противовеса <b class="nowrap"></b> г</td>
 					<td></td>
-					<td><input type="number" min="1" style="width: 50px;"></td>
-					<td><input type="number" min="1" style="width: 50px;"></td>
-					<td><input type="number" min="1" style="width: 50px;"></td>
-					<td><input type="number" min="1" style="width: 50px;"></td>
+					<td><input type="number" min="0" style="width: 50px;"></td>
+					<td><input type="number" min="0" style="width: 50px;"></td>
+					<td><input type="number" min="0" style="width: 50px;"></td>
+					<td><input type="number" min="0" style="width: 50px;"></td>
 					<td><input type="number" min="1" style="width: 50px;"></td>
 				</tr>
 				<tr>
@@ -90,10 +90,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<td><input type="time" required></td>
 					<td colspan="2"><input type="number" min="1000" max="20000" style="width: 70px; font-size: 1em;"><input type="number" min="1000" max="20000" style="width: 70px; font-size: 1em;"><input type="number" min="1000" max="20000" style="width: 70px; font-size: 1em;"></td>
 					<td></td>
-					<td><input type="number" min="1" style="width: 50px;"></td>
-					<td><input type="number" min="1" style="width: 50px;"></td>
-					<td><input type="number" min="1" style="width: 50px;"></td>
-					<td><input type="number" min="1" style="width: 50px;"></td>
+					<td><input type="number" min="0" style="width: 50px;"></td>
+					<td><input type="number" min="0" style="width: 50px;"></td>
+					<td><input type="number" min="0" style="width: 50px;"></td>
+					<td><input type="number" min="0" style="width: 50px;"></td>
 					<td><input type="number" min="1" style="width: 50px;"></td>
 				</tr>
 			</tbody>
