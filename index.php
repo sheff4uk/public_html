@@ -77,11 +77,11 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<td><input type="date" required></td>
 					<td><input type="time" required></td>
 					<td colspan="2" id="weight">Вес противовеса <b class="nowrap"></b> г</td>
-					<td></td>
-					<td><input type="number" min="0" style="width: 50px;"></td>
-					<td><input type="number" min="0" style="width: 50px;"></td>
-					<td><input type="number" min="0" style="width: 50px;"></td>
-					<td><input type="number" min="0" style="width: 50px;"></td>
+					<td id="d_amount" style="font-size: 1.2em"></td>
+					<td><input type="number" class="d_defect" min="0" style="width: 50px;"></td>
+					<td><input type="number" class="d_defect" min="0" style="width: 50px;"></td>
+					<td><input type="number" class="d_defect" min="0" style="width: 50px;"></td>
+					<td><input type="number" class="d_defect" min="0" style="width: 50px;"></td>
 					<td><input type="number" min="1" style="width: 50px;"></td>
 				</tr>
 				<tr>
@@ -89,11 +89,11 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<td><input type="date" required></td>
 					<td><input type="time" required></td>
 					<td colspan="2"><input type="number" min="1000" max="20000" style="width: 70px; font-size: 1em;"><input type="number" min="1000" max="20000" style="width: 70px; font-size: 1em;"><input type="number" min="1000" max="20000" style="width: 70px; font-size: 1em;"></td>
-					<td></td>
-					<td><input type="number" min="0" style="width: 50px;"></td>
-					<td><input type="number" min="0" style="width: 50px;"></td>
-					<td><input type="number" min="0" style="width: 50px;"></td>
-					<td><input type="number" min="0" style="width: 50px;"></td>
+					<td id="b_amount" style="font-size: 1.2em"></td>
+					<td><input type="number" class="b_defect" min="0" style="width: 50px;"></td>
+					<td><input type="number" class="b_defect" min="0" style="width: 50px;"></td>
+					<td><input type="number" class="b_defect" min="0" style="width: 50px;"></td>
+					<td><input type="number" class="b_defect" min="0" style="width: 50px;"></td>
 					<td><input type="number" min="1" style="width: 50px;"></td>
 				</tr>
 			</tbody>
@@ -111,6 +111,41 @@ this.subbut.value='Подождите, пожалуйста!';">
 		$('#route_sheet_form table input').attr("disabled", true);
 		$('#route_sheet_form table select').attr("disabled", true);
 
+		// Пересчет числа годных детелей при изменениях данных по браку
+		$('#route_sheet_form #amount').change(function() {
+			var d_amount = $('#route_sheet_form #amount').val();
+			$('#route_sheet_form .d_defect').each(function() {
+				d_amount = d_amount - $(this).val();
+			});
+
+			var b_amount = d_amount;
+			$('#route_sheet_form .b_defect').each(function() {
+				b_amount = b_amount - $(this).val();
+			});
+			$('#route_sheet_form #d_amount').text(d_amount).effect( 'highlight', {color: 'red'}, 500 );
+			$('#route_sheet_form #b_amount').text(b_amount).effect( 'highlight', {color: 'red'}, 500 );
+		});
+		$('#route_sheet_form .d_defect').change(function() {
+			var d_amount = $('#route_sheet_form #amount').val();
+			$('#route_sheet_form .d_defect').each(function() {
+				d_amount = d_amount - $(this).val();
+			});
+
+			var b_amount = d_amount;
+			$('#route_sheet_form .b_defect').each(function() {
+				b_amount = b_amount - $(this).val();
+			});
+			$('#route_sheet_form #d_amount').text(d_amount).effect( 'highlight', {color: 'red'}, 500 );
+			$('#route_sheet_form #b_amount').text(b_amount).effect( 'highlight', {color: 'red'}, 500 );
+		});
+		$('#route_sheet_form .b_defect').change(function() {
+			var b_amount = $('#route_sheet_form #d_amount').text();
+			$('#route_sheet_form .b_defect').each(function() {
+				b_amount = b_amount - $(this).val();
+			});
+			$('#route_sheet_form #b_amount').text(b_amount).effect( 'highlight', {color: 'red'}, 500 );
+		});
+
 		// При выборе кода противовеса разблокируется форма
 		$('#route_sheet_form #CW').change(function() {
 			var val = $(this).val();
@@ -119,15 +154,15 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#route_sheet_form table select').attr("disabled", false);
 
 				var in_cassette = $('#route_sheet_form #CW option:selected').attr('in_cassette');
-				$('#route_sheet_form #amount').val(in_cassette);
+				$('#route_sheet_form #amount').val(in_cassette).change();
 				$('#route_sheet_form #amount').attr('max', in_cassette);
 
 				var min_weight = $('#route_sheet_form #CW option:selected').attr('min_weight');
 				var max_weight = $('#route_sheet_form #CW option:selected').attr('max_weight');
 				$('#route_sheet_form #weight b').text(min_weight+' - '+max_weight);
 
-				$('#route_sheet_form #amount').effect( 'highlight', {color: 'red'}, 1000 );
-				$('#route_sheet_form #weight').effect( 'highlight', {color: 'red'}, 1000 );
+				$('#route_sheet_form #amount').effect( 'highlight', {color: 'red'}, 500 );
+				$('#route_sheet_form #weight').effect( 'highlight', {color: 'red'}, 500 );
 			}
 			else {
 				$('#route_sheet_form table input').attr("disabled", true);
