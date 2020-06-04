@@ -57,7 +57,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<td><input type="number" id="amount" min="0" style="width: 70px;" required></td>
 					<td colspan="4" style="background-color: #333333;"></td>
 					<td>
-						<select name="OP_ID" required>
+						<select name="OP_ID" style="width: 100px;" required>
 							<option value=""></option>
 							<?
 							$query = "
