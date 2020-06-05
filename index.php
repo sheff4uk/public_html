@@ -89,6 +89,8 @@ if( isset($_POST["CW_ID"]) ) {
 $query = "
 	SELECT RS.RS_ID
 		,CW.item
+		,CW.min_weight
+		,CW.max_weight
 
 		,DATE_FORMAT(RS.filling_date, '%d.%m.%y') filling_date
 		,DATE_FORMAT(RS.filling_date, '%H:%i') filling_time
@@ -125,7 +127,7 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	?>
-		<tr style="border-top: 3px solid #333;">
+		<tr style="border-top: 2px solid #333;">
 			<td rowspan="3" style="font-size: 1.5em; font-weight: bold;"><?=$row["item"]?></td>
 			<td>Заливка</td>
 			<td><?=$row["filling_date"]?></td>
@@ -140,7 +142,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Расформовка</td>
 			<td><?=$row["decoupling_date"]?></td>
 			<td><?=$row["decoupling_time"]?></td>
-			<td colspan="2" id="weight">Вес противовеса <b class="nowrap"></b> г</td>
+			<td colspan="2" id="weight" style="border-top: 2px solid #333; border-left: 2px solid #333; border-right: 2px solid #333;">Вес противовеса <span class="nowrap"><?=$row["min_weight"]?> - <?=$row["max_weight"]?></span> г</td>
 			<td><?=$row["d_amount"]?></td>
 			<td><?=$row["d_not_spill"]?></td>
 			<td><?=$row["d_crack"]?></td>
@@ -152,7 +154,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Упаковка</td>
 			<td><?=$row["boxing_date"]?></td>
 			<td><?=$row["boxing_time"]?></td>
-			<td colspan="2" class="nowrap"><?=$row["weight1"]?> | <?=$row["weight2"]?> | <?=$row["weight3"]?></td>
+			<td colspan="2" class="nowrap" style="border-left: 2px solid #333; border-right: 2px solid #333;"><?=$row["weight1"]?> | <?=$row["weight2"]?> | <?=$row["weight3"]?></td>
 			<td><?=$row["b_amount"]?></td>
 			<td><?=$row["b_not_spill"]?></td>
 			<td><?=$row["b_crack"]?></td>
