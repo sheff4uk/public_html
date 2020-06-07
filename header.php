@@ -2,11 +2,13 @@
 //ini_set('display_errors', 1);
 //error_reporting(E_ALL);
 
-	// Функция делает ссылки кликабельными
-	function src_url($src) {
-		$src = preg_replace('/((?:\w+:\/\/|www\.)[\w.\/%\d&?#+=-]+)/i', '<a href="\1" target="_blank" class="button">\1</a>', $src);
-		return $src;
-	}
+include_once "checkrights.php";
+
+// Функция делает ссылки кликабельными
+function src_url($src) {
+	$src = preg_replace('/((?:\w+:\/\/|www\.)[\w.\/%\d&?#+=-]+)/i', '<a href="\1" target="_blank" class="button">\1</a>', $src);
+	return $src;
+}
 
 ?>
 <!DOCTYPE html>
@@ -181,6 +183,66 @@
 
 	<div id="loading" class='uil-default-css' style='transform:scale(1); position: absolute; left: calc(50% - 100px); top: calc(50% - 100px); align-items: center; display: flex;'><div style='top:80px;left:93px;width:14px;height:40px;background:#fdce46;-webkit-transform:rotate(0deg) translate(0,-60px);transform:rotate(0deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:80px;left:93px;width:14px;height:40px;background:#fdce46;-webkit-transform:rotate(30deg) translate(0,-60px);transform:rotate(30deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:80px;left:93px;width:14px;height:40px;background:#fdce46;-webkit-transform:rotate(60deg) translate(0,-60px);transform:rotate(60deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:80px;left:93px;width:14px;height:40px;background:#fdce46;-webkit-transform:rotate(90deg) translate(0,-60px);transform:rotate(90deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:80px;left:93px;width:14px;height:40px;background:#fdce46;-webkit-transform:rotate(120deg) translate(0,-60px);transform:rotate(120deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:80px;left:93px;width:14px;height:40px;background:#fdce46;-webkit-transform:rotate(150deg) translate(0,-60px);transform:rotate(150deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:80px;left:93px;width:14px;height:40px;background:#fdce46;-webkit-transform:rotate(180deg) translate(0,-60px);transform:rotate(180deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:80px;left:93px;width:14px;height:40px;background:#fdce46;-webkit-transform:rotate(210deg) translate(0,-60px);transform:rotate(210deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:80px;left:93px;width:14px;height:40px;background:#fdce46;-webkit-transform:rotate(240deg) translate(0,-60px);transform:rotate(240deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:80px;left:93px;width:14px;height:40px;background:#fdce46;-webkit-transform:rotate(270deg) translate(0,-60px);transform:rotate(270deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:80px;left:93px;width:14px;height:40px;background:#fdce46;-webkit-transform:rotate(300deg) translate(0,-60px);transform:rotate(300deg) translate(0,-60px);border-radius:10px;position:absolute;'></div><div style='top:80px;left:93px;width:14px;height:40px;background:#fdce46;-webkit-transform:rotate(330deg) translate(0,-60px);transform:rotate(330deg) translate(0,-60px);border-radius:10px;position:absolute;'></div></div>
 
+	<!-- NAVBAR -->
+	<nav class="navbar">
+		<div class="navbar-header" id="main">
+			<div class="aside-nav-control navbar-brand">
+				<i class="fa fa-bars fa-lg"></i>
+			</div>
+			<a class="navbar-brand" href="/" title="На главную" style="position: relative;"><?=$company_name?></a>
+		</div>
+<?
+	if( empty($_SESSION['id']) ) {
+		//$menu = array ("Вход" => "login.php", "Регистрация" => "reg.php");
+		$menu = array ();
+	}
+	else {
+		$menu["Выход {$USR_Icon}"] = "exit.php";
+	}
+
+	// Формируем элементы меню
+	$nav_buttons = "";
+	foreach ($menu as $title=>$url) {
+		// Если содержится подменю
+		if (is_array($url)) {
+			$sub_buttons = "";
+			$class = "";
+			foreach ($url as $sub_title=>$sub_url) {
+				$pieces = explode("?", $sub_url);
+				if (strpos($_SERVER["REQUEST_URI"], $pieces[0])) {
+					$sub_class = "active";
+					$class = "active";
+				}
+				else {
+					$sub_class = "";
+				}
+				$sub_buttons .= "<li class='{$sub_class}'><a href='{$sub_url}'>{$sub_title}</a></li>";
+			}
+			$nav_buttons .= "<li class='parent {$class}'><a href='#'>{$title} <i class='fas fa-angle-down'></i></a><ul>{$sub_buttons}</ul></li>";
+		}
+		else {
+			$pieces = explode("?", $url);
+			$class = strpos($_SERVER["REQUEST_URI"], $pieces[0]) ? "active" : "";
+			$nav_buttons .= "<li class='{$class}'><a href='{$url}'>{$title}</a></li>";
+		}
+	}
+
+	echo "<ul class='navbar-nav'>";
+	echo $nav_buttons;
+	echo "</ul>";
+	echo "</nav>";
+
+	echo "<div class='aside-nav'>";
+	echo "<div class='close_btn'><i class='fa fa-times fa-2x'></i></div>";
+	echo "<ul>";
+	echo $nav_buttons;
+	echo "</ul>";
+	echo "</div>";
+	// END NAVBAR
+
+	$MONTHS = array(1=>'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь');
+	$MONTHS_DATE = array(1=>'янв.', 'февр.', 'мар.', 'апр.', 'мая', 'июня', 'июля', 'авг.', 'сент.', 'окт.', 'нояб.', 'дек.');
+?>
 	<div id="body_wraper" style="display: none;">
 
 <script>
