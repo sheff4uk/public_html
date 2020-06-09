@@ -74,15 +74,6 @@ table tbody tr:hover, tbody td.hover {
 	background: #ffa; /* Цвет фона при наведении */
 }
 
-tbody tr:nth-child(odd){ /* Задаем стили для нечетных рядов таблицы */
-	background: #fff;
-}
-
-tbody tr:nth-child(even){ /* Задаем стили для четных рядов таблицы */
-	background: #fff;
-/*	background: #e2f6f8;*/
-}
-
 .code {
 	background: #333;
 	color: #fff;
@@ -102,39 +93,8 @@ a:hover .code {
 	border-color: #D65C4F;
 }
 
-pre {
-	margin: 0;
-}
-.empty {
-	background: #666 !important;
-}
-.notready {
-	background: #fff !important;
-}
-.inwork {
+.error {
 	background: coral !important;
-}
-.ready {
-	background: chartreuse !important;
-}
-
-.confirmed {
-	color: chartreuse !important;
-}
-.not_confirmed {
-	color: #666 !important;
-}
-.edit_confirmed, .taken_confirmed {
-	cursor: pointer;
-}
-
-.unvisible {
-	text-decoration: line-through;
-	filter: grayscale(1) brightness(0.7);
-	-webkit-filter: grayscale(1) brightness(0.7);
-	-moz-filter: grayscale(1) brightness(0.7);
-	-ms-filter: grayscale(1) brightness(0.7);
-	-o-filter: grayscale(1) brightness(0.7);
 }
 
 .txtright {

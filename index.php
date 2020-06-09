@@ -109,6 +109,7 @@ if( isset($_POST["CW_ID"]) ) {
 			<th>Операция</th>
 			<th>Дата</th>
 			<th>Время</th>
+			<th><i class="far fa-lg fa-hourglass" title="Интервал в часах с моента заливки."></i></th>
 			<th>№ замеса</th>
 			<th>№ кассеты</th>
 			<th>Кол-во годных деталей</th>
@@ -156,6 +157,9 @@ $query = "
 		,RS.b_chipped
 		,RS.b_def_form
 		,RS.b_post
+
+		,RS.interval1
+		,RS.interval2
 	FROM RouteSheet RS
 	JOIN CounterWeight CW ON CW.CW_ID = RS.CW_ID
 	JOIN Operator OP ON OP.OP_ID = RS.OP_ID
@@ -169,6 +173,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Заливка</td>
 			<td><?=$row["filling_date"]?></td>
 			<td><?=$row["filling_time"]?></td>
+			<td></td>
 			<td><?=$row["batch"]?></td>
 			<td><?=$row["cassette"]?></td>
 			<td><?=$row["amount"]?></td>
@@ -180,8 +185,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Расформовка</td>
 			<td><?=$row["decoupling_date"]?></td>
 			<td><?=$row["decoupling_time"]?></td>
+			<td <?=($row["interval1"] < 24 ? "class='error'" : "")?>><?=$row["interval1"]?></td>
 			<td colspan="2" id="weight" style="border-top: 2px solid #333; border-left: 2px solid #333; border-right: 2px solid #333;">Вес противовеса <span class="nowrap"><?=$row["min_weight"]?> - <?=$row["max_weight"]?></span> г</td>
-			<td><?=$row["d_amount"]?></td>
+			<td <?=($row["d_amount"] < 0 ? "class='error'" : "")?>><?=$row["d_amount"]?></td>
 			<td><?=$row["d_not_spill"]?></td>
 			<td><?=$row["d_crack"]?></td>
 			<td><?=$row["d_chipped"]?></td>
@@ -192,8 +198,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Упаковка</td>
 			<td><?=$row["boxing_date"]?></td>
 			<td><?=$row["boxing_time"]?></td>
+			<td <?=($row["interval2"] < 120 ? "class='error'" : "")?>><?=$row["interval2"]?></td>
 			<td colspan="2" class="nowrap" style="border-left: 2px solid #333; border-right: 2px solid #333;"><?=$row["weight1"]?>&nbsp;&nbsp;<?=$row["weight2"]?>&nbsp;&nbsp;<?=$row["weight3"]?></td>
-			<td><?=$row["b_amount"]?></td>
+			<td <?=($row["b_amount"] < 0 ? "class='error'" : "")?>><?=$row["b_amount"]?></td>
 			<td><?=$row["b_not_spill"]?></td>
 			<td><?=$row["b_crack"]?></td>
 			<td><?=$row["b_chipped"]?></td>
@@ -323,8 +330,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#route_sheet_form .b_defect').each(function() {
 				b_amount = b_amount - $(this).val();
 			});
-			$('#route_sheet_form .d_amount').text(d_amount).effect( 'highlight', {color: 'red'}, 500 );
-			$('#route_sheet_form .b_amount').text(b_amount).effect( 'highlight', {color: 'red'}, 500 );
+			$('#route_sheet_form .d_amount').text(d_amount).effect( 'highlight', {color: 'red'}, 200 );
+			$('#route_sheet_form .b_amount').text(b_amount).effect( 'highlight', {color: 'red'}, 200 );
 		});
 		$('#route_sheet_form .d_defect').change(function() {
 			var d_amount = $('#route_sheet_form input[name="amount"]').val();
@@ -336,15 +343,15 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#route_sheet_form .b_defect').each(function() {
 				b_amount = b_amount - $(this).val();
 			});
-			$('#route_sheet_form .d_amount').text(d_amount).effect( 'highlight', {color: 'red'}, 500 );
-			$('#route_sheet_form .b_amount').text(b_amount).effect( 'highlight', {color: 'red'}, 500 );
+			$('#route_sheet_form .d_amount').text(d_amount).effect( 'highlight', {color: 'red'}, 200 );
+			$('#route_sheet_form .b_amount').text(b_amount).effect( 'highlight', {color: 'red'}, 200 );
 		});
 		$('#route_sheet_form .b_defect').change(function() {
 			var b_amount = $('#route_sheet_form .d_amount').text();
 			$('#route_sheet_form .b_defect').each(function() {
 				b_amount = b_amount - $(this).val();
 			});
-			$('#route_sheet_form .b_amount').text(b_amount).effect( 'highlight', {color: 'red'}, 500 );
+			$('#route_sheet_form .b_amount').text(b_amount).effect( 'highlight', {color: 'red'}, 200 );
 		});
 
 		// При выборе кода противовеса разблокируется форма
@@ -362,8 +369,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				var max_weight = $('#route_sheet_form select[name="CW_ID"] option:selected').attr('max_weight');
 				$('#route_sheet_form .weight b').text(min_weight+' - '+max_weight);
 
-				$('#route_sheet_form input[name="amount"]').effect( 'highlight', {color: 'red'}, 500 );
-				$('#route_sheet_form .weight').effect( 'highlight', {color: 'red'}, 500 );
+				$('#route_sheet_form input[name="amount"]').effect( 'highlight', {color: 'red'}, 200 );
+				$('#route_sheet_form .weight').effect( 'highlight', {color: 'red'}, 200 );
 			}
 			else {
 				$('#route_sheet_form table input').attr("disabled", true);
