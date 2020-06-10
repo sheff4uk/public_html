@@ -127,6 +127,7 @@ if( isset($_POST["CW_ID"]) ) {
 $query = "
 	SELECT RS.RS_ID
 		,CW.item
+		,CW.in_cassette
 		,CW.min_weight
 		,CW.max_weight
 
@@ -176,7 +177,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td></td>
 			<td><?=$row["batch"]?></td>
 			<td><?=$row["cassette"]?></td>
-			<td><?=$row["amount"]?></td>
+			<td style="position: relative;"><?=$row["amount"]?><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td colspan="4" style="background-color: #333;"></td>
 			<td><?=$row["name"]?></td>
 			<td rowspan="3"><a href="#" class="add_route_sheet" RS_ID="<?=$row["RS_ID"]?>" title="Изменить маршрутный лист"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
@@ -187,7 +188,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["decoupling_time"]?></td>
 			<td <?=($row["interval1"] < 24 ? "class='error'" : "")?>><?=$row["interval1"]?></td>
 			<td colspan="2" id="weight" style="border-top: 2px solid #333; border-left: 2px solid #333; border-right: 2px solid #333;">Вес противовеса <span class="nowrap"><?=$row["min_weight"]?> - <?=$row["max_weight"]?></span> г</td>
-			<td <?=($row["d_amount"] < 0 ? "class='error'" : "")?>><?=$row["d_amount"]?></td>
+			<td  style="position: relative;" <?=($row["d_amount"] < 0 ? "class='error'" : "")?>><?=$row["d_amount"]?><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["d_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td><?=$row["d_not_spill"]?></td>
 			<td><?=$row["d_crack"]?></td>
 			<td><?=$row["d_chipped"]?></td>
@@ -199,8 +200,12 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["boxing_date"]?></td>
 			<td><?=$row["boxing_time"]?></td>
 			<td <?=($row["interval2"] < 120 ? "class='error'" : "")?>><?=$row["interval2"]?></td>
-			<td colspan="2" class="nowrap" style="border-left: 2px solid #333; border-right: 2px solid #333;"><?=$row["weight1"]?>&nbsp;&nbsp;<?=$row["weight2"]?>&nbsp;&nbsp;<?=$row["weight3"]?></td>
-			<td <?=($row["b_amount"] < 0 ? "class='error'" : "")?>><?=$row["b_amount"]?></td>
+			<td colspan="2" class="nowrap" style="border-left: 2px solid #333; border-right: 2px solid #333;">
+				<span class="<?=(($row["weight1"] < $row["min_weight"] or $row["weight1"] > $row["max_weight"]) ? "bg-red" : "bg-green")?>"><?=$row["weight1"]?></span>
+				<span class="<?=(($row["weight2"] < $row["min_weight"] or $row["weight2"] > $row["max_weight"]) ? "bg-red" : "bg-green")?>"><?=$row["weight2"]?></span>
+				<span class="<?=(($row["weight3"] < $row["min_weight"] or $row["weight3"] > $row["max_weight"]) ? "bg-red" : "bg-green")?>"><?=$row["weight3"]?></span>
+			</td>
+			<td  style="position: relative;" <?=($row["b_amount"] < 0 ? "class='error'" : "")?>><?=$row["b_amount"]?><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["b_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td><?=$row["b_not_spill"]?></td>
 			<td><?=$row["b_crack"]?></td>
 			<td><?=$row["b_chipped"]?></td>
@@ -299,7 +304,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<td>Упаковка</td>
 					<td><input type="date" name="boxing_date" required></td>
 					<td><input type="time" name="boxing_time" required></td>
-					<td colspan="2"><input type="number" name="weight1" min="1000" max="20000" style="width: 70px; font-size: 1em;" required><input type="number" name="weight2" min="1000" max="20000" style="width: 70px; font-size: 1em;" required><input type="number" name="weight3" min="1000" max="20000" style="width: 70px; font-size: 1em;" required></td>
+					<td colspan="2"><input type="number" name="weight1" min="0" style="width: 70px; font-size: 1em;" required><input type="number" name="weight2" min="0" style="width: 70px; font-size: 1em;" required><input type="number" name="weight3" min="0" style="width: 70px; font-size: 1em;" required></td>
 					<td class="b_amount" style="font-size: 1.2em"></td>
 					<td><input type="number" name="b_not_spill" class="b_defect" min="0" style="width: 50px;"></td>
 					<td><input type="number" name="b_crack" class="b_defect" min="0" style="width: 50px;"></td>
