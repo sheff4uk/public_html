@@ -343,6 +343,14 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 <script>
 	$(function() {
+		// Ограничения по выбору отрицательных дат
+		$('#route_sheet_form input[name="filling_date"]').change(function() {
+			$('#route_sheet_form input[name="decoupling_date"]').attr("min", $(this).val());
+		});
+		$('#route_sheet_form input[name="decoupling_date"]').change(function() {
+			$('#route_sheet_form input[name="boxing_date"]').attr("min", $(this).val());
+		});
+
 		// Пересчет числа годных детелей при изменениях данных по браку
 		$('#route_sheet_form input[name="amount"]').change(function() {
 			var d_amount = $('#route_sheet_form input[name="amount"]').val();
@@ -421,7 +429,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#route_sheet_form select[name="CW_ID"]').val(route_sheet_data['CW_ID']);
 
 				// Дата/время заливки
-				$('#route_sheet_form input[name="filling_date"]').val(route_sheet_data['filling_date']);
+				$('#route_sheet_form input[name="filling_date"]').val(route_sheet_data['filling_date']).change();
 				$('#route_sheet_form input[name="filling_time"]').val(route_sheet_data['filling_time']);
 				// № замеса
 				$('#route_sheet_form input[name="batch"]').val(route_sheet_data['batch']);
@@ -435,7 +443,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#route_sheet_form select[name="sOP_ID"]').val(route_sheet_data['sOP_ID']);
 
 				// Дата/время расформовки
-				$('#route_sheet_form input[name="decoupling_date"]').val(route_sheet_data['decoupling_date']);
+				$('#route_sheet_form input[name="decoupling_date"]').val(route_sheet_data['decoupling_date']).change();
 				$('#route_sheet_form input[name="decoupling_time"]').val(route_sheet_data['decoupling_time']);
 				// Допустимые границы веса
 				$('#route_sheet_form .weight b').text(route_sheet_data['min_weight'] + ' - ' + route_sheet_data['max_weight']);
@@ -477,6 +485,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#route_sheet_form table select').val('');
 				$('#route_sheet_form table input').attr("disabled", true);
 				$('#route_sheet_form table select').attr("disabled", true);
+				$('#route_sheet_form input[type="date"]').attr("min", '');
 			}
 
 			$('#route_sheet_form').dialog({
