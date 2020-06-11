@@ -11,6 +11,7 @@ if( isset($_POST["CW_ID"]) ) {
 	$cassette = $_POST["cassette"];
 	$amount = $_POST["amount"];
 	$OP_ID = $_POST["OP_ID"];
+	$sOP_ID = $_POST["sOP_ID"] ? $_POST["sOP_ID"] : "NULL";
 
 	$decoupling_date = "{$_POST["decoupling_date"]} {$_POST["decoupling_time"]}";
 	$d_not_spill = $_POST["d_not_spill"] ? $_POST["d_not_spill"] : "NULL";
@@ -40,6 +41,7 @@ if( isset($_POST["CW_ID"]) ) {
 				,cassette = {$cassette}
 				,amount = {$amount}
 				,OP_ID = {$OP_ID}
+				,sOP_ID = {$sOP_ID}
 
 				,decoupling_date = '{$decoupling_date}'
 				,d_not_spill = {$d_not_spill}
@@ -73,6 +75,7 @@ if( isset($_POST["CW_ID"]) ) {
 				,cassette = {$cassette}
 				,amount = {$amount}
 				,OP_ID = {$OP_ID}
+				,sOP_ID = {$sOP_ID}
 
 				,decoupling_date = '{$decoupling_date}'
 				,d_not_spill = {$d_not_spill}
@@ -136,7 +139,8 @@ $query = "
 		,RS.batch
 		,RS.cassette
 		,RS.amount
-		,OP.name
+		,OP.name OPname
+		,sOP.name sOPname
 
 		,DATE_FORMAT(RS.decoupling_date, '%d.%m.%y') decoupling_date
 		,DATE_FORMAT(RS.decoupling_date, '%H:%i') decoupling_time
@@ -164,6 +168,7 @@ $query = "
 	FROM RouteSheet RS
 	JOIN CounterWeight CW ON CW.CW_ID = RS.CW_ID
 	JOIN Operator OP ON OP.OP_ID = RS.OP_ID
+	LEFT JOIN Operator sOP ON sOP.OP_ID = RS.sOP_ID
 	ORDER BY RS.RS_ID DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -179,7 +184,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["cassette"]?></td>
 			<td style="position: relative;"><?=$row["amount"]?><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td colspan="4" style="background-color: #333;"></td>
-			<td><?=$row["name"]?></td>
+			<td><?=$row["OPname"]?><br><span style="font-size: .9em;"><?=$row["sOPname"]?></span></td>
 			<td rowspan="3"><a href="#" class="add_route_sheet" RS_ID="<?=$row["RS_ID"]?>" title="Изменить маршрутный лист"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 		</tr>
 		<tr>
@@ -201,9 +206,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["boxing_time"]?></td>
 			<td <?=($row["interval2"] < 120 ? "class='error'" : "")?>><?=$row["interval2"]?></td>
 			<td colspan="2" class="nowrap" style="border-left: 2px solid #333; border-right: 2px solid #333;">
-				<span class="<?=(($row["weight1"] < $row["min_weight"] or $row["weight1"] > $row["max_weight"]) ? "bg-red" : "bg-green")?>"><?=$row["weight1"]?></span>
-				<span class="<?=(($row["weight2"] < $row["min_weight"] or $row["weight2"] > $row["max_weight"]) ? "bg-red" : "bg-green")?>"><?=$row["weight2"]?></span>
-				<span class="<?=(($row["weight3"] < $row["min_weight"] or $row["weight3"] > $row["max_weight"]) ? "bg-red" : "bg-green")?>"><?=$row["weight3"]?></span>
+				<span class="<?=(($row["weight1"] < $row["min_weight"] or $row["weight1"] > $row["max_weight"]) ? "bg-red" : "")?>"><?=$row["weight1"]?></span>
+				<span class="<?=(($row["weight2"] < $row["min_weight"] or $row["weight2"] > $row["max_weight"]) ? "bg-red" : "")?>"><?=$row["weight2"]?></span>
+				<span class="<?=(($row["weight3"] < $row["min_weight"] or $row["weight3"] > $row["max_weight"]) ? "bg-red" : "")?>"><?=$row["weight3"]?></span>
 			</td>
 			<td  style="position: relative;" <?=($row["b_amount"] < 0 ? "class='error'" : "")?>><?=$row["b_amount"]?><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["b_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td><?=$row["b_not_spill"]?></td>
@@ -286,6 +291,20 @@ this.subbut.value='Подождите, пожалуйста!';">
 							}
 							?>
 						</select>
+						<br>
+						<select name="sOP_ID" style="width: 80px;">
+							<option value=""></option>
+							<?
+							$query = "
+								SELECT OP.OP_ID, OP.name
+								FROM Operator OP
+							";
+							$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+							while( $row = mysqli_fetch_array($res) ) {
+								echo "<option value='{$row["OP_ID"]}'>{$row["name"]}</option>";
+							}
+							?>
+						</select>
 					</td>
 				</tr>
 				<tr>
@@ -304,7 +323,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<td>Упаковка</td>
 					<td><input type="date" name="boxing_date" required></td>
 					<td><input type="time" name="boxing_time" required></td>
-					<td colspan="2"><input type="number" name="weight1" min="0" style="width: 70px; font-size: 1em;" required><input type="number" name="weight2" min="0" style="width: 70px; font-size: 1em;" required><input type="number" name="weight3" min="0" style="width: 70px; font-size: 1em;" required></td>
+					<td colspan="2"><input type="number" name="weight1" min="5000" max="20000" style="width: 70px; font-size: 1em;" required><input type="number" name="weight2" min="5000" max="20000" style="width: 70px; font-size: 1em;" required><input type="number" name="weight3" min="5000" max="20000" style="width: 70px; font-size: 1em;" required></td>
 					<td class="b_amount" style="font-size: 1.2em"></td>
 					<td><input type="number" name="b_not_spill" class="b_defect" min="0" style="width: 50px;"></td>
 					<td><input type="number" name="b_crack" class="b_defect" min="0" style="width: 50px;"></td>
@@ -411,8 +430,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 				// Кол-во годных деталей и максимальный предел
 				$('#route_sheet_form input[name="amount"]').val(route_sheet_data['amount']);
 				$('#route_sheet_form input[name="amount"]').attr("max", route_sheet_data['in_cassette']);
-				// Оператор
+				// Оператор + помошник
 				$('#route_sheet_form select[name="OP_ID"]').val(route_sheet_data['OP_ID']);
+				$('#route_sheet_form select[name="sOP_ID"]').val(route_sheet_data['sOP_ID']);
 
 				// Дата/время расформовки
 				$('#route_sheet_form input[name="decoupling_date"]').val(route_sheet_data['decoupling_date']);

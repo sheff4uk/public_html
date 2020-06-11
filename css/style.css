@@ -94,7 +94,7 @@ a:hover .code {
 }
 
 .error {
-	background: lightcoral !important;
+	background: red !important;
 }
 
 .txtright {
@@ -286,7 +286,7 @@ input[type="checkbox"].nightshift + label {
 }
 
 .bg-red {
-	background-color: lightcoral;
+	background-color: red;
 /*	box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);*/
 	border-radius: 20%;
 }
