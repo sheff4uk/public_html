@@ -182,7 +182,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td></td>
 			<td><?=$row["batch"]?></td>
 			<td><?=$row["cassette"]?></td>
-			<td style="position: relative;"><?=$row["amount"]?><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
+			<td style="position: relative;"><b><?=$row["amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td colspan="4" style="background-color: #333;"></td>
 			<td><?=$row["OPname"]?><br><span style="font-size: .9em;"><?=$row["sOPname"]?></span></td>
 			<td rowspan="3"><a href="#" class="add_route_sheet" RS_ID="<?=$row["RS_ID"]?>" title="Изменить маршрутный лист"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
@@ -193,7 +193,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["decoupling_time"]?></td>
 			<td <?=($row["interval1"] < 24 ? "class='error'" : "")?>><?=$row["interval1"]?></td>
 			<td colspan="2" id="weight" style="border-top: 2px solid #333; border-left: 2px solid #333; border-right: 2px solid #333;">Вес противовеса <span class="nowrap"><?=$row["min_weight"]?> - <?=$row["max_weight"]?></span> г</td>
-			<td  style="position: relative;" <?=($row["d_amount"] < 0 ? "class='error'" : "")?>><?=$row["d_amount"]?><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["d_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
+			<td style="position: relative;" <?=($row["d_amount"] < 0 ? "class='error'" : "")?>><b><?=$row["d_amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["d_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td><?=$row["d_not_spill"]?></td>
 			<td><?=$row["d_crack"]?></td>
 			<td><?=$row["d_chipped"]?></td>
@@ -210,7 +210,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<span class="<?=(($row["weight2"] < $row["min_weight"] or $row["weight2"] > $row["max_weight"]) ? "bg-red" : "")?>"><?=$row["weight2"]?></span>
 				<span class="<?=(($row["weight3"] < $row["min_weight"] or $row["weight3"] > $row["max_weight"]) ? "bg-red" : "")?>"><?=$row["weight3"]?></span>
 			</td>
-			<td  style="position: relative;" <?=($row["b_amount"] < 0 ? "class='error'" : "")?>><?=$row["b_amount"]?><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["b_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
+			<td  style="position: relative;" <?=($row["b_amount"] < 0 ? "class='error'" : "")?>><b><?=$row["b_amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["b_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td><?=$row["b_not_spill"]?></td>
 			<td><?=$row["b_crack"]?></td>
 			<td><?=$row["b_chipped"]?></td>
