@@ -11,7 +11,7 @@ include "./forms/route_sheet_form.php";
 			<th>Противовес</th>
 			<th>Операция</th>
 			<th>Дата</th>
-			<th>Время</th>
+			<th>Время (смена)</th>
 			<th><i class="far fa-lg fa-hourglass" title="Интервал в часах с моента заливки."></i></th>
 			<th>№ замеса</th>
 			<th>№ кассеты</th>
@@ -36,23 +36,26 @@ $query = "
 
 		,DATE_FORMAT(RS.filling_date, '%d.%m.%y') filling_date
 		,DATE_FORMAT(RS.filling_date, '%H:%i') filling_time
+		,RS.filling_shift
 		,RS.batch
 		,RS.cassette
 		,RS.amount
 		,OP.name OPname
 		,sOP.name sOPname
 
-		,DATE_FORMAT(RS.decoupling_date, '%d.%m.%y') decoupling_date
-		,DATE_FORMAT(RS.decoupling_date, '%H:%i') decoupling_time
-		,RS.d_amount
-		,RS.d_not_spill
-		,RS.d_crack
-		,RS.d_chipped
-		,RS.d_def_form
-		,RS.d_post
+		,DATE_FORMAT(RS.opening_date, '%d.%m.%y') opening_date
+		,DATE_FORMAT(RS.opening_date, '%H:%i') opening_time
+		,RS.opening_shift
+		,RS.o_amount
+		,RS.o_not_spill
+		,RS.o_crack
+		,RS.o_chipped
+		,RS.o_def_form
+		,RS.o_post
 
 		,DATE_FORMAT(RS.boxing_date, '%d.%m.%y') boxing_date
 		,DATE_FORMAT(RS.boxing_date, '%H:%i') boxing_time
+		,RS.boxing_shift
 		,RS.weight1
 		,RS.weight2
 		,RS.weight3
@@ -78,7 +81,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td rowspan="3"><span style="font-size: 1.5em; font-weight: bold;"><?=$row["item"]?></span><p class="nowrap" id="<?=$row["RS_ID"]?>">id: <b><?=$row["RS_ID"]?></b></p></td>
 			<td>Заливка</td>
 			<td><?=$row["filling_date"]?></td>
-			<td><?=$row["filling_time"]?></td>
+			<td><?=$row["filling_time"]?> (<?=$row["filling_shift"]?>)</td>
 			<td></td>
 			<td><?=$row["batch"]?></td>
 			<td><?=$row["cassette"]?></td>
@@ -89,21 +92,21 @@ while( $row = mysqli_fetch_array($res) ) {
 		</tr>
 		<tr>
 			<td>Расформовка</td>
-			<td><?=$row["decoupling_date"]?></td>
-			<td><?=$row["decoupling_time"]?></td>
+			<td><?=$row["opening_date"]?></td>
+			<td><?=$row["opening_time"]?> (<?=$row["opening_shift"]?>)</td>
 			<td <?=($row["interval1"] < 24 ? "class='error'" : "")?>><?=$row["interval1"]?></td>
 			<td colspan="2" id="weight" style="border-top: 2px solid #333; border-left: 2px solid #333; border-right: 2px solid #333;">Вес <span class="nowrap"><?=$row["min_weight"]?> - <?=$row["max_weight"]?></span> г</td>
-			<td style="position: relative;" <?=($row["d_amount"] < 0 ? "class='error'" : "")?>><b><?=$row["d_amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["d_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
-			<td><?=$row["d_not_spill"]?></td>
-			<td><?=$row["d_crack"]?></td>
-			<td><?=$row["d_chipped"]?></td>
-			<td><?=$row["d_def_form"]?></td>
-			<td><?=$row["d_post"]?></td>
+			<td style="position: relative;" <?=($row["o_amount"] < 0 ? "class='error'" : "")?>><b><?=$row["o_amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["o_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
+			<td><?=$row["o_not_spill"]?></td>
+			<td><?=$row["o_crack"]?></td>
+			<td><?=$row["o_chipped"]?></td>
+			<td><?=$row["o_def_form"]?></td>
+			<td><?=$row["o_post"]?></td>
 		</tr>
 		<tr>
 			<td>Упаковка</td>
 			<td><?=$row["boxing_date"]?></td>
-			<td><?=$row["boxing_time"]?></td>
+			<td><?=$row["boxing_time"]?> (<?=$row["boxing_shift"]?>)</td>
 			<td <?=($row["interval2"] < 120 ? "class='error'" : "")?>><?=$row["interval2"]?></td>
 			<td colspan="2" class="nowrap" style="border-left: 2px solid #333; border-right: 2px solid #333;">
 				<span class="<?=(($row["weight1"] < $row["min_weight"] or $row["weight1"] > $row["max_weight"]) ? "bg-red" : "")?>"><?=$row["weight1"]?></span>&nbsp;&nbsp;

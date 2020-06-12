@@ -12,12 +12,12 @@ if( isset($_POST["CW_ID"]) ) {
 	$OP_ID = $_POST["OP_ID"];
 	$sOP_ID = $_POST["sOP_ID"] ? $_POST["sOP_ID"] : "NULL";
 
-	$decoupling_date = "{$_POST["decoupling_date"]} {$_POST["decoupling_time"]}";
-	$d_not_spill = $_POST["d_not_spill"] ? $_POST["d_not_spill"] : "NULL";
-	$d_crack = $_POST["d_crack"] ? $_POST["d_crack"] : "NULL";
-	$d_chipped = $_POST["d_chipped"] ? $_POST["d_chipped"] : "NULL";
-	$d_def_form = $_POST["d_def_form"] ? $_POST["d_def_form"] : "NULL";
-	$d_post = $_POST["d_post"] ? $_POST["d_post"] : "NULL";
+	$opening_date = "{$_POST["opening_date"]} {$_POST["opening_time"]}";
+	$o_not_spill = $_POST["o_not_spill"] ? $_POST["o_not_spill"] : "NULL";
+	$o_crack = $_POST["o_crack"] ? $_POST["o_crack"] : "NULL";
+	$o_chipped = $_POST["o_chipped"] ? $_POST["o_chipped"] : "NULL";
+	$o_def_form = $_POST["o_def_form"] ? $_POST["o_def_form"] : "NULL";
+	$o_post = $_POST["o_post"] ? $_POST["o_post"] : "NULL";
 
 	$boxing_date = "{$_POST["boxing_date"]} {$_POST["boxing_time"]}";
 	$weight1 = $_POST["weight1"];
@@ -42,12 +42,12 @@ if( isset($_POST["CW_ID"]) ) {
 				,OP_ID = {$OP_ID}
 				,sOP_ID = {$sOP_ID}
 
-				,decoupling_date = '{$decoupling_date}'
-				,d_not_spill = {$d_not_spill}
-				,d_crack = {$d_crack}
-				,d_chipped = {$d_chipped}
-				,d_def_form = {$d_def_form}
-				,d_post = {$d_post}
+				,opening_date = '{$opening_date}'
+				,o_not_spill = {$o_not_spill}
+				,o_crack = {$o_crack}
+				,o_chipped = {$o_chipped}
+				,o_def_form = {$o_def_form}
+				,o_post = {$o_post}
 
 				,boxing_date = '{$boxing_date}'
 				,weight1 = {$weight1}
@@ -76,12 +76,12 @@ if( isset($_POST["CW_ID"]) ) {
 				,OP_ID = {$OP_ID}
 				,sOP_ID = {$sOP_ID}
 
-				,decoupling_date = '{$decoupling_date}'
-				,d_not_spill = {$d_not_spill}
-				,d_crack = {$d_crack}
-				,d_chipped = {$d_chipped}
-				,d_def_form = {$d_def_form}
-				,d_post = {$d_post}
+				,opening_date = '{$opening_date}'
+				,o_not_spill = {$o_not_spill}
+				,o_crack = {$o_crack}
+				,o_chipped = {$o_chipped}
+				,o_def_form = {$o_def_form}
+				,o_post = {$o_post}
 
 				,boxing_date = '{$boxing_date}'
 				,weight1 = {$weight1}
@@ -186,15 +186,15 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</tr>
 				<tr>
 					<td>Расформовка</td>
-					<td><input type="date" name="decoupling_date" required></td>
-					<td><input type="time" name="decoupling_time" required></td>
+					<td><input type="date" name="opening_date" required></td>
+					<td><input type="time" name="opening_time" required></td>
 					<td colspan="2" class="weight">Вес противовеса <b class="nowrap"></b> г</td>
-					<td class="d_amount" style="font-size: 1.2em"></td>
-					<td><input type="number" name="d_not_spill" class="d_defect" min="0" style="width: 50px;"></td>
-					<td><input type="number" name="d_crack" class="d_defect" min="0" style="width: 50px;"></td>
-					<td><input type="number" name="d_chipped" class="d_defect" min="0" style="width: 50px;"></td>
-					<td><input type="number" name="d_def_form" class="d_defect" min="0" style="width: 50px;"></td>
-					<td><input type="number" name="d_post" min="1" style="width: 50px;"></td>
+					<td class="o_amount" style="font-size: 1.2em"></td>
+					<td><input type="number" name="o_not_spill" class="o_defect" min="0" style="width: 50px;"></td>
+					<td><input type="number" name="o_crack" class="o_defect" min="0" style="width: 50px;"></td>
+					<td><input type="number" name="o_chipped" class="o_defect" min="0" style="width: 50px;"></td>
+					<td><input type="number" name="o_def_form" class="o_defect" min="0" style="width: 50px;"></td>
+					<td><input type="number" name="o_post" min="1" style="width: 50px;"></td>
 				</tr>
 				<tr>
 					<td>Упаковка</td>
@@ -222,41 +222,41 @@ this.subbut.value='Подождите, пожалуйста!';">
 	$(function() {
 		// Ограничения по выбору отрицательных дат
 		$('#route_sheet_form input[name="filling_date"]').change(function() {
-			$('#route_sheet_form input[name="decoupling_date"]').attr("min", $(this).val());
+			$('#route_sheet_form input[name="opening_date"]').attr("min", $(this).val());
 		});
-		$('#route_sheet_form input[name="decoupling_date"]').change(function() {
+		$('#route_sheet_form input[name="opening_date"]').change(function() {
 			$('#route_sheet_form input[name="boxing_date"]').attr("min", $(this).val());
 		});
 
 		// Пересчет числа годных детелей при изменениях данных по браку
 		$('#route_sheet_form input[name="amount"]').change(function() {
-			var d_amount = $('#route_sheet_form input[name="amount"]').val();
-			$('#route_sheet_form .d_defect').each(function() {
-				d_amount = d_amount - $(this).val();
+			var o_amount = $('#route_sheet_form input[name="amount"]').val();
+			$('#route_sheet_form .o_defect').each(function() {
+				o_amount = o_amount - $(this).val();
 			});
 
-			var b_amount = d_amount;
+			var b_amount = o_amount;
 			$('#route_sheet_form .b_defect').each(function() {
 				b_amount = b_amount - $(this).val();
 			});
-			$('#route_sheet_form .d_amount').text(d_amount).effect( 'highlight', {color: 'red'}, 200 );
+			$('#route_sheet_form .o_amount').text(o_amount).effect( 'highlight', {color: 'red'}, 200 );
 			$('#route_sheet_form .b_amount').text(b_amount).effect( 'highlight', {color: 'red'}, 200 );
 		});
-		$('#route_sheet_form .d_defect').change(function() {
-			var d_amount = $('#route_sheet_form input[name="amount"]').val();
-			$('#route_sheet_form .d_defect').each(function() {
-				d_amount = d_amount - $(this).val();
+		$('#route_sheet_form .o_defect').change(function() {
+			var o_amount = $('#route_sheet_form input[name="amount"]').val();
+			$('#route_sheet_form .o_defect').each(function() {
+				o_amount = o_amount - $(this).val();
 			});
 
-			var b_amount = d_amount;
+			var b_amount = o_amount;
 			$('#route_sheet_form .b_defect').each(function() {
 				b_amount = b_amount - $(this).val();
 			});
-			$('#route_sheet_form .d_amount').text(d_amount).effect( 'highlight', {color: 'red'}, 200 );
+			$('#route_sheet_form .o_amount').text(o_amount).effect( 'highlight', {color: 'red'}, 200 );
 			$('#route_sheet_form .b_amount').text(b_amount).effect( 'highlight', {color: 'red'}, 200 );
 		});
 		$('#route_sheet_form .b_defect').change(function() {
-			var b_amount = $('#route_sheet_form .d_amount').text();
+			var b_amount = $('#route_sheet_form .o_amount').text();
 			$('#route_sheet_form .b_defect').each(function() {
 				b_amount = b_amount - $(this).val();
 			});
@@ -328,19 +328,19 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#route_sheet_form select[name="sOP_ID"]').val(route_sheet_data['sOP_ID']);
 
 				// Дата/время расформовки
-				$('#route_sheet_form input[name="decoupling_date"]').val(route_sheet_data['decoupling_date']).change();
-				$('#route_sheet_form input[name="decoupling_time"]').val(route_sheet_data['decoupling_time']);
+				$('#route_sheet_form input[name="opening_date"]').val(route_sheet_data['opening_date']).change();
+				$('#route_sheet_form input[name="opening_time"]').val(route_sheet_data['opening_time']);
 				// Допустимые границы веса
 				$('#route_sheet_form .weight b').text(route_sheet_data['min_weight'] + ' - ' + route_sheet_data['max_weight']);
 				// Кол-во годных деталей
-				$('#route_sheet_form .d_amount').text(route_sheet_data['d_amount']);
+				$('#route_sheet_form .o_amount').text(route_sheet_data['o_amount']);
 				// Дефекты расформовки
-				$('#route_sheet_form input[name="d_not_spill"]').val(route_sheet_data['d_not_spill']);
-				$('#route_sheet_form input[name="d_crack"]').val(route_sheet_data['d_crack']);
-				$('#route_sheet_form input[name="d_chipped"]').val(route_sheet_data['d_chipped']);
-				$('#route_sheet_form input[name="d_def_form"]').val(route_sheet_data['d_def_form']);
+				$('#route_sheet_form input[name="o_not_spill"]').val(route_sheet_data['o_not_spill']);
+				$('#route_sheet_form input[name="o_crack"]').val(route_sheet_data['o_crack']);
+				$('#route_sheet_form input[name="o_chipped"]').val(route_sheet_data['o_chipped']);
+				$('#route_sheet_form input[name="o_def_form"]').val(route_sheet_data['o_def_form']);
 				// № поста
-				$('#route_sheet_form input[name="d_post"]').val(route_sheet_data['d_post']);
+				$('#route_sheet_form input[name="o_post"]').val(route_sheet_data['o_post']);
 
 				// Дата/время упаковки
 				$('#route_sheet_form input[name="boxing_date"]').val(route_sheet_data['boxing_date']);
@@ -364,7 +364,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#route_sheet_form input[name="RS_ID"]').val('');
 				$('#route_sheet_form select[name="CW_ID"]').val('');
 				$('#route_sheet_form .weight b').text('');
-				$('#route_sheet_form .d_amount').text('');
+				$('#route_sheet_form .o_amount').text('');
 				$('#route_sheet_form .b_amount').text('');
 				$('#route_sheet_form table input').val('');
 				$('#route_sheet_form table select').val('');
