@@ -72,7 +72,8 @@ $query = "
 	JOIN CounterWeight CW ON CW.CW_ID = RS.CW_ID
 	JOIN Operator OP ON OP.OP_ID = RS.OP_ID
 	LEFT JOIN Operator sOP ON sOP.OP_ID = RS.sOP_ID
-	ORDER BY RS.RS_ID DESC
+	#ORDER BY RS.RS_ID DESC
+	ORDER BY RS.filling_date DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
