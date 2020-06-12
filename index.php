@@ -91,7 +91,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Расформовка</td>
 			<td><?=$row["decoupling_date"]?></td>
 			<td><?=$row["decoupling_time"]?></td>
-			<td <?=($row["interval1"] < 24 ? "style='color: red;'" : "")?>><?=$row["interval1"]?></td>
+			<td <?=($row["interval1"] < 24 ? "class='error'" : "")?>><?=$row["interval1"]?></td>
 			<td colspan="2" id="weight" style="border-top: 2px solid #333; border-left: 2px solid #333; border-right: 2px solid #333;">Вес <span class="nowrap"><?=$row["min_weight"]?> - <?=$row["max_weight"]?></span> г</td>
 			<td style="position: relative;" <?=($row["d_amount"] < 0 ? "class='error'" : "")?>><b><?=$row["d_amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["d_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td><?=$row["d_not_spill"]?></td>
@@ -104,11 +104,11 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Упаковка</td>
 			<td><?=$row["boxing_date"]?></td>
 			<td><?=$row["boxing_time"]?></td>
-			<td <?=($row["interval2"] < 120 ? "style='color: red;'" : "")?>><?=$row["interval2"]?></td>
+			<td <?=($row["interval2"] < 120 ? "class='error'" : "")?>><?=$row["interval2"]?></td>
 			<td colspan="2" class="nowrap" style="border-left: 2px solid #333; border-right: 2px solid #333;">
-				<span style="<?=(($row["weight1"] < $row["min_weight"] or $row["weight1"] > $row["max_weight"]) ? "color: red;" : "")?>"><?=$row["weight1"]?></span>&nbsp;&nbsp;
-				<span style="<?=(($row["weight2"] < $row["min_weight"] or $row["weight2"] > $row["max_weight"]) ? "color: red;" : "")?>"><?=$row["weight2"]?></span>&nbsp;&nbsp;
-				<span style="<?=(($row["weight3"] < $row["min_weight"] or $row["weight3"] > $row["max_weight"]) ? "color: red;" : "")?>"><?=$row["weight3"]?></span>
+				<span class="<?=(($row["weight1"] < $row["min_weight"] or $row["weight1"] > $row["max_weight"]) ? "bg-red" : "")?>"><?=$row["weight1"]?></span>&nbsp;&nbsp;
+				<span class="<?=(($row["weight2"] < $row["min_weight"] or $row["weight2"] > $row["max_weight"]) ? "bg-red" : "")?>"><?=$row["weight2"]?></span>&nbsp;&nbsp;
+				<span class="<?=(($row["weight3"] < $row["min_weight"] or $row["weight3"] > $row["max_weight"]) ? "bg-red" : "")?>"><?=$row["weight3"]?></span>
 			</td>
 			<td  style="position: relative;" <?=($row["b_amount"] < 0 ? "class='error'" : "")?>><b><?=$row["b_amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["b_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td><?=$row["b_not_spill"]?></td>
