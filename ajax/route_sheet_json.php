@@ -1,5 +1,5 @@
 <?
-include "../config.php";
+include_once "../checkrights.php";
 
 $RS_ID = $_GET["RS_ID"];
 
