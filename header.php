@@ -192,11 +192,9 @@ function src_url($src) {
 			<a class="navbar-brand" href="/" title="На главную" style="position: relative;"><?=$company_name?></a>
 		</div>
 <?
-	if( empty($_SESSION['id']) ) {
-		//$menu = array ("Вход" => "login.php", "Регистрация" => "reg.php");
-		$menu = array ();
-	}
-	else {
+	if( !empty($_SESSION['id']) ) {
+		$menu["Чек-лист замеса"] = "batch_checklist.php";
+		$menu["Маршрутный лист"] = "route_sheet.php";
 		$menu["Выход {$USR_Icon}"] = "exit.php";
 	}
 

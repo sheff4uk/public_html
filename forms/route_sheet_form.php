@@ -3,6 +3,8 @@ include_once "../config.php";
 
 // Сохранение/редактирование маршрутного листа
 if( isset($_POST["CW_ID"]) ) {
+	session_start();
+
 	$CW_ID = $_POST["CW_ID"];
 
 	$filling_date = "{$_POST["filling_date"]} {$_POST["filling_time"]}";
@@ -60,7 +62,9 @@ if( isset($_POST["CW_ID"]) ) {
 				,b_post = {$b_post}
 			WHERE RS_ID = {$_POST["RS_ID"]}
 		";
-		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		if( !mysqli_query( $mysqli, $query ) ) {
+			$_SESSION["error"][] = "Ошибка в запросе: ".mysqli_error( $mysqli );
+		}
 		$RS_ID = $_POST["RS_ID"];
 	}
 	// Сохраняем новый маршрутный лист
@@ -93,12 +97,14 @@ if( isset($_POST["CW_ID"]) ) {
 				,b_def_form = {$b_def_form}
 				,b_post = {$b_post}
 		";
-		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		if( !mysqli_query( $mysqli, $query ) ) {
+			$_SESSION["error"][] = "Ошибка в запросе: ".mysqli_error( $mysqli );
+		}
 		$RS_ID = mysqli_insert_id( $mysqli );
 	}
 
 	// Перенаправление в журнал маршрутных листов
-	exit ('<meta http-equiv="refresh" content="0; url=/#'.$RS_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/route_sheet.php#'.$RS_ID.'">');
 }
 ///////////////////////////////////////////////////////
 ?>
