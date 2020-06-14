@@ -5,7 +5,7 @@ include "./forms/batch_checklist_form.php";
 
 // Вывод чеклистов замеса
 ?>
-<table>
+<table style="width: 100%;">
 	<thead>
 		<tr>
 			<th>Дата</th>

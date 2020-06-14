@@ -12,11 +12,14 @@ function src_url($src) {
 
 ?>
 <!DOCTYPE html>
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html>
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?=$title?></title>
 <!--	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css">-->
 	<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?v=1">
-	<link rel='stylesheet' type='text/css' href='css/style.css?v=2'>
+	<link rel='stylesheet' type='text/css' href='css/style.css?v=3'>
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 <!--	<link rel='stylesheet' type='text/css' href='css/font-awesome.min.css'>-->
 	<link rel='stylesheet' type='text/css' href='css/buttons.css'>
@@ -47,16 +50,6 @@ function src_url($src) {
 
 	<script>
 		$(document).ready(function(){
-			$('.aside-nav-control').click(function() {
-				$('.aside-nav').addClass('opened');
-				$('body').css('overflow', 'hidden');
-			});
-
-			$('.aside-nav .close_btn').click(function() {
-				$('.aside-nav').removeClass('opened');
-				$('body').css('overflow', '');
-			});
-
 			$('#body_wraper').fadeIn('slow');
 			$('#loading').hide();
 
@@ -185,10 +178,8 @@ function src_url($src) {
 
 	<!-- NAVBAR -->
 	<nav class="navbar">
+		<div class="page">
 		<div class="navbar-header" id="main">
-			<div class="aside-nav-control navbar-brand">
-				<i class="fa fa-bars fa-lg"></i>
-			</div>
 			<a class="navbar-brand" href="/" title="На главную" style="position: relative;"><?=$company_name?></a>
 		</div>
 <?
@@ -228,20 +219,14 @@ function src_url($src) {
 	echo "<ul class='navbar-nav'>";
 	echo $nav_buttons;
 	echo "</ul>";
-	echo "</nav>";
-
-	echo "<div class='aside-nav'>";
-	echo "<div class='close_btn'><i class='fa fa-times fa-2x'></i></div>";
-	echo "<ul>";
-	echo $nav_buttons;
-	echo "</ul>";
 	echo "</div>";
+	echo "</nav>";
 	// END NAVBAR
 
 	$MONTHS = array(1=>'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь');
 	$MONTHS_DATE = array(1=>'янв.', 'февр.', 'мар.', 'апр.', 'мая', 'июня', 'июля', 'авг.', 'сент.', 'окт.', 'нояб.', 'дек.');
 ?>
-	<div id="body_wraper" style="display: none;">
+	<div id="body_wraper" style="display: none;" class="page">
 
 <script>
 	$(function() {

@@ -2,10 +2,25 @@
 include "config.php";
 include "header.php";
 include "./forms/route_sheet_form.php";
-
-// Вывод маршрутных листов
 ?>
-<table>
+
+<!--Фильтр-->
+<div id="filter">
+	<h3>Фильтр</h3>
+	<p>В разработке.</p>
+</div>
+<script>
+	$(document).ready(function() {
+		$( "#filter" ).accordion({
+			active: false,
+			collapsible: true,
+			heightStyle: "content"
+		});
+	});
+</script>
+
+<!--Вывод маршрутных листов-->
+<table style="width: 100%;">
 	<thead>
 		<tr>
 			<th>Противовес</th>
