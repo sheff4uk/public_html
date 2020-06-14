@@ -121,7 +121,8 @@ if( isset($_POST["CW_ID"]) ) {
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 		<input type="hidden" name="RS_ID">
-		<label for="CW">Код противовеса:</label>
+
+		Код противовеса:
 		<select name="CW_ID" style="font-size: 2em;" required>
 			<option value=""></option>
 			<?
@@ -135,6 +136,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			}
 			?>
 		</select>
+
 		<table>
 			<thead>
 				<tr>

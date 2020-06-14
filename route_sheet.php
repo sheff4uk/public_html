@@ -7,7 +7,47 @@ include "./forms/route_sheet_form.php";
 <!--Фильтр-->
 <div id="filter">
 	<h3>Фильтр</h3>
-	<p>В разработке.</p>
+	<form method="get" style="position: relative;">
+		<a href="/route_sheet.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+		id: <input name="RS_ID" type="number" min="1" value="<?=$_GET["RS_ID"]?>">
+		<br>
+
+		Код противовеса:
+		<select name="CW_ID">
+			<option value=""></option>
+			<?
+			$query = "
+				SELECT CW.CW_ID, CW.item, CW.min_weight, CW.max_weight, CW.in_cassette
+				FROM CounterWeight CW
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $row = mysqli_fetch_array($res) ) {
+				$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
+				echo "<option value='{$row["CW_ID"]}' in_cassette='{$row["in_cassette"]}' min_weight='{$row["min_weight"]}' max_weight='{$row["max_weight"]}' {$selected}>{$row["item"]}</option>";
+			}
+			?>
+		</select>
+		<br>
+
+		№ замеса: <input name="batch" type="number" min="1" value="<?=$_GET["batch"]?>">
+		<br>
+
+		№ кассеты: <input name="cassette" type="number" min="1" max="200" value="<?=$_GET["cassette"]?>">
+		<br>
+
+		Дата заливки между:
+			<input name="filling_date_from" type="date" value="<?=$_GET["filling_date_from"]?>">
+			<input name="filling_date_to" type="date" value="<?=$_GET["filling_date_to"]?>">
+			№ смены: <select name="filling_shift">
+				<option value=""></option>
+				<option value="3" <?=($_GET["filling_shift"] == 3? "selected" : "")?>>3</option>
+				<option value="1" <?=($_GET["filling_shift"] == 1? "selected" : "")?>>1</option>
+				<option value="2" <?=($_GET["filling_shift"] == 2 ?"selected" : "")?>>2</option>
+			</select>
+		<br>
+
+		<button>Фильтр</button>
+	</form>
 </div>
 <script>
 	$(document).ready(function() {
@@ -87,7 +127,14 @@ $query = "
 	JOIN CounterWeight CW ON CW.CW_ID = RS.CW_ID
 	JOIN Operator OP ON OP.OP_ID = RS.OP_ID
 	LEFT JOIN Operator sOP ON sOP.OP_ID = RS.sOP_ID
-	#ORDER BY RS.RS_ID DESC
+	WHERE 1
+		".($_GET["RS_ID"] ? "AND RS.RS_ID={$_GET["RS_ID"]}" : "")."
+		".($_GET["CW_ID"] ? "AND RS.CW_ID={$_GET["CW_ID"]}" : "")."
+		".($_GET["filling_date_from"] ? "AND DATE(RS.filling_date) >= '{$_GET["filling_date_from"]}'" : "")."
+		".($_GET["filling_date_to"] ? "AND DATE(RS.filling_date) <= '{$_GET["filling_date_to"]}'" : "")."
+		".($_GET["filling_shift"] ? "AND RS.filling_shift = {$_GET["filling_shift"]}" : "")."
+		".($_GET["batch"] ? "AND RS.batch = {$_GET["batch"]}" : "")."
+		".($_GET["cassette"] ? "AND RS.cassette = {$_GET["cassette"]}" : "")."
 	ORDER BY RS.filling_date DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -113,10 +160,10 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td <?=($row["interval1"] < 24 ? "class='error'" : "")?>><?=$row["interval1"]?></td>
 			<td colspan="2" id="weight" style="border-top: 2px solid #333; border-left: 2px solid #333; border-right: 2px solid #333;">Вес <span class="nowrap"><?=$row["min_weight"]?> - <?=$row["max_weight"]?></span> г</td>
 			<td style="position: relative;" <?=($row["o_amount"] < 0 ? "class='error'" : "")?>><b><?=$row["o_amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["o_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
-			<td><?=$row["o_not_spill"]?></td>
-			<td><?=$row["o_crack"]?></td>
-			<td><?=$row["o_chipped"]?></td>
-			<td><?=$row["o_def_form"]?></td>
+			<td style="color: red;"><?=$row["o_not_spill"]?></td>
+			<td style="color: red;"><?=$row["o_crack"]?></td>
+			<td style="color: red;"><?=$row["o_chipped"]?></td>
+			<td style="color: red;"><?=$row["o_def_form"]?></td>
 			<td><?=$row["o_post"]?></td>
 		</tr>
 		<tr>
@@ -130,10 +177,10 @@ while( $row = mysqli_fetch_array($res) ) {
 				<span class="<?=(($row["weight3"] < $row["min_weight"] or $row["weight3"] > $row["max_weight"]) ? "bg-red" : "")?>"><?=$row["weight3"]?></span>
 			</td>
 			<td  style="position: relative;" <?=($row["b_amount"] < 0 ? "class='error'" : "")?>><b><?=$row["b_amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["b_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
-			<td><?=$row["b_not_spill"]?></td>
-			<td><?=$row["b_crack"]?></td>
-			<td><?=$row["b_chipped"]?></td>
-			<td><?=$row["b_def_form"]?></td>
+			<td style="color: red;"><?=$row["b_not_spill"]?></td>
+			<td style="color: red;"><?=$row["b_crack"]?></td>
+			<td style="color: red;"><?=$row["b_chipped"]?></td>
+			<td style="color: red;"><?=$row["b_def_form"]?></td>
 			<td><?=$row["b_post"]?></td>
 		</tr>
 	<?
