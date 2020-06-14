@@ -35,6 +35,23 @@ include "./forms/route_sheet_form.php";
 		№ кассеты: <input name="cassette" type="number" min="1" max="200" value="<?=$_GET["cassette"]?>">
 		<br>
 
+		Оператор или помошник:
+		<select name="OP_ID">
+			<option value=""></option>
+			<?
+			$query = "
+				SELECT OP.OP_ID, OP.name
+				FROM Operator OP
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $row = mysqli_fetch_array($res) ) {
+				$selected = ($row["OP_ID"] == $_GET["OP_ID"]) ? "selected" : "";
+				echo "<option value='{$row["OP_ID"]}' {$selected}>{$row["name"]}</option>";
+			}
+			?>
+		</select>
+		<br>
+
 		Дата заливки между:
 			<input name="filling_date_from" type="date" value="<?=$_GET["filling_date_from"]?>">
 			<input name="filling_date_to" type="date" value="<?=$_GET["filling_date_to"]?>">
@@ -130,11 +147,12 @@ $query = "
 	WHERE 1
 		".($_GET["RS_ID"] ? "AND RS.RS_ID={$_GET["RS_ID"]}" : "")."
 		".($_GET["CW_ID"] ? "AND RS.CW_ID={$_GET["CW_ID"]}" : "")."
+		".($_GET["batch"] ? "AND RS.batch = {$_GET["batch"]}" : "")."
+		".($_GET["cassette"] ? "AND RS.cassette = {$_GET["cassette"]}" : "")."
+		".($_GET["OP_ID"] ? "AND (RS.OP_ID = {$_GET["OP_ID"]} OR RS.sOP_ID = {$_GET["OP_ID"]})" : "")."
 		".($_GET["filling_date_from"] ? "AND DATE(RS.filling_date) >= '{$_GET["filling_date_from"]}'" : "")."
 		".($_GET["filling_date_to"] ? "AND DATE(RS.filling_date) <= '{$_GET["filling_date_to"]}'" : "")."
 		".($_GET["filling_shift"] ? "AND RS.filling_shift = {$_GET["filling_shift"]}" : "")."
-		".($_GET["batch"] ? "AND RS.batch = {$_GET["batch"]}" : "")."
-		".($_GET["cassette"] ? "AND RS.cassette = {$_GET["cassette"]}" : "")."
 	ORDER BY RS.filling_date DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
