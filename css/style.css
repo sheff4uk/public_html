@@ -48,6 +48,7 @@ body, td {
 }
 
 input[type="date"] { width: 145px; }
+input[type="time"] { width: 80px; }
 
 .date {
 	width: 90px;
