@@ -15,7 +15,6 @@ body {
 	width: 990px;
 	padding: 0 5px;
 	margin: auto;
-	position: relative;
 }
 a {
 	transition: all 0.3s ease-in-out;
