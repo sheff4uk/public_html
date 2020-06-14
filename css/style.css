@@ -47,6 +47,8 @@ body, td {
 	display: none;
 }
 
+input[type="date"] { width: 145px; }
+
 .date {
 	width: 90px;
 	text-align: center;
