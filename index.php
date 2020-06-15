@@ -1,5 +1,6 @@
 <?
 include "config.php";
+$title = 'КИС Константа главная';
 include "header.php";
 ////////////////////////
 echo "<h1>Меню:</h1>";

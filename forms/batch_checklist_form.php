@@ -107,10 +107,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 					</td>
 					<td><input type="number" name="batch_num" min="1" max="50" style="width: 70px;" required></td>
 					<td><input type="number" name="iron_oxide_weight" style="width: 70px;" required></td>
-					<td><input type="number" name="iron_oxide" style="width: 70px;" required></td>
-					<td><input type="number" name="sand" style="width: 70px;" required></td>
-					<td><input type="number" name="cement" style="width: 70px;" required></td>
-					<td><input type="number" name="water" style="width: 70px;" required></td>
+					<td><input type="number" name="iron_oxide" style="width: 70px; background: sandybrown;" required></td>
+					<td><input type="number" name="sand" style="width: 70px; background: palegoldenrod;" required></td>
+					<td><input type="number" name="cement" style="width: 70px; background: darkgrey;" required></td>
+					<td><input type="number" name="water" style="width: 70px; background: lightskyblue;" required></td>
 					<td><input type="number" name="mix_weight" style="width: 70px;" required></td>
 				</tr>
 			</tbody>

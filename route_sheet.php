@@ -1,5 +1,6 @@
 <?
 include "config.php";
+$title = 'Маршрутный лист';
 include "header.php";
 include "./forms/route_sheet_form.php";
 ?>

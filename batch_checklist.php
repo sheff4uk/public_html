@@ -1,5 +1,6 @@
 <?
 include "config.php";
+$title = 'Чек-лист оператора';
 include "header.php";
 include "./forms/batch_checklist_form.php";
 
@@ -46,10 +47,10 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><b><?=$row["item"]?></b></td>
 			<td><?=$row["batch_num"]?></td>
 			<td><?=$row["iron_oxide_weight"]?></td>
-			<td><?=$row["iron_oxide"]?></td>
-			<td><?=$row["sand"]?></td>
-			<td><?=$row["cement"]?></td>
-			<td><?=$row["water"]?></td>
+			<td style="background: sandybrown;"><?=$row["iron_oxide"]?></td>
+			<td style="background: palegoldenrod;"><?=$row["sand"]?></td>
+			<td style="background: darkgrey;"><?=$row["cement"]?></td>
+			<td style="background: lightskyblue;"><?=$row["water"]?></td>
 			<td><?=$row["mix_weight"]?></td>
 			<td><a href="#" class="add_batch_checklist" BC_ID="<?=$row["BC_ID"]?>" title="Изменить данные замеса"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 		</tr>
