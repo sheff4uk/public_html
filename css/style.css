@@ -47,8 +47,8 @@ body, td {
 	display: none;
 }
 
-input[type="date"] { width: 145px; }
-input[type="time"] { width: 80px; }
+input[type="date"] { width: 155px; }
+input[type="time"] { width: 90px; }
 
 .date {
 	width: 90px;
