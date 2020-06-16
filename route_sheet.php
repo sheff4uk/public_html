@@ -58,9 +58,9 @@ include "./forms/route_sheet_form.php";
 			<input name="filling_date_to" type="date" value="<?=$_GET["filling_date_to"]?>">
 			№ смены: <select name="filling_shift">
 				<option value=""></option>
-				<option value="3" <?=($_GET["filling_shift"] == 3? "selected" : "")?>>3</option>
 				<option value="1" <?=($_GET["filling_shift"] == 1? "selected" : "")?>>1</option>
 				<option value="2" <?=($_GET["filling_shift"] == 2 ?"selected" : "")?>>2</option>
+				<option value="3" <?=($_GET["filling_shift"] == 3? "selected" : "")?>>3</option>
 			</select>
 		<br>
 
@@ -113,8 +113,8 @@ $query = "
 		,RS.batch
 		,RS.cassette
 		,RS.amount
-		#,OP.name OPname
-		#,sOP.name sOPname
+		,OP.name OPname
+		,sOP.name sOPname
 
 		,DATE_FORMAT(RS.opening_date, '%d.%m.%y') opening_date
 		,DATE_FORMAT(RS.opening_time, '%H:%i') opening_time
@@ -143,14 +143,15 @@ $query = "
 		,RS.interval2
 	FROM RouteSheet RS
 	JOIN CounterWeight CW ON CW.CW_ID = RS.CW_ID
-	#JOIN Operator OP ON OP.OP_ID = RS.OP_ID
-	#LEFT JOIN Operator sOP ON sOP.OP_ID = RS.sOP_ID
+	LEFT JOIN OperatorChecklist OC ON OC.CW_ID = RS.CW_ID AND OC.batch_date = RS.filling_date AND OC.batch_num = RS.batch
+	LEFT JOIN Operator OP ON OP.OP_ID = OC.OP_ID
+	LEFT JOIN Operator sOP ON sOP.OP_ID = OC.sOP_ID
 	WHERE 1
 		".($_GET["RS_ID"] ? "AND RS.RS_ID={$_GET["RS_ID"]}" : "")."
 		".($_GET["CW_ID"] ? "AND RS.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["batch"] ? "AND RS.batch = {$_GET["batch"]}" : "")."
 		".($_GET["cassette"] ? "AND RS.cassette = {$_GET["cassette"]}" : "")."
-		#".($_GET["OP_ID"] ? "AND (RS.OP_ID = {$_GET["OP_ID"]} OR RS.sOP_ID = {$_GET["OP_ID"]})" : "")."
+		".($_GET["OP_ID"] ? "AND (OC.OP_ID = {$_GET["OP_ID"]} OR OC.sOP_ID = {$_GET["OP_ID"]})" : "")."
 		".($_GET["filling_date_from"] ? "AND RS.filling_date >= '{$_GET["filling_date_from"]}'" : "")."
 		".($_GET["filling_date_to"] ? "AND RS.filling_date <= '{$_GET["filling_date_to"]}'" : "")."
 		".($_GET["filling_shift"] ? "AND RS.filling_shift = {$_GET["filling_shift"]}" : "")."
@@ -165,7 +166,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["filling_date"]?></td>
 			<td><?=$row["filling_time"]?> (<?=$row["filling_shift"]?>)</td>
 			<td></td>
-			<td><?=$row["batch"]?></td>
+			<td><span class="<?=($row["OPname"] ? "" : "bg-red")?>"><?=$row["batch"]?></span></td>
 			<td><?=$row["cassette"]?></td>
 			<td style="position: relative;"><b><?=$row["amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td colspan="4" style="background-color: #333;"></td>
