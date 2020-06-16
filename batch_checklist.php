@@ -18,6 +18,7 @@ include "./forms/batch_checklist_form.php";
 			<th>Цемент</th>
 			<th>Вода</th>
 			<th>Куб смеси</th>
+			<th>Оператор</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -35,8 +36,12 @@ $query = "
 		,BC.cement
 		,BC.water
 		,BC.mix_weight
+		,OP.name OPname
+		,sOP.name sOPname
 	FROM BatchChecklist BC
 	JOIN CounterWeight CW ON CW.CW_ID = BC.CW_ID
+	JOIN Operator OP ON OP.OP_ID = BC.OP_ID
+	LEFT JOIN Operator sOP ON sOP.OP_ID = BC.sOP_ID
 	ORDER BY BC.batch_date DESC, BC.CW_ID, BC.batch_num
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -52,6 +57,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td style="background: darkgrey;"><?=$row["cement"]?></td>
 			<td style="background: lightskyblue;"><?=$row["water"]?></td>
 			<td><?=$row["mix_weight"]?></td>
+			<td><?=$row["OPname"]?><br><span style="font-size: .9em;"><?=$row["sOPname"]?></span></td>
 			<td><a href="#" class="add_batch_checklist" BC_ID="<?=$row["BC_ID"]?>" title="Изменить данные замеса"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 		</tr>
 	<?

@@ -11,8 +11,6 @@ if( isset($_POST["CW_ID"]) ) {
 	$batch = $_POST["batch"];
 	$cassette = $_POST["cassette"];
 	$amount = $_POST["amount"];
-	$OP_ID = $_POST["OP_ID"];
-	$sOP_ID = $_POST["sOP_ID"] ? $_POST["sOP_ID"] : "NULL";
 
 	$opening_date = "{$_POST["opening_date"]} {$_POST["opening_time"]}";
 	$o_not_spill = $_POST["o_not_spill"] ? $_POST["o_not_spill"] : "NULL";
@@ -41,8 +39,6 @@ if( isset($_POST["CW_ID"]) ) {
 				,batch = {$batch}
 				,cassette = {$cassette}
 				,amount = {$amount}
-				,OP_ID = {$OP_ID}
-				,sOP_ID = {$sOP_ID}
 
 				,opening_date = '{$opening_date}'
 				,o_not_spill = {$o_not_spill}
@@ -77,8 +73,6 @@ if( isset($_POST["CW_ID"]) ) {
 				,batch = {$batch}
 				,cassette = {$cassette}
 				,amount = {$amount}
-				,OP_ID = {$OP_ID}
-				,sOP_ID = {$sOP_ID}
 
 				,opening_date = '{$opening_date}'
 				,o_not_spill = {$o_not_spill}
@@ -150,7 +144,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<th>Трещина</th>
 					<th>Скол</th>
 					<th>Дефект форм</th>
-					<th>Оператор/<br>пост</th>
+					<th>Пост</th>
 				</tr>
 			</thead>
 			<tbody style="text-align: center;">
@@ -161,36 +155,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<td><input type="number" name="batch" min="1" max="50" style="width: 70px;" required></td>
 					<td><input type="number" name="cassette" min="1" max="200" style="width: 70px;" required></td>
 					<td><input type="number" name="amount" min="0" style="width: 70px;" required></td>
-					<td colspan="4" style="background-color: #333333;"></td>
-					<td>
-						<select name="OP_ID" style="width: 80px;" required>
-							<option value=""></option>
-							<?
-							$query = "
-								SELECT OP.OP_ID, OP.name
-								FROM Operator OP
-							";
-							$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-							while( $row = mysqli_fetch_array($res) ) {
-								echo "<option value='{$row["OP_ID"]}'>{$row["name"]}</option>";
-							}
-							?>
-						</select>
-						<br>
-						<select name="sOP_ID" style="width: 80px;">
-							<option value=""></option>
-							<?
-							$query = "
-								SELECT OP.OP_ID, OP.name
-								FROM Operator OP
-							";
-							$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-							while( $row = mysqli_fetch_array($res) ) {
-								echo "<option value='{$row["OP_ID"]}'>{$row["name"]}</option>";
-							}
-							?>
-						</select>
-					</td>
+					<td colspan="5" style="background-color: #333333;"></td>
 				</tr>
 				<tr>
 					<td>Расформовка</td>
@@ -331,9 +296,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 				// Кол-во годных деталей и максимальный предел
 				$('#route_sheet_form input[name="amount"]').val(route_sheet_data['amount']);
 				$('#route_sheet_form input[name="amount"]').attr("max", route_sheet_data['in_cassette']);
-				// Оператор + помошник
-				$('#route_sheet_form select[name="OP_ID"]').val(route_sheet_data['OP_ID']);
-				$('#route_sheet_form select[name="sOP_ID"]').val(route_sheet_data['sOP_ID']);
 
 				// Дата/время расформовки
 				$('#route_sheet_form input[name="opening_date"]').val(route_sheet_data['opening_date']).change();

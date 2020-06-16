@@ -14,6 +14,8 @@ if( isset($_POST["CW_ID"]) ) {
 	$cement = $_POST["cement"];
 	$water = $_POST["water"];
 	$mix_weight = $_POST["mix_weight"];
+	$OP_ID = $_POST["OP_ID"];
+	$sOP_ID = $_POST["sOP_ID"] ? $_POST["sOP_ID"] : "NULL";
 
 	// Редактируем маршрутный лист
 	if( $_POST["BC_ID"] ) {
@@ -28,6 +30,8 @@ if( isset($_POST["CW_ID"]) ) {
 				,cement = {$cement}
 				,water = {$water}
 				,mix_weight = {$mix_weight}
+				,OP_ID = {$OP_ID}
+				,sOP_ID = {$sOP_ID}
 			WHERE BC_ID = {$_POST["BC_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -48,6 +52,8 @@ if( isset($_POST["CW_ID"]) ) {
 				,cement = {$cement}
 				,water = {$water}
 				,mix_weight = {$mix_weight}
+				,OP_ID = {$OP_ID}
+				,sOP_ID = {$sOP_ID}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Ошибка в запросе: ".mysqli_error( $mysqli );
@@ -85,6 +91,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<th>Цемент</th>
 					<th>Вода</th>
 					<th>Куб смеси</th>
+					<th>Оператор</th>
 				</tr>
 			</thead>
 			<tbody style="text-align: center;">
@@ -105,13 +112,51 @@ this.subbut.value='Подождите, пожалуйста!';">
 							?>
 						</select>
 					</td>
-					<td><input type="number" name="batch_num" min="1" max="50" style="width: 70px;" required></td>
+					<td>
+						<select name="batch_num" style="width: 70px;" required>
+							<option value=""></option>
+							<?
+							for ($i = 1; $i <= 30; $i++) {
+								echo "<option value='{$i}'>{$i}</option>";
+							}
+							?>
+						</select>
+					</td>
+<!--					<td><input type="number" name="batch_num" min="1" max="50" style="width: 70px;" required></td>-->
 					<td><input type="number" name="iron_oxide_weight" style="width: 70px;" required></td>
-					<td><input type="number" name="iron_oxide" style="width: 70px; background: sandybrown;" required></td>
-					<td><input type="number" name="sand" style="width: 70px; background: palegoldenrod;" required></td>
-					<td><input type="number" name="cement" style="width: 70px; background: darkgrey;" required></td>
-					<td><input type="number" name="water" style="width: 70px; background: lightskyblue;" required></td>
+					<td style="background: sandybrown;"><input type="number" name="iron_oxide" style="width: 70px;" required></td>
+					<td style="background: palegoldenrod;"><input type="number" name="sand" style="width: 70px;" required></td>
+					<td style="background: darkgrey;"><input type="number" name="cement" style="width: 70px;" required></td>
+					<td style="background: lightskyblue;"><input type="number" name="water" style="width: 70px;" required></td>
 					<td><input type="number" name="mix_weight" style="width: 70px;" required></td>
+					<td>
+						<select name="OP_ID" style="width: 80px;" required>
+							<option value=""></option>
+							<?
+							$query = "
+								SELECT OP.OP_ID, OP.name
+								FROM Operator OP
+							";
+							$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+							while( $row = mysqli_fetch_array($res) ) {
+								echo "<option value='{$row["OP_ID"]}'>{$row["name"]}</option>";
+							}
+							?>
+						</select>
+						<select name="sOP_ID" style="width: 80px;">
+							<option value=""></option>
+							<?
+							$query = "
+								SELECT OP.OP_ID, OP.name
+								FROM Operator OP
+							";
+							$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+							while( $row = mysqli_fetch_array($res) ) {
+								echo "<option value='{$row["OP_ID"]}'>{$row["name"]}</option>";
+							}
+							?>
+						</select>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -154,6 +199,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#batch_checklist_form input[name="cement"]').val(batch_checklist_data['cement']);
 				$('#batch_checklist_form input[name="water"]').val(batch_checklist_data['water']);
 				$('#batch_checklist_form input[name="mix_weight"]').val(batch_checklist_data['mix_weight']);
+				// Оператор + помошник
+				$('#batch_checklist_form select[name="OP_ID"]').val(batch_checklist_data['OP_ID']);
+				$('#batch_checklist_form select[name="sOP_ID"]').val(batch_checklist_data['sOP_ID']);
 			}
 			// Иначе очищаем форму
 			else {
