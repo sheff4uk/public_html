@@ -156,6 +156,7 @@ $query = "
 		".($_GET["filling_date_to"] ? "AND RS.filling_date <= '{$_GET["filling_date_to"]}'" : "")."
 		".($_GET["filling_shift"] ? "AND RS.filling_shift = {$_GET["filling_shift"]}" : "")."
 	ORDER BY RS.filling_date DESC, RS.filling_time DESC
+	LIMIT 500
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {

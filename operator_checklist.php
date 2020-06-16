@@ -43,6 +43,7 @@ $query = "
 	JOIN Operator OP ON OP.OP_ID = OC.OP_ID
 	LEFT JOIN Operator sOP ON sOP.OP_ID = OC.sOP_ID
 	ORDER BY OC.batch_date DESC, OC.CW_ID, OC.batch_num
+	LIMIT 500
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
