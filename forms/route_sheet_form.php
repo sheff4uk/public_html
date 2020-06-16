@@ -65,7 +65,7 @@ if( isset($_POST["CW_ID"]) ) {
 			WHERE RS_ID = {$_POST["RS_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
-			$_SESSION["error"][] = "Ошибка в запросе: ".mysqli_error( $mysqli );
+			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 		}
 		$RS_ID = $_POST["RS_ID"];
 	}
@@ -101,7 +101,7 @@ if( isset($_POST["CW_ID"]) ) {
 				,b_post = {$b_post}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
-			$_SESSION["error"][] = "Ошибка в запросе: ".mysqli_error( $mysqli );
+			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 		}
 		$RS_ID = mysqli_insert_id( $mysqli );
 	}
