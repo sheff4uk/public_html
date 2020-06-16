@@ -161,7 +161,16 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<td>Заливка</td>
 					<td><input type="date" name="filling_date" required></td>
 					<td><input type="time" name="filling_time" required></td>
-					<td><input type="number" name="batch" min="1" max="50" style="width: 70px;" required></td>
+					<td>
+						<select name="batch" style="width: 70px;" required>
+							<option value=""></option>
+							<?
+							for ($i = 1; $i <= 30; $i++) {
+								echo "<option value='{$i}'>{$i}</option>";
+							}
+							?>
+						</select>
+					</td>
 					<td><input type="number" name="cassette" min="1" max="200" style="width: 70px;" required></td>
 					<td><input type="number" name="amount" min="0" style="width: 70px;" required></td>
 					<td colspan="5" style="background-color: #333333;"></td>
@@ -299,7 +308,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#route_sheet_form input[name="filling_date"]').val(route_sheet_data['filling_date']).change();
 				$('#route_sheet_form input[name="filling_time"]').val(route_sheet_data['filling_time']);
 				// № замеса
-				$('#route_sheet_form input[name="batch"]').val(route_sheet_data['batch']);
+				$('#route_sheet_form select[name="batch"]').val(route_sheet_data['batch']);
 				// № Кассеты
 				$('#route_sheet_form input[name="cassette"]').val(route_sheet_data['cassette']);
 				// Кол-во годных деталей и максимальный предел
