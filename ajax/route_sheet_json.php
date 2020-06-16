@@ -9,14 +9,14 @@ $query = "
 		,CW.min_weight
 		,CW.max_weight
 
-		,DATE(RS.filling_date) filling_date
-		,TIME(RS.filling_date) filling_time
+		,RS.filling_date
+		,RS.filling_time
 		,RS.batch
 		,RS.cassette
 		,RS.amount
 
-		,DATE(RS.opening_date) opening_date
-		,TIME(RS.opening_date) opening_time
+		,RS.opening_date
+		,RS.opening_time
 		,RS.o_amount
 		,RS.o_not_spill
 		,RS.o_crack
@@ -24,8 +24,8 @@ $query = "
 		,RS.o_def_form
 		,RS.o_post
 
-		,DATE(RS.boxing_date) boxing_date
-		,TIME(RS.boxing_date) boxing_time
+		,RS.boxing_date
+		,RS.boxing_time
 		,RS.weight1
 		,RS.weight2
 		,RS.weight3

@@ -7,19 +7,22 @@ if( isset($_POST["CW_ID"]) ) {
 
 	$CW_ID = $_POST["CW_ID"];
 
-	$filling_date = "{$_POST["filling_date"]} {$_POST["filling_time"]}";
+	$filling_date = $_POST["filling_date"];
+	$filling_time = $_POST["filling_time"];
 	$batch = $_POST["batch"];
 	$cassette = $_POST["cassette"];
 	$amount = $_POST["amount"];
 
-	$opening_date = "{$_POST["opening_date"]} {$_POST["opening_time"]}";
+	$opening_date = $_POST["opening_date"];
+	$opening_time = $_POST["opening_time"];
 	$o_not_spill = $_POST["o_not_spill"] ? $_POST["o_not_spill"] : "NULL";
 	$o_crack = $_POST["o_crack"] ? $_POST["o_crack"] : "NULL";
 	$o_chipped = $_POST["o_chipped"] ? $_POST["o_chipped"] : "NULL";
 	$o_def_form = $_POST["o_def_form"] ? $_POST["o_def_form"] : "NULL";
 	$o_post = $_POST["o_post"] ? $_POST["o_post"] : "NULL";
 
-	$boxing_date = "{$_POST["boxing_date"]} {$_POST["boxing_time"]}";
+	$boxing_date = $_POST["boxing_date"];
+	$boxing_time = $_POST["boxing_time"];
 	$weight1 = $_POST["weight1"];
 	$weight2 = $_POST["weight2"];
 	$weight3 = $_POST["weight3"];
@@ -36,11 +39,13 @@ if( isset($_POST["CW_ID"]) ) {
 			SET CW_ID = {$CW_ID}
 
 				,filling_date = '{$filling_date}'
+				,filling_time = '{$filling_time}'
 				,batch = {$batch}
 				,cassette = {$cassette}
 				,amount = {$amount}
 
 				,opening_date = '{$opening_date}'
+				,opening_time = '{$opening_time}'
 				,o_not_spill = {$o_not_spill}
 				,o_crack = {$o_crack}
 				,o_chipped = {$o_chipped}
@@ -48,6 +53,7 @@ if( isset($_POST["CW_ID"]) ) {
 				,o_post = {$o_post}
 
 				,boxing_date = '{$boxing_date}'
+				,boxing_time = '{$boxing_time}'
 				,weight1 = {$weight1}
 				,weight2 = {$weight2}
 				,weight3 = {$weight3}
@@ -70,11 +76,13 @@ if( isset($_POST["CW_ID"]) ) {
 			SET CW_ID = {$CW_ID}
 
 				,filling_date = '{$filling_date}'
+				,filling_time = '{$filling_time}'
 				,batch = {$batch}
 				,cassette = {$cassette}
 				,amount = {$amount}
 
 				,opening_date = '{$opening_date}'
+				,opening_time = '{$opening_time}'
 				,o_not_spill = {$o_not_spill}
 				,o_crack = {$o_crack}
 				,o_chipped = {$o_chipped}
@@ -82,6 +90,7 @@ if( isset($_POST["CW_ID"]) ) {
 				,o_post = {$o_post}
 
 				,boxing_date = '{$boxing_date}'
+				,boxing_time = '{$boxing_time}'
 				,weight1 = {$weight1}
 				,weight2 = {$weight2}
 				,weight3 = {$weight3}

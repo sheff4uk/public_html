@@ -18,9 +18,9 @@ if( isset($_POST["CW_ID"]) ) {
 	$sOP_ID = $_POST["sOP_ID"] ? $_POST["sOP_ID"] : "NULL";
 
 	// Редактируем маршрутный лист
-	if( $_POST["BC_ID"] ) {
+	if( $_POST["OC_ID"] ) {
 		$query = "
-			UPDATE BatchChecklist
+			UPDATE OperatorChecklist
 			SET CW_ID = {$CW_ID}
 				,batch_date = '{$batch_date}'
 				,batch_num = {$batch_num}
@@ -32,17 +32,17 @@ if( isset($_POST["CW_ID"]) ) {
 				,mix_weight = {$mix_weight}
 				,OP_ID = {$OP_ID}
 				,sOP_ID = {$sOP_ID}
-			WHERE BC_ID = {$_POST["BC_ID"]}
+			WHERE OC_ID = {$_POST["OC_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Ошибка в запросе: ".mysqli_error( $mysqli );
 		}
-		$BC_ID = $_POST["BC_ID"];
+		$OC_ID = $_POST["OC_ID"];
 	}
 	// Сохраняем новый маршрутный лист
 	else {
 		$query = "
-			INSERT INTO BatchChecklist
+			INSERT INTO OperatorChecklist
 			SET CW_ID = {$CW_ID}
 				,batch_date = '{$batch_date}'
 				,batch_num = {$batch_num}
@@ -58,27 +58,27 @@ if( isset($_POST["CW_ID"]) ) {
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Ошибка в запросе: ".mysqli_error( $mysqli );
 		}
-		$BC_ID = mysqli_insert_id( $mysqli );
+		$OC_ID = mysqli_insert_id( $mysqli );
 	}
 
 	// Перенаправление в журнал чек листов замеса
-	exit ('<meta http-equiv="refresh" content="0; url=/batch_checklist.php#'.$BC_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/operator_checklist.php#'.$OC_ID.'">');
 }
 ///////////////////////////////////////////////////////
 ?>
 <!-- Форма чек листа замеса -->
 <style>
-	#batch_checklist_form table input,
-	#batch_checklist_form table select {
+	#operator_checklist_form table input,
+	#operator_checklist_form table select {
 		font-size: 1.2em;
 	}
 </style>
 
-<div id='batch_checklist_form' title='Чек лист замеса' style='display:none;'>
-	<form method='post' action="/forms/batch_checklist_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
+<div id='operator_checklist_form' title='Чек лист замеса' style='display:none;'>
+	<form method='post' action="/forms/operator_checklist_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
-		<input type="hidden" name="BC_ID">
+		<input type="hidden" name="OC_ID">
 		<table>
 			<thead>
 				<tr>
@@ -122,7 +122,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 							?>
 						</select>
 					</td>
-<!--					<td><input type="number" name="batch_num" min="1" max="50" style="width: 70px;" required></td>-->
 					<td><input type="number" name="iron_oxide_weight" style="width: 70px;" required></td>
 					<td style="background: sandybrown;"><input type="number" name="iron_oxide" style="width: 70px;" required></td>
 					<td style="background: palegoldenrod;"><input type="number" name="sand" style="width: 70px;" required></td>
@@ -171,45 +170,45 @@ this.subbut.value='Подождите, пожалуйста!';">
 <script>
 	$(function() {
 		// Кнопка добавления маршрутного листа
-		$('.add_batch_checklist').click( function() {
+		$('.add_operator_checklist').click( function() {
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
-			var BC_ID = $(this).attr("BC_ID");
+			var OC_ID = $(this).attr("OC_ID");
 
 			// В случае редактирования заполняем форму
-			if( BC_ID ) {
+			if( OC_ID ) {
 				// Данные чек листа замеса аяксом
 				$.ajax({
-					url: "/ajax/batch_checklist_json.php?BC_ID=" + BC_ID,
-					success: function(msg) { batch_checklist_data = msg; },
+					url: "/ajax/operator_checklist_json.php?OC_ID=" + OC_ID,
+					success: function(msg) { operator_checklist_data = msg; },
 					dataType: "json",
 					async: false
 				});
 
 				// Идентификатор замеса
-				$('#batch_checklist_form input[name="BC_ID"]').val(BC_ID);
+				$('#operator_checklist_form input[name="OC_ID"]').val(OC_ID);
 
-				$('#batch_checklist_form input[name="batch_date"]').val(batch_checklist_data['batch_date']);
-				$('#batch_checklist_form select[name="CW_ID"]').val(batch_checklist_data['CW_ID']);
-				$('#batch_checklist_form input[name="batch_num"]').val(batch_checklist_data['batch_num']);
-				$('#batch_checklist_form input[name="iron_oxide_weight"]').val(batch_checklist_data['iron_oxide_weight']);
-				$('#batch_checklist_form input[name="iron_oxide"]').val(batch_checklist_data['iron_oxide']);
-				$('#batch_checklist_form input[name="sand"]').val(batch_checklist_data['sand']);
-				$('#batch_checklist_form input[name="cement"]').val(batch_checklist_data['cement']);
-				$('#batch_checklist_form input[name="water"]').val(batch_checklist_data['water']);
-				$('#batch_checklist_form input[name="mix_weight"]').val(batch_checklist_data['mix_weight']);
+				$('#operator_checklist_form input[name="batch_date"]').val(operator_checklist_data['batch_date']);
+				$('#operator_checklist_form select[name="CW_ID"]').val(operator_checklist_data['CW_ID']);
+				$('#operator_checklist_form select[name="batch_num"]').val(operator_checklist_data['batch_num']);
+				$('#operator_checklist_form input[name="iron_oxide_weight"]').val(operator_checklist_data['iron_oxide_weight']);
+				$('#operator_checklist_form input[name="iron_oxide"]').val(operator_checklist_data['iron_oxide']);
+				$('#operator_checklist_form input[name="sand"]').val(operator_checklist_data['sand']);
+				$('#operator_checklist_form input[name="cement"]').val(operator_checklist_data['cement']);
+				$('#operator_checklist_form input[name="water"]').val(operator_checklist_data['water']);
+				$('#operator_checklist_form input[name="mix_weight"]').val(operator_checklist_data['mix_weight']);
 				// Оператор + помошник
-				$('#batch_checklist_form select[name="OP_ID"]').val(batch_checklist_data['OP_ID']);
-				$('#batch_checklist_form select[name="sOP_ID"]').val(batch_checklist_data['sOP_ID']);
+				$('#operator_checklist_form select[name="OP_ID"]').val(operator_checklist_data['OP_ID']);
+				$('#operator_checklist_form select[name="sOP_ID"]').val(operator_checklist_data['sOP_ID']);
 			}
 			// Иначе очищаем форму
 			else {
-				$('#batch_checklist_form table input').val('');
-				$('#batch_checklist_form table select').val('');
+				$('#operator_checklist_form table input').val('');
+				$('#operator_checklist_form table select').val('');
 			}
 
-			$('#batch_checklist_form').dialog({
+			$('#operator_checklist_form').dialog({
 				resizable: false,
 				width: 1000,
 				modal: true,

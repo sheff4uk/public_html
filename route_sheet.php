@@ -108,16 +108,16 @@ $query = "
 		,CW.max_weight
 
 		,DATE_FORMAT(RS.filling_date, '%d.%m.%y') filling_date
-		,DATE_FORMAT(RS.filling_date, '%H:%i') filling_time
+		,DATE_FORMAT(RS.filling_time, '%H:%i') filling_time
 		,RS.filling_shift
 		,RS.batch
 		,RS.cassette
 		,RS.amount
-		,OP.name OPname
-		,sOP.name sOPname
+		#,OP.name OPname
+		#,sOP.name sOPname
 
 		,DATE_FORMAT(RS.opening_date, '%d.%m.%y') opening_date
-		,DATE_FORMAT(RS.opening_date, '%H:%i') opening_time
+		,DATE_FORMAT(RS.opening_time, '%H:%i') opening_time
 		,RS.opening_shift
 		,RS.o_amount
 		,RS.o_not_spill
@@ -127,7 +127,7 @@ $query = "
 		,RS.o_post
 
 		,DATE_FORMAT(RS.boxing_date, '%d.%m.%y') boxing_date
-		,DATE_FORMAT(RS.boxing_date, '%H:%i') boxing_time
+		,DATE_FORMAT(RS.boxing_time, '%H:%i') boxing_time
 		,RS.boxing_shift
 		,RS.weight1
 		,RS.weight2
@@ -143,18 +143,18 @@ $query = "
 		,RS.interval2
 	FROM RouteSheet RS
 	JOIN CounterWeight CW ON CW.CW_ID = RS.CW_ID
-	JOIN Operator OP ON OP.OP_ID = RS.OP_ID
-	LEFT JOIN Operator sOP ON sOP.OP_ID = RS.sOP_ID
+	#JOIN Operator OP ON OP.OP_ID = RS.OP_ID
+	#LEFT JOIN Operator sOP ON sOP.OP_ID = RS.sOP_ID
 	WHERE 1
 		".($_GET["RS_ID"] ? "AND RS.RS_ID={$_GET["RS_ID"]}" : "")."
 		".($_GET["CW_ID"] ? "AND RS.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["batch"] ? "AND RS.batch = {$_GET["batch"]}" : "")."
 		".($_GET["cassette"] ? "AND RS.cassette = {$_GET["cassette"]}" : "")."
-		".($_GET["OP_ID"] ? "AND (RS.OP_ID = {$_GET["OP_ID"]} OR RS.sOP_ID = {$_GET["OP_ID"]})" : "")."
-		".($_GET["filling_date_from"] ? "AND DATE(RS.filling_date) >= '{$_GET["filling_date_from"]}'" : "")."
-		".($_GET["filling_date_to"] ? "AND DATE(RS.filling_date) <= '{$_GET["filling_date_to"]}'" : "")."
+		#".($_GET["OP_ID"] ? "AND (RS.OP_ID = {$_GET["OP_ID"]} OR RS.sOP_ID = {$_GET["OP_ID"]})" : "")."
+		".($_GET["filling_date_from"] ? "AND RS.filling_date >= '{$_GET["filling_date_from"]}'" : "")."
+		".($_GET["filling_date_to"] ? "AND RS.filling_date <= '{$_GET["filling_date_to"]}'" : "")."
 		".($_GET["filling_shift"] ? "AND RS.filling_shift = {$_GET["filling_shift"]}" : "")."
-	ORDER BY RS.filling_date DESC
+	ORDER BY RS.filling_date DESC, RS.filling_time DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {

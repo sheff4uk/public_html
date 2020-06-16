@@ -2,7 +2,7 @@
 include "config.php";
 $title = 'Чек-лист оператора';
 include "header.php";
-include "./forms/batch_checklist_form.php";
+include "./forms/operator_checklist_form.php";
 
 // Вывод чеклистов замеса
 ?>
@@ -26,28 +26,28 @@ include "./forms/batch_checklist_form.php";
 
 <?
 $query = "
-	SELECT BC.BC_ID
-		,DATE_FORMAT(BC.batch_date, '%d.%m.%y') batch_date
+	SELECT OC.OC_ID
+		,DATE_FORMAT(OC.batch_date, '%d.%m.%y') batch_date
 		,CW.item
-		,BC.batch_num
-		,BC.iron_oxide_weight
-		,BC.iron_oxide
-		,BC.sand
-		,BC.cement
-		,BC.water
-		,BC.mix_weight
+		,OC.batch_num
+		,OC.iron_oxide_weight
+		,OC.iron_oxide
+		,OC.sand
+		,OC.cement
+		,OC.water
+		,OC.mix_weight
 		,OP.name OPname
 		,sOP.name sOPname
-	FROM BatchChecklist BC
-	JOIN CounterWeight CW ON CW.CW_ID = BC.CW_ID
-	JOIN Operator OP ON OP.OP_ID = BC.OP_ID
-	LEFT JOIN Operator sOP ON sOP.OP_ID = BC.sOP_ID
-	ORDER BY BC.batch_date DESC, BC.CW_ID, BC.batch_num
+	FROM OperatorChecklist OC
+	JOIN CounterWeight CW ON CW.CW_ID = OC.CW_ID
+	JOIN Operator OP ON OP.OP_ID = OC.OP_ID
+	LEFT JOIN Operator sOP ON sOP.OP_ID = OC.sOP_ID
+	ORDER BY OC.batch_date DESC, OC.CW_ID, OC.batch_num
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	?>
-		<tr id="<?=$row["BC_ID"]?>">
+		<tr id="<?=$row["OC_ID"]?>">
 			<td><?=$row["batch_date"]?></td>
 			<td><b><?=$row["item"]?></b></td>
 			<td><?=$row["batch_num"]?></td>
@@ -58,7 +58,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td style="background: lightskyblue;"><?=$row["water"]?></td>
 			<td><?=$row["mix_weight"]?></td>
 			<td><?=$row["OPname"]?><br><span style="font-size: .9em;"><?=$row["sOPname"]?></span></td>
-			<td><a href="#" class="add_batch_checklist" BC_ID="<?=$row["BC_ID"]?>" title="Изменить данные замеса"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
+			<td><a href="#" class="add_operator_checklist" OC_ID="<?=$row["OC_ID"]?>" title="Изменить данные замеса"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 		</tr>
 	<?
 }
@@ -66,7 +66,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<div id="add_btn" class="add_batch_checklist" title="Внести данные замеса"></div>
+<div id="add_btn" class="add_operator_checklist" title="Внести данные замеса"></div>
 
 <?
 include "footer.php";
