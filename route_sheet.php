@@ -346,7 +346,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<h3>Всего записей: <?=$count?></h3>
+<h3>Маршрутных листов на экране: <?=$count?></h3>
 
 <div id="add_btn" class="add_route_sheet" title="Внести маршрутный лист"></div>
 
