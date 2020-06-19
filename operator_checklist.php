@@ -9,17 +9,22 @@ include "./forms/operator_checklist_form.php";
 <table style="width: 100%;">
 	<thead>
 		<tr>
-			<th>Дата</th>
-			<th>Противовес</th>
-			<th>№ замеса</th>
-			<th>Куб окалины</th>
-			<th>Окалина</th>
-			<th>Отсев</th>
-			<th>Цемент</th>
-			<th>Вода</th>
-			<th>Куб смеси</th>
-			<th>Оператор</th>
-			<th></th>
+				<tr>
+					<th rowspan="2">Дата</th>
+					<th rowspan="2">Противовес</th>
+					<th rowspan="2">№ замеса</th>
+					<th rowspan="2">Плотность №1 г/л</th>
+					<th colspan="4">Компоненты смеси</th>
+					<th rowspan="2">Плотность смеси г/л</th>
+					<th rowspan="2">Оператор</th>
+					<th rowspan="2"></th>
+				</tr>
+				<tr>
+					<th>№1 кг</th>
+					<th>№2 кг</th>
+					<th>№3 кг</th>
+					<th>№4 кг</th>
+				</tr>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
@@ -53,10 +58,10 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><b><?=$row["item"]?></b></td>
 			<td><?=$row["batch_num"]?></td>
 			<td><?=$row["iron_oxide_weight"]?></td>
-			<td style="background: sandybrown;"><?=$row["iron_oxide"]?></td>
-			<td style="background: palegoldenrod;"><?=$row["sand"]?></td>
-			<td style="background: darkgrey;"><?=$row["cement"]?></td>
-			<td style="background: lightskyblue;"><?=$row["water"]?></td>
+			<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["iron_oxide"]?></td>
+			<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["sand"]?></td>
+			<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["cement"]?></td>
+			<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["water"]?></td>
 			<td><?=$row["mix_weight"]?></td>
 			<td><?=$row["OPname"]?><br><span style="font-size: .9em;"><?=$row["sOPname"]?></span></td>
 			<td><a href="#" class="add_operator_checklist" OC_ID="<?=$row["OC_ID"]?>" title="Изменить данные замеса"><i class="fa fa-pencil-alt fa-lg"></i></a></td>

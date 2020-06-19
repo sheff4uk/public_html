@@ -107,7 +107,7 @@ if( isset($_POST["CW_ID"]) ) {
 	}
 
 	// Перенаправление в журнал маршрутных листов
-	exit ('<meta http-equiv="refresh" content="0; url=/route_sheet.php#'.$RS_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/route_sheet.php?RS_ID='.$RS_ID.'">');
 }
 ///////////////////////////////////////////////////////
 ?>
