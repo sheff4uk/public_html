@@ -248,7 +248,7 @@ input[type="checkbox"].nightshift + label {
 	height: 56px;
 	opacity: .4;
 	position: fixed;
-	right: 30px;
+	right: 20px;
 	z-index: 9;
 	border-radius: 50%;
 	background-color: #db4437;
