@@ -3,7 +3,10 @@ include "config.php";
 $title = 'Маршрутный лист';
 include "header.php";
 include "./forms/route_sheet_form.php";
+$limit = 500;
 ?>
+
+<h3>На экране отображается не более <?=$limit?> последних записей. Данные отсортированы по дате и времени заливки.</h3>
 
 <!--Фильтр-->
 <div id="filter">
@@ -209,6 +212,8 @@ foreach ($_GET as &$value) {
 	<tbody style="text-align: center;">
 
 <?
+$count = 0; //Счетчик записей
+
 $query = "
 	SELECT RS.RS_ID
 		,CW.item
@@ -286,14 +291,14 @@ $query = "
 		".($_GET["chipped"] ? "AND (RS.o_chipped OR RS.b_chipped)" : "")."
 		".($_GET["def_form"] ? "AND (RS.o_def_form OR RS.b_def_form)" : "")."
 	ORDER BY RS.filling_date DESC, RS.filling_time DESC
-	LIMIT 500
+	LIMIT {$limit}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	?>
 		<tr style="border-top: 2px solid #333;">
 			<td rowspan="3"><span style="font-size: 1.5em; font-weight: bold;"><?=$row["item"]?></span><p class="nowrap" id="<?=$row["RS_ID"]?>">id: <b><?=$row["RS_ID"]?></b></p></td>
-			<td>Заливка</td>
+			<td><i class="fas fa-lg fa-fill-drip"></i></td>
 			<td><?=$row["filling_date"]?></td>
 			<td><?=$row["filling_time"]?> (<?=$row["filling_shift"]?>)</td>
 			<td></td>
@@ -305,7 +310,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td rowspan="3"><a href="#" class="add_route_sheet" RS_ID="<?=$row["RS_ID"]?>" title="Изменить маршрутный лист"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 		</tr>
 		<tr>
-			<td>Расформовка</td>
+			<td><i class="fas fa-lg fa-box-open"></i></td>
 			<td><?=$row["opening_date"]?></td>
 			<td><?=$row["opening_time"]?> (<?=$row["opening_shift"]?>)</td>
 			<td <?=($row["interval1"] < 24 ? "class='error'" : "")?>><?=$row["interval1"]?></td>
@@ -318,7 +323,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["o_post"]?></td>
 		</tr>
 		<tr>
-			<td>Упаковка</td>
+			<td><i class="fas fa-lg fa-pallet"></i></td>
 			<td><?=$row["boxing_date"]?></td>
 			<td><?=$row["boxing_time"]?> (<?=$row["boxing_shift"]?>)</td>
 			<td <?=($row["interval2"] < 120 ? "class='error'" : "")?>><?=$row["interval2"]?></td>
@@ -335,10 +340,13 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["b_post"]?></td>
 		</tr>
 	<?
+	$count++;
 }
 ?>
 	</tbody>
 </table>
+
+<h3>Всего записей: <?=$count?></h3>
 
 <div id="add_btn" class="add_route_sheet" title="Внести маршрутный лист"></div>
 

@@ -1,7 +1,7 @@
 <?
 include_once "../config.php";
 
-// Сохранение/редактирование чек листа замеса
+// Сохранение/редактирование чек листа оператора
 if( isset($_POST["CW_ID"]) ) {
 	session_start();
 
@@ -61,12 +61,12 @@ if( isset($_POST["CW_ID"]) ) {
 		$OC_ID = mysqli_insert_id( $mysqli );
 	}
 
-	// Перенаправление в журнал чек листов замеса
+	// Перенаправление в журнал чек листов оператора
 	exit ('<meta http-equiv="refresh" content="0; url=/operator_checklist.php#'.$OC_ID.'">');
 }
 ///////////////////////////////////////////////////////
 ?>
-<!-- Форма чек листа замеса -->
+<!-- Форма чек листа оператора -->
 <style>
 	#operator_checklist_form table input,
 	#operator_checklist_form table select {
@@ -74,7 +74,7 @@ if( isset($_POST["CW_ID"]) ) {
 	}
 </style>
 
-<div id='operator_checklist_form' title='Чек лист замеса' style='display:none;'>
+<div id='operator_checklist_form' title='Чек лист оператора' style='display:none;'>
 	<form method='post' action="/forms/operator_checklist_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
@@ -82,16 +82,19 @@ this.subbut.value='Подождите, пожалуйста!';">
 		<table>
 			<thead>
 				<tr>
-					<th>Дата</th>
-					<th>Противовес</th>
-					<th>№ замеса</th>
-					<th>Куб окалины</th>
-					<th>Окалина</th>
-					<th>Отсев</th>
-					<th>Цемент</th>
-					<th>Вода</th>
-					<th>Куб смеси</th>
-					<th>Оператор</th>
+					<th rowspan="2">Дата</th>
+					<th rowspan="2">Противовес</th>
+					<th rowspan="2">№ замеса</th>
+					<th rowspan="2">Плотность №1 г/л</th>
+					<th colspan="4">Компоненты смеси</th>
+					<th rowspan="2">Плотность смеси г/л</th>
+					<th rowspan="2">Оператор</th>
+				</tr>
+				<tr>
+					<th>№1 кг</th>
+					<th>№2 кг</th>
+					<th>№3 кг</th>
+					<th>№4 кг</th>
 				</tr>
 			</thead>
 			<tbody style="text-align: center;">
@@ -123,10 +126,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 						</select>
 					</td>
 					<td><input type="number" name="iron_oxide_weight" style="width: 70px;" required></td>
-					<td style="background: sandybrown;"><input type="number" name="iron_oxide" style="width: 70px;" required></td>
-					<td style="background: palegoldenrod;"><input type="number" name="sand" style="width: 70px;" required></td>
-					<td style="background: darkgrey;"><input type="number" name="cement" style="width: 70px;" required></td>
-					<td style="background: lightskyblue;"><input type="number" name="water" style="width: 70px;" required></td>
+					<td style="background-color: rgba(0, 0, 0, 0.2);"><input type="number" name="iron_oxide" style="width: 70px;" required></td>
+					<td style="background-color: rgba(0, 0, 0, 0.2);"><input type="number" name="sand" style="width: 70px;" required></td>
+					<td style="background-color: rgba(0, 0, 0, 0.2);"><input type="number" name="cement" style="width: 70px;" required></td>
+					<td style="background-color: rgba(0, 0, 0, 0.2);"><input type="number" name="water" style="width: 70px;" required></td>
 					<td><input type="number" name="mix_weight" style="width: 70px;" required></td>
 					<td>
 						<select name="OP_ID" style="width: 80px;" required>
@@ -178,7 +181,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 			// В случае редактирования заполняем форму
 			if( OC_ID ) {
-				// Данные чек листа замеса аяксом
+				// Данные чек листа оператора аяксом
 				$.ajax({
 					url: "/ajax/operator_checklist_json.php?OC_ID=" + OC_ID,
 					success: function(msg) { operator_checklist_data = msg; },
