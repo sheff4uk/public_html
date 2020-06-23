@@ -30,7 +30,7 @@ include "header.php";
 $query = "
 	SELECT
 		RS.filling_date,
-		COUNT(distinct(RS.CW_ID)) cnt,
+		COUNT(distinct(RS.CW_ID)) item_cnt,
 		SUM(IFNULL(o_not_spill,0)) + SUM(IFNULL(b_not_spill,0)) not_spill,
 		SUM(IFNULL(o_crack,0)) + SUM(IFNULL(b_crack,0)) crack,
 		SUM(IFNULL(o_chipped,0)) + SUM(IFNULL(b_chipped,0)) chipped,
@@ -42,7 +42,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$cnt = $row["cnt"];
+	$item_cnt = $row["item_cnt"];
 
 	$query = "
 		SELECT
@@ -67,11 +67,11 @@ while( $row = mysqli_fetch_array($res) ) {
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
 		// Выводим общую ячейку с датой заливки
-		if( $cnt ) {
-			$cnt++;
+		if( $item_cnt ) {
+			$item_cnt++;
 			echo "<tr style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}'>{$subrow["date"]}</td>";
-			$cnt = 0;
+			echo "<td rowspan='{$item_cnt}'>{$subrow["date"]}</td>";
+			$item_cnt = 0;
 		}
 		else {
 			echo "<tr>";
