@@ -190,7 +190,7 @@ foreach ($_GET as &$value) {
 </script>
 
 <!--Вывод маршрутных листов-->
-<table style="width: 100%;">
+<table class="main_table">
 	<thead>
 		<tr>
 			<th>Противовес</th>
@@ -297,7 +297,7 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	?>
 		<tr style="border-top: 2px solid #333;">
-			<td rowspan="3"><span style="font-size: 1.5em; font-weight: bold;"><?=$row["item"]?></span><p class="nowrap" id="<?=$row["RS_ID"]?>">id: <b><?=$row["RS_ID"]?></b></p></td>
+			<td rowspan="3"><b><?=$row["item"]?></b><p class="nowrap" id="<?=$row["RS_ID"]?>">id: <b><?=$row["RS_ID"]?></b></p></td>
 			<td><i class="fas fa-lg fa-fill-drip"></i></td>
 			<td><?=$row["filling_date"]?></td>
 			<td><?=$row["filling_time"]?> (<?=$row["filling_shift"]?>)</td>
@@ -306,7 +306,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["cassette"]?></td>
 			<td style="position: relative;"><b><?=$row["amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td colspan="4" style="background-color: #333;"></td>
-			<td><?=$row["OPname"]?><br><span style="font-size: .9em;"><?=$row["sOPname"]?></span></td>
+			<td><?=$row["OPname"]?><br><font style="font-size: .8em;"><?=$row["sOPname"]?></font></td>
 			<td rowspan="3"><a href="#" class="add_route_sheet" RS_ID="<?=$row["RS_ID"]?>" title="Изменить маршрутный лист"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 		</tr>
 		<tr>
@@ -314,7 +314,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["opening_date"]?></td>
 			<td><?=$row["opening_time"]?> (<?=$row["opening_shift"]?>)</td>
 			<td <?=($row["interval1"] < 24 ? "class='error'" : "")?>><?=$row["interval1"]?></td>
-			<td colspan="2" id="weight" style="border-top: 2px solid #333; border-left: 2px solid #333; border-right: 2px solid #333;">Вес <span class="nowrap"><?=$row["min_weight"]?> - <?=$row["max_weight"]?></span> г</td>
+			<td colspan="2" id="weight" style="border-top: 2px solid #333; border-left: 2px solid #333; border-right: 2px solid #333;">Вес <?=$row["min_weight"]?> - <?=$row["max_weight"]?> г</td>
 			<td style="position: relative;" <?=($row["o_amount"] < 0 ? "class='error'" : "")?>><b><?=$row["o_amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["o_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
 			<td style="color: red;"><?=$row["o_not_spill"]?></td>
 			<td style="color: red;"><?=$row["o_crack"]?></td>
@@ -328,8 +328,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["boxing_time"]?> (<?=$row["boxing_shift"]?>)</td>
 			<td <?=($row["interval2"] < 120 ? "class='error'" : "")?>><?=$row["interval2"]?></td>
 			<td colspan="2" class="nowrap" style="border-left: 2px solid #333; border-right: 2px solid #333;">
-				<span class="<?=(($row["spec1"]) ? "" : "bg-red")?>"><?=$row["weight1"]?></span>&nbsp;&nbsp;
-				<span class="<?=(($row["spec2"]) ? "" : "bg-red")?>"><?=$row["weight2"]?></span>&nbsp;&nbsp;
+				<span class="<?=(($row["spec1"]) ? "" : "bg-red")?>"><?=$row["weight1"]?></span>&nbsp;
+				<span class="<?=(($row["spec2"]) ? "" : "bg-red")?>"><?=$row["weight2"]?></span>&nbsp;
 				<span class="<?=(($row["spec3"]) ? "" : "bg-red")?>"><?=$row["weight3"]?></span>
 			</td>
 			<td  style="position: relative;" <?=($row["b_amount"] < 0 ? "class='error'" : "")?>><b><?=$row["b_amount"]?></b><div style="background-color: chartreuse; left: 0; bottom: 0; width: <?=(100*$row["b_amount"]/$row["in_cassette"])?>%; position: absolute; height: 100%; opacity: .3;"></div></td>
