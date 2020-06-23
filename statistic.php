@@ -10,7 +10,7 @@ include "header.php";
 	}
 </style>
 
-<table style="width: 100%;">
+<table class="main_table">
 	<thead>
 		<tr>
 			<th>Дата заливки</th>

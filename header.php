@@ -32,7 +32,7 @@ function src_url($src) {
 	<script src="js/jquery-1.11.3.min.js"></script>
 	<script src="js/ui/jquery-ui.js"></script>
 <!--	<script src="js/jquery.ui.datepicker-ru.js"></script>-->
-	<script src="js/script.js?v=0" type="text/javascript"></script>
+	<script src="js/script.js?v=1" type="text/javascript"></script>
 	<script src="js/jquery.printPage.js" type="text/javascript"></script>
 	<script src="js/jquery.columnhover.js" type="text/javascript"></script>
 	<script src="js/noty/packaged/jquery.noty.packaged.min.js" type="text/javascript"></script>
