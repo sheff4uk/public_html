@@ -46,15 +46,9 @@ $(function(){
 		var scrollTop = $(window).scrollTop();
 		if(scrollTop != 0) {
 			$(".main_table thead").css({'position' : 'fixed', 'width':'980px', 'display':'inherit', 'table-layout':'fixed'});
-//			$("#nav").stop().animate({'height':'0px'},300);
-//			$(".logo").stop().animate({'height':'64px', 'width':'64px'},300);
-//			$(".logo img").stop().animate({'top':'68%'},300);
 		}
 		else {
 			$(".main_table thead").css({'display' : 'contents'});
-//			$("#nav").stop().animate({'height':'35px'},300);
-//			$(".logo").stop().animate({'height':'120px', 'width':'120px'},300);
-//			$(".logo img").stop().animate({'top':'50%'},300);
 		}
 	});
 });
