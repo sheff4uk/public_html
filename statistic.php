@@ -8,6 +8,12 @@ include "header.php";
 	.summary td {
 		background-color: rgba(0, 0, 0, 0.2);
 	}
+	.total {
+		background: #333333 url(js/ui/images/ui-bg_diagonals-thick_8_333333_40x40.png) 50% 50% repeat !important;
+	}
+	.total td {
+		color: #fff;
+	}
 </style>
 
 <!--Фильтр-->
@@ -20,6 +26,24 @@ include "header.php";
 			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
 			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
 			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
+		</div>
+
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>Код противовеса:</span>
+			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT CW.CW_ID, CW.item, CW.min_weight, CW.max_weight, CW.in_cassette
+					FROM CounterWeight CW
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
+					echo "<option value='{$row["CW_ID"]}' in_cassette='{$row["in_cassette"]}' min_weight='{$row["min_weight"]}' max_weight='{$row["max_weight"]}' {$selected}>{$row["item"]}</option>";
+				}
+				?>
+			</select>
 		</div>
 
 		<button style="float: right;">Фильтр</button>
@@ -88,6 +112,7 @@ $query = "
 	WHERE 1
 		".($_GET["date_from"] ? "AND RS.filling_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND RS.filling_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["CW_ID"] ? "AND RS.CW_ID={$_GET["CW_ID"]}" : "")."
 	GROUP BY filling_date
 	ORDER BY RS.filling_date DESC
 ";
@@ -115,6 +140,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		FROM RouteSheet RS
 		JOIN CounterWeight CW ON CW.CW_ID = RS.CW_ID
 		WHERE filling_date LIKE '{$row["filling_date"]}'
+			".($_GET["CW_ID"] ? "AND RS.CW_ID={$_GET["CW_ID"]}" : "")."
 		GROUP BY RS.filling_date, RS.CW_ID
 		ORDER BY RS.filling_date DESC, RS.CW_ID
 	";
@@ -185,6 +211,7 @@ if( $filter ) {
 		WHERE 1
 			".($_GET["date_from"] ? "AND RS.filling_date >= '{$_GET["date_from"]}'" : "")."
 			".($_GET["date_to"] ? "AND RS.filling_date <= '{$_GET["date_to"]}'" : "")."
+			".($_GET["CW_ID"] ? "AND RS.CW_ID={$_GET["CW_ID"]}" : "")."
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
@@ -212,6 +239,7 @@ if( $filter ) {
 			WHERE 1
 				".($_GET["date_from"] ? "AND RS.filling_date >= '{$_GET["date_from"]}'" : "")."
 				".($_GET["date_to"] ? "AND RS.filling_date <= '{$_GET["date_to"]}'" : "")."
+				".($_GET["CW_ID"] ? "AND RS.CW_ID={$_GET["CW_ID"]}" : "")."
 			GROUP BY RS.CW_ID
 			ORDER BY RS.CW_ID
 		";
@@ -220,12 +248,12 @@ if( $filter ) {
 			// Выводим общую ячейку с датой заливки
 			if( $item_cnt ) {
 				$item_cnt++;
-				echo "<tr style='border-top: 2px solid #333; font-weight: bold;'>";
-				echo "<td rowspan='{$item_cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>За выбраный период</td>";
+				echo "<tr style='border-top: 2px solid #333;' class='total'>";
+				echo "<td rowspan='{$item_cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h2>Σ</h2></td>";
 				$item_cnt = 0;
 			}
 			else {
-				echo "<tr style='font-weight: bold;'>";
+				echo "<tr class='total'>";
 			}
 
 			echo "<td>{$subrow["item"]}</td>";
@@ -245,7 +273,7 @@ if( $filter ) {
 			echo "<td>{$percent_total} %</td>";
 			echo "</tr>";
 		}
-		echo "<tr class='summary' style='font-weight: bold;'>";
+		echo "<tr class='summary total'>";
 		echo "<td>Итог:</td>";
 		echo "<td>{$row["cnt"]}</td>";
 		echo "<td>{$row["interval1"]}</td>";
