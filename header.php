@@ -184,7 +184,7 @@ function src_url($src) {
 		</div>
 <?
 	if( !empty($_SESSION['id']) ) {
-		$menu["Чек-лист оператора"] = "operator_checklist.php";
+		$menu["Чек-лист"] = "checklist.php";
 		$menu["Маршрутный лист"] = "route_sheet.php";
 		$menu["Статистика"] = "statistic.php";
 		$menu["Выход {$USR_Icon}"] = "exit.php";
