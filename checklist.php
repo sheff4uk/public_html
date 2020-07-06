@@ -12,7 +12,7 @@ include "./forms/checklist_form.php";
 			<th rowspan="2">Время</th>
 			<th rowspan="2">Противовес</th>
 			<th rowspan="2">Оператор</th>
-			<th colspan="2">Масса кубика, г</th>
+			<th colspan="2">Масса кубика, х10 г</th>
 			<th rowspan="2">Окалина, кг</th>
 			<th rowspan="2">КМП, кг</th>
 			<th rowspan="2">Отсев, кг</th>
@@ -43,7 +43,7 @@ $query = "
 		,LB.crushed_stone
 		,LB.cement
 		,LB.water
-		,GROUP_CONCAT(LP.cassette) cassette
+		,GROUP_CONCAT(LP.cassette ORDER BY LP.LP_ID SEPARATOR '/') cassette
 		,LB.underfilling
 	FROM list__Batches LB
 	JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID

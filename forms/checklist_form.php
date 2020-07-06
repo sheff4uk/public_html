@@ -16,7 +16,7 @@ if( isset($_POST["CW_ID"]) ) {
 	$crushed_stone = $_POST["crushed_stone"] ? $_POST["crushed_stone"] : "NULL";
 	$cement = $_POST["cement"];
 	$water = $_POST["water"];
-	$underfilling = $_POST["underfilling"] ? $_POST["underfilling"] : "NULL";
+	$underfilling = $_POST["underfilling"] ? $_POST["underfilling"] : 0;
 
 	// Редактируем маршрутный лист
 	if( $_POST["LB_ID"] ) {
@@ -43,7 +43,16 @@ if( isset($_POST["CW_ID"]) ) {
 		else {
 			$LB_ID = $_POST["LB_ID"];
 			// Редактируем заливки
-
+			foreach ($_POST["cassette"] as $key => $value) {
+				$query = "
+					UPDATE list__Pourings
+					SET cassette = {$value}
+					WHERE LP_ID = {$key}
+				";
+				if( !mysqli_query( $mysqli, $query ) ) {
+					$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+				}
+			}
 		}
 	}
 	// Сохраняем новый маршрутный лист
@@ -151,7 +160,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<thead>
 					<tr>
 						<th rowspan="2">Время</th>
-						<th colspan="2">Масса кубика, г</th>
+						<th colspan="2">Масса кубика, х10 г</th>
 						<th rowspan="2">Окалина, кг</th>
 						<th rowspan="2">КМП, кг</th>
 						<th rowspan="2">Отсев, кг</th>
@@ -168,8 +177,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<tbody style="text-align: center;">
 					<tr>
 						<td><input type='time' name='batch_time' required></td>
-						<td><input type='number' min='0' name='comp_density' style='width: 80px;' required></td>
-						<td><input type='number' min='0' name='mix_density' style='width: 80px;' required></td>
+						<td><input type='number' min='200' max='300' name='comp_density' style='width: 80px;' required></td>
+						<td><input type='number' min='250' max='350' name='mix_density' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='iron_oxide' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='sand' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='crushed_stone' style='width: 80px;' required></td>
@@ -242,7 +251,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				// Блокируем выбор противовеса
 				$('#checklist_form select[name="CW_ID"] option:not(:selected)').attr('disabled', true);
 				// Прячем инпуты для кассет
-				$('#fillings').html('Не редактируется');
+				//$('#fillings').html('Не редактируется');
+				$.ajax({ url: "/ajax/checklist_cassette.php?LB_ID=" + LB_ID, dataType: "script", async: false });
 			}
 			// Иначе очищаем форму
 			else {
