@@ -8,9 +8,8 @@ include "./forms/checklist_form.php";
 <table class="main_table">
 	<thead>
 		<tr>
-			<th rowspan="2">Дата</th>
+			<th rowspan="2">Дата<br>Противовес</th>
 			<th rowspan="2">Время</th>
-			<th rowspan="2">Противовес</th>
 			<th rowspan="2">Оператор</th>
 			<th colspan="2">Масса кубика, х10 г</th>
 			<th rowspan="2">Окалина, кг</th>
@@ -30,49 +29,71 @@ include "./forms/checklist_form.php";
 	<tbody style="text-align: center;">
 
 <?
+// Получаем список дат и противовесов и кол-во замесов на эти даты
 $query = "
-	SELECT LB.LB_ID
-		,CW.item
-		,OP.name
-		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date
-		,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time
-		,LB.comp_density
-		,LB.mix_density
-		,LB.iron_oxide
-		,LB.sand
-		,LB.crushed_stone
-		,LB.cement
-		,LB.water
-		,GROUP_CONCAT(LP.cassette ORDER BY LP.LP_ID SEPARATOR '/') cassette
-		,LB.underfilling
+	SELECT
+		LB.batch_date,
+		LB.CW_ID,
+		SUM(1) cnt
 	FROM list__Batches LB
-	JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
-	JOIN Operator OP ON OP.OP_ID = LB.OP_ID
-	JOIN list__Pourings LP ON LP.LB_ID = LB.LB_ID
-	GROUP BY LB.LB_ID
-	ORDER BY LB.batch_date DESC, LB.batch_time ASC, LB.CW_ID
-	LIMIT 500
+	GROUP BY LB.batch_date, LB.CW_ID
+	ORDER BY LB.batch_date DESC, LB.CW_ID
+	LIMIT 30
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	?>
-		<tr id="<?=$row["LB_ID"]?>">
-			<td><?=$row["batch_date"]?></td>
-			<td><?=$row["batch_time"]?></td>
-			<td><b><?=$row["item"]?></b></td>
-			<td><?=$row["name"]?></td>
-			<td><?=$row["comp_density"]?></td>
-			<td><?=$row["mix_density"]?></td>
-			<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["iron_oxide"]?></td>
-			<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["sand"]?></td>
-			<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["crushed_stone"]?></td>
-			<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["cement"]?></td>
-			<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["water"]?></td>
-			<td class="nowrap"><?=$row["cassette"]?></td>
-			<td><?=$row["underfilling"]?></td>
-			<td><a href="#" class="add_checklist" LB_ID="<?=$row["LB_ID"]?>" title="Изменить данные замеса"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
-		</tr>
-	<?
+	$cnt = $row["cnt"];
+
+	$query = "
+		SELECT LB.LB_ID
+			,CW.item
+			,OP.name
+			,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date
+			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time
+			,LB.comp_density
+			,LB.mix_density
+			,LB.iron_oxide
+			,LB.sand
+			,LB.crushed_stone
+			,LB.cement
+			,LB.water
+			,GROUP_CONCAT(LP.cassette ORDER BY LP.LP_ID SEPARATOR '/') cassette
+			,LB.underfilling
+		FROM list__Batches LB
+		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
+		JOIN list__Pourings LP ON LP.LB_ID = LB.LB_ID
+		WHERE LB.batch_date LIKE '{$row["batch_date"]}' AND LB.CW_ID = {$row["CW_ID"]}
+		GROUP BY LB.LB_ID
+		ORDER BY LB.batch_time ASC
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		// Выводим общую ячейку с датой кодом
+		if( $cnt ) {
+			echo "<tr style='border-top: 2px solid #333;' id='{$row["LB_ID"]}'>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$row["batch_date"]}<br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
+			$cnt = 0;
+		}
+		else {
+			echo "<tr id='{$row["LB_ID"]}'>";
+		}
+		?>
+				<td><?=$row["batch_time"]?></td>
+				<td><?=$row["name"]?></td>
+				<td><?=$row["comp_density"]?></td>
+				<td><?=$row["mix_density"]?></td>
+				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["iron_oxide"]?></td>
+				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["sand"]?></td>
+				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["crushed_stone"]?></td>
+				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["cement"]?></td>
+				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["water"]?></td>
+				<td class="nowrap"><?=$row["cassette"]?></td>
+				<td><?=$row["underfilling"]?></td>
+				<td><a href="#" class="add_checklist" LB_ID="<?=$row["LB_ID"]?>" title="Изменить данные замеса"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
+			</tr>
+		<?
+	}
 }
 ?>
 	</tbody>
