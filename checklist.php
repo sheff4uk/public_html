@@ -57,7 +57,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.crushed_stone
 			,LB.cement
 			,LB.water
-			,GROUP_CONCAT(LP.cassette ORDER BY LP.LP_ID SEPARATOR '/') cassette
+			,GROUP_CONCAT(LP.cassette ORDER BY LP.sort SEPARATOR '/') cassette
 			,LB.underfilling
 		FROM list__Batches LB
 		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
@@ -67,30 +67,30 @@ while( $row = mysqli_fetch_array($res) ) {
 		GROUP BY LB.LB_ID
 		ORDER BY LB.batch_time ASC
 	";
-	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-	while( $row = mysqli_fetch_array($res) ) {
+	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $subrow = mysqli_fetch_array($subres) ) {
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
-			echo "<tr style='border-top: 2px solid #333;' id='{$row["LB_ID"]}'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$row["batch_date"]}<br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
+			echo "<tr style='border-top: 2px solid #333;' id='{$subrow["LB_ID"]}'>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$subrow["batch_date"]}<br><b>{$subrow["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
 			$cnt = 0;
 		}
 		else {
-			echo "<tr id='{$row["LB_ID"]}'>";
+			echo "<tr id='{$subrow["LB_ID"]}'>";
 		}
 		?>
-				<td><?=$row["batch_time"]?></td>
-				<td><?=$row["name"]?></td>
-				<td><?=$row["comp_density"]?></td>
-				<td><?=$row["mix_density"]?></td>
-				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["iron_oxide"]?></td>
-				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["sand"]?></td>
-				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["crushed_stone"]?></td>
-				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["cement"]?></td>
-				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["water"]?></td>
-				<td class="nowrap"><?=$row["cassette"]?></td>
-				<td><?=$row["underfilling"]?></td>
-				<td><a href="#" class="add_checklist" LB_ID="<?=$row["LB_ID"]?>" title="Изменить данные замеса"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
+				<td><?=$subrow["batch_time"]?></td>
+				<td><?=$subrow["name"]?></td>
+				<td><?=$subrow["comp_density"]?></td>
+				<td><?=$subrow["mix_density"]?></td>
+				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["iron_oxide"]?></td>
+				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["sand"]?></td>
+				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["crushed_stone"]?></td>
+				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["cement"]?></td>
+				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["water"]?></td>
+				<td class="nowrap"><?=$subrow["cassette"]?></td>
+				<td><?=$subrow["underfilling"]?></td>
+				<td><a href="#" class="add_checklist" LB_ID="<?=$subrow["LB_ID"]?>" title="Изменить данные замеса"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 			</tr>
 		<?
 	}

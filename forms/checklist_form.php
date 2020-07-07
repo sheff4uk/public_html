@@ -23,18 +23,19 @@ if( isset($_POST["CW_ID"]) ) {
 		// Редактируем замесы
 		$query = "
 			UPDATE list__Batches
-			SET CW_ID = {$CW_ID}
-				,OP_ID = {$OP_ID}
-				,batch_date = '{$batch_date}'
-				,batch_time = '{$batch_time}'
-				,comp_density = {$comp_density}
-				,mix_density = {$mix_density}
-				,iron_oxide = {$iron_oxide}
-				,sand = {$sand}
-				,crushed_stone = {$crushed_stone}
-				,cement = {$cement}
-				,water = {$water}
-				,underfilling = {$underfilling}
+			SET
+				CW_ID = {$CW_ID},
+				OP_ID = {$OP_ID},
+				batch_date = '{$batch_date}',
+				batch_time = '{$batch_time}',
+				comp_density = {$comp_density},
+				mix_density = {$mix_density},
+				iron_oxide = {$iron_oxide},
+				sand = {$sand},
+				crushed_stone = {$crushed_stone},
+				cement = {$cement},
+				water = {$water},
+				underfilling = {$underfilling}
 			WHERE LB_ID = {$_POST["LB_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -47,7 +48,7 @@ if( isset($_POST["CW_ID"]) ) {
 				$query = "
 					UPDATE list__Pourings
 					SET cassette = {$value}
-					WHERE LP_ID = {$key}
+					WHERE LB_ID = {$LB_ID} AND sort = {$key}
 				";
 				if( !mysqli_query( $mysqli, $query ) ) {
 					$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -57,40 +58,63 @@ if( isset($_POST["CW_ID"]) ) {
 	}
 	// Сохраняем новый маршрутный лист
 	else {
+		// Проверяем наличие дублирующих ключей
+		$cassette = implode(",", $_POST["cassette"]);
 		$query = "
-			INSERT INTO list__Batches
-			SET CW_ID = {$CW_ID}
-				,OP_ID = {$OP_ID}
-				,batch_date = '{$batch_date}'
-				,batch_time = '{$batch_time}'
-				,comp_density = {$comp_density}
-				,mix_density = {$mix_density}
-				,iron_oxide = {$iron_oxide}
-				,sand = {$sand}
-				,crushed_stone = {$crushed_stone}
-				,cement = {$cement}
-				,water = {$water}
-				,underfilling = {$underfilling}
+			SELECT
+				DATE_FORMAT(LP.pouring_date, '%d.%m.%y') pouring_date,
+				LP.cassette
+			FROM list__Pourings LP
+			WHERE LP.pouring_date = '{$batch_date}' AND LP.cassette IN ({$cassette})
 		";
-		if( !mysqli_query( $mysqli, $query ) ) {
-			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		if( mysqli_num_rows($res) ) {
+			while( $row = mysqli_fetch_array($res) ) {
+				$_SESSION["error"][] = "Кассета №{$row["cassette"]} уже заливалась {$row["pouring_date"]}.";
+			}
 		}
 		else {
-			$add = 1;
-			$LB_ID = mysqli_insert_id( $mysqli );
-			// Записываем заливки
-			foreach ($_POST["cassette"] as $value) {
-				$query = "
-					INSERT INTO list__Pourings
-					SET LB_ID = {$LB_ID}
-						,cassette = {$value}
-				";
-				if( !mysqli_query( $mysqli, $query ) ) {
-					$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+			// Создаем замес
+			$query = "
+				INSERT INTO list__Batches
+				SET
+					CW_ID = {$CW_ID},
+					OP_ID = {$OP_ID},
+					batch_date = '{$batch_date}',
+					batch_time = '{$batch_time}',
+					comp_density = {$comp_density},
+					mix_density = {$mix_density},
+					iron_oxide = {$iron_oxide},
+					sand = {$sand},
+					crushed_stone = {$crushed_stone},
+					cement = {$cement},
+					water = {$water},
+					underfilling = {$underfilling}
+			";
+			if( !mysqli_query( $mysqli, $query ) ) {
+				$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+			}
+			else {
+				$add = 1;
+				$LB_ID = mysqli_insert_id( $mysqli );
+				// Записываем заливки
+				foreach ($_POST["cassette"] as $key => $value) {
+					$query = "
+						INSERT INTO list__Pourings
+						SET
+							pouring_date = '{$batch_date}',
+							cassette = {$value},
+							LB_ID = {$LB_ID},
+							sort = {$key}
+					";
+					if( !mysqli_query( $mysqli, $query ) ) {
+						$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+					}
 				}
 			}
 		}
 	}
+
 	if( count($_SESSION["error"]) == 0) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
