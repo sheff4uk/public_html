@@ -291,6 +291,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				}
 				else {
 					$('#checklist_form select[name="CW_ID"]').val('').change();
+					$('#checklist_form input[name="batch_date"]').val('');
+					$('#checklist_form select[name="OP_ID"]').val('');
 				}
 
 				// Разблокируем выбор противовеса
