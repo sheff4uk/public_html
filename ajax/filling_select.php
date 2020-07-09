@@ -11,7 +11,9 @@ if( $type == 1 ) {
 		SELECT LF.LF_ID
 			,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date
 			,LF.cassette
+			,CW.item
 		FROM list__Batch LB
+		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		WHERE LO.LO_ID IS NULL
@@ -25,7 +27,9 @@ if( $type == 2 ) {
 		SELECT LF.LF_ID
 			,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date
 			,LF.cassette
+			,CW.item
 		FROM list__Batch LB
+		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
 		WHERE LP.LP_ID IS NULL
@@ -36,7 +40,7 @@ if( $type == 2 ) {
 
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$filling_select .= "<option value=\"{$row["LF_ID"]}\">{$row["batch_date"]} кассета №{$row["cassette"]}</option>";
+	$filling_select .= "<option value=\"{$row["LF_ID"]}\">{$row["batch_date"]} кассета[{$row["cassette"]}] {$row["item"]}</option>";
 }
 
 echo "$('#filling_select').html('{$filling_select}');";

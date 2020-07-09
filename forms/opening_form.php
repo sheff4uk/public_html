@@ -90,7 +90,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 				<span>Заливка:</span>
-				<select name="LF_ID" id="filling_select" style="width: 200px;" required>
+				<select name="LF_ID" id="filling_select" style="width: 300px;" required>
 					<!--Данные аяксом-->
 				</select>
 			</div>
