@@ -34,13 +34,33 @@ include "header.php";
 				<option value=""></option>
 				<?
 				$query = "
-					SELECT CW.CW_ID, CW.item, CW.min_weight, CW.max_weight, CW.in_cassette
+					SELECT CW.CW_ID, CW.item
 					FROM CounterWeight CW
+					ORDER BY CW.CW_ID
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
 					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
-					echo "<option value='{$row["CW_ID"]}' in_cassette='{$row["in_cassette"]}' min_weight='{$row["min_weight"]}' max_weight='{$row["max_weight"]}' {$selected}>{$row["item"]}</option>";
+					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>Брэнд:</span>
+			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT CB.CB_ID, CB.brand
+					FROM ClientBrand CB
+					ORDER BY CB.CB_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
+					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
 				}
 				?>
 			</select>
@@ -113,6 +133,7 @@ $query = "
 		".($_GET["date_from"] ? "AND RS.filling_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND RS.filling_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND RS.CW_ID={$_GET["CW_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND RS.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	GROUP BY filling_date
 	ORDER BY RS.filling_date DESC
 ";
@@ -141,6 +162,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		JOIN CounterWeight CW ON CW.CW_ID = RS.CW_ID
 		WHERE filling_date LIKE '{$row["filling_date"]}'
 			".($_GET["CW_ID"] ? "AND RS.CW_ID={$_GET["CW_ID"]}" : "")."
+			".($_GET["CB_ID"] ? "AND RS.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		GROUP BY RS.filling_date, RS.CW_ID
 		ORDER BY RS.filling_date DESC, RS.CW_ID
 	";
@@ -212,6 +234,7 @@ if( $filter ) {
 			".($_GET["date_from"] ? "AND RS.filling_date >= '{$_GET["date_from"]}'" : "")."
 			".($_GET["date_to"] ? "AND RS.filling_date <= '{$_GET["date_to"]}'" : "")."
 			".($_GET["CW_ID"] ? "AND RS.CW_ID={$_GET["CW_ID"]}" : "")."
+			".($_GET["CB_ID"] ? "AND RS.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
@@ -240,6 +263,7 @@ if( $filter ) {
 				".($_GET["date_from"] ? "AND RS.filling_date >= '{$_GET["date_from"]}'" : "")."
 				".($_GET["date_to"] ? "AND RS.filling_date <= '{$_GET["date_to"]}'" : "")."
 				".($_GET["CW_ID"] ? "AND RS.CW_ID={$_GET["CW_ID"]}" : "")."
+				".($_GET["CB_ID"] ? "AND RS.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 			GROUP BY RS.CW_ID
 			ORDER BY RS.CW_ID
 		";

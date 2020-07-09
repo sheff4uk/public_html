@@ -64,13 +64,14 @@ $limit = 500;
 				<option value=""></option>
 				<?
 				$query = "
-					SELECT CW.CW_ID, CW.item, CW.min_weight, CW.max_weight, CW.in_cassette
+					SELECT CW.CW_ID, CW.item
 					FROM CounterWeight CW
+					ORDER BY CW.CW_ID
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
 					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
-					echo "<option value='{$row["CW_ID"]}' in_cassette='{$row["in_cassette"]}' min_weight='{$row["min_weight"]}' max_weight='{$row["max_weight"]}' {$selected}>{$row["item"]}</option>";
+					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
 				}
 				?>
 			</select>

@@ -157,6 +157,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					$query = "
 						SELECT CW.CW_ID, CW.item, CW.fillings, CW.type
 						FROM CounterWeight CW
+						ORDER BY CW.CW_ID
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) ) {
