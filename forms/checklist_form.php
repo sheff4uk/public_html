@@ -9,8 +9,8 @@ if( isset($_POST["CW_ID"]) ) {
 	$OP_ID = $_POST["OP_ID"];
 	$batch_date = $_POST["batch_date"];
 	$batch_time = $_POST["batch_time"];
-	$comp_density = $_POST["comp_density"];
-	$mix_density = $_POST["mix_density"];
+	$comp_density = $_POST["comp_density"]*1000;
+	$mix_density = $_POST["mix_density"]*1000;
 	$iron_oxide = $_POST["iron_oxide"] ? $_POST["iron_oxide"] : "NULL";
 	$sand = $_POST["sand"] ? $_POST["sand"] : "NULL";
 	$crushed_stone = $_POST["crushed_stone"] ? $_POST["crushed_stone"] : "NULL";
@@ -22,7 +22,7 @@ if( isset($_POST["CW_ID"]) ) {
 	if( $_POST["LB_ID"] ) {
 		// Редактируем замесы
 		$query = "
-			UPDATE list__Batches
+			UPDATE list__Batch
 			SET
 				CW_ID = {$CW_ID},
 				OP_ID = {$OP_ID},
@@ -46,9 +46,9 @@ if( isset($_POST["CW_ID"]) ) {
 			// Редактируем заливки
 			foreach ($_POST["cassette"] as $key => $value) {
 				$query = "
-					UPDATE list__Pourings
+					UPDATE list__Filling
 					SET cassette = {$value}
-					WHERE LB_ID = {$LB_ID} AND sort = {$key}
+					WHERE LF_ID = {$key}
 				";
 				if( !mysqli_query( $mysqli, $query ) ) {
 					$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -58,57 +58,63 @@ if( isset($_POST["CW_ID"]) ) {
 	}
 	// Сохраняем новый маршрутный лист
 	else {
-		// Проверяем наличие дублирующих ключей
-		$cassette = implode(",", $_POST["cassette"]);
-		$query = "
-			SELECT
-				DATE_FORMAT(LP.pouring_date, '%d.%m.%y') pouring_date,
-				LP.cassette
-			FROM list__Pourings LP
-			WHERE LP.pouring_date = '{$batch_date}' AND LP.cassette IN ({$cassette})
-		";
-		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		if( mysqli_num_rows($res) ) {
-			while( $row = mysqli_fetch_array($res) ) {
-				$_SESSION["error"][] = "Кассета №{$row["cassette"]} уже заливалась {$row["pouring_date"]}.";
-			}
+		// Проверяем нет ли повторяющихся кассет
+		if( count(array_unique($_POST["cassette"])) != count($_POST["cassette"]) ) {
+			$_SESSION["error"][] = "Введенные номера кассет повторяются.";
 		}
 		else {
-			// Создаем замес
+			// Проверяем наличие дублирующих ключей
+			$cassette = implode(",", $_POST["cassette"]);
 			$query = "
-				INSERT INTO list__Batches
-				SET
-					CW_ID = {$CW_ID},
-					OP_ID = {$OP_ID},
-					batch_date = '{$batch_date}',
-					batch_time = '{$batch_time}',
-					comp_density = {$comp_density},
-					mix_density = {$mix_density},
-					iron_oxide = {$iron_oxide},
-					sand = {$sand},
-					crushed_stone = {$crushed_stone},
-					cement = {$cement},
-					water = {$water},
-					underfilling = {$underfilling}
+				SELECT
+					DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date,
+					DATE_FORMAT(LB.batch_time, '%H:%i') batch_time,
+					LF.cassette
+				FROM list__Batch LB
+				JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+				WHERE LB.batch_date = '{$batch_date}' AND LF.cassette IN ({$cassette})
 			";
-			if( !mysqli_query( $mysqli, $query ) ) {
-				$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			if( mysqli_num_rows($res) ) {
+				while( $row = mysqli_fetch_array($res) ) {
+					$_SESSION["error"][] = "Кассета №{$row["cassette"]} уже заливалась {$row["batch_date"]} в {$row["batch_time"]}.";
+				}
 			}
 			else {
-				$add = 1;
-				$LB_ID = mysqli_insert_id( $mysqli );
-				// Записываем заливки
-				foreach ($_POST["cassette"] as $key => $value) {
-					$query = "
-						INSERT INTO list__Pourings
-						SET
-							pouring_date = '{$batch_date}',
-							cassette = {$value},
-							LB_ID = {$LB_ID},
-							sort = {$key}
-					";
-					if( !mysqli_query( $mysqli, $query ) ) {
-						$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+				// Создаем замес
+				$query = "
+					INSERT INTO list__Batch
+					SET
+						CW_ID = {$CW_ID},
+						OP_ID = {$OP_ID},
+						batch_date = '{$batch_date}',
+						batch_time = '{$batch_time}',
+						comp_density = {$comp_density},
+						mix_density = {$mix_density},
+						iron_oxide = {$iron_oxide},
+						sand = {$sand},
+						crushed_stone = {$crushed_stone},
+						cement = {$cement},
+						water = {$water},
+						underfilling = {$underfilling}
+				";
+				if( !mysqli_query( $mysqli, $query ) ) {
+					$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+				}
+				else {
+					$add = 1;
+					$LB_ID = mysqli_insert_id( $mysqli );
+					// Записываем заливки
+					foreach ($_POST["cassette"] as $key => $value) {
+						$query = "
+							INSERT INTO list__Filling
+							SET
+								cassette = {$value},
+								LB_ID = {$LB_ID}
+						";
+						if( !mysqli_query( $mysqli, $query ) ) {
+							$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+						}
 					}
 				}
 			}
@@ -184,7 +190,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<thead>
 					<tr>
 						<th rowspan="2">Время</th>
-						<th colspan="2">Масса кубика, х10 г</th>
+						<th colspan="2">Масса кубика, кг</th>
 						<th rowspan="2">Окалина, кг</th>
 						<th rowspan="2">КМП, кг</th>
 						<th rowspan="2">Отсев, кг</th>
@@ -201,8 +207,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<tbody style="text-align: center;">
 					<tr>
 						<td><input type='time' name='batch_time' required></td>
-						<td><input type='number' min='200' max='300' name='comp_density' style='width: 80px;' required></td>
-						<td><input type='number' min='250' max='350' name='mix_density' style='width: 80px;' required></td>
+						<td><input type='number' min='2' max='3' step='0.01' name='comp_density' style='width: 80px;' required></td>
+						<td><input type='number' min='2.5' max='3.5' step='0.01' name='mix_density' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='iron_oxide' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='sand' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='crushed_stone' style='width: 80px;' required></td>
@@ -230,15 +236,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 		// Если было добавление замеса, автоматичеки открывается форма для новой записи
 		$(document).ready(function() {
 			$('#add_btn').click();
-//			$('#checklist_form select[name="CW_ID"]').val(1).change();
-//			$('#checklist_form input[name="batch_date"]').val('2020-07-03');
-//			$('#checklist_form select[name="OP_ID"]').val(1);
 		});
 		<?
 		}
 		?>
 
-		// Кнопка добавления маршрутного листа
+		// Кнопка добавления замеса
 		$('.add_checklist').click( function() {
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });

@@ -1,6 +1,6 @@
 <?
 include "config.php";
-$title = 'Чек-лист';
+$title = 'Замес/Заливка';
 include "header.php";
 include "./forms/checklist_form.php";
 ?>
@@ -11,7 +11,7 @@ include "./forms/checklist_form.php";
 			<th rowspan="2">Дата<br>Противовес</th>
 			<th rowspan="2">Время</th>
 			<th rowspan="2">Оператор</th>
-			<th colspan="2">Масса кубика, х10 г</th>
+			<th colspan="2">Масса кубика, кг</th>
 			<th rowspan="2">Окалина, кг</th>
 			<th rowspan="2">КМП, кг</th>
 			<th rowspan="2">Отсев, кг</th>
@@ -35,7 +35,7 @@ $query = "
 		LB.batch_date,
 		LB.CW_ID,
 		SUM(1) cnt
-	FROM list__Batches LB
+	FROM list__Batch LB
 	GROUP BY LB.batch_date, LB.CW_ID
 	ORDER BY LB.batch_date DESC, LB.CW_ID
 	LIMIT 30
@@ -50,25 +50,28 @@ while( $row = mysqli_fetch_array($res) ) {
 			,OP.name
 			,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date
 			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time
-			,LB.comp_density
-			,LB.mix_density
+			,LB.comp_density/1000 comp_density
+			,LB.mix_density/1000 mix_density
 			,LB.iron_oxide
 			,LB.sand
 			,LB.crushed_stone
 			,LB.cement
 			,LB.water
-			,GROUP_CONCAT(LP.cassette ORDER BY LP.sort SEPARATOR '/') cassette
+			,GROUP_CONCAT(LF.cassette ORDER BY LF.LF_ID SEPARATOR '/') cassette
 			,LB.underfilling
-		FROM list__Batches LB
+		FROM list__Batch LB
 		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
-		JOIN list__Pourings LP ON LP.LB_ID = LB.LB_ID
+		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		WHERE LB.batch_date LIKE '{$row["batch_date"]}' AND LB.CW_ID = {$row["CW_ID"]}
 		GROUP BY LB.LB_ID
 		ORDER BY LB.batch_time ASC
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
+		$comp_density = (float)$subrow["comp_density"];
+		$mix_density = (float)$subrow["mix_density"];
+
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
 			echo "<tr style='border-top: 2px solid #333;' id='{$subrow["LB_ID"]}'>";
@@ -81,8 +84,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		?>
 				<td><?=$subrow["batch_time"]?></td>
 				<td><?=$subrow["name"]?></td>
-				<td><?=$subrow["comp_density"]?></td>
-				<td><?=$subrow["mix_density"]?></td>
+				<td><?=$comp_density?></td>
+				<td><?=$mix_density?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["iron_oxide"]?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["sand"]?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["crushed_stone"]?></td>
