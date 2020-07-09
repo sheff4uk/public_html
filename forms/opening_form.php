@@ -123,10 +123,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<tbody style="text-align: center;">
 					<tr>
 						<td><input type='time' name='o_time' required></td>
-						<td><input type="number" name="o_not_spill" class="o_defect" min="0" style="width: 50px;"></td>
-						<td><input type="number" name="o_crack" class="o_defect" min="0" style="width: 50px;"></td>
-						<td><input type="number" name="o_chipped" class="o_defect" min="0" style="width: 50px;"></td>
-						<td><input type="number" name="o_def_form" class="o_defect" min="0" style="width: 50px;"></td>
+						<td><input type="number" name="o_not_spill" min="0" style="width: 70px;"></td>
+						<td><input type="number" name="o_crack" min="0" style="width: 70px;"></td>
+						<td><input type="number" name="o_chipped" min="0" style="width: 70px;"></td>
+						<td><input type="number" name="o_def_form" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="weight1" min="5" max="20" step="0.01" required></td>
 						<td><input type="number" name="weight2" min="5" max="20" step="0.01" required></td>
 						<td><input type="number" name="weight3" min="5" max="20" step="0.01" required></td>
@@ -165,7 +165,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
-			var LO_ID = $(this).attr("LO_ID");
+			var LO_ID = $(this).attr("LO_ID"),
+				o_date = $(this).attr("o_date"),
+				o_post = $(this).attr("o_post");
 
 			// В случае редактирования заполняем форму
 			if( LO_ID ) {
@@ -203,8 +205,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				// Генерируем список свободных заливок
 				$.ajax({ url: "/ajax/filling_select.php?type=1", dataType: "script", async: false });
 
-				$('#opening_form input[name="o_date"]').val('');
-				$('#opening_form input[name="o_post"]').val('');
+				$('#opening_form input[name="o_date"]').val(o_date);
+				$('#opening_form input[name="o_post"]').val(o_post);
 				$('#opening_form table input').val('');
 				$('#opening_form table select').val('');
 			}
