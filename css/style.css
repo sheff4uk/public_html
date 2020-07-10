@@ -12,8 +12,8 @@ body {
 	padding-top: 60px;
 }
 input:focus, select:focus {
-	background: rgb(255, 0, 0, .2);
-	box-shadow: 0px 0px 8px 0px #f00;
+	background: rgb(255, 255, 0, .2);
+	box-shadow: 0px 0px 8px 0px #ff0;
 }
 .page {
 	width: 990px;
