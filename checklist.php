@@ -59,6 +59,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.water
 			,GROUP_CONCAT(LF.cassette ORDER BY LF.LF_ID SEPARATOR '/') cassette
 			,LB.underfilling
+			,LB.mix_diff/1000 mix_diff
+			,LB.mix_error
 		FROM list__Batch LB
 		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
@@ -71,6 +73,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	while( $subrow = mysqli_fetch_array($subres) ) {
 		$comp_density = (float)$subrow["comp_density"];
 		$mix_density = (float)$subrow["mix_density"];
+		$mix_diff = (float)$subrow["mix_diff"];
 
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
@@ -85,7 +88,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td><?=$subrow["batch_time"]?></td>
 				<td><?=$subrow["name"]?></td>
 				<td><?=$comp_density?></td>
-				<td><?=$mix_density?></td>
+				<td><?=$mix_density?> <font style="font-size: .8em;" color="<?=($subrow["mix_error"] ? "red" : "green")?>"><?=($mix_diff > 0 ? "+".$mix_diff : $mix_diff)?></font></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["iron_oxide"]?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["sand"]?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["crushed_stone"]?></td>
