@@ -85,7 +85,7 @@ $limit = 500;
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>№ кассеты:</span>
-			<input name="cassette" type="number" min="1" max="200" value="<?=$_GET["cassette"]?>" style="width: 70px;" class="<?=$_GET["cassette"] ? "filtered" : ""?>">
+			<input name="cassette" type="number" min="1" max="206" value="<?=$_GET["cassette"]?>" style="width: 70px;" class="<?=$_GET["cassette"] ? "filtered" : ""?>">
 		</div>
 
 		<div class="nowrap" style="margin-bottom: 10px;">

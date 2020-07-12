@@ -14,7 +14,7 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) )
 {
-	$cassette .= "<input type=\'number\' min=\'1\' max=\'200\' name=\'cassette[{$row["LF_ID"]}]\' value=\'{$row["cassette"]}\' required>";
+	$cassette .= "<input type=\'number\' min=\'1\' max=\'206\' name=\'cassette[{$row["LF_ID"]}]\' value=\'{$row["cassette"]}\' required>";
 }
 
 echo "$('#fillings').html('{$cassette}');";

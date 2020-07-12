@@ -172,7 +172,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							?>
 						</select>
 					</td>
-					<td><input type="number" name="cassette" min="1" max="200" style="width: 70px;" required></td>
+					<td><input type="number" name="cassette" min="1" max="206" style="width: 70px;" required></td>
 					<td><input type="number" name="amount" min="0" style="width: 70px;" required></td>
 					<td colspan="5" style="background-color: #333333;"></td>
 				</tr>

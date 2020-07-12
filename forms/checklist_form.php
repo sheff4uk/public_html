@@ -320,7 +320,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				cassette = '';
 			// Выводим инпуты для номеров кассет
 			for (var i = 0; i < fillings; i++) {
-				var cassette = cassette + '<input type="number" min="1" max="200" name="cassette[]" style="display: none;" required>';
+				var cassette = cassette + '<input type="number" min="1" max="206" name="cassette[]" style="display: none;" required>';
 			}
 			$('#fillings').html(cassette);
 			$('#checklist_form input[name="cassette[]"]').show('fast');
