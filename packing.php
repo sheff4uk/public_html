@@ -50,10 +50,10 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["p_date"]?></td>
 		<td><?=$row["p_time"]?></td>
 		<td><?=$row["p_post"]?></td>
-		<td><?=$row["p_not_spill"]?></td>
-		<td><?=$row["p_crack"]?></td>
-		<td><?=$row["p_chipped"]?></td>
-		<td><?=$row["p_def_form"]?></td>
+		<td style="color: red;"><?=$row["p_not_spill"]?></td>
+		<td style="color: red;"><?=$row["p_crack"]?></td>
+		<td style="color: red;"><?=$row["p_chipped"]?></td>
+		<td style="color: red;"><?=$row["p_def_form"]?></td>
 		<td title="Кассета[<?=$row["cassette"]?>] <?=$row["item"]?>" style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["batch_date"]?> <i class="fas fa-question-circle"></i></td>
 		<td><a href="#" class="add_packing" LP_ID="<?=$row["LP_ID"]?>" title="Изменить данные упаковки"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>

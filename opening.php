@@ -60,10 +60,10 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["o_date"]?></td>
 		<td><?=$row["o_time"]?></td>
 		<td><?=$row["o_post"]?></td>
-		<td><?=$row["o_not_spill"]?></td>
-		<td><?=$row["o_crack"]?></td>
-		<td><?=$row["o_chipped"]?></td>
-		<td><?=$row["o_def_form"]?></td>
+		<td style="color: red;"><?=$row["o_not_spill"]?></td>
+		<td style="color: red;"><?=$row["o_crack"]?></td>
+		<td style="color: red;"><?=$row["o_chipped"]?></td>
+		<td style="color: red;"><?=$row["o_def_form"]?></td>
 		<td><?=$weight1?></td>
 		<td><?=$weight2?></td>
 		<td><?=$weight3?></td>

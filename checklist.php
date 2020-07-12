@@ -88,7 +88,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td><?=$subrow["batch_time"]?></td>
 				<td><?=$subrow["name"]?></td>
 				<td><?=$comp_density?></td>
-				<td><?=$mix_density?> <font style="font-size: .8em;" color="<?=($subrow["mix_error"] ? "red" : "green")?>"><?=($mix_diff > 0 ? "+".$mix_diff : $mix_diff)?></font></td>
+				<td><?=$mix_density?><?="<font style='font-size: .8em;' color='red'>".($subrow["mix_error"] ? ($mix_diff > 0 ? " +".$mix_diff : " ".$mix_diff) : "")."</font>"?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["iron_oxide"]?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["sand"]?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["crushed_stone"]?></td>
