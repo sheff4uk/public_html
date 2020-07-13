@@ -11,7 +11,7 @@ include "./forms/opening_form.php";
 			<th rowspan="2">Время</th>
 			<th rowspan="2">№ поста</th>
 			<th colspan="4">Кол-во брака, шт</th>
-			<th colspan="3">Взвешивания, кг</th>
+			<th colspan="3">Взвешивания, кг ±3%</th>
 			<th rowspan="2">Заливка</th>
 			<th rowspan="2"></th>
 		</tr>
@@ -37,9 +37,15 @@ $query = "
 		,LO.o_crack
 		,LO.o_chipped
 		,LO.o_def_form
-		,LO.weight1/1000 weight1
-		,LO.weight2/1000 weight2
-		,LO.weight3/1000 weight3
+		,LO.weight1
+		,LO.weight2
+		,LO.weight3
+		,LO.w1_diff
+		,LO.w2_diff
+		,LO.w3_diff
+		,LO.w1_error
+		,LO.w2_error
+		,LO.w3_error
 		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date
 		,LF.cassette
 		,CW.item
@@ -52,9 +58,6 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$weight1 = (float)$row["weight1"];
-	$weight2 = (float)$row["weight2"];
-	$weight3 = (float)$row["weight3"];
 	?>
 	<tr id="<?=$row["LO_ID"]?>">
 		<td><?=$row["o_date"]?></td>
@@ -64,9 +67,9 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td style="color: red;"><?=$row["o_crack"]?></td>
 		<td style="color: red;"><?=$row["o_chipped"]?></td>
 		<td style="color: red;"><?=$row["o_def_form"]?></td>
-		<td><?=$weight1?></td>
-		<td><?=$weight2?></td>
-		<td><?=$weight3?></td>
+		<td><?=$row["weight1"]/1000?><?=($row["w1_error"] ? "<font style='font-size: .8em;' color='red'>".($row["w1_diff"] > 0 ? " +" : " ").($row["w1_diff"]/10)."%</font>" : "")?></td>
+		<td><?=$row["weight2"]/1000?><?=($row["w2_error"] ? "<font style='font-size: .8em;' color='red'>".($row["w2_diff"] > 0 ? " +" : " ").($row["w2_diff"]/10)."%</font>" : "")?></td>
+		<td><?=$row["weight3"]/1000?><?=($row["w3_error"] ? "<font style='font-size: .8em;' color='red'>".($row["w3_diff"] > 0 ? " +" : " ").($row["w3_diff"]/10)."%</font>" : "")?></td>
 		<td title="Кассета[<?=$row["cassette"]?>] <?=$row["item"]?>" style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["batch_date"]?> <i class="fas fa-question-circle"></i></td>
 		<td><a href="#" class="add_opening" LO_ID="<?=$row["LO_ID"]?>" title="Изменить данные расформовки"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>

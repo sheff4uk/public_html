@@ -23,7 +23,7 @@ include "./forms/checklist_form.php";
 		</tr>
 		<tr>
 			<th>Контрольный компонент</th>
-			<th>Раствор</th>
+			<th>Раствор ±0.05</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
@@ -50,8 +50,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			,OP.name
 			,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date
 			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time
-			,LB.comp_density/1000 comp_density
-			,LB.mix_density/1000 mix_density
+			,LB.comp_density
+			,LB.mix_density
 			,LB.iron_oxide
 			,LB.sand
 			,LB.crushed_stone
@@ -59,7 +59,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.water
 			,GROUP_CONCAT(LF.cassette ORDER BY LF.LF_ID SEPARATOR '/') cassette
 			,LB.underfilling
-			,LB.mix_diff/1000 mix_diff
+			,LB.mix_diff
 			,LB.mix_error
 		FROM list__Batch LB
 		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
@@ -71,9 +71,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
-		$comp_density = (float)$subrow["comp_density"];
-		$mix_density = (float)$subrow["mix_density"];
-		$mix_diff = (float)$subrow["mix_diff"];
 
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
@@ -87,8 +84,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		?>
 				<td><?=$subrow["batch_time"]?></td>
 				<td><?=$subrow["name"]?></td>
-				<td><?=$comp_density?></td>
-				<td><?=$mix_density?><?="<font style='font-size: .8em;' color='red'>".($subrow["mix_error"] ? ($mix_diff > 0 ? " +".$mix_diff : " ".$mix_diff) : "")."</font>"?></td>
+				<td><?=$subrow["comp_density"]/1000?></td>
+				<td><?=$subrow["mix_density"]/1000?><?=($subrow["mix_error"] ? "<font style='font-size: .8em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["iron_oxide"]?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["sand"]?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["crushed_stone"]?></td>
