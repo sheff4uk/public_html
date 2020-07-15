@@ -127,10 +127,10 @@ if( isset($_POST["CW_ID"]) ) {
 
 	// Перенаправление в журнал чек листов оператора
 	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/checklist.php?CW_ID='.$CW_ID.'&batch_date='.$batch_date.'&OP_ID='.$OP_ID.'&add#'.$LB_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/checklist.php?CW_ID='.$CW_ID.'&date_from='.$batch_date.'&date_to='.$batch_date.'&batch_date='.$batch_date.'&OP_ID='.$OP_ID.'&add#'.$LB_ID.'">');
 	}
 	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/checklist.php#'.$LB_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/checklist.php?date_from='.$batch_date.'&date_to='.$batch_date.'#'.$LB_ID.'">');
 	}
 }
 ///////////////////////////////////////////////////////
