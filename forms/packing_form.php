@@ -67,8 +67,8 @@ if( isset($_POST["LF_ID"]) ) {
 ?>
 
 <style>
-	#opening_form table input,
-	#opening_form table select {
+	#packing_form table input,
+	#packing_form table select {
 		font-size: 1.2em;
 	}
 </style>
@@ -136,7 +136,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 		<?
 		if( isset($_GET["add"]) ) {
 		?>
-		// Если было добавление расформовки, автоматичеки открывается форма для новой записи
+		// Если было добавление упаковки, автоматичеки открывается форма для новой записи
 		$(document).ready(function() {
 			$('#add_btn').click();
 		});
@@ -144,7 +144,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 		}
 		?>
 
-		// Кнопка добавления расформовки
+		// Кнопка добавления упаковки
 		$('.add_packing').click( function() {
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });

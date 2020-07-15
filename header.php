@@ -187,6 +187,7 @@ function src_url($src) {
 		$menu["Операции"]["Замес+Заливка"] = "checklist.php";
 		$menu["Операции"]["Расформовка"] = "opening.php";
 		$menu["Операции"]["Упаковка"] = "packing.php";
+		$menu["Доп. данные"]["Суточный&nbsp;брак"] = "daily_reject.php";
 		$menu["Маршрутный лист"] = "route_sheet.php";
 		$menu["Статистика"] = "statistic.php";
 		$menu["Выход {$USR_Icon}"] = "exit.php";
