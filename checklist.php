@@ -111,7 +111,7 @@ foreach ($_GET as &$value) {
 		</tr>
 		<tr>
 			<th>Контрольный компонент</th>
-			<th>Раствор ±0.05</th>
+			<th>Раствор</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
@@ -152,7 +152,6 @@ while( $row = mysqli_fetch_array($res) ) {
 			,GROUP_CONCAT(LF.cassette ORDER BY LF.LF_ID SEPARATOR '/') cassette
 			,LB.underfilling
 			,LB.mix_diff
-			,LB.mix_error
 		FROM list__Batch LB
 		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
@@ -177,7 +176,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td><?=$subrow["batch_time"]?></td>
 				<td><?=$subrow["name"]?></td>
 				<td><?=$subrow["comp_density"]/1000?></td>
-				<td><?=$subrow["mix_density"]/1000?><?=($subrow["mix_error"] ? "<font style='font-size: .8em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
+				<td><?=$subrow["mix_density"]/1000?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["iron_oxide"]?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["sand"]?></td>
 				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["crushed_stone"]?></td>
