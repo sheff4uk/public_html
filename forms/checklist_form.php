@@ -18,52 +18,75 @@ if( isset($_POST["CW_ID"]) ) {
 	$water = $_POST["water"];
 	$underfilling = $_POST["underfilling"] ? $_POST["underfilling"] : 0;
 
-	// Редактируем маршрутный лист
+	// Редактируем замес
 	if( $_POST["LB_ID"] ) {
-		// Редактируем замесы
-		$query = "
-			UPDATE list__Batch
-			SET
-				CW_ID = {$CW_ID},
-				OP_ID = {$OP_ID},
-				batch_date = '{$batch_date}',
-				batch_time = '{$batch_time}',
-				comp_density = {$comp_density},
-				mix_density = {$mix_density},
-				iron_oxide = {$iron_oxide},
-				sand = {$sand},
-				crushed_stone = {$crushed_stone},
-				cement = {$cement},
-				water = {$water},
-				underfilling = {$underfilling}
-			WHERE LB_ID = {$_POST["LB_ID"]}
-		";
-		if( !mysqli_query( $mysqli, $query ) ) {
-			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+				// Проверяем нет ли повторяющихся кассет
+		if( count(array_unique($_POST["cassette"])) != count($_POST["cassette"]) ) {
+			$_SESSION["error"][] = "Введенные номера кассет повторяются.";
 		}
 		else {
-			$LB_ID = $_POST["LB_ID"];
-			// Редактируем заливки
-			foreach ($_POST["cassette"] as $key => $value) {
-				$query = "
-					UPDATE list__Filling
-					SET cassette = {$value}
-					WHERE LF_ID = {$key}
-				";
-				if( !mysqli_query( $mysqli, $query ) ) {
-					$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+			// Проверяем наличие таких же кассет в этот день
+			$cassette = implode(",", $_POST["cassette"]);
+			$query = "
+				SELECT
+					DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date,
+					DATE_FORMAT(LB.batch_time, '%H:%i') batch_time,
+					LF.cassette
+				FROM list__Batch LB
+				JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+				WHERE LB.batch_date = '{$batch_date}' AND LF.cassette IN ({$cassette}) AND LB.LB_ID != {$_POST["LB_ID"]}
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			if( mysqli_num_rows($res) ) {
+				while( $row = mysqli_fetch_array($res) ) {
+					$_SESSION["alert"][] = "Кассета №{$row["cassette"]} уже заливалась {$row["batch_date"]} в {$row["batch_time"]}.";
+				}
+			}
+			// Редактируем замесы
+			$query = "
+				UPDATE list__Batch
+				SET
+					CW_ID = {$CW_ID},
+					OP_ID = {$OP_ID},
+					batch_date = '{$batch_date}',
+					batch_time = '{$batch_time}',
+					comp_density = {$comp_density},
+					mix_density = {$mix_density},
+					iron_oxide = {$iron_oxide},
+					sand = {$sand},
+					crushed_stone = {$crushed_stone},
+					cement = {$cement},
+					water = {$water},
+					underfilling = {$underfilling}
+				WHERE LB_ID = {$_POST["LB_ID"]}
+			";
+			if( !mysqli_query( $mysqli, $query ) ) {
+				$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+			}
+			else {
+				$LB_ID = $_POST["LB_ID"];
+				// Редактируем заливки
+				foreach ($_POST["cassette"] as $key => $value) {
+					$query = "
+						UPDATE list__Filling
+						SET cassette = {$value}
+						WHERE LF_ID = {$key}
+					";
+					if( !mysqli_query( $mysqli, $query ) ) {
+						$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+					}
 				}
 			}
 		}
 	}
-	// Сохраняем новый маршрутный лист
+	// Сохраняем новый замес
 	else {
 		// Проверяем нет ли повторяющихся кассет
 		if( count(array_unique($_POST["cassette"])) != count($_POST["cassette"]) ) {
 			$_SESSION["error"][] = "Введенные номера кассет повторяются.";
 		}
 		else {
-			// Проверяем наличие дублирующих ключей
+			// Проверяем наличие таких же кассет в этот день
 			$cassette = implode(",", $_POST["cassette"]);
 			$query = "
 				SELECT
@@ -77,44 +100,42 @@ if( isset($_POST["CW_ID"]) ) {
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			if( mysqli_num_rows($res) ) {
 				while( $row = mysqli_fetch_array($res) ) {
-					$_SESSION["error"][] = "Кассета №{$row["cassette"]} уже заливалась {$row["batch_date"]} в {$row["batch_time"]}.";
+					$_SESSION["alert"][] = "Кассета №{$row["cassette"]} уже заливалась {$row["batch_date"]} в {$row["batch_time"]}.";
 				}
 			}
+			// Создаем замес
+			$query = "
+				INSERT INTO list__Batch
+				SET
+					CW_ID = {$CW_ID},
+					OP_ID = {$OP_ID},
+					batch_date = '{$batch_date}',
+					batch_time = '{$batch_time}',
+					comp_density = {$comp_density},
+					mix_density = {$mix_density},
+					iron_oxide = {$iron_oxide},
+					sand = {$sand},
+					crushed_stone = {$crushed_stone},
+					cement = {$cement},
+					water = {$water},
+					underfilling = {$underfilling}
+			";
+			if( !mysqli_query( $mysqli, $query ) ) {
+				$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+			}
 			else {
-				// Создаем замес
-				$query = "
-					INSERT INTO list__Batch
-					SET
-						CW_ID = {$CW_ID},
-						OP_ID = {$OP_ID},
-						batch_date = '{$batch_date}',
-						batch_time = '{$batch_time}',
-						comp_density = {$comp_density},
-						mix_density = {$mix_density},
-						iron_oxide = {$iron_oxide},
-						sand = {$sand},
-						crushed_stone = {$crushed_stone},
-						cement = {$cement},
-						water = {$water},
-						underfilling = {$underfilling}
-				";
-				if( !mysqli_query( $mysqli, $query ) ) {
-					$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
-				}
-				else {
-					$add = 1;
-					$LB_ID = mysqli_insert_id( $mysqli );
-					// Записываем заливки
-					foreach ($_POST["cassette"] as $key => $value) {
-						$query = "
-							INSERT INTO list__Filling
-							SET
-								cassette = {$value},
-								LB_ID = {$LB_ID}
-						";
-						if( !mysqli_query( $mysqli, $query ) ) {
-							$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
-						}
+				$add = 1;
+				$LB_ID = mysqli_insert_id( $mysqli );
+				// Записываем заливки
+				foreach ($_POST["cassette"] as $key => $value) {
+					$query = "
+						INSERT INTO list__Filling
+						SET
+							cassette = {$value},
+							LB_ID = {$LB_ID}
+					";
+					if( !mysqli_query( $mysqli, $query ) ) {
+						$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 					}
 				}
 			}
