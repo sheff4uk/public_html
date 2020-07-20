@@ -25,7 +25,7 @@ $query = "
 		,LDR.p_reject_cnt
 	FROM list__DailyReject LDR
 	JOIN CounterWeight CW ON CW.CW_ID = LDR.CW_ID
-	ORDER BY LDR.reject_date, LDR.CW_ID
+	ORDER BY LDR.reject_date DESC, LDR.CW_ID
 	LIMIT 500
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
