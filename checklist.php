@@ -100,10 +100,10 @@ foreach ($_GET as &$value) {
 			<th rowspan="2">Время</th>
 			<th rowspan="2">Оператор</th>
 			<th colspan="2">Масса кубика, кг</th>
-			<th rowspan="2">Окалина, кг</th>
-			<th rowspan="2">КМП, кг</th>
-			<th rowspan="2">Отсев, кг</th>
-			<th rowspan="2">Цемент, кг</th>
+			<th rowspan="2">Окалина,<br>кг ±5</th>
+			<th rowspan="2">КМП,<br>кг ±5</th>
+			<th rowspan="2">Отсев,<br>кг ±5</th>
+			<th rowspan="2">Цемент,<br>кг ±2</th>
 			<th rowspan="2">Вода, л</th>
 			<th rowspan="2">№ кассеты</th>
 			<th rowspan="2">Недолив</th>
@@ -151,7 +151,13 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.water
 			,GROUP_CONCAT(LF.cassette ORDER BY LF.LF_ID SEPARATOR '/') cassette
 			,LB.underfilling
+			,LB.letter
 			,LB.mix_diff
+			,LB.io_diff
+			,LB.s_diff
+			,LB.cs_diff
+			,LB.c_diff
+			,LB.w_diff
 		FROM list__Batch LB
 		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
@@ -166,7 +172,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
 			echo "<tr style='border-top: 2px solid #333;' id='{$subrow["LB_ID"]}'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$subrow["batch_date"]}<br><b>{$subrow["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
+			echo "<td rowspan='{$cnt}' class='bg-gray'>{$subrow["batch_date"]}<br><b>{$subrow["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
 			$cnt = 0;
 		}
 		else {
@@ -175,13 +181,13 @@ while( $row = mysqli_fetch_array($res) ) {
 		?>
 				<td><?=$subrow["batch_time"]?></td>
 				<td><?=$subrow["name"]?></td>
-				<td><?=$subrow["comp_density"]/1000?></td>
+				<td><?=$subrow["letter"] ? "<b>{$subrow["letter"]}</b>&nbsp;" : ""?><?=$subrow["comp_density"]/1000?></td>
 				<td><?=$subrow["mix_density"]/1000?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
-				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["iron_oxide"]?></td>
-				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["sand"]?></td>
-				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["crushed_stone"]?></td>
-				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["cement"]?></td>
-				<td style="background-color: rgba(0, 0, 0, 0.2);"><?=$subrow["water"]?></td>
+				<td class="bg-gray"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
+				<td class="bg-gray"><?=$subrow["sand"]?><?=($subrow["s_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["s_diff"] > 0 ? " +" : " ").($subrow["s_diff"])."</font>" : "")?></td>
+				<td class="bg-gray"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
+				<td class="bg-gray"><?=$subrow["cement"]?><?=($subrow["c_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["c_diff"] > 0 ? " +" : " ").($subrow["c_diff"])."</font>" : "")?></td>
+				<td class="bg-gray"><?=$subrow["water"]?><?=($subrow["w_diff"] ? "<font style='font-size: .8em;' color='red'> ".($subrow["w_diff"])."</font>" : "")?></td>
 				<td class="nowrap"><?=$subrow["cassette"]?></td>
 				<td><?=$subrow["underfilling"]?></td>
 				<td><a href="#" class="add_checklist" LB_ID="<?=$subrow["LB_ID"]?>" title="Изменить данные замеса"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
