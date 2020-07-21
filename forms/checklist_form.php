@@ -190,6 +190,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 				<span>Дата замеса:</span>
 				<input type="date" name="batch_date" required>
+				<i id="date_notice" class="fas fa-question-circle" title="Дата не редактируется так как есть связанные этапы расформовки или упаковки."></i>
 			</div>
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 				<span>Оператор:</span>
@@ -296,11 +297,19 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#checklist_form input[name="cement"]').val(data['cement']);
 				$('#checklist_form input[name="water"]').val(data['water']);
 				$('#checklist_form input[name="underfilling"]').val(data['underfilling']);
+				// Если связаны расформовка или упаковка, блокируем дату
+				if( data['is_link'] == 1 ) {
+					$('#checklist_form input[name="batch_date"]').attr('readonly', true);
+					$('#date_notice').show('fast');
+				}
+				else {
+					$('#checklist_form input[name="batch_date"]').attr('readonly', false);
+					$('#date_notice').hide('fast');
+				}
 
 				// Блокируем выбор противовеса
 				$('#checklist_form select[name="CW_ID"] option:not(:selected)').attr('disabled', true);
-				// Прячем инпуты для кассет
-				//$('#fillings').html('Не редактируется');
+				// Выводим инпуты для кассет аяксом
 				$.ajax({ url: "/ajax/checklist_cassette.php?LB_ID=" + LB_ID, dataType: "script", async: false });
 			}
 			// Иначе очищаем форму
@@ -319,6 +328,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 				// Разблокируем выбор противовеса
 				$('#checklist_form select[name="CW_ID"] option').attr('disabled', false);
+				// Разблокируем выбор даты
+				$('#checklist_form input[name="batch_date"]').attr('readonly', false);
+				$('#date_notice').hide('fast');
 
 				$('#checklist_form table input').val('');
 				$('#checklist_form table select').val('');
