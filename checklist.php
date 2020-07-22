@@ -105,7 +105,7 @@ foreach ($_GET as &$value) {
 			<th rowspan="2">Отсев,<br>кг ±5</th>
 			<th rowspan="2">Цемент,<br>кг ±2</th>
 			<th rowspan="2">Вода, л</th>
-			<th rowspan="2">№ кассеты</th>
+			<th rowspan="2" colspan="2">№ кассеты</th>
 			<th rowspan="2">Недолив</th>
 			<th rowspan="2"></th>
 		</tr>
@@ -149,7 +149,6 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.crushed_stone
 			,LB.cement
 			,LB.water
-			,GROUP_CONCAT(LF.cassette ORDER BY LF.LF_ID SEPARATOR '/') cassette
 			,LB.underfilling
 			,LB.letter
 			,LB.mix_diff
@@ -161,13 +160,31 @@ while( $row = mysqli_fetch_array($res) ) {
 		FROM list__Batch LB
 		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
-		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		WHERE LB.batch_date LIKE '{$row["batch_date"]}' AND LB.CW_ID = {$row["CW_ID"]}
-		GROUP BY LB.LB_ID
 		ORDER BY LB.batch_time ASC
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
+		// Получаем список кассет
+		$query = "
+			SELECT LF.cassette
+				,LO.o_date
+				,LO.LO_ID
+			FROM list__Filling LF
+			LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+			WHERE LF.LB_ID = {$subrow["LB_ID"]}
+			ORDER BY LF.LF_ID
+		";
+		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		$cassette = "";
+		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
+			if( $subsubrow["LO_ID"] ) {
+				$cassette .= "<a href='opening.php?date_from={$subsubrow["o_date"]}&date_to={$subsubrow["o_date"]}#{$subsubrow["LO_ID"]}' target='_blank'><b class='cassette'>{$subsubrow["cassette"]}</b></a>";
+			}
+			else {
+				$cassette .= "<b class='cassette'>{$subsubrow["cassette"]}</b>";
+			}
+		}
 
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
@@ -188,7 +205,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td class="bg-gray"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
 				<td class="bg-gray"><?=$subrow["cement"]?><?=($subrow["c_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["c_diff"] > 0 ? " +" : " ").($subrow["c_diff"])."</font>" : "")?></td>
 				<td class="bg-gray"><?=$subrow["water"]?><?=($subrow["w_diff"] ? "<font style='font-size: .8em;' color='red'> ".($subrow["w_diff"])."</font>" : "")?></td>
-				<td class="nowrap"><?=$subrow["cassette"]?></td>
+				<td colspan="2" class="nowrap"><?=$cassette?></td>
 				<td><?=$subrow["underfilling"]?></td>
 				<td><a href="#" class="add_checklist" LB_ID="<?=$subrow["LB_ID"]?>" title="Изменить данные замеса"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 			</tr>
