@@ -182,6 +182,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			}
 			// Иначе очищаем форму
 			else {
+				$('#packing_form input[name="LP_ID"]').val('');
 				// Генерируем список свободных заливок
 				$.ajax({ url: "/ajax/filling_select.php?type=2", dataType: "script", async: false });
 

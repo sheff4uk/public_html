@@ -116,7 +116,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 		<?
 		if( isset($_GET["add"]) ) {
 		?>
-		// Если было добавление расформовки, автоматичеки открывается форма для новой записи
+		// Если было добавление, автоматичеки открывается форма для новой записи
 		$(document).ready(function() {
 			$('#add_btn').click();
 		});
@@ -150,6 +150,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			}
 			// Иначе очищаем форму
 			else {
+				$('#daily_reject_form input[name="LDR_ID"]').val('');
 				$('#daily_reject_form input[name="reject_date"]').val(reject_date);
 				$('#daily_reject_form table input').val('');
 				$('#daily_reject_form table select').val('');

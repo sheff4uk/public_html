@@ -202,6 +202,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			}
 			// Иначе очищаем форму
 			else {
+				$('#opening_form input[name="LO_ID"]').val('');
 				// Генерируем список свободных заливок
 				$.ajax({ url: "/ajax/filling_select.php?type=1", dataType: "script", async: false });
 

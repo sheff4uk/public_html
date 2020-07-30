@@ -314,6 +314,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			}
 			// Иначе очищаем форму
 			else {
+				$('#checklist_form input[name="LB_ID"]').val('');
 				// Если после добавления записи, заполняем код, дату, оператора
 				if( CW_ID ) {
 					$('#checklist_form select[name="CW_ID"]').val(CW_ID).change();
