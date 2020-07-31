@@ -2,28 +2,22 @@
 include_once "../config.php";
 
 // Сохранение/редактирование расформовки
-if( isset($_POST["CW_ID"]) ) {
+if( isset($_POST["LB_ID"]) ) {
 	session_start();
+	$LB_ID = $_POST["LB_ID"];
 	$test_date = $_POST["test_date"];
-	$CW_ID = $_POST["CW_ID"];
-	$h24_test_time = $_POST["24_test_time"];
-	$h24_cube_weight = $_POST["24_cube_weight"]*1000;
-	$h24_pressure = $_POST["24_pressure"];
-	$h72_test_time = $_POST["72_test_time"];
-	$h72_cube_weight = $_POST["72_cube_weight"]*1000;
-	$h72_pressure = $_POST["72_pressure"];
+	$test_time = $_POST["test_time"];
+	$cube_weight = $_POST["cube_weight"]*1000;
+	$pressure = $_POST["pressure"];
 
 	if( $_POST["LCT_ID"] ) { // Редактируем
 		$query = "
 			UPDATE list__CubeTest
-			SET test_date = '{$test_date}'
-				,CW_ID = {$CW_ID}
-				,24_test_time = '{$h24_test_time}'
-				,24_cube_weight = {$h24_cube_weight}
-				,24_pressure = {$h24_pressure}
-				,72_test_time = '{$h72_test_time}'
-				,72_cube_weight = {$h72_cube_weight}
-				,72_pressure = {$h72_pressure}
+			SET LB_ID = {$LB_ID}
+				,test_date = '{$test_date}'
+				,test_time = '{$test_time}'
+				,cube_weight = {$cube_weight}
+				,pressure = {$pressure}
 			WHERE LCT_ID = {$_POST["LCT_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -34,14 +28,11 @@ if( isset($_POST["CW_ID"]) ) {
 	else { // Добавляем
 		$query = "
 			INSERT INTO list__CubeTest
-			SET test_date = '{$test_date}'
-				,CW_ID = {$CW_ID}
-				,24_test_time = '{$h24_test_time}'
-				,24_cube_weight = {$h24_cube_weight}
-				,24_pressure = {$h24_pressure}
-				,72_test_time = '{$h72_test_time}'
-				,72_cube_weight = {$h72_cube_weight}
-				,72_pressure = {$h72_pressure}
+			SET LB_ID = {$LB_ID}
+				,test_date = '{$test_date}'
+				,test_time = '{$test_time}'
+				,cube_weight = {$cube_weight}
+				,pressure = {$pressure}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -80,50 +71,27 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="LCT_ID">
 
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-				<span>Дата испытания:</span>
-				<input type="date" name="test_date" required>
+				<span>Замес:</span>
+				<select name="LB_ID" id="batch_select" style="width: 300px;" required>
+					<!--Данные аяксом-->
+				</select>
 			</div>
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
-						<th rowspan="2">Противовес</th>
-						<th colspan="3">24 часа</th>
-						<th colspan="3">72 часа</th>
-					</tr>
-					<tr>
-						<th>Время теста</th>
-						<th>Масса куба, кг</th>
-						<th>Давление, МПа</th>
-						<th>Время теста</th>
+						<th>Дата испытания</th>
+						<th>Время испытания</th>
 						<th>Масса куба, кг</th>
 						<th>Давление, МПа</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td>
-							<select name="CW_ID" style="width: 150px;" required>
-								<option value=""></option>
-								<?
-								$query = "
-									SELECT CW.CW_ID, CW.item
-									FROM CounterWeight CW
-									ORDER BY CW.CW_ID
-								";
-								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-								while( $row = mysqli_fetch_array($res) ) {
-									echo "<option value='{$row["CW_ID"]}'>{$row["item"]}</option>";
-								}
-								?>
-							</select>
-						</td>
-						<td><input type='time' name='24_test_time' required></td>
-						<td><input type='number' min='1' max='4' step='0.01' name='24_cube_weight' style='width: 80px;' required></td>
-						<td><input type='number' name='24_pressure' style='width: 80px;' required></td>
-						<td><input type='time' name='72_test_time' required></td>
-						<td><input type='number' min='1' max='4' step='0.01' name='72_cube_weight' style='width: 80px;' required></td>
-						<td><input type='number' name='72_pressure' style='width: 80px;' required></td>
+						<td><input type='date' name='test_date' required></td>
+						<td><input type='time' name='test_time' required></td>
+						<td><input type='number' min='1' max='4' step='0.01' name='cube_weight' style='width: 80px;' required></td>
+						<td><input type='number' name='pressure' style='width: 80px;' required></td>
 					</tr>
 				</tbody>
 			</table>
@@ -137,6 +105,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 <script>
 	$(function() {
+		$('#cubetest_form select[name="LB_ID"]').select2({ placeholder: 'Выберите замес', language: 'ru' });
+		// Костыль для Select2 чтобы работал поиск
+		$.ui.dialog.prototype._allowInteraction = function (e) {
+			return true;
+		};
+
 		<?
 		if( isset($_GET["add"]) ) {
 		?>
@@ -165,24 +139,24 @@ this.subbut.value='Подождите, пожалуйста!';">
 					dataType: "json",
 					async: false
 				});
+				// Генерируем список свободных заливок
+				$.ajax({ url: "/ajax/batch_select.php?LB_ID=" + test_data['LB_ID'], dataType: "script", async: false });
 
 				$('#cubetest_form input[name="LCT_ID"]').val(LCT_ID);
+				$('#cubetest_form select[name="LB_ID"]').val(test_data['LB_ID']);
 				$('#cubetest_form input[name="test_date"]').val(test_data['test_date']);
-				$('#cubetest_form select[name="CW_ID"]').val(test_data['CW_ID']);
-				$('#cubetest_form input[name="24_test_time"]').val(test_data['24_test_time']);
-				$('#cubetest_form input[name="24_cube_weight"]').val(test_data['24_cube_weight']);
-				$('#cubetest_form input[name="24_pressure"]').val(test_data['24_pressure']);
-				$('#cubetest_form input[name="72_test_time"]').val(test_data['72_test_time']);
-				$('#cubetest_form input[name="72_cube_weight"]').val(test_data['72_cube_weight']);
-				$('#cubetest_form input[name="72_pressure"]').val(test_data['72_pressure']);
+				$('#cubetest_form input[name="test_time"]').val(test_data['test_time']);
+				$('#cubetest_form input[name="cube_weight"]').val(test_data['cube_weight']);
+				$('#cubetest_form input[name="pressure"]').val(test_data['pressure']);
 			}
 			// Иначе очищаем форму
 			else {
+				// Генерируем список свободных заливок
+				$.ajax({ url: "/ajax/batch_select.php", dataType: "script", async: false });
+
 				$('#cubetest_form input[name="LCT_ID"]').val('');
-				$('#cubetest_form input[name="test_date"]').val(test_date);
-				$('#cubetest_form select[name="CW_ID"]').val('');
 				$('#cubetest_form table input').val('');
-				$('#cubetest_form table select').val('');
+				$('#cubetest_form input[name="test_date"]').val(test_date);
 			}
 
 			$('#cubetest_form').dialog({
