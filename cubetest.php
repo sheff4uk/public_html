@@ -25,11 +25,14 @@ include "./forms/cubetest_form.php";
 <?
 $query = "
 	SELECT LCT.LCT_ID
+		,LCT.LB_ID
 		,DATE_FORMAT(LCT.test_date, '%d.%m.%y') test_date
 		,DATE_FORMAT(LCT.test_time, '%H:%i') test_time
 		,CW.item
-		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date
-		,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time
+		,CW.CW_ID
+		,LB.batch_date batch_date
+		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
+		,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 		,TIMESTAMPDIFF(HOUR, CAST(CONCAT(LB.batch_date, ' ', LB.batch_time) as datetime), CAST(CONCAT(LCT.test_date, ' ', LCT.test_time) as datetime)) interval_hrs
 		,LB.mix_density
 		,LCT.cube_weight
@@ -45,9 +48,9 @@ while( $row = mysqli_fetch_array($res) ) {
 	<tr id="<?=$row["LCT_ID"]?>">
 		<td><?=$row["test_date"]?></td>
 		<td><?=$row["test_time"]?></td>
-		<td class="bg-gray"><?=$row["item"]?></td>
-		<td class="bg-gray"><?=$row["batch_date"]?></td>
-		<td class="bg-gray"><?=$row["batch_time"]?></td>
+		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" target="_blank"><?=$row["item"]?></a></td>
+		<td class="bg-gray"><?=$row["batch_date_format"]?></td>
+		<td class="bg-gray"><?=$row["batch_time_format"]?></td>
 		<td class="bg-gray"><?=$row["interval_hrs"]?></td>
 		<td class="bg-gray"><?=$row["mix_density"]/1000?></td>
 		<td><?=$row["cube_weight"]/1000?></td>
