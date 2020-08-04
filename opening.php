@@ -160,7 +160,7 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	if( $row["LP_ID"] ) {
-		$cassette = "<a href='packing.php?date_from={$row["p_date"]}&date_to={$row["p_date"]}#{$row["LP_ID"]}' title='Расформовка' target='_blank'><b class='cassette'>{$row["cassette"]}</b></a>";
+		$cassette = "<a href='packing.php?date_from={$row["p_date"]}&date_to={$row["p_date"]}#{$row["LP_ID"]}' title='Упаковка' target='_blank'><b class='cassette'>{$row["cassette"]}</b></a>";
 	}
 	else {
 		$cassette = "<b class='cassette'>{$row["cassette"]}</b>";
