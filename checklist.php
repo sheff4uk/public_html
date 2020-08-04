@@ -179,7 +179,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		$cassette = "";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
 			if( $subsubrow["LO_ID"] ) {
-				$cassette .= "<a href='opening.php?date_from={$subsubrow["o_date"]}&date_to={$subsubrow["o_date"]}#{$subsubrow["LO_ID"]}' target='_blank'><b class='cassette'>{$subsubrow["cassette"]}</b></a>";
+				$cassette .= "<a href='opening.php?date_from={$subsubrow["o_date"]}&date_to={$subsubrow["o_date"]}#{$subsubrow["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette'>{$subsubrow["cassette"]}</b></a>";
 			}
 			else {
 				$cassette .= "<b class='cassette'>{$subsubrow["cassette"]}</b>";
