@@ -48,8 +48,8 @@ while( $row = mysqli_fetch_array($res) ) {
 	<tr id="<?=$row["LCT_ID"]?>">
 		<td><?=$row["test_date"]?></td>
 		<td><?=$row["test_time"]?></td>
-		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" target="_blank"><?=$row["item"]?></a></td>
-		<td class="bg-gray"><?=$row["batch_date_format"]?></td>
+		<td class="bg-gray"><?=$row["item"]?></td>
+		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Замес" target="_blank"><?=$row["batch_date_format"]?></a></td>
 		<td class="bg-gray"><?=$row["batch_time_format"]?></td>
 		<td class="bg-gray"><?=$row["interval_hrs"]?></td>
 		<td class="bg-gray"><?=$row["mix_density"]/1000?></td>

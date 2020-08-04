@@ -101,7 +101,9 @@ foreach ($_GET as &$value) {
 			<th rowspan="2">№ поста</th>
 			<th colspan="4">Кол-во брака, шт</th>
 			<th colspan="3">Взвешивания, кг ±3%</th>
-			<th rowspan="2">Заливка</th>
+			<th rowspan="2">Противовес</th>
+			<th rowspan="2">Дата замеса</th>
+			<th rowspan="2">№ кассеты</th>
 			<th rowspan="2"></th>
 		</tr>
 		<tr>
@@ -135,13 +137,19 @@ $query = "
 		,LO.w1_error
 		,LO.w2_error
 		,LO.w3_error
-		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date
+		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 		,LF.cassette
 		,CW.item
+		,LB.batch_date
+		,LB.CW_ID
+		,LB.LB_ID
+		,LP.LP_ID
+		,LP.p_date
 	FROM list__Opening LO
 	LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 	LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	LEFT JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+	LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND LO.o_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND LO.o_date <= '{$_GET["date_to"]}'" : "")."
@@ -151,6 +159,12 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
+	if( $row["LP_ID"] ) {
+		$cassette = "<a href='packing.php?date_from={$row["p_date"]}&date_to={$row["p_date"]}#{$row["LP_ID"]}' title='Расформовка' target='_blank'><b class='cassette'>{$row["cassette"]}</b></a>";
+	}
+	else {
+		$cassette = "<b class='cassette'>{$row["cassette"]}</b>";
+	}
 	?>
 	<tr id="<?=$row["LO_ID"]?>">
 		<td><?=$row["o_date"]?></td>
@@ -163,7 +177,9 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["weight1"]/1000?><?=($row["w1_error"] ? "<font style='font-size: .8em;' color='red'>".($row["w1_diff"] > 0 ? " +" : " ").($row["w1_diff"]/10)."%</font>" : "")?></td>
 		<td><?=$row["weight2"]/1000?><?=($row["w2_error"] ? "<font style='font-size: .8em;' color='red'>".($row["w2_diff"] > 0 ? " +" : " ").($row["w2_diff"]/10)."%</font>" : "")?></td>
 		<td><?=$row["weight3"]/1000?><?=($row["w3_error"] ? "<font style='font-size: .8em;' color='red'>".($row["w3_diff"] > 0 ? " +" : " ").($row["w3_diff"]/10)."%</font>" : "")?></td>
-		<td title="Кассета[<?=$row["cassette"]?>] <?=$row["item"]?>" style="background-color: rgba(0, 0, 0, 0.2);"><?=$row["batch_date"]?> <i class="fas fa-question-circle"></i></td>
+		<td class="bg-gray"><?=$row["item"]?></td>
+		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Замес" target="_blank"><?=$row["batch_date_format"]?></a></td>
+		<td class="bg-gray"><?=$cassette?></td>
 		<td><a href="#" class="add_opening" LO_ID="<?=$row["LO_ID"]?>" title="Изменить данные расформовки"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?
