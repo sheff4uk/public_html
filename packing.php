@@ -98,6 +98,7 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th rowspan="2">Дата</th>
 			<th rowspan="2">Время</th>
+			<th rowspan="2"><i class="far fa-lg fa-hourglass" title="Интервал в часах с моента заливки."></i></th>
 			<th rowspan="2">№ поста</th>
 			<th colspan="4">Кол-во брака, шт</th>
 			<th rowspan="2">Противовес</th>
@@ -120,6 +121,7 @@ $query = "
 		,LP.p_post
 		,DATE_FORMAT(LP.p_date, '%d.%m.%y') p_date
 		,DATE_FORMAT(LP.p_time, '%H:%i') p_time
+		,p_interval(LP.LP_ID) p_interval
 		,LP.p_not_spill
 		,LP.p_crack
 		,LP.p_chipped
@@ -156,6 +158,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	<tr id="<?=$row["LP_ID"]?>">
 		<td><?=$row["p_date"]?></td>
 		<td><?=$row["p_time"]?></td>
+		<td <?=($row["p_interval"] < 120 ? "class='error'" : "")?>><?=$row["p_interval"]?></td>
 		<td><?=$row["p_post"]?></td>
 		<td style="color: red;"><?=$row["p_not_spill"]?></td>
 		<td style="color: red;"><?=$row["p_crack"]?></td>

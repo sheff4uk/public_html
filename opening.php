@@ -98,6 +98,7 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th rowspan="2">Дата</th>
 			<th rowspan="2">Время</th>
+			<th rowspan="2"><i class="far fa-lg fa-hourglass" title="Интервал в часах с моента заливки."></i></th>
 			<th rowspan="2">№ поста</th>
 			<th colspan="4">Кол-во брака, шт</th>
 			<th colspan="3">Взвешивания, кг ±3%</th>
@@ -124,6 +125,7 @@ $query = "
 		,LO.o_post
 		,DATE_FORMAT(LO.o_date, '%d.%m.%y') o_date
 		,DATE_FORMAT(LO.o_time, '%H:%i') o_time
+		,o_interval(LO.LO_ID) o_interval
 		,LO.o_not_spill
 		,LO.o_crack
 		,LO.o_chipped
@@ -169,6 +171,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	<tr id="<?=$row["LO_ID"]?>">
 		<td><?=$row["o_date"]?></td>
 		<td><?=$row["o_time"]?></td>
+		<td <?=($row["o_interval"] < 24 ? "class='error'" : "")?>><?=$row["o_interval"]?></td>
 		<td><?=$row["o_post"]?></td>
 		<td style="color: red;"><?=$row["o_not_spill"]?></td>
 		<td style="color: red;"><?=$row["o_crack"]?></td>
