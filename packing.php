@@ -211,7 +211,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	if( $row["LP_ID"] ) {
+	if( $row["LO_ID"] ) {
 		$cassette = "<a href='opening.php?o_date_from={$row["o_date"]}&o_date_to={$row["o_date"]}#{$row["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette'>{$row["cassette"]}</b></a>";
 	}
 	else {
