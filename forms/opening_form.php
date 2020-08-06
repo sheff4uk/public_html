@@ -67,10 +67,10 @@ if( isset($_POST["LF_ID"]) ) {
 
 	// Перенаправление в журнал маршрутных листов
 	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/opening.php?date_from='.$o_date.'&date_to='.$o_date.'&o_date='.$o_date.'&o_post='.$o_post.'&add#'.$LO_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/opening.php?o_date_from='.$o_date.'&o_date_to='.$o_date.'&o_date='.$o_date.'&o_post='.$o_post.'&add#'.$LO_ID.'">');
 	}
 	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/opening.php?date_from='.$o_date.'&date_to='.$o_date.'#'.$LO_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/opening.php?o_date_from='.$o_date.'&o_date_to='.$o_date.'#'.$LO_ID.'">');
 	}
 }
 ?>

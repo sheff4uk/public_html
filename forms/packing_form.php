@@ -58,10 +58,10 @@ if( isset($_POST["LF_ID"]) ) {
 
 	// Перенаправление в журнал маршрутных листов
 	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/packing.php?date_from='.$p_date.'&date_to='.$p_date.'&p_date='.$p_date.'&p_post='.$p_post.'&add#'.$LP_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/packing.php?p_date_from='.$p_date.'&p_date_to='.$p_date.'&p_date='.$p_date.'&p_post='.$p_post.'&add#'.$LP_ID.'">');
 	}
 	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/packing.php?date_from='.$p_date.'&date_to='.$p_date.'#'.$LP_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/packing.php?p_date_from='.$p_date.'&p_date_to='.$p_date.'#'.$LP_ID.'">');
 	}
 }
 ?>

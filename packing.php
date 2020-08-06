@@ -5,13 +5,15 @@ include "header.php";
 include "./forms/packing_form.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
-if( !$_GET["date_from"] ) {
-	$date = new DateTime('-6 days');
-	$_GET["date_from"] = date_format($date, 'Y-m-d');
-}
-if( !$_GET["date_to"] ) {
-	$date = new DateTime('-0 days');
-	$_GET["date_to"] = date_format($date, 'Y-m-d');
+if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
+	if( !$_GET["p_date_from"] ) {
+		$date = new DateTime('-6 days');
+		$_GET["p_date_from"] = date_format($date, 'Y-m-d');
+	}
+	if( !$_GET["p_date_to"] ) {
+		$date = new DateTime('-0 days');
+		$_GET["p_date_to"] = date_format($date, 'Y-m-d');
+	}
 }
 ?>
 
@@ -23,9 +25,15 @@ if( !$_GET["date_to"] ) {
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата упаковки между:</span>
-			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
-			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
+			<input name="p_date_from" type="date" value="<?=$_GET["p_date_from"]?>" class="<?=$_GET["p_date_from"] ? "filtered" : ""?>">
+			<input name="p_date_to" type="date" value="<?=$_GET["p_date_to"]?>" class="<?=$_GET["p_date_to"] ? "filtered" : ""?>">
 			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
+		</div>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
+			<input name="batch_date_from" type="date" value="<?=$_GET["batch_date_from"]?>" class="<?=$_GET["batch_date_from"] ? "filtered" : ""?>">
+			<input name="batch_date_to" type="date" value="<?=$_GET["batch_date_to"]?>" class="<?=$_GET["batch_date_to"] ? "filtered" : ""?>">
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -188,8 +196,10 @@ $query = "
 	LEFT JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 	LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 	WHERE 1
-		".($_GET["date_from"] ? "AND LP.p_date >= '{$_GET["date_from"]}'" : "")."
-		".($_GET["date_to"] ? "AND LP.p_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["p_date_from"] ? "AND LP.p_date >= '{$_GET["p_date_from"]}'" : "")."
+		".($_GET["p_date_to"] ? "AND LP.p_date <= '{$_GET["p_date_to"]}'" : "")."
+		".($_GET["batch_date_from"] ? "AND LB.batch_date >= '{$_GET["batch_date_from"]}'" : "")."
+		".($_GET["batch_date_to"] ? "AND LB.batch_date <= '{$_GET["batch_date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		".($_GET["int120"] ? "AND p_interval(LP.LP_ID) < 120" : "")."
@@ -230,6 +240,29 @@ while( $row = mysqli_fetch_array($res) ) {
 </table>
 
 <div id="add_btn" class="add_packing" p_date="<?=$_GET["p_date"]?>" p_post="<?=$_GET["p_post"]?>" title="Внести данные упаковки "></div>
+
+<script>
+	$(function() {
+		// При выборе даты заливки сбрасываются даты упаковки
+		$('input[name="batch_date_from"]').change(function() {
+			$('input[name="p_date_from"]').val('');
+			$('input[name="p_date_to"]').val('');
+		});
+		$('input[name="batch_date_to"]').change(function() {
+			$('input[name="p_date_from"]').val('');
+			$('input[name="p_date_to"]').val('');
+		});
+		// При выборе даты упаковки сбрасываются даты заливки
+		$('input[name="p_date_from"]').change(function() {
+			$('input[name="batch_date_from"]').val('');
+			$('input[name="batch_date_to"]').val('');
+		});
+		$('input[name="p_date_to"]').change(function() {
+			$('input[name="batch_date_from"]').val('');
+			$('input[name="batch_date_to"]').val('');
+		});
+	});
+</script>
 
 <?
 include "footer.php";
