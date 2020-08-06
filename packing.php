@@ -143,8 +143,7 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th rowspan="2">Дата</th>
-			<th rowspan="2">Время</th>
+			<th colspan="2">Упаковка</th>
 			<th rowspan="2"><i class="far fa-lg fa-hourglass" title="Интервал в часах с моента заливки."></i></th>
 			<th rowspan="2">№ поста</th>
 			<th colspan="4">Кол-во брака, шт</th>
@@ -154,6 +153,8 @@ foreach ($_GET as &$value) {
 			<th rowspan="2"></th>
 		</tr>
 		<tr>
+			<th>Дата</th>
+			<th>Время</th>
 			<th>Непролив</th>
 			<th>Трещина</th>
 			<th>Скол</th>
