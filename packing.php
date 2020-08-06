@@ -70,7 +70,7 @@ if( !$_GET["date_to"] ) {
 			<fieldset>
 				<legend>Нарушение тех. процесса:</legend>
 				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-					<label style="text-decoration: underline;" class="<?=$_GET["int24"] ? "filtered" : ""?>">
+					<label style="text-decoration: underline;" class="<?=$_GET["int120"] ? "filtered" : ""?>">
 						Менее 120 часов с момента заливки:
 						<input type="checkbox" name="int120" value="1" <?=$_GET["int120"] ? "checked" : ""?>>
 					</label>
