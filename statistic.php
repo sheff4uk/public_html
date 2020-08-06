@@ -36,6 +36,7 @@ if( !$_GET["date_to"] ) {
 			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
 			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
 			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
+			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
