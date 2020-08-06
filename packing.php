@@ -66,6 +66,53 @@ if( !$_GET["date_to"] ) {
 			</select>
 		</div>
 
+		<div style="margin-bottom: 10px;">
+			<fieldset>
+				<legend>Нарушение тех. процесса:</legend>
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["int24"] ? "filtered" : ""?>">
+						Менее 120 часов с момента заливки:
+						<input type="checkbox" name="int120" value="1" <?=$_GET["int120"] ? "checked" : ""?>>
+					</label>
+				</div>
+			</fieldset>
+		</div>
+
+		<div style="margin-bottom: 10px;">
+			<fieldset>
+				<legend>Брак:</legend>
+
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["not_spill"] ? "filtered" : ""?>">
+						Непролив:
+						<input type="checkbox" name="not_spill" value="1" <?=$_GET["not_spill"] ? "checked" : ""?>>
+					</label>
+				</div>
+
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["crack"] ? "filtered" : ""?>">
+						Трещина:
+						<input type="checkbox" name="crack" value="1" <?=$_GET["crack"] ? "checked" : ""?>>
+					</label>
+				</div>
+
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["chipped"] ? "filtered" : ""?>">
+						Скол:
+						<input type="checkbox" name="chipped" value="1" <?=$_GET["chipped"] ? "checked" : ""?>>
+					</label>
+				</div>
+
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["def_form"] ? "filtered" : ""?>">
+						Дефект форм:
+						<input type="checkbox" name="def_form" value="1" <?=$_GET["def_form"] ? "checked" : ""?>>
+					</label>
+				</div>
+
+			</fieldset>
+		</div>
+
 		<button style="float: right;">Фильтр</button>
 	</form>
 </div>
@@ -144,6 +191,11 @@ $query = "
 		".($_GET["date_to"] ? "AND LP.p_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		".($_GET["int120"] ? "AND p_interval(LP.LP_ID) < 120" : "")."
+		".($_GET["not_spill"] ? "AND LP.p_not_spill" : "")."
+		".($_GET["crack"] ? "AND LP.p_crack" : "")."
+		".($_GET["chipped"] ? "AND LP.p_chipped" : "")."
+		".($_GET["def_form"] ? "AND LP.p_def_form" : "")."
 	ORDER BY LP.p_date DESC, LP.p_time, LP.p_post
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
