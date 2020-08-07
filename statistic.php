@@ -96,6 +96,13 @@ foreach ($_GET as &$value) {
 			collapsible: true,
 			heightStyle: "content"
 		});
+
+		// При скроле сворачивается фильтр
+		$(window).scroll(function(){
+			$( "#filter" ).accordion({
+				active: "false"
+			});
+		});
 	});
 </script>
 

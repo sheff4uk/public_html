@@ -141,6 +141,13 @@ foreach ($_GET as &$value) {
 			heightStyle: "content"
 		});
 
+		// При скроле сворачивается фильтр
+		$(window).scroll(function(){
+			$( "#filter" ).accordion({
+				active: "false"
+			});
+		});
+
 //		$('#filter input[name="date_from"]').change(function() {
 //			var val = $(this).val();
 //			$('#filter input[name="date_to"]').val(val);
