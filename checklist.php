@@ -157,6 +157,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.cement
 			,LB.water
 			,LB.underfilling
+			,LB.test
 			,LB.letter
 			,LB.mix_diff
 			,LB.io_diff
@@ -164,9 +165,11 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.cs_diff
 			,LB.c_diff
 			,LB.w_diff
+			,LCT.LCT_ID
 		FROM list__Batch LB
 		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
+		LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID
 		WHERE LB.batch_date LIKE '{$row["batch_date"]}' AND LB.CW_ID = {$row["CW_ID"]}
 		ORDER BY LB.batch_time ASC
 	";
@@ -203,7 +206,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			echo "<tr id='{$subrow["LB_ID"]}'>";
 		}
 		?>
-				<td><?=$subrow["batch_time"]?></td>
+				<td><?=$subrow["batch_time"]?><?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?></td>
 				<td><?=$subrow["name"]?></td>
 				<td><?=$subrow["letter"] ? "<b>{$subrow["letter"]}</b>&nbsp;" : ""?><?=$subrow["comp_density"]/1000?></td>
 				<td><?=$subrow["mix_density"]/1000?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>

@@ -16,7 +16,7 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) )
 {
-	$cassette .= "<input type=\'number\' min=\'1\' max=\'206\' name=\'cassette[{$row["LF_ID"]}]\' value=\'{$row["cassette"]}\' required ".($row["is_link"] ? "readonly" : "").">".($row["is_link"] ? '<i id="date_notice" class="fas fa-question-circle" title="Номер кассеты не редактируется так как есть связанные этапы расформовки или упаковки."></i>' : '');
+	$cassette .= "<input type=\'number\' min=\'1\' max=\'{$cassetts}\' name=\'cassette[{$row["LF_ID"]}]\' value=\'{$row["cassette"]}\' required ".($row["is_link"] ? "readonly" : "").">".($row["is_link"] ? '<i id="date_notice" class="fas fa-question-circle" title="Номер кассеты не редактируется так как есть связанные этапы расформовки или упаковки."></i>' : '');
 }
 
 echo "$('#fillings').html('{$cassette}');";

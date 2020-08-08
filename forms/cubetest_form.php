@@ -1,10 +1,11 @@
 <?
 include_once "../config.php";
 
-// Сохранение/редактирование расформовки
+// Сохранение/редактирование
 if( isset($_POST["LB_ID"]) ) {
 	session_start();
-	$LB_ID = $_POST["LB_ID"];
+	$LB_ID = abs($_POST["LB_ID"]);
+	$type = $_POST["type"];
 	$test_date = $_POST["test_date"];
 	$test_time = $_POST["test_time"];
 	$cube_weight = $_POST["cube_weight"]*1000;
@@ -14,6 +15,7 @@ if( isset($_POST["LB_ID"]) ) {
 		$query = "
 			UPDATE list__CubeTest
 			SET LB_ID = {$LB_ID}
+				,type = {$type}
 				,test_date = '{$test_date}'
 				,test_time = '{$test_time}'
 				,cube_weight = {$cube_weight}
@@ -29,6 +31,7 @@ if( isset($_POST["LB_ID"]) ) {
 		$query = "
 			INSERT INTO list__CubeTest
 			SET LB_ID = {$LB_ID}
+				,type = {$type}
 				,test_date = '{$test_date}'
 				,test_time = '{$test_time}'
 				,cube_weight = {$cube_weight}
@@ -75,6 +78,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<select name="LB_ID" id="batch_select" style="width: 300px;" required>
 					<!--Данные аяксом-->
 				</select>
+				<input type="hidden" name="type">
 			</div>
 
 			<table style="width: 100%; table-layout: fixed;">
@@ -122,6 +126,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 //		}
 //		?>
 
+		// Привыборе замеса узнаем тип 24/72
+		$('#cubetest_form select[name="LB_ID"]').change(function() {
+			var type = $('#cubetest_form select[name="LB_ID"] option:selected').attr('type');
+			$('#cubetest_form input[name="type"]').val(type);
+		});
+
 		// Кнопка добавления расформовки
 		$('.add_cubetest').click( function() {
 			// Проверяем сессию
@@ -144,6 +154,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 				$('#cubetest_form input[name="LCT_ID"]').val(LCT_ID);
 				$('#cubetest_form select[name="LB_ID"]').val(test_data['LB_ID']);
+				$('#cubetest_form input[name="type"]').val(test_data['type']);
 				$('#cubetest_form input[name="test_date"]').val(test_data['test_date']);
 				$('#cubetest_form input[name="test_time"]').val(test_data['test_time']);
 				$('#cubetest_form input[name="cube_weight"]').val(test_data['cube_weight']);

@@ -17,6 +17,7 @@ if( isset($_POST["CW_ID"]) ) {
 	$cement = $_POST["cement"];
 	$water = $_POST["water"];
 	$underfilling = $_POST["underfilling"] ? $_POST["underfilling"] : 0;
+	$test = $_POST["test"] ? 1 : 0;
 
 	// Редактируем замес
 	if( $_POST["LB_ID"] ) {
@@ -57,7 +58,8 @@ if( isset($_POST["CW_ID"]) ) {
 					crushed_stone = {$crushed_stone},
 					cement = {$cement},
 					water = {$water},
-					underfilling = {$underfilling}
+					underfilling = {$underfilling},
+					test = {$test}
 				WHERE LB_ID = {$_POST["LB_ID"]}
 			";
 			if( !mysqli_query( $mysqli, $query ) ) {
@@ -118,7 +120,8 @@ if( isset($_POST["CW_ID"]) ) {
 					crushed_stone = {$crushed_stone},
 					cement = {$cement},
 					water = {$water},
-					underfilling = {$underfilling}
+					underfilling = {$underfilling},
+					test = {$test}
 			";
 			if( !mysqli_query( $mysqli, $query ) ) {
 				$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -221,6 +224,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th rowspan="2">Вода, л</th>
 						<th rowspan="2">№ кассеты</th>
 						<th rowspan="2">Недолив</th>
+						<th rowspan="2">Испытиния кубов</th>
 					</tr>
 					<tr>
 						<th>Контрольный компонент</th>
@@ -239,6 +243,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='water' style='width: 80px;' required></td>
 						<td id='fillings'></td>
 						<td><input type="number" min="0" max="64" name="underfilling"></td>
+						<td><input type="checkbox" name="test" value="1"><i id="test_notice" class="fas fa-question-circle" title="Не редактируется так как есть связанные испытания куба."></i></td>
 					</tr>
 				</tbody>
 			</table>
@@ -297,6 +302,22 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#checklist_form input[name="cement"]').val(data['cement']);
 				$('#checklist_form input[name="water"]').val(data['water']);
 				$('#checklist_form input[name="underfilling"]').val(data['underfilling']);
+				// Чекбокс контрольного куба
+				if( data['test'] == 1 ) {
+					$('#checklist_form input[name="test"]').prop('checked', true);
+				}
+				else {
+					$('#checklist_form input[name="test"]').prop('checked', false);
+				}
+				// Если произведено испытание, чекбокс блокируется
+				if( data['is_test'] == 1 ) {
+					$('#checklist_form input[name="test"]').prop('disabled', true);
+					$('#test_notice').show('fast');
+				}
+				else {
+					$('#checklist_form input[name="test"]').prop('disabled', false);
+					$('#test_notice').hide('fast');
+				}
 				// Если связаны расформовка или упаковка, блокируем дату
 				if( data['is_link'] == 1 ) {
 					$('#checklist_form input[name="batch_date"]').attr('readonly', true);
@@ -315,6 +336,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Иначе очищаем форму
 			else {
 				$('#checklist_form input[name="LB_ID"]').val('');
+				$('#checklist_form input[name="test"]').prop('checked', false);
+				$('#checklist_form input[name="test"]').prop('disabled', false);
+				$('#test_notice').hide('fast');
 				// Если после добавления записи, заполняем код, дату, оператора
 				if( CW_ID ) {
 					$('#checklist_form select[name="CW_ID"]').val(CW_ID).change();
@@ -354,7 +378,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				cassette = '';
 			// Выводим инпуты для номеров кассет
 			for (var i = 0; i < fillings; i++) {
-				var cassette = cassette + '<input type="number" min="1" max="206" name="cassette[]" style="display: none;" required>';
+				var cassette = cassette + '<input type="number" min="1" max="<?=$cassetts?>" name="cassette[]" style="display: none;" required>';
 			}
 			$('#fillings').html(cassette);
 			$('#checklist_form input[name="cassette[]"]').show('fast');
