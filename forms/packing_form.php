@@ -127,12 +127,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 <script>
 	$(function() {
-		$('#packing_form select[name="LF_ID"]').select2({ placeholder: 'Выберите заливку', language: 'ru' });
-		// Костыль для Select2 чтобы работал поиск
-		$.ui.dialog.prototype._allowInteraction = function (e) {
-			return true;
-		};
-
 //		<?
 //		if( isset($_GET["add"]) ) {
 //		?>
@@ -163,12 +157,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 					async: false
 				});
 				// Генерируем список свободных заливок
-				$.ajax({ url: "/ajax/filling_select.php?LF_ID=" + packing_data['LF_ID'] + "&type=2", dataType: "script", async: false });
+				$.ajax({ url: "/ajax/filling_select.php?LF_ID=" + packing_data['LF_ID'] + "&type=2", dataType: "script", async: true });
 
 				// Идентификатор упаковки
 				$('#packing_form input[name="LP_ID"]').val(LP_ID);
-				// Заливка
-				$('#packing_form select[name="LF_ID"]').val(packing_data['LF_ID']);
 				// № поста
 				$('#packing_form input[name="p_post"]').val(packing_data['p_post']);
 				// Дата/время упаковки
@@ -184,7 +176,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			else {
 				$('#packing_form input[name="LP_ID"]').val('');
 				// Генерируем список свободных заливок
-				$.ajax({ url: "/ajax/filling_select.php?type=2", dataType: "script", async: false });
+				$.ajax({ url: "/ajax/filling_select.php?type=2", dataType: "script", async: true });
 
 				$('#packing_form input[name="p_date"]').val(p_date);
 				$('#packing_form input[name="p_post"]').val(p_post);
