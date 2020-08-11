@@ -465,6 +465,7 @@ input.amount {
 .main_table {
 	table-layout: fixed;
 	width: 100%;
+	margin-bottom: 70px;
 }
 .main_table td, .main_table th {
 	overflow: hidden;
