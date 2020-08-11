@@ -143,7 +143,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 <script>
 	$(function() {
-//		$('#opening_form select[name="LF_ID"]').select2({ placeholder: 'Выберите заливку', language: 'ru' });
+		$('#opening_form select[name="LF_ID"]').select2({ placeholder: 'Выберите заливку', language: 'ru' });
 		// Костыль для Select2 чтобы работал поиск
 //		$.ui.dialog.prototype._allowInteraction = function (e) {
 //			return true;
