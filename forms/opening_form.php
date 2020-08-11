@@ -184,7 +184,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				// Идентификатор расформовки
 				$('#opening_form input[name="LO_ID"]').val(LO_ID);
 				// Заливка
-				$('#opening_form select[name="LF_ID"]').val(opening_data['LF_ID']);
+				//$('#opening_form select[name="LF_ID"]').val(opening_data['LF_ID']);
 				// № поста
 				$('#opening_form input[name="o_post"]').val(opening_data['o_post']);
 				// Дата/время расформовки

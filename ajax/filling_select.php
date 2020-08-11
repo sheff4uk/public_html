@@ -44,4 +44,5 @@ while( $row = mysqli_fetch_array($res) ) {
 }
 
 echo "$('#filling_select').html('{$filling_select}');";
+echo "$('#filling_select').val('{$LF_ID}');";
 ?>
