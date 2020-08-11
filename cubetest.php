@@ -3,6 +3,7 @@ include "config.php";
 $title = 'Протокол испытаний куба';
 include "header.php";
 include "./forms/cubetest_form.php";
+die("<h1>В разработке</h1>");
 ?>
 
 <table class="main_table">
