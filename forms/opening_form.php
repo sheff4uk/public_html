@@ -179,7 +179,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					async: false
 				});
 				// Генерируем список свободных заливок
-				$.ajax({ url: "/ajax/filling_select.php?LF_ID=" + opening_data['LF_ID'] + "&type=1", dataType: "script", async: false });
+//				$.ajax({ url: "/ajax/filling_select.php?LF_ID=" + opening_data['LF_ID'] + "&type=1", dataType: "script", async: false });
 
 				// Идентификатор расформовки
 				$('#opening_form input[name="LO_ID"]').val(LO_ID);
@@ -204,7 +204,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			else {
 				$('#opening_form input[name="LO_ID"]').val('');
 				// Генерируем список свободных заливок
-				$.ajax({ url: "/ajax/filling_select.php?type=1", dataType: "script", async: false });
+//				$.ajax({ url: "/ajax/filling_select.php?type=1", dataType: "script", async: false });
 
 				$('#opening_form input[name="o_date"]').val(o_date);
 				$('#opening_form input[name="o_post"]').val(o_post);
