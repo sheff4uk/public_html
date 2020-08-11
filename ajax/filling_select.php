@@ -45,4 +45,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 echo "$('#filling_select').html('{$filling_select}');";
 echo "$('#filling_select').val('{$LF_ID}');";
+echo "$('#filling_select').select2({ placeholder: 'Выберите заливку', language: 'ru' });";
+// Костыль для Select2 чтобы работал поиск
+echo "$.ui.dialog.prototype._allowInteraction = function (e) {return true;};";
 ?>
