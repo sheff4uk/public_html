@@ -40,9 +40,10 @@ if( $type == 2 ) {
 
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$filling_select .= "<option value=\"{$row["LF_ID"]}\">{$row["batch_date"]} кассета[{$row["cassette"]}] {$row["item"]}</option>";
+	$selected = $row["LF_ID"] == $LF_ID ? "selected" : "";
+	$filling_select .= "<option value=\"{$row["LF_ID"]}\" {$selected}>{$row["batch_date"]} кассета[{$row["cassette"]}] {$row["item"]}</option>";
 }
 
 echo "$('#filling_select').html('{$filling_select}');";
-echo "$('#filling_select').val('{$LF_ID}');";
+//echo "$('#filling_select').val('{$LF_ID}');";
 ?>
