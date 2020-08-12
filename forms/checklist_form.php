@@ -357,7 +357,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#checklist_form input[name="batch_date"]').attr('readonly', false);
 				$('#date_notice').hide('fast');
 
-				$('#checklist_form table input').not('#checklist_form table input[type="checkbox"]').val('');
+				$('#checklist_form table input:not([type="checkbox"])').val('');
 				$('#checklist_form table select').val('');
 			}
 
