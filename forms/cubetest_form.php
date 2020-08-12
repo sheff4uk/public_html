@@ -72,14 +72,8 @@ if( isset($_POST["LB_ID"]) ) {
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="LCT_ID">
-
-			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-				<span>Замес:</span>
-				<select name="LB_ID" id="batch_select" style="width: 300px;" required>
-					<!--Данные аяксом-->
-				</select>
-				<input type="hidden" name="type">
-			</div>
+			<input type="hidden" name="type">
+			<input type="hidden" name="LB_ID">
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
@@ -137,8 +131,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
-			var LCT_ID = $(this).attr("LCT_ID"),
-				test_date = $(this).attr("test_date");
+			var LCT_ID = $(this).attr("LCT_ID");
 
 			// В случае редактирования заполняем форму
 			if( LCT_ID ) {
@@ -149,11 +142,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 					dataType: "json",
 					async: false
 				});
-				// Генерируем список свободных заливок
-				$.ajax({ url: "/ajax/batch_select.php?LB_ID=" + test_data['LB_ID'], dataType: "script", async: false });
-
 				$('#cubetest_form input[name="LCT_ID"]').val(LCT_ID);
-				$('#cubetest_form select[name="LB_ID"]').val(test_data['LB_ID']);
+				$('#cubetest_form input[name="LB_ID"]').val(test_data['LB_ID']);
 				$('#cubetest_form input[name="type"]').val(test_data['type']);
 				$('#cubetest_form input[name="test_date"]').val(test_data['test_date']);
 				$('#cubetest_form input[name="test_time"]').val(test_data['test_time']);
@@ -162,10 +152,13 @@ this.subbut.value='Подождите, пожалуйста!';">
 			}
 			// Иначе очищаем форму
 			else {
-				// Генерируем список свободных заливок
-				$.ajax({ url: "/ajax/batch_select.php", dataType: "script", async: false });
+				var LB_ID = $(this).attr("LB_ID"),
+					type = $(this).attr("type"),
+					test_date = $(this).attr("test_date");
 
 				$('#cubetest_form input[name="LCT_ID"]').val('');
+				$('#cubetest_form input[name="LB_ID"]').val(LB_ID);
+				$('#cubetest_form input[name="type"]').val(type);
 				$('#cubetest_form table input').val('');
 				$('#cubetest_form input[name="test_date"]').val(test_date);
 			}
