@@ -94,7 +94,8 @@ if( isset($_POST["CW_ID"]) ) {
 				SELECT
 					DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date,
 					DATE_FORMAT(LB.batch_time, '%H:%i') batch_time,
-					LF.cassette
+					LF.cassette,
+					test = {$test}
 				FROM list__Batch LB
 				JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 				WHERE LB.batch_date = '{$batch_date}' AND LF.cassette IN ({$cassette})
