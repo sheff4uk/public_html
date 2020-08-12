@@ -165,11 +165,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.cs_diff
 			,LB.c_diff
 			,LB.w_diff
-			,LCT.LCT_ID
 		FROM list__Batch LB
 		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
-		LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID
 		WHERE LB.batch_date LIKE '{$row["batch_date"]}' AND LB.CW_ID = {$row["CW_ID"]}
 		ORDER BY LB.batch_time ASC
 	";

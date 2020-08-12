@@ -6,7 +6,7 @@ include "./forms/cubetest_form.php";
 ?>
 
 <h1>Планируемые испытания</h1>
-<table style="table-layout: fixed; width: 100%;">
+<table class="main_table">
 	<thead>
 		<tr>
 			<th>Противовес</th>
@@ -86,20 +86,6 @@ while( $row = mysqli_fetch_array($res) ) {
 
 <h1>Произведенные испытания</h1>
 <table class="main_table">
-	<thead>
-		<tr>
-			<th>Противовес</th>
-			<th>Дата замеса</th>
-			<th>Время замеса</th>
-			<th>Масса куба смеси, кг</th>
-			<th>Дата испытания</th>
-			<th>Время испытания</th>
-			<th>Масса испытуемого куба, кг</th>
-			<th>Давление, МПа</th>
-			<th>Выдержка в часах</th>
-			<th></th>
-		</tr>
-	</thead>
 	<tbody style="text-align: center;">
 
 <?
