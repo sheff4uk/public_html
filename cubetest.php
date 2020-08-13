@@ -73,16 +73,19 @@ $query = "
 		AND LCT.LCT_ID IS NULL
 	ORDER BY test_date_time
 ";
+$now = new DateTime("now");
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
+	$test_date_time = new DateTime($row["test_date_time"]);
+	$error = $test_date_time < $now ? "error" : "";
 	?>
 	<tr>
 		<td class="bg-gray"><?=$row["item"]?></td>
 		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Замес" target="_blank"><?=$row["batch_date_format"]?></a></td>
 		<td class="bg-gray"><?=$row["batch_time_format"]?></td>
 		<td class="bg-gray"><?=$row["mix_density"]/1000?></td>
-		<td><?=$row["test_date_format"]?></td>
-		<td><?=$row["test_time_format"]?></td>
+		<td class="<?=$error?>"><?=$row["test_date_format"]?></td>
+		<td class="<?=$error?>"><?=$row["test_time_format"]?></td>
 		<td></td>
 		<td></td>
 		<td><?=$row["delay"]?></td>
