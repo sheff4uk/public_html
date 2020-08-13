@@ -20,6 +20,7 @@ if( isset($_POST["LB_ID"]) ) {
 				,test_time = '{$test_time}'
 				,cube_weight = {$cube_weight}
 				,pressure = {$pressure}
+				,USR_ID = {$_SESSION['id']}
 			WHERE LCT_ID = {$_POST["LCT_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -36,6 +37,7 @@ if( isset($_POST["LB_ID"]) ) {
 				,test_time = '{$test_time}'
 				,cube_weight = {$cube_weight}
 				,pressure = {$pressure}
+				,USR_ID = {$_SESSION['id']}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
