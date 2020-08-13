@@ -14,18 +14,6 @@ if( !$_GET["date_to"] ) {
 }
 ?>
 
-<style>
-	.summary td {
-		background-color: rgba(0, 0, 0, 0.2);
-	}
-	.total {
-		background: #333333 url(js/ui/images/ui-bg_diagonals-thick_8_333333_40x40.png) 50% 50% repeat !important;
-	}
-	.total td {
-		color: #fff;
-	}
-</style>
-
 <!--Фильтр-->
 <div id="filter">
 	<h3>Фильтр</h3>
