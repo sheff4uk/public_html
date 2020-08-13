@@ -51,12 +51,7 @@ if( isset($_POST["LB_ID"]) ) {
 	}
 
 	// Перенаправление в журнал
-	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/cubetest.php?test_date='.$test_date.'&add#'.$LCT_ID.'">');
-	}
-	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/cubetest.php#'.$LCT_ID.'">');
-	}
+	exit ('<meta http-equiv="refresh" content="0; url=/cubetest.php#'.$LCT_ID.'">');
 }
 ?>
 
