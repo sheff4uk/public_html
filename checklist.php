@@ -126,10 +126,10 @@ foreach ($_GET as &$value) {
 <?
 // Получаем список дат и противовесов и кол-во замесов на эти даты
 $query = "
-	SELECT
-		LB.batch_date,
-		LB.CW_ID,
-		SUM(1) cnt
+	SELECT LB.batch_date
+		,MIN(LB.batch_time) batch_time
+		,LB.CW_ID
+		,SUM(1) cnt
 	FROM list__Batch LB
 	WHERE 1
 		".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
@@ -137,7 +137,7 @@ $query = "
 		".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	GROUP BY LB.batch_date, LB.CW_ID
-	ORDER BY LB.batch_date DESC, LB.CW_ID
+	ORDER BY LB.batch_date DESC, batch_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
