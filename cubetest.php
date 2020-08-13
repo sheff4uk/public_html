@@ -148,6 +148,15 @@ while( $row = mysqli_fetch_array($res) ) {
 			</select>
 		</div>
 
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>Выдержка:</span>
+			<select name="delay" class="<?=$_GET["delay"] ? "filtered" : ""?>" style="width: 100px;">
+				<option value=""></option>
+				<option value="24" <?=($_GET["delay"]==24 ? "selected" : "")?>>24 часа</option>
+				<option value="72" <?=($_GET["delay"]==72 ? "selected" : "")?>>72 часа</option>
+			</select>
+		</div>
+
 		<button style="float: right;">Фильтр</button>
 	</form>
 </div>
@@ -209,6 +218,7 @@ $query = "
 		".($_GET["date_to"] ? "AND LCT.test_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		".($_GET["delay"] ? "AND LCT.delay={$_GET["delay"]}" : "")."
 	ORDER BY LCT.test_date DESC, LCT.test_time DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
