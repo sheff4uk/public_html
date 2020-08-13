@@ -46,10 +46,10 @@ if( isset($_POST["CW_ID"]) ) {
 
 	// Перенаправление в журнал
 	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/daily_reject.php?reject_date='.$reject_date.'&add#'.$LDR_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/daily_reject.php?date_from='.$reject_date.'&date_to='.$reject_date.'&reject_date='.$reject_date.'&add#'.$LDR_ID.'">');
 	}
 	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/daily_reject.php#'.$LDR_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/daily_reject.php?date_from='.$reject_date.'&date_to='.$reject_date.'#'.$LDR_ID.'">');
 	}
 }
 ?>

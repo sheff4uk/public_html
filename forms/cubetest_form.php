@@ -5,7 +5,7 @@ include_once "../config.php";
 if( isset($_POST["LB_ID"]) ) {
 	session_start();
 	$LB_ID = abs($_POST["LB_ID"]);
-	$type = $_POST["type"];
+	$delay = $_POST["delay"];
 	$test_date = $_POST["test_date"];
 	$test_time = $_POST["test_time"];
 	$cube_weight = $_POST["cube_weight"]*1000;
@@ -15,7 +15,7 @@ if( isset($_POST["LB_ID"]) ) {
 		$query = "
 			UPDATE list__CubeTest
 			SET LB_ID = {$LB_ID}
-				,type = {$type}
+				,delay = {$delay}
 				,test_date = '{$test_date}'
 				,test_time = '{$test_time}'
 				,cube_weight = {$cube_weight}
@@ -31,7 +31,7 @@ if( isset($_POST["LB_ID"]) ) {
 		$query = "
 			INSERT INTO list__CubeTest
 			SET LB_ID = {$LB_ID}
-				,type = {$type}
+				,delay = {$delay}
 				,test_date = '{$test_date}'
 				,test_time = '{$test_time}'
 				,cube_weight = {$cube_weight}
@@ -51,7 +51,7 @@ if( isset($_POST["LB_ID"]) ) {
 	}
 
 	// Перенаправление в журнал
-	exit ('<meta http-equiv="refresh" content="0; url=/cubetest.php#'.$LCT_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/cubetest.php?date_from='.$test_date.'&date_to='.$test_date.'#'.$LCT_ID.'">');
 }
 ?>
 
@@ -67,7 +67,7 @@ if( isset($_POST["LB_ID"]) ) {
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="LCT_ID">
-			<input type="hidden" name="type">
+			<input type="hidden" name="delay">
 			<input type="hidden" name="LB_ID">
 
 			<table style="width: 100%; table-layout: fixed;">
@@ -115,12 +115,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 //		}
 //		?>
 
-		// Привыборе замеса узнаем тип 24/72
-		$('#cubetest_form select[name="LB_ID"]').change(function() {
-			var type = $('#cubetest_form select[name="LB_ID"] option:selected').attr('type');
-			$('#cubetest_form input[name="type"]').val(type);
-		});
-
 		// Кнопка добавления расформовки
 		$('.add_cubetest').click( function() {
 			// Проверяем сессию
@@ -139,7 +133,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				});
 				$('#cubetest_form input[name="LCT_ID"]').val(LCT_ID);
 				$('#cubetest_form input[name="LB_ID"]').val(test_data['LB_ID']);
-				$('#cubetest_form input[name="type"]').val(test_data['type']);
+				$('#cubetest_form input[name="delay"]').val(test_data['delay']);
 				$('#cubetest_form input[name="test_date"]').val(test_data['test_date']);
 				$('#cubetest_form input[name="test_time"]').val(test_data['test_time']);
 				$('#cubetest_form input[name="cube_weight"]').val(test_data['cube_weight']);
@@ -148,12 +142,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Иначе очищаем форму
 			else {
 				var LB_ID = $(this).attr("LB_ID"),
-					type = $(this).attr("type"),
+					delay = $(this).attr("delay"),
 					test_date = $(this).attr("test_date");
 
 				$('#cubetest_form input[name="LCT_ID"]').val('');
 				$('#cubetest_form input[name="LB_ID"]').val(LB_ID);
-				$('#cubetest_form input[name="type"]').val(type);
+				$('#cubetest_form input[name="delay"]').val(delay);
 				$('#cubetest_form table input').val('');
 				$('#cubetest_form input[name="test_date"]').val(test_date);
 			}

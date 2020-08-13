@@ -45,11 +45,10 @@ $query = "
 		,DATE_FORMAT(LB.batch_time, '%H:%i') test_time_format
 		,LB.batch_date + INTERVAL 1 DAY test_date
 		,24 delay
-		,1 type
 		,CAST(CONCAT(LB.batch_date + INTERVAL 1 DAY, ' ', LB.batch_time) as datetime) test_date_time
 	FROM list__Batch LB
 	JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
-	LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.type = 1
+	LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 24
 	WHERE LB.test = 1
 		AND LCT.LCT_ID IS NULL
 	UNION ALL
@@ -64,11 +63,10 @@ $query = "
 		,DATE_FORMAT(LB.batch_time, '%H:%i') test_time_format
 		,LB.batch_date + INTERVAL 3 DAY test_date
 		,72 delay
-		,2 type
 		,CAST(CONCAT(LB.batch_date + INTERVAL 3 DAY, ' ', LB.batch_time) as datetime) test_date_time
 	FROM list__Batch LB
 	JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
-	LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.type = 2
+	LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 72
 	WHERE LB.test = 1
 		AND LCT.LCT_ID IS NULL
 	ORDER BY test_date_time
@@ -89,7 +87,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td></td>
 		<td></td>
 		<td><?=$row["delay"]?></td>
-		<td><a href="#" class="add_cubetest" LB_ID="<?=$row["LB_ID"]?>" type="<?=$row["type"]?>" test_date="<?=$row["test_date"]?>" title="Внести данные испытания куба"><i class="fa fa-plus-square fa-lg"></i></a></td>
+		<td><a href="#" class="add_cubetest" LB_ID="<?=$row["LB_ID"]?>" delay="<?=$row["delay"]?>" test_date="<?=$row["test_date"]?>" title="Внести данные испытания куба"><i class="fa fa-plus-square fa-lg"></i></a></td>
 	</tr>
 	<?
 }
@@ -103,7 +101,7 @@ while( $row = mysqli_fetch_array($res) ) {
 <div id="filter">
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
-		<a href="/checklist.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+		<a href="/cubetest.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата испытания между:</span>
@@ -198,7 +196,8 @@ $query = "
 		,LB.batch_date batch_date
 		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 		,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
-		,TIMESTAMPDIFF(HOUR, CAST(CONCAT(LB.batch_date, ' ', LB.batch_time) as datetime), CAST(CONCAT(LCT.test_date, ' ', LCT.test_time) as datetime)) delay
+		,TIMESTAMPDIFF(HOUR, CAST(CONCAT(LB.batch_date, ' ', LB.batch_time) as datetime), CAST(CONCAT(LCT.test_date, ' ', LCT.test_time) as datetime)) delay_fact
+		,LCT.delay
 		,LB.mix_density
 		,LCT.cube_weight
 		,LCT.pressure
@@ -224,7 +223,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["test_time"]?></td>
 		<td><?=$row["cube_weight"]/1000?></td>
 		<td><?=$row["pressure"]?></td>
-		<td><?=$row["delay"]?></td>
+		<td class="<?=($row["delay_fact"] != $row["delay"] ? "error" : "")?>"><?=$row["delay_fact"]?></td>
 		<td><a href="#" class="add_cubetest" LCT_ID="<?=$row["LCT_ID"]?>" title="Изменить данные испытания куба"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?

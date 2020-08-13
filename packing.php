@@ -21,7 +21,7 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 <div id="filter">
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
-		<a href="/opening.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+		<a href="/packing.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата упаковки между:</span>

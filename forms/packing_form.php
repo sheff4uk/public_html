@@ -56,7 +56,7 @@ if( isset($_POST["LF_ID"]) ) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 
-	// Перенаправление в журнал маршрутных листов
+	// Перенаправление в журнал
 	if( $add ) {
 		exit ('<meta http-equiv="refresh" content="0; url=/packing.php?p_date_from='.$p_date.'&p_date_to='.$p_date.'&p_date='.$p_date.'&p_post='.$p_post.'&add#'.$LP_ID.'">');
 	}

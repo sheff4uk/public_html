@@ -19,7 +19,7 @@ if( !$_GET["date_to"] ) {
 <div id="filter">
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
-		<a href="/checklist.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+		<a href="/daily_reject.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата между:</span>
