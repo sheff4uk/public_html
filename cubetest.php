@@ -15,87 +15,117 @@ if( !$_GET["date_to"] ) {
 }
 ?>
 
-<h1>Планируемые испытания</h1>
-<table class="main_table">
-	<thead>
-		<tr>
-			<th>Противовес</th>
-			<th>Дата замеса</th>
-			<th>Время замеса</th>
-			<th>Масса куба смеси, кг</th>
-			<th>Дата испытания</th>
-			<th>Время испытания</th>
-			<th>Масса испытуемого куба, кг</th>
-			<th>Давление, МПа</th>
-			<th>Выдержка в часах</th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody style="text-align: center;">
-<?
-$query = "
-	SELECT LB.LB_ID
-		,CW.CW_ID
-		,CW.item
-		,LB.batch_date
-		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
-		,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
-		,LB.mix_density
-		,DATE_FORMAT(LB.batch_date + INTERVAL 1 DAY, '%d.%m.%y') test_date_format
-		,DATE_FORMAT(LB.batch_time, '%H:%i') test_time_format
-		,LB.batch_date + INTERVAL 1 DAY test_date
-		,24 delay
-		,CAST(CONCAT(LB.batch_date + INTERVAL 1 DAY, ' ', LB.batch_time) as datetime) test_date_time
-	FROM list__Batch LB
-	JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
-	LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 24
-	WHERE LB.test = 1
-		AND LCT.LCT_ID IS NULL
-	UNION ALL
-	SELECT LB.LB_ID
-		,CW.CW_ID
-		,CW.item
-		,LB.batch_date
-		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
-		,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
-		,LB.mix_density
-		,DATE_FORMAT(LB.batch_date + INTERVAL 3 DAY, '%d.%m.%y') test_date_format
-		,DATE_FORMAT(LB.batch_time, '%H:%i') test_time_format
-		,LB.batch_date + INTERVAL 3 DAY test_date
-		,72 delay
-		,CAST(CONCAT(LB.batch_date + INTERVAL 3 DAY, ' ', LB.batch_time) as datetime) test_date_time
-	FROM list__Batch LB
-	JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
-	LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 72
-	WHERE LB.test = 1
-		AND LCT.LCT_ID IS NULL
-	ORDER BY test_date_time
-";
-$now = new DateTime("now");
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-while( $row = mysqli_fetch_array($res) ) {
-	$test_date_time = new DateTime($row["test_date_time"]);
-	$error = $test_date_time < $now ? "error" : "";
-	?>
-	<tr>
-		<td class="bg-gray"><?=$row["item"]?></td>
-		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Замес" target="_blank"><?=$row["batch_date_format"]?></a></td>
-		<td class="bg-gray"><?=$row["batch_time_format"]?></td>
-		<td class="bg-gray"><?=$row["mix_density"]/1000?></td>
-		<td class="<?=$error?>"><?=$row["test_date_format"]?></td>
-		<td class="<?=$error?>"><?=$row["test_time_format"]?></td>
-		<td></td>
-		<td></td>
-		<td><?=$row["delay"]?></td>
-		<td><a href="#" class="add_cubetest" LB_ID="<?=$row["LB_ID"]?>" delay="<?=$row["delay"]?>" test_date="<?=$row["test_date"]?>" title="Внести данные испытания куба"><i class="fa fa-plus-square fa-lg"></i></a></td>
-	</tr>
-	<?
-}
-?>
-	</tbody>
-</table>
+<style>
+	#cube_test_plan {
+		position: relative;
+	}
+	#cube_test_plan:hover > div {
+		height: 300px;
+		opacity: 1;
+	}
+	#cube_test_plan > div {
+		background: #fff;
+		height: 0px;
+		border: 1px solid #bbb;
+		padding: 10px;
+		border-radius: 5px;
+		margin-top: 10px;
+		z-index: 2;
+		position: absolute;
+		top: -10px;
+		left: 0px;
+		width: 100%;
+		overflow: auto;
+		opacity: 0;
+		transition: .3s;
+		-webkit-transition: .3s;
+		box-shadow: 5px 5px 8px #666;
+	}
+	#cube_test_plan > div table {
+		width: 100%;
+		table-layout: fixed;
+	}
+</style>
 
-<h1>Произведенные испытания</h1>
+<div id='cube_test_plan'>
+	<a href="#" class="button" style="width: 100%; z-index: -1;">Планируемые испытания</a>
+	<div>
+		<table>
+			<thead>
+				<tr>
+					<th>Противовес</th>
+					<th>Дата замеса</th>
+					<th>Время замеса</th>
+					<th>Масса куба смеси, кг</th>
+					<th>Дата испытания</th>
+					<th>Время испытания</th>
+					<th>Выдержка в часах</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody style="text-align: center;">
+		<?
+		$query = "
+			SELECT LB.LB_ID
+				,CW.CW_ID
+				,CW.item
+				,LB.batch_date
+				,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
+				,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
+				,LB.mix_density
+				,DATE_FORMAT(LB.batch_date + INTERVAL 1 DAY, '%d.%m.%y') test_date_format
+				,DATE_FORMAT(LB.batch_time, '%H:%i') test_time_format
+				,LB.batch_date + INTERVAL 1 DAY test_date
+				,24 delay
+				,CAST(CONCAT(LB.batch_date + INTERVAL 1 DAY, ' ', LB.batch_time) as datetime) test_date_time
+			FROM list__Batch LB
+			JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+			LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 24
+			WHERE LB.test = 1
+				AND LCT.LCT_ID IS NULL
+			UNION ALL
+			SELECT LB.LB_ID
+				,CW.CW_ID
+				,CW.item
+				,LB.batch_date
+				,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
+				,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
+				,LB.mix_density
+				,DATE_FORMAT(LB.batch_date + INTERVAL 3 DAY, '%d.%m.%y') test_date_format
+				,DATE_FORMAT(LB.batch_time, '%H:%i') test_time_format
+				,LB.batch_date + INTERVAL 3 DAY test_date
+				,72 delay
+				,CAST(CONCAT(LB.batch_date + INTERVAL 3 DAY, ' ', LB.batch_time) as datetime) test_date_time
+			FROM list__Batch LB
+			JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+			LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 72
+			WHERE LB.test = 1
+				AND LCT.LCT_ID IS NULL
+			ORDER BY test_date_time
+		";
+		$now = new DateTime("now");
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		while( $row = mysqli_fetch_array($res) ) {
+			$test_date_time = new DateTime($row["test_date_time"]);
+			$error = $test_date_time < $now ? "error" : "";
+			?>
+			<tr>
+				<td class="bg-gray"><?=$row["item"]?></td>
+				<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Замес" target="_blank"><?=$row["batch_date_format"]?></a></td>
+				<td class="bg-gray"><?=$row["batch_time_format"]?></td>
+				<td class="bg-gray"><?=$row["mix_density"]/1000?></td>
+				<td class="<?=$error?>"><?=$row["test_date_format"]?></td>
+				<td class="<?=$error?>"><?=$row["test_time_format"]?></td>
+				<td><?=$row["delay"]?></td>
+				<td><a href="#" class="add_cubetest" LB_ID="<?=$row["LB_ID"]?>" delay="<?=$row["delay"]?>" test_date="<?=$row["test_date"]?>" title="Внести данные испытания куба"><i class="fa fa-plus-square fa-lg"></i></a></td>
+			</tr>
+			<?
+		}
+		?>
+			</tbody>
+		</table>
+	</div>
+</div>
 
 <!--Фильтр-->
 <div id="filter">
@@ -192,6 +222,20 @@ foreach ($_GET as &$value) {
 </script>
 
 <table class="main_table">
+	<thead>
+		<tr>
+			<th>Противовес</th>
+			<th>Дата замеса</th>
+			<th>Время замеса</th>
+			<th>Масса куба смеси, кг</th>
+			<th>Дата испытания</th>
+			<th>Время испытания</th>
+			<th>Масса испытуемого куба, кг</th>
+			<th>Давление, МПа</th>
+			<th>Выдержка в часах</th>
+			<th></th>
+		</tr>
+	</thead>
 	<tbody style="text-align: center;">
 
 <?
