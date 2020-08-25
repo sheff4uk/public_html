@@ -126,7 +126,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
 			var PP_ID = $(this).attr("PP_ID"),
-				PP_date = $(this).attr("pp_date");
+				pp_date = $(this).attr("pp_date");
 
 			// В случае редактирования заполняем форму
 			if( PP_ID ) {
@@ -149,6 +149,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			else {
 				$('#plan_production_form table input').val('');
 				$('#plan_production_form table select').val('');
+				$('#plan_production_form table input[name="pp_date"]').val(pp_date);
 			}
 
 			$('#plan_production_form').dialog({
