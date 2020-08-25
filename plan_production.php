@@ -108,6 +108,7 @@ foreach ($_GET as &$value) {
 			<th>Замесов</th>
 			<th>Заливок</th>
 			<th>Деталей</th>
+			<th>Факт</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -117,7 +118,9 @@ foreach ($_GET as &$value) {
 $query = "
 	SELECT PP.PP_ID
 		,DATE_FORMAT(PP.pp_date, '%d.%m.%y') pp_date_format
+		,PP.pp_date
 		,CW.item
+		,PP.CW_ID
 		,PP.batches
 		,PP.batches * CW.fillings fillings
 		,PP.batches * CW.fillings * CW.in_cassette amount
@@ -132,6 +135,19 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
+	// Узнаем факт
+	$query = "
+		SELECT SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
+		FROM list__Batch LB
+		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+		WHERE LB.batch_date LIKE '{$row["pp_date"]}'
+			AND LB.CW_ID = {$row["CW_ID"]}
+	";
+	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$subrow = mysqli_fetch_array($subres);
+
+
 	$batches += $row["batches"];
 	$fillings += $row["fillings"];
 	$amount += $row["amount"];
@@ -142,9 +158,12 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["batches"]?></td>
 		<td><?=$row["fillings"]?></td>
 		<td><?=$row["amount"]?></td>
+		<td class="bg-gray"><?=$subrow["fakt"]?></td>
 		<td><a href="#" class="add_pp" PP_ID="<?=$row["PP_ID"]?>" title="Изменить данные производственного плана"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?
+
+	$total_fakt += $subrow["fakt"];
 }
 ?>
 		<tr class="total">
@@ -153,6 +172,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$batches?></td>
 			<td><?=$fillings?></td>
 			<td><?=$amount?></td>
+			<td class="bg-gray"><?=$total_fakt?></td>
 			<td></td>
 		</tr>
 	</tbody>

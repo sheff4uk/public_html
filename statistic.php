@@ -121,19 +121,18 @@ foreach ($_GET as &$value) {
 <?
 // Получаем список дат и список залитых деталей на эти даты
 $query = "
-	SELECT
-		LB.batch_date,
-		DATE_FORMAT(LB.batch_date, '%d.%m.%y') date,
-		COUNT(distinct(LB.CW_ID)) item_cnt,
-		SUM(IFNULL(LO.o_not_spill,0)) + SUM(IFNULL(LP.p_not_spill,0)) not_spill,
-		SUM(IFNULL(LO.o_crack,0)) + SUM(IFNULL(LP.p_crack,0)) crack,
-		SUM(IFNULL(LO.o_chipped,0)) + SUM(IFNULL(LP.p_chipped,0)) chipped,
-		SUM(IFNULL(LO.o_def_form,0)) + SUM(IFNULL(LP.p_def_form,0)) def_form,
-		SUM(1) cnt,
-		SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval,
-		SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval,
-		SUM(IF(LO.w1_error OR LO.w2_error OR LO.w3_error, 1, NULL)) not_spec,
-		SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
+	SELECT LB.batch_date
+		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') date
+		,COUNT(distinct(LB.CW_ID)) item_cnt
+		,SUM(IFNULL(LO.o_not_spill,0)) + SUM(IFNULL(LP.p_not_spill,0)) not_spill
+		,SUM(IFNULL(LO.o_crack,0)) + SUM(IFNULL(LP.p_crack,0)) crack
+		,SUM(IFNULL(LO.o_chipped,0)) + SUM(IFNULL(LP.p_chipped,0)) chipped
+		,SUM(IFNULL(LO.o_def_form,0)) + SUM(IFNULL(LP.p_def_form,0)) def_form
+		,SUM(1) cnt
+		,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
+		,SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval
+		,SUM(IF(LO.w1_error OR LO.w2_error OR LO.w3_error, 1, NULL)) not_spec
+		,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
 	FROM list__Batch LB
 	JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
@@ -152,22 +151,21 @@ while( $row = mysqli_fetch_array($res) ) {
 	$item_cnt = $row["item_cnt"];
 
 	$query = "
-		SELECT
-			CW.item,
-			LB.CW_ID,
-			IFNULL(SUM(LO.o_not_spill), '-') o_not_spill,
-			IFNULL(SUM(LO.o_crack), '-') o_crack,
-			IFNULL(SUM(LO.o_chipped), '-') o_chipped,
-			IFNULL(SUM(LO.o_def_form), '-') o_def_form,
-			IFNULL(SUM(LP.p_not_spill), '-') p_not_spill,
-			IFNULL(SUM(LP.p_crack), '-') p_crack,
-			IFNULL(SUM(LP.p_chipped), '-') p_chipped,
-			IFNULL(SUM(LP.p_def_form), '-') p_def_form,
-			SUM(1) cnt,
-			SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval,
-			SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval,
-			SUM(IF(LO.w1_error OR LO.w2_error OR LO.w3_error, 1, NULL)) not_spec,
-			SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
+		SELECT CW.item
+			,LB.CW_ID
+			,IFNULL(SUM(LO.o_not_spill), '-') o_not_spill
+			,IFNULL(SUM(LO.o_crack), '-') o_crack
+			,IFNULL(SUM(LO.o_chipped), '-') o_chipped
+			,IFNULL(SUM(LO.o_def_form), '-') o_def_form
+			,IFNULL(SUM(LP.p_not_spill), '-') p_not_spill
+			,IFNULL(SUM(LP.p_crack), '-') p_crack
+			,IFNULL(SUM(LP.p_chipped), '-') p_chipped
+			,IFNULL(SUM(LP.p_def_form), '-') p_def_form
+			,SUM(1) cnt
+			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
+			,SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval
+			,SUM(IF(LO.w1_error OR LO.w2_error OR LO.w3_error, 1, NULL)) not_spec
+			,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
 		FROM list__Batch LB
 		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
@@ -181,6 +179,17 @@ while( $row = mysqli_fetch_array($res) ) {
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
+		// Узнаем план
+		$query = "
+			SELECT PP.batches * CW.fillings * CW.in_cassette plan
+			FROM plan__Production PP
+			JOIN CounterWeight CW ON CW.CW_ID = PP.CW_ID
+			WHERE PP.CW_ID = {$subrow["CW_ID"]}
+				AND PP.pp_date LIKE '{$row["batch_date"]}'
+		";
+		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		$subsubrow = mysqli_fetch_array($subsubres);
+
 		// Выводим общую ячейку с датой заливки
 		if( $item_cnt ) {
 			$item_cnt++;
@@ -205,10 +214,12 @@ while( $row = mysqli_fetch_array($res) ) {
 		$total = $subrow["o_not_spill"] + $subrow["p_not_spill"] + $subrow["o_crack"] + $subrow["p_crack"] + $subrow["o_chipped"] + $subrow["p_chipped"] + $subrow["o_def_form"] + $subrow["p_def_form"];
 		$percent_total = round($total / $subrow["fakt"] * 100, 2);
 		echo "<td>{$total}</td>";
-		echo "<td>?</td>";
+		echo "<td>{$subsubrow["plan"]}</td>";
 		echo "<td>{$subrow["fakt"]}</td>";
 		echo "<td>{$percent_total} %</td>";
 		echo "</tr>";
+
+		$total_plan += $subsubrow["plan"];
 	}
 	echo "<tr class='summary'>";
 	echo "<td>Итог:</td>";
@@ -223,10 +234,12 @@ while( $row = mysqli_fetch_array($res) ) {
 	$total = $row["not_spill"] + $row["crack"] + $row["chipped"] + $row["def_form"];
 	$percent_total = round($total / $row["fakt"] * 100, 2);
 	echo "<td>{$total}</td>";
-	echo "<td>?</td>";
+	echo "<td>{$total_plan}</td>";
 	echo "<td>{$row["fakt"]}</td>";
 	echo "<td>{$percent_total} %</td>";
 	echo "</tr>";
+
+	unset($total_plan);
 }
 ////////////////////////////////////////////////
 // Выводим итог, если есть фильтр
@@ -290,6 +303,18 @@ if( $filter ) {
 		";
 		$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $subrow = mysqli_fetch_array($subres) ) {
+			// Узнаем план
+			$query = "
+				SELECT SUM(PP.batches * CW.fillings * CW.in_cassette) plan
+				FROM plan__Production PP
+				JOIN CounterWeight CW ON CW.CW_ID = PP.CW_ID
+				WHERE PP.CW_ID = {$subrow["CW_ID"]}
+					".($_GET["date_from"] ? "AND PP.pp_date >= '{$_GET["date_from"]}'" : "")."
+					".($_GET["date_to"] ? "AND PP.pp_date <= '{$_GET["date_to"]}'" : "")."
+			";
+			$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			$subsubrow = mysqli_fetch_array($subsubres);
+
 			// Выводим общую ячейку с датой заливки
 			if( $item_cnt ) {
 				$item_cnt++;
@@ -314,10 +339,12 @@ if( $filter ) {
 			$total = $subrow["o_not_spill"] + $subrow["p_not_spill"] + $subrow["o_crack"] + $subrow["p_crack"] + $subrow["o_chipped"] + $subrow["p_chipped"] + $subrow["o_def_form"] + $subrow["p_def_form"];
 			$percent_total = round($total / $subrow["fakt"] * 100, 2);
 			echo "<td>{$total}</td>";
-			echo "<td>?</td>";
+			echo "<td>{$subsubrow["plan"]}</td>";
 			echo "<td>{$subrow["fakt"]}</td>";
 			echo "<td>{$percent_total} %</td>";
 			echo "</tr>";
+
+			$total_plan += $subsubrow["plan"];
 		}
 		echo "<tr class='summary total'>";
 		echo "<td>Итог:</td>";
@@ -332,7 +359,7 @@ if( $filter ) {
 		$total = $row["not_spill"] + $row["crack"] + $row["chipped"] + $row["def_form"];
 		$percent_total = round($total / $row["fakt"] * 100, 2);
 		echo "<td>{$total}</td>";
-		echo "<td>?</td>";
+		echo "<td>{$total_plan}</td>";
 		echo "<td>{$row["fakt"]}</td>";
 		echo "<td>{$percent_total} %</td>";
 		echo "</tr>";
