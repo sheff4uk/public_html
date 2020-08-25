@@ -5,7 +5,6 @@ include_once "../config.php";
 if( isset($_POST["CW_ID"]) ) {
 	session_start();
 	$pp_date = $_POST["pp_date"];
-	$shift = $_POST["shift"];
 	$CW_ID = $_POST["CW_ID"];
 	$batches = $_POST["batches"];
 
@@ -13,7 +12,6 @@ if( isset($_POST["CW_ID"]) ) {
 		$query = "
 			UPDATE plan__Production
 			SET pp_date = '{$pp_date}'
-				,shift = {$shift}
 				,CW_ID = {$CW_ID}
 				,batches = {$batches}
 			WHERE PP_ID = {$_POST["PP_ID"]}
@@ -27,7 +25,6 @@ if( isset($_POST["CW_ID"]) ) {
 		$query = "
 			INSERT INTO plan__Production
 			SET pp_date = '{$pp_date}'
-				,shift = {$shift}
 				,CW_ID = {$CW_ID}
 				,batches = {$batches}
 		";
@@ -71,7 +68,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<thead>
 					<tr>
 						<th>Дата</th>
-						<th>Смена</th>
 						<th>Противовес</th>
 						<th>Замесов</th>
 						<th>Заливок</th>
@@ -81,7 +77,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<tbody style="text-align: center;">
 					<tr>
 						<td><input type="date" name="pp_date" required></td>
-						<td><input type="number" name="shift" min="1" max="3" required></td>
 						<td>
 							<select name="CW_ID" style="width: 150px;" required>
 								<option value=""></option>
@@ -145,7 +140,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 				$('#plan_production_form input[name="PP_ID"]').val(PP_ID);
 				$('#plan_production_form input[name="pp_date"]').val(pp_data['pp_date']);
-				$('#plan_production_form input[name="shift"]').val(pp_data['shift']);
 				$('#plan_production_form select[name="CW_ID"]').val(pp_data['CW_ID']);
 				$('#plan_production_form input[name="batches"]').val(pp_data['batches']);
 				$('#plan_production_form input[name="fillings"]').val(pp_data['fillings']);

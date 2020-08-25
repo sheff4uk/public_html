@@ -104,7 +104,6 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th>Дата</th>
-			<th>Смена</th>
 			<th>Противовес</th>
 			<th>Замесов</th>
 			<th>Заливок</th>
@@ -118,7 +117,6 @@ foreach ($_GET as &$value) {
 $query = "
 	SELECT PP.PP_ID
 		,DATE_FORMAT(PP.pp_date, '%d.%m.%y') pp_date_format
-		,PP.shift
 		,CW.item
 		,PP.batches
 		,PP.batches * CW.fillings fillings
@@ -130,7 +128,7 @@ $query = "
 		".($_GET["date_to"] ? "AND PP.pp_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PP.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PP.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	ORDER BY PP.pp_date DESC, PP.shift, PP.CW_ID
+	ORDER BY PP.pp_date DESC, PP.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -140,7 +138,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	?>
 	<tr id="<?=$row["PP_ID"]?>">
 		<td><?=$row["pp_date_format"]?></td>
-		<td><?=$row["shift"]?></td>
 		<td><?=$row["item"]?></td>
 		<td><?=$row["batches"]?></td>
 		<td><?=$row["fillings"]?></td>
@@ -151,7 +148,6 @@ while( $row = mysqli_fetch_array($res) ) {
 }
 ?>
 		<tr class="total">
-			<td></td>
 			<td></td>
 			<td>Итог:</td>
 			<td><?=$batches?></td>
