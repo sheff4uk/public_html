@@ -9,7 +9,6 @@
 	}
 ?>
 </div>
-<!--
 <div style="
 	height: 40px;
 	position: absolute;
@@ -28,8 +27,7 @@
 	box-shadow: 0 -1px 4px rgba(0,0,0,0.2);
 	text-align: center;
 	line-height: 25px;
-			">&copy; 2016-<?=( date("Y") )?> ООО &laquo;<a href="https://фабрикастульев.рф" target="_blank">Престол</a>&raquo;</div>
--->
+			">&copy; <?=( date("Y") )?> ООО &laquo;<a href="https://konstanta.ltd" target="_blank">Константа</a>&raquo;</div>
 
 <script>
 	$(document).ready(function(){
