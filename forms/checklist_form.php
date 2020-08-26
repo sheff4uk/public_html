@@ -241,7 +241,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='crushed_stone' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='cement' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='water' style='width: 80px;' required></td>
-						<td id='fillings'></td>
+						<td id='fillings' style='position: relative;'></td>
 						<td><input type="number" min="0" max="64" name="underfilling"></td>
 						<td><input type="checkbox" name="test" value="1"><i id="test_notice" class="fas fa-question-circle" title="Не редактируется так как есть связанные испытания куба."></i></td>
 					</tr>
