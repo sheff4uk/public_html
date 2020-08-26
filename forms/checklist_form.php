@@ -167,7 +167,7 @@ if( isset($_POST["CW_ID"]) ) {
 	}
 </style>
 
-<div id='checklist_form' title='Данные замеса' style='display:none;'>
+<div id='checklist_form' title='Данные заливок' style='display:none;'>
 	<form method='post' action="/forms/checklist_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
@@ -191,7 +191,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</select>
 			</div>
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-				<span>Дата замеса:</span>
+				<span>Дата заливки:</span>
 				<input type="date" name="batch_date" required>
 				<i id="date_notice" class="fas fa-question-circle" title="Дата не редактируется так как есть связанные этапы расформовки или упаковки."></i>
 			</div>

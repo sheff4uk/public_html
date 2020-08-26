@@ -163,7 +163,7 @@ foreach ($_GET as &$value) {
 			<th rowspan="2">№ поста</th>
 			<th colspan="4">Кол-во брака, шт</th>
 			<th rowspan="2">Противовес</th>
-			<th rowspan="2">Дата замеса</th>
+			<th rowspan="2">Дата заливки</th>
 			<th rowspan="2">№ кассеты</th>
 			<th rowspan="2"></th>
 		</tr>
@@ -235,7 +235,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td style="color: red;"><?=$row["p_chipped"]?></td>
 		<td style="color: red;"><?=$row["p_def_form"]?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
-		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Замес" target="_blank"><?=$row["batch_date_format"]?></a></td>
+		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
 		<td class="bg-gray"><?=$cassette?></td>
 		<td><a href="#" class="add_packing" LP_ID="<?=$row["LP_ID"]?>" title="Изменить данные упаковки"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>

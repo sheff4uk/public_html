@@ -100,12 +100,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 <script>
 	$(function() {
-		$('#cubetest_form select[name="LB_ID"]').select2({ placeholder: 'Выберите замес', language: 'ru' });
-		// Костыль для Select2 чтобы работал поиск
-		$.ui.dialog.prototype._allowInteraction = function (e) {
-			return true;
-		};
-
 //		<?
 //		if( isset($_GET["add"]) ) {
 //		?>

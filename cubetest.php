@@ -5,13 +5,15 @@ include "header.php";
 include "./forms/cubetest_form.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
-if( !$_GET["date_from"] ) {
-	$date = new DateTime('-6 days');
-	$_GET["date_from"] = date_format($date, 'Y-m-d');
-}
-if( !$_GET["date_to"] ) {
-	$date = new DateTime('-0 days');
-	$_GET["date_to"] = date_format($date, 'Y-m-d');
+if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
+	if( !$_GET["date_from"] ) {
+		$date = new DateTime('-6 days');
+		$_GET["date_from"] = date_format($date, 'Y-m-d');
+	}
+	if( !$_GET["date_to"] ) {
+		$date = new DateTime('-0 days');
+		$_GET["date_to"] = date_format($date, 'Y-m-d');
+	}
 }
 ?>
 
@@ -54,8 +56,8 @@ if( !$_GET["date_to"] ) {
 			<thead>
 				<tr>
 					<th>Противовес</th>
-					<th>Дата замеса</th>
-					<th>Время замеса</th>
+					<th>Дата заливки</th>
+					<th>Время заливки</th>
 					<th>Масса куба смеси, кг</th>
 					<th>Дата испытания</th>
 					<th>Время испытания</th>
@@ -111,7 +113,7 @@ if( !$_GET["date_to"] ) {
 			?>
 			<tr>
 				<td class="bg-gray"><?=$row["item"]?></td>
-				<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Замес" target="_blank"><?=$row["batch_date_format"]?></a></td>
+				<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
 				<td class="bg-gray"><?=$row["batch_time_format"]?></td>
 				<td class="bg-gray"><?=$row["mix_density"]/1000?></td>
 				<td class="<?=$error?>"><?=$row["test_date_format"]?></td>
@@ -138,6 +140,12 @@ if( !$_GET["date_to"] ) {
 			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
 			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
 			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
+		</div>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
+			<input name="batch_date_from" type="date" value="<?=$_GET["batch_date_from"]?>" class="<?=$_GET["batch_date_from"] ? "filtered" : ""?>">
+			<input name="batch_date_to" type="date" value="<?=$_GET["batch_date_to"]?>" class="<?=$_GET["batch_date_to"] ? "filtered" : ""?>">
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -225,8 +233,8 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th>Противовес</th>
-			<th>Дата замеса</th>
-			<th>Время замеса</th>
+			<th>Дата заливки</th>
+			<th>Время заливки</th>
 			<th>Масса куба смеси, кг</th>
 			<th>Дата испытания</th>
 			<th>Время испытания</th>
@@ -262,6 +270,8 @@ $query = "
 	WHERE 1
 		".($_GET["date_from"] ? "AND LCT.test_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND LCT.test_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["batch_date_from"] ? "AND LB.batch_date >= '{$_GET["batch_date_from"]}'" : "")."
+		".($_GET["batch_date_to"] ? "AND LB.batch_date <= '{$_GET["batch_date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		".($_GET["delay"] ? "AND LCT.delay={$_GET["delay"]}" : "")."
@@ -272,7 +282,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	?>
 	<tr id="<?=$row["LCT_ID"]?>">
 		<td class="bg-gray"><?=$row["item"]?></td>
-		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Замес" target="_blank"><?=$row["batch_date_format"]?></a></td>
+		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
 		<td class="bg-gray"><?=$row["batch_time_format"]?></td>
 		<td class="bg-gray"><?=$row["mix_density"]/1000?></td>
 		<td><?=$row["test_date"]?></td>
@@ -288,6 +298,21 @@ while( $row = mysqli_fetch_array($res) ) {
 
 	</tbody>
 </table>
+
+<script>
+	$(function() {
+		// При выборе даты заливки сбрасывается дата испытания
+		$('input[name="batch_date_from"], input[name="batch_date_to"]').change(function() {
+			$('input[name="date_from"]').val('');
+			$('input[name="date_to"]').val('');
+		});
+		// При выборе даты испытания сбрасывается дата заливки
+		$('input[name="date_from"], input[name="date_to"]').change(function() {
+			$('input[name="batch_date_from"]').val('');
+			$('input[name="batch_date_to"]').val('');
+		});
+	});
+</script>
 
 <?
 include "footer.php";

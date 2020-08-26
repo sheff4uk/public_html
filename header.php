@@ -185,7 +185,7 @@ function src_url($src) {
 <?
 	if( !empty($_SESSION['id']) ) {
 		$menu["Планы"]["Производство"] = "plan_production.php";
-		$menu["Операции"]["Замес+Заливка"] = "checklist.php";
+		$menu["Операции"]["Заливка"] = "checklist.php";
 		$menu["Операции"]["Расформовка"] = "opening.php";
 		$menu["Операции"]["Упаковка"] = "packing.php";
 		$menu["Доп. данные"]["Суточный&nbsp;брак"] = "daily_reject.php";

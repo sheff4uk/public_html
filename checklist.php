@@ -1,6 +1,6 @@
 <?
 include "config.php";
-$title = 'Замес/Заливка';
+$title = 'Заливка';
 include "header.php";
 include "./forms/checklist_form.php";
 
@@ -197,7 +197,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
 			echo "<tr style='border-top: 2px solid #333;' id='{$subrow["LB_ID"]}'>";
-			echo "<td rowspan='{$cnt}' class='bg-gray'>{$subrow["batch_date"]}<br><b>{$subrow["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
+			//echo "<td rowspan='{$cnt}' class='bg-gray'>{$subrow["batch_date"]}<br><b>{$subrow["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
+			echo "<td rowspan='{$cnt}' class='bg-gray'>{$subrow["batch_date"]}<br><b>{$subrow["item"]}</b></td>";
 			$cnt = 0;
 		}
 		else {
@@ -215,7 +216,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td class="bg-gray"><?=$subrow["water"]?><?=($subrow["w_diff"] ? "<font style='font-size: .8em;' color='red'> ".($subrow["w_diff"])."</font>" : "")?></td>
 				<td colspan="2" class="nowrap"><?=$cassette?></td>
 				<td><?=$subrow["underfilling"]?></td>
-				<td><a href="#" class="add_checklist" LB_ID="<?=$subrow["LB_ID"]?>" title="Изменить данные замеса"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
+				<td><a href="#" class="add_checklist" LB_ID="<?=$subrow["LB_ID"]?>" title="Изменить данные заливок"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 			</tr>
 		<?
 	}
@@ -224,7 +225,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<div id="add_btn" class="add_checklist" CW_ID="<?=$_GET["CW_ID"]?>" batch_date="<?=$_GET["batch_date"]?>" OP_ID="<?=$_GET["OP_ID"]?>" title="Внести данные замеса"></div>
+<div id="add_btn" class="add_checklist" CW_ID="<?=$_GET["CW_ID"]?>" batch_date="<?=$_GET["batch_date"]?>" OP_ID="<?=$_GET["OP_ID"]?>" title="Внести данные заливок"></div>
 
 <?
 include "footer.php";
