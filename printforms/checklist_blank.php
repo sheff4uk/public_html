@@ -78,12 +78,12 @@ echo "<title>Чеклист оператора для {$item} от {$pp_date}</t
 <?
 // Данные рецепта
 $query = "
-	SELECT GROUP_CONCAT(CONCAT('<span style=\'font-size: 1.5em;\'>', letter, '</span>', ROUND(density_from/1000, 2), '&ndash;', ROUND(density_to/1000, 2)) SEPARATOR '<br>') control_density
-		,GROUP_CONCAT(CONCAT(iron_oxide, ' ±5') SEPARATOR '<br>') iron_oxide
-		,GROUP_CONCAT(CONCAT(sand, ' ±5') SEPARATOR '<br>') sand
-		,GROUP_CONCAT(CONCAT(crushed_stone, ' ±5') SEPARATOR '<br>') crushed_stone
-		,GROUP_CONCAT(CONCAT(cement, ' ±2') SEPARATOR '<br>') cement
-		,GROUP_CONCAT(CONCAT('min ', water) SEPARATOR '<br>') water
+	SELECT GROUP_CONCAT(CONCAT('<span style=\'font-size: 1.5em;\'>', letter, '</span>', ROUND(density_from/1000, 2), '&ndash;', ROUND(density_to/1000, 2)) ORDER BY letter SEPARATOR '<br>') control_density
+		,GROUP_CONCAT(distinct CONCAT(iron_oxide, ' ±5') ORDER BY letter SEPARATOR '<br>') iron_oxide
+		,GROUP_CONCAT(distinct CONCAT(sand, ' ±5') ORDER BY letter SEPARATOR '<br>') sand
+		,GROUP_CONCAT(distinct CONCAT(crushed_stone, ' ±5') ORDER BY letter SEPARATOR '<br>') crushed_stone
+		,GROUP_CONCAT(distinct CONCAT(cement, ' ±2') ORDER BY letter SEPARATOR '<br>') cement
+		,GROUP_CONCAT(distinct CONCAT('min ', water) ORDER BY letter SEPARATOR '<br>') water
 	FROM MixFormula
 	WHERE CW_ID = {$CW_ID}
 ";
