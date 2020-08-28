@@ -71,7 +71,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Противовес</th>
 						<th>Замесов</th>
 						<th>Заливок</th>
-						<th>Деталей</th>
+						<th>План</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
