@@ -244,7 +244,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<tbody style="text-align: center;">
 					<tr>
 						<td><input type='time' name='batch_time' required></td>
-<!--						<td><input type='number' min='1' max='4' step='0.01' name='comp_density' style='width: 80px;' required></td>-->
 						<td><input type='number' min='2' max='4' step='0.01' name='mix_density' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='iron_oxide' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='sand' style='width: 80px;' required></td>
