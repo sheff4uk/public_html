@@ -3,7 +3,7 @@ include "config.php";
 $title = 'Заливка';
 include "header.php";
 include "./forms/checklist_form.php";
-die("<h1>Ведутся работы</h1>");
+//die("<h1>Ведутся работы</h1>");
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["date_from"] ) {
 	$date = new DateTime('-6 days');
