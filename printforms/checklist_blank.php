@@ -79,6 +79,10 @@ echo "<title>Чеклист оператора для {$item} от {$pp_date}</t
 // Данные рецепта
 $query = "
 	SELECT GROUP_CONCAT(CONCAT('<span style=\'font-size: 1.5em;\'>', letter, '</span>', ROUND(density_from/1000, 2), '&ndash;', ROUND(density_to/1000, 2)) ORDER BY letter SEPARATOR '<br>') control_density
+		,GROUP_CONCAT(CONCAT('<span style=\'font-size: 1.5em;\'>', letter, '</span>') ORDER BY letter SEPARATOR '<br>') ltr
+		,GROUP_CONCAT(CONCAT(ROUND(io_min/1000, 2), '&ndash;', ROUND(io_max/1000, 2)) ORDER BY letter SEPARATOR '<br>') io
+		,GROUP_CONCAT(CONCAT(ROUND(sn_min/1000, 2), '&ndash;', ROUND(sn_max/1000, 2)) ORDER BY letter SEPARATOR '<br>') sn
+		,GROUP_CONCAT(CONCAT(ROUND(cs_min/1000, 2), '&ndash;', ROUND(cs_max/1000, 2)) ORDER BY letter SEPARATOR '<br>') cs
 		,GROUP_CONCAT(distinct CONCAT(iron_oxide, ' ±5') ORDER BY letter SEPARATOR '<br>') iron_oxide
 		,GROUP_CONCAT(distinct CONCAT(sand, ' ±5') ORDER BY letter SEPARATOR '<br>') sand
 		,GROUP_CONCAT(distinct CONCAT(crushed_stone, ' ±5') ORDER BY letter SEPARATOR '<br>') crushed_stone
@@ -96,7 +100,8 @@ $row = mysqli_fetch_array($res);
 		<tr>
 			<th rowspan="3" width="40">№<br>п/п</th>
 			<th rowspan="3">Время замеса</th>
-			<th colspan="2">Масса куба, кг</th>
+			<th rowspan="2" width="30" style="word-wrap: break-word;">Рецепт</th>
+			<th colspan="<?=(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0) + ($row["cs"] ? 1 : 0))?>">Масса куба, кг</th>
 			<?=($row["iron_oxide"] ? "<th rowspan='2'>Окалина, кг</th>" : "")?>
 			<?=($row["sand"] ? "<th rowspan='2'>КМП, кг</th>" : "")?>
 			<?=($row["crushed_stone"] ? "<th rowspan='2'>Отсев, кг</th>" : "")?>
@@ -106,11 +111,16 @@ $row = mysqli_fetch_array($res);
 			<th rowspan="3">Недолив</th>
 		</tr>
 		<tr>
-			<th>Контрольного компонента</th>
+			<?=(($row["io"] ? "<th>Окалины</th>" : ""))?>
+			<?=(($row["sn"] ? "<th>КМП</th>" : ""))?>
+			<?=(($row["cs"] ? "<th>Отсева</th>" : ""))?>
 			<th>Раствора</th>
 		</tr>
 		<tr>
-			<th class="nowrap"><?=$row["control_density"]?></th>
+			<th><?=$row["ltr"]?></th>
+			<?=(($row["io"] ? "<th class='nowrap'>{$row["io"]}</th>" : ""))?>
+			<?=(($row["sn"] ? "<th class='nowrap'>{$row["sn"]}</th>" : ""))?>
+			<?=(($row["cs"] ? "<th class='nowrap'>{$row["cs"]}</th>" : ""))?>
 			<th class="nowrap"><?=$spec?></th>
 			<?=($row["iron_oxide"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")?>
 			<?=($row["sand"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")?>
@@ -131,6 +141,9 @@ for ($i = 1; $i <= $batches; $i++) {
 			<td style='text-align: center;'>{$i}</td>
 			<td></td>
 			<td></td>
+			".($row["io"] ? "<td></td>" : "")."
+			".($row["sn"] ? "<td></td>" : "")."
+			".($row["cs"] ? "<td></td>" : "")."
 			<td></td>
 			".($row["iron_oxide"] ? "<td></td>" : "")."
 			".($row["sand"] ? "<td></td>" : "")."

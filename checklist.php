@@ -3,7 +3,7 @@ include "config.php";
 $title = 'Заливка';
 include "header.php";
 include "./forms/checklist_form.php";
-
+die("<h1>Ведутся работы</h1>");
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["date_from"] ) {
 	$date = new DateTime('-6 days');
@@ -103,22 +103,19 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th rowspan="2">Дата<br>Противовес</th>
-			<th rowspan="2">Время</th>
-			<th rowspan="2">Оператор</th>
-			<th colspan="2">Масса кубика, кг</th>
-			<th rowspan="2">Окалина,<br>кг ±5</th>
-			<th rowspan="2">КМП,<br>кг ±5</th>
-			<th rowspan="2">Отсев,<br>кг ±5</th>
-			<th rowspan="2">Цемент,<br>кг ±2</th>
-			<th rowspan="2">Вода, л</th>
-			<th rowspan="2" colspan="2">№ кассеты</th>
-			<th rowspan="2">Недолив</th>
-			<th rowspan="2"></th>
-		</tr>
-		<tr>
-			<th>Контрольный компонент</th>
-			<th>Раствор</th>
+			<th>Дата<br>Противовес</th>
+			<th>Время</th>
+			<th>Оператор</th>
+			<th>Рецепт</th>
+			<th>Куб раствора, кг</th>
+			<th>Окалина,<br>кг ±5</th>
+			<th>КМП,<br>кг ±5</th>
+			<th>Отсев,<br>кг ±5</th>
+			<th>Цемент,<br>кг ±2</th>
+			<th>Вода, л</th>
+			<th colspan="2">№ кассеты</th>
+			<th>Недолив</th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
@@ -149,7 +146,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			,OP.name
 			,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date
 			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time
-			,LB.comp_density
+			,LB.io_density
+			,LB.sn_density
+			,LB.cs_density
 			,LB.mix_density
 			,LB.iron_oxide
 			,LB.sand
@@ -207,7 +206,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		?>
 				<td><?=$subrow["batch_time"]?><?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?></td>
 				<td><?=$subrow["name"]?></td>
-				<td><?=$subrow["letter"] ? "<b>{$subrow["letter"]}</b>&nbsp;" : ""?><?=$subrow["comp_density"]/1000?></td>
+		<td><span class="nowrap"><?=$subrow["letter"] ? "<b>{$subrow["letter"]}</b> " : ""?><?=($subrow["io_density"] ? "<i title='Окалина'>".($subrow["io_density"]/1000)."</i> / " : "")?><?=($subrow["sn_density"] ? "<i title='КМП'>".($subrow["sn_density"]/1000)."</i> / " : "")?><?=($subrow["cs_density"] ? "<i title='Отсев'>".($subrow["cs_density"]/1000)."</i>" : "")?></span></td>
 				<td><?=$subrow["mix_density"]/1000?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
 				<td class="bg-gray"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
 				<td class="bg-gray"><?=$subrow["sand"]?><?=($subrow["s_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["s_diff"] > 0 ? " +" : " ").($subrow["s_diff"])."</font>" : "")?></td>

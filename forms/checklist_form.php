@@ -9,7 +9,9 @@ if( isset($_POST["CW_ID"]) ) {
 	$OP_ID = $_POST["OP_ID"];
 	$batch_date = $_POST["batch_date"];
 	$batch_time = $_POST["batch_time"];
-	$comp_density = $_POST["comp_density"]*1000;
+	$io_density = $_POST["io_density"] ? $_POST["io_density"]*1000 : "NULL";
+	$sn_density = $_POST["sn_density"] ? $_POST["sn_density"]*1000 : "NULL";
+	$cs_density = $_POST["cs_density"] ? $_POST["cs_density"]*1000 : "NULL";
 	$mix_density = $_POST["mix_density"]*1000;
 	$iron_oxide = $_POST["iron_oxide"] ? $_POST["iron_oxide"] : "NULL";
 	$sand = $_POST["sand"] ? $_POST["sand"] : "NULL";
@@ -51,7 +53,9 @@ if( isset($_POST["CW_ID"]) ) {
 					OP_ID = {$OP_ID},
 					batch_date = '{$batch_date}',
 					batch_time = '{$batch_time}',
-					comp_density = {$comp_density},
+					io_density = {$io_density},
+					sn_density = {$sn_density},
+					cs_density = {$cs_density},
 					mix_density = {$mix_density},
 					iron_oxide = {$iron_oxide},
 					sand = {$sand},
@@ -113,7 +117,9 @@ if( isset($_POST["CW_ID"]) ) {
 					OP_ID = {$OP_ID},
 					batch_date = '{$batch_date}',
 					batch_time = '{$batch_time}',
-					comp_density = {$comp_density},
+					io_density = {$io_density},
+					sn_density = {$sn_density},
+					cs_density = {$cs_density},
 					mix_density = {$mix_density},
 					iron_oxide = {$iron_oxide},
 					sand = {$sand},
@@ -179,13 +185,21 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<option value=""></option>
 					<?
 					$query = "
-						SELECT CW.CW_ID, CW.item, CW.fillings, CW.type
+						SELECT CW.CW_ID
+							,CW.item
+							,CW.fillings
+							,CW.type
+							,SUM(MF.io_min) io
+							,SUM(MF.sn_min) sn
+							,SUM(MF.cs_min) cs
 						FROM CounterWeight CW
+						LEFT JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID
+						GROUP BY CW.CW_ID
 						ORDER BY CW.CW_ID
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) ) {
-						echo "<option value='{$row["CW_ID"]}' fillings='{$row["fillings"]}' type='{$row["type"]}'>{$row["item"]}</option>";
+						echo "<option value='{$row["CW_ID"]}' fillings='{$row["fillings"]}' type='{$row["type"]}' io='{$row["io"]}' sn='{$row["sn"]}' cs='{$row["cs"]}'>{$row["item"]}</option>";
 					}
 					?>
 				</select>
@@ -215,27 +229,23 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
-						<th rowspan="2">Время</th>
-						<th colspan="2">Масса кубика, кг</th>
-						<th rowspan="2">Окалина, кг</th>
-						<th rowspan="2">КМП, кг</th>
-						<th rowspan="2">Отсев, кг</th>
-						<th rowspan="2">Цемент, кг</th>
-						<th rowspan="2">Вода, л</th>
-						<th rowspan="2">№ кассеты</th>
-						<th rowspan="2">Недолив</th>
-						<th rowspan="2">Испытиния кубов</th>
-					</tr>
-					<tr>
-						<th>Контрольный компонент</th>
-						<th>Раствор</th>
+						<th>Время</th>
+						<th>Куб раствора, кг</th>
+						<th>Окалина, кг</th>
+						<th>КМП, кг</th>
+						<th>Отсев, кг</th>
+						<th>Цемент, кг</th>
+						<th>Вода, л</th>
+						<th>№ кассеты</th>
+						<th>Недолив</th>
+						<th>Испытиния кубов</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
 						<td><input type='time' name='batch_time' required></td>
-						<td><input type='number' min='1' max='4' step='0.01' name='comp_density' style='width: 80px;' required></td>
-						<td><input type='number' min='1' max='4' step='0.01' name='mix_density' style='width: 80px;' required></td>
+<!--						<td><input type='number' min='1' max='4' step='0.01' name='comp_density' style='width: 80px;' required></td>-->
+						<td><input type='number' min='2' max='4' step='0.01' name='mix_density' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='iron_oxide' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='sand' style='width: 80px;' required></td>
 						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='0' name='crushed_stone' style='width: 80px;' required></td>
@@ -244,6 +254,17 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td id='fillings' style='position: relative;'></td>
 						<td><input type="number" min="0" max="64" name="underfilling"></td>
 						<td><input type="checkbox" name="test" value="1"><i id="test_notice" class="fas fa-question-circle" title="Не редактируется так как есть связанные испытания куба."></i></td>
+					</tr>
+					<tr>
+						<td colspan="2"><b>Масса куба, кг:</b></td>
+						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='2' max='3' step='0.01' name='io_density' style='width: 80px;' required></td>
+						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='1' max='2' step='0.01' name='sn_density' style='width: 80px;' required></td>
+						<td style='background-color: rgba(0, 0, 0, 0.2);'><input type='number' min='1' max='2' step='0.01' name='cs_density' style='width: 80px;' required></td>
+						<td style='background-color: rgba(0, 0, 0, 0.2);'></td>
+						<td style='background-color: rgba(0, 0, 0, 0.2);'></td>
+						<td></td>
+						<td></td>
+						<td></td>
 					</tr>
 				</tbody>
 			</table>
@@ -294,7 +315,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#checklist_form select[name="OP_ID"]').val(data['OP_ID']);
 				$('#checklist_form input[name="batch_date"]').val(data['batch_date']);
 				$('#checklist_form input[name="batch_time"]').val(data['batch_time']);
-				$('#checklist_form input[name="comp_density"]').val(data['comp_density']);
+				$('#checklist_form input[name="io_density"]').val(data['io_density']);
+				$('#checklist_form input[name="sn_density"]').val(data['sn_density']);
+				$('#checklist_form input[name="cs_density"]').val(data['cs_density']);
 				$('#checklist_form input[name="mix_density"]').val(data['mix_density']);
 				$('#checklist_form input[name="iron_oxide"]').val(data['iron_oxide']);
 				$('#checklist_form input[name="sand"]').val(data['sand']);
@@ -375,6 +398,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 		$('#checklist_form select[name="CW_ID"]').change( function() {
 			var fillings = $('#checklist_form select[name="CW_ID"] option:selected').attr('fillings'),
 				type = $('#checklist_form select[name="CW_ID"] option:selected').attr('type'),
+				io = $('#checklist_form select[name="CW_ID"] option:selected').attr('io'),
+				sn = $('#checklist_form select[name="CW_ID"] option:selected').attr('sn'),
+				cs = $('#checklist_form select[name="CW_ID"] option:selected').attr('cs'),
 				cassette = '';
 			// Выводим инпуты для номеров кассет
 			for (var i = 0; i < fillings; i++) {
@@ -415,6 +441,32 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#checklist_form input[name="sand"]').attr("disabled", true);
 				$('#checklist_form input[name="crushed_stone"]').hide('fast');
 				$('#checklist_form input[name="crushed_stone"]').attr("disabled", true);
+			}
+
+			// Отображаем поля ввода плотности компонентов
+			if( io ) {
+				$('#checklist_form input[name="io_density"]').show('fast');
+				$('#checklist_form input[name="io_density"]').attr("disabled", false);
+			}
+			else {
+				$('#checklist_form input[name="io_density"]').hide('fast');
+				$('#checklist_form input[name="io_density"]').attr("disabled", true);
+			}
+			if( sn ) {
+				$('#checklist_form input[name="sn_density"]').show('fast');
+				$('#checklist_form input[name="sn_density"]').attr("disabled", false);
+			}
+			else {
+				$('#checklist_form input[name="sn_density"]').hide('fast');
+				$('#checklist_form input[name="sn_density"]').attr("disabled", true);
+			}
+			if( cs ) {
+				$('#checklist_form input[name="cs_density"]').show('fast');
+				$('#checklist_form input[name="cs_density"]').attr("disabled", false);
+			}
+			else {
+				$('#checklist_form input[name="cs_density"]').hide('fast');
+				$('#checklist_form input[name="cs_density"]').attr("disabled", true);
 			}
 		});
 	});
