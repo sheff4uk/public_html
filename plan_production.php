@@ -159,7 +159,9 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["fillings"]?></td>
 		<td><?=$row["amount"]?></td>
 		<td class="bg-gray"><?=$subrow["fakt"]?></td>
-		<td><a href="#" class="add_pp" PP_ID="<?=$row["PP_ID"]?>" title="Изменить данные производственного плана"><i class="fa fa-pencil-alt fa-lg"></i></a><a href="printforms/checklist_blank.php?PP_ID=<?=$row["PP_ID"]?>" class="print" title="Бланк чеклиста оператора"><i class="fas fa-print fa-lg"></i></a></td>
+		<td>
+			<?=(!$subrow["fakt"] ? "<a href='#' class='add_pp' PP_ID='{$row["PP_ID"]}' title='Изменить данные производственного плана'><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?>
+			<a href="printforms/checklist_blank.php?PP_ID=<?=$row["PP_ID"]?>" class="print" title="Бланк чеклиста оператора"><i class="fas fa-print fa-lg"></i></a></td>
 	</tr>
 	<?
 
