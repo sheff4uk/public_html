@@ -208,11 +208,11 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td><?=$subrow["name"]?></td>
 		<td><span class="nowrap"><?=$subrow["letter"] ? "<b>{$subrow["letter"]}</b> " : "<i class='fas fa-exclamation-triangle' style='color: red;' title='Подходящий рецепт не обнаружен'></i> "?><?=($subrow["io_density"] ? "<i title='Плотность окалины' style='text-decoration: underline;'>".($subrow["io_density"]/1000)."</i> " : "")?><?=($subrow["sn_density"] ? "<i title='Плотность КМП' style='text-decoration: underline;'>".($subrow["sn_density"]/1000)."</i> " : "")?><?=($subrow["cs_density"] ? "<i title='Плотность отсева' style='text-decoration: underline;'>".($subrow["cs_density"]/1000)."</i>" : "")?></span></td>
 				<td><?=$subrow["mix_density"]/1000?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
-				<td class="bg-gray"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
-				<td class="bg-gray"><?=$subrow["sand"]?><?=($subrow["s_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["s_diff"] > 0 ? " +" : " ").($subrow["s_diff"])."</font>" : "")?></td>
-				<td class="bg-gray"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
-				<td class="bg-gray"><?=$subrow["cement"]?><?=($subrow["c_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["c_diff"] > 0 ? " +" : " ").($subrow["c_diff"])."</font>" : "")?></td>
-				<td class="bg-gray"><?=$subrow["water"]?><?=($subrow["w_diff"] ? "<font style='font-size: .8em;' color='red'> ".($subrow["w_diff"])."</font>" : "")?></td>
+				<td class="bg-gray" <?=($subrow["letter"] ? "" : "style='color: red;'")?>><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
+				<td class="bg-gray" <?=($subrow["letter"] ? "" : "style='color: red;'")?>><?=$subrow["sand"]?><?=($subrow["s_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["s_diff"] > 0 ? " +" : " ").($subrow["s_diff"])."</font>" : "")?></td>
+				<td class="bg-gray" <?=($subrow["letter"] ? "" : "style='color: red;'")?>><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
+				<td class="bg-gray" <?=($subrow["letter"] ? "" : "style='color: red;'")?>><?=$subrow["cement"]?><?=($subrow["c_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["c_diff"] > 0 ? " +" : " ").($subrow["c_diff"])."</font>" : "")?></td>
+				<td class="bg-gray" <?=($subrow["letter"] ? "" : "style='color: red;'")?>><?=$subrow["water"]?><?=($subrow["w_diff"] ? "<font style='font-size: .8em;' color='red'> ".($subrow["w_diff"])."</font>" : "")?></td>
 				<td colspan="2" class="nowrap"><?=$cassette?></td>
 				<td><?=$subrow["underfilling"]?></td>
 				<td><a href="#" class="add_checklist" LB_ID="<?=$subrow["LB_ID"]?>" title="Изменить данные заливок"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
