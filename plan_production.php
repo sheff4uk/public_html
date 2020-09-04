@@ -4,14 +4,12 @@ $title = 'План производства';
 include "header.php";
 include "./forms/plan_production_form.php";
 
-// Если в фильтре не установлен период, показываем последние 7 дней
-if( !$_GET["date_from"] ) {
-	$date = new DateTime('-6 days');
-	$_GET["date_from"] = date_format($date, 'Y-m-d');
-}
-if( !$_GET["date_to"] ) {
-	$date = new DateTime('-0 days');
-	$_GET["date_to"] = date_format($date, 'Y-m-d');
+// Если в фильтре не установлена неделя, показываем текущую
+if( !$_GET["week"] ) {
+	$query = "SELECT YEARWEEK(NOW(), 1) week";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$_GET["week"] = $row["week"];
 }
 ?>
 
@@ -22,10 +20,24 @@ if( !$_GET["date_to"] ) {
 		<a href="/plan_production.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
-			<span style="display: inline-block; width: 200px;">Дата между:</span>
-			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
-			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
-			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
+			<span>Неделя:</span>
+			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>">
+				<?
+				$query = "
+					SELECT YEARWEEK(NOW(), 1) week, INSERT(YEARWEEK(NOW(), 1), 5, 0, '-w') week_format
+					UNION
+					SELECT YEARWEEK(pp_date, 1) week, INSERT(YEARWEEK(pp_date, 1), 5, 0, '-w') week_format
+					FROM plan__Production
+					ORDER BY week DESC
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["week"] == $_GET["week"]) ? "selected" : "";
+					echo "<option value='{$row["week"]}' {$selected}>{$row["week_format"]}</option>";
+				}
+				?>
+			</select>
+			<i class="fas fa-question-circle" title="По умолчанию устанавливаются текущая неделя."></i>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -127,8 +139,7 @@ $query = "
 	FROM plan__Production PP
 	JOIN CounterWeight CW ON CW.CW_ID = PP.CW_ID
 	WHERE 1
-		".($_GET["date_from"] ? "AND PP.pp_date >= '{$_GET["date_from"]}'" : "")."
-		".($_GET["date_to"] ? "AND PP.pp_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["week"] ? "AND YEARWEEK(PP.pp_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PP.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PP.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	ORDER BY PP.pp_date DESC, PP.CW_ID
