@@ -128,55 +128,111 @@ foreach ($_GET as &$value) {
 
 <?
 $query = "
-	SELECT PP.PP_ID
+	SELECT SUM(1) cnt
 		,DATE_FORMAT(PP.pp_date, '%d.%m.%y') pp_date_format
 		,PP.pp_date
-		,CW.item
-		,PP.CW_ID
-		,PP.batches
-		,PP.batches * CW.fillings fillings
-		,PP.batches * CW.fillings * CW.in_cassette amount
+		,SUM(PP.batches) batches
+		,SUM(PP.batches * CW.fillings) fillings
+		,SUM(PP.batches * CW.fillings * CW.in_cassette) plan
+		,SUM(SUB.fakt) fakt
 	FROM plan__Production PP
 	JOIN CounterWeight CW ON CW.CW_ID = PP.CW_ID
+	LEFT JOIN (
+		SELECT LB.batch_date
+			,LB.CW_ID
+			,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
+		FROM list__Batch LB
+		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+		WHERE 1
+			".($_GET["week"] ? "AND YEARWEEK(LB.batch_date, 1) LIKE '{$_GET["week"]}'" : "")."
+			".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
+			".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		GROUP BY LB.batch_date, LB.CW_ID
+	) SUB ON SUB.batch_date = PP.pp_date AND SUB.CW_ID = PP.CW_ID
 	WHERE 1
 		".($_GET["week"] ? "AND YEARWEEK(PP.pp_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PP.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PP.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+	GROUP BY PP.pp_date
 	ORDER BY PP.pp_date DESC, PP.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	// Узнаем факт
+	$cnt = $row["cnt"];
+
 	$query = "
-		SELECT SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
-		FROM list__Batch LB
-		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
-		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		WHERE LB.batch_date LIKE '{$row["pp_date"]}'
-			AND LB.CW_ID = {$row["CW_ID"]}
+		SELECT PP.PP_ID
+			,DATE_FORMAT(PP.pp_date, '%d.%m.%y') pp_date_format
+			,PP.pp_date
+			,CW.item
+			,PP.CW_ID
+			,PP.batches
+			,PP.batches * CW.fillings fillings
+			,PP.batches * CW.fillings * CW.in_cassette plan
+			,SUB.fakt
+		FROM plan__Production PP
+		JOIN CounterWeight CW ON CW.CW_ID = PP.CW_ID
+		LEFT JOIN (
+			SELECT LB.batch_date
+				,LB.CW_ID
+				,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
+			FROM list__Batch LB
+			JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+			JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+			WHERE 1
+				AND LB.batch_date = '{$row["pp_date"]}'
+				".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
+				".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+			GROUP BY LB.batch_date, LB.CW_ID
+		) SUB ON SUB.batch_date = PP.pp_date AND SUB.CW_ID = PP.CW_ID
+		WHERE 1
+			AND PP.pp_date = '{$row["pp_date"]}'
+			".($_GET["CW_ID"] ? "AND PP.CW_ID={$_GET["CW_ID"]}" : "")."
+			".($_GET["CB_ID"] ? "AND PP.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		ORDER BY PP.pp_date DESC, PP.CW_ID
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-	$subrow = mysqli_fetch_array($subres);
+	while( $subrow = mysqli_fetch_array($subres) ) {
+		$batches += $subrow["batches"];
+		$fillings += $subrow["fillings"];
+		$plan += $subrow["plan"];
+		$fakt += $subrow["fakt"];
 
+		// Выводим общую ячейку с датой заливки
+		if( $cnt ) {
+			$cnt++;
+			echo "<tr id='{$subrow["PP_ID"]}' style='border-top: 2px solid #333;'>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$row["pp_date_format"]}</td>";
+			$cnt = 0;
+		}
+		else {
+			echo "<tr id='{$subrow["PP_ID"]}'>";
+		}
 
-	$batches += $row["batches"];
-	$fillings += $row["fillings"];
-	$amount += $row["amount"];
-	?>
-	<tr id="<?=$row["PP_ID"]?>">
-		<td><?=$row["pp_date_format"]?></td>
-		<td><?=$row["item"]?></td>
-		<td><?=$row["batches"]?></td>
-		<td><?=$row["fillings"]?></td>
-		<td><?=$row["amount"]?></td>
-		<td class="bg-gray"><?=$subrow["fakt"]?></td>
-		<td>
-			<?=(!$subrow["fakt"] ? "<a href='#' class='add_pp' PP_ID='{$row["PP_ID"]}' title='Изменить данные производственного плана'><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?>
-			<a href="printforms/checklist_blank.php?PP_ID=<?=$row["PP_ID"]?>" class="print" title="Бланк чеклиста оператора"><i class="fas fa-print fa-lg"></i></a></td>
-	</tr>
-	<?
+		?>
+			<td><?=$subrow["item"]?></td>
+			<td><?=$subrow["batches"]?></td>
+			<td><?=$subrow["fillings"]?></td>
+			<td><?=$subrow["plan"]?></td>
+			<td class="bg-gray"><?=$subrow["fakt"]?></td>
+			<td>
+				<?=(!$subrow["fakt"] ? "<a href='#' class='add_pp' PP_ID='{$subrow["PP_ID"]}' title='Изменить данные производственного плана'><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?>
+				<a href="printforms/checklist_blank.php?PP_ID=<?=$subrow["PP_ID"]?>" class="print" title="Бланк чеклиста оператора"><i class="fas fa-print fa-lg"></i></a></td>
+		</tr>
+		<?
 
-	$total_fakt += $subrow["fakt"];
+	}
+?>
+		<tr class="summary">
+			<td>Итог:</td>
+			<td><?=$row["batches"]?></td>
+			<td><?=$row["fillings"]?></td>
+			<td><?=$row["plan"]?></td>
+			<td class="bg-gray"><?=$row["fakt"]?></td>
+			<td></td>
+		</tr>
+<?
 }
 ?>
 		<tr class="total">
@@ -184,8 +240,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Итог:</td>
 			<td><?=$batches?></td>
 			<td><?=$fillings?></td>
-			<td><?=$amount?></td>
-			<td class="bg-gray"><?=$total_fakt?></td>
+			<td><?=$plan?></td>
+			<td class="bg-gray"><?=$fakt?></td>
 			<td></td>
 		</tr>
 	</tbody>
