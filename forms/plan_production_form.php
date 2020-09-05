@@ -41,12 +41,18 @@ if( isset($_POST["CW_ID"]) ) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 
+	// Получаем неделю
+	$query = "SELECT YEARWEEK('{$pp_date}', 1) week";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$week = $row["week"];
+
 	// Перенаправление в журнал
 	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/plan_production.php?date_from='.$pp_date.'&date_to='.$pp_date.'&pp_date='.$pp_date.'&add#'.$PP_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/plan_production.php?week='.$week.'&pp_date='.$pp_date.'&add#'.$PP_ID.'">');
 	}
 	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/plan_production.php?date_from='.$pp_date.'&date_to='.$pp_date.'#'.$PP_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/plan_production.php?week='.$week.'#'.$PP_ID.'">');
 	}
 }
 ?>
