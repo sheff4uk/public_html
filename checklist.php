@@ -158,7 +158,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.underfilling
 			,LB.test
 			,mix_letter(LB.LB_ID) letter
-			,LB.mix_diff
+			,mix_diff(LB.CW_ID, LB.mix_density) mix_diff
 			,mix_io_diff(LB.CW_ID, mix_letter(LB.LB_ID), LB.iron_oxide) io_diff
 			,mix_sn_diff(LB.CW_ID, mix_letter(LB.LB_ID), LB.sand) sn_diff
 			,mix_cs_diff(LB.CW_ID, mix_letter(LB.LB_ID), LB.crushed_stone) cs_diff
