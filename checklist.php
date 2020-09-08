@@ -158,12 +158,13 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.underfilling
 			,LB.test
 			,mix_letter(LB.LB_ID) letter
+			,mix_id(LB.LB_ID) MF_ID
 			,mix_diff(LB.CW_ID, LB.mix_density) mix_diff
-			,mix_io_diff(LB.CW_ID, mix_letter(LB.LB_ID), LB.iron_oxide) io_diff
-			,mix_sn_diff(LB.CW_ID, mix_letter(LB.LB_ID), LB.sand) sn_diff
-			,mix_cs_diff(LB.CW_ID, mix_letter(LB.LB_ID), LB.crushed_stone) cs_diff
-			,mix_cm_diff(LB.CW_ID, mix_letter(LB.LB_ID), LB.cement) cm_diff
-			,mix_wt_diff(LB.CW_ID, mix_letter(LB.LB_ID), LB.water) wt_diff
+			,mix_io_diff(mix_id(LB.LB_ID), LB.iron_oxide) io_diff
+			,mix_sn_diff(mix_id(LB.LB_ID), LB.sand) sn_diff
+			,mix_cs_diff(mix_id(LB.LB_ID), LB.crushed_stone) cs_diff
+			,mix_cm_diff(mix_id(LB.LB_ID), LB.cement) cm_diff
+			,mix_wt_diff(mix_id(LB.LB_ID), LB.water) wt_diff
 		FROM list__Batch LB
 		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
@@ -206,7 +207,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		?>
 				<td><?=$subrow["batch_time"]?><?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?></td>
 				<td><?=$subrow["name"]?></td>
-		<td><span class="nowrap"><?=$subrow["letter"] ? "<b>{$subrow["letter"]}</b> " : "<i class='fas fa-exclamation-triangle' style='color: red;' title='Подходящий рецепт не обнаружен'></i> "?><?=($subrow["io_density"] ? "<i title='Плотность окалины' style='text-decoration: underline;'>".($subrow["io_density"]/1000)."</i> " : "")?><?=($subrow["sn_density"] ? "<i title='Плотность КМП' style='text-decoration: underline;'>".($subrow["sn_density"]/1000)."</i> " : "")?><?=($subrow["cs_density"] ? "<i title='Плотность отсева' style='text-decoration: underline;'>".($subrow["cs_density"]/1000)."</i>" : "")?></span></td>
+		<td><span class="nowrap"><?=$subrow["letter"] ? "<a href='mix_formula.php#{$subrow["MF_ID"]}' target='_blank'><b>{$subrow["letter"]}</b></a> " : "<i class='fas fa-exclamation-triangle' style='color: red;' title='Подходящий рецепт не обнаружен'></i> "?><?=($subrow["io_density"] ? "<i title='Плотность окалины' style='text-decoration: underline;'>".($subrow["io_density"]/1000)."</i> " : "")?><?=($subrow["sn_density"] ? "<i title='Плотность КМП' style='text-decoration: underline;'>".($subrow["sn_density"]/1000)."</i> " : "")?><?=($subrow["cs_density"] ? "<i title='Плотность отсева' style='text-decoration: underline;'>".($subrow["cs_density"]/1000)."</i>" : "")?></span></td>
 				<td><?=$subrow["mix_density"]/1000?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
 				<td class="bg-gray" <?=($subrow["letter"] ? "" : "style='color: red;'")?>><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
 				<td class="bg-gray" <?=($subrow["letter"] ? "" : "style='color: red;'")?>><?=$subrow["sand"]?><?=($subrow["sn_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["sn_diff"] > 0 ? " +" : " ").($subrow["sn_diff"])."</font>" : "")?></td>
