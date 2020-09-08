@@ -255,9 +255,9 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td style="color: red;"><?=$row["o_crack"]?></td>
 		<td style="color: red;"><?=$row["o_chipped"]?></td>
 		<td style="color: red;"><?=$row["o_def_form"]?></td>
-		<td class="nowrap"><?=$row["weight1"]/1000?><?=($row["w1_error"] ? "<font style='font-size: .8em;' color='red'>".($row["w1_diff"] > 0 ? " +" : " ").($row["w1_diff"]/10)."%</font>" : "")?></td>
-		<td class="nowrap"><?=$row["weight2"]/1000?><?=($row["w2_error"] ? "<font style='font-size: .8em;' color='red'>".($row["w2_diff"] > 0 ? " +" : " ").($row["w2_diff"]/10)."%</font>" : "")?></td>
-		<td class="nowrap"><?=$row["weight3"]/1000?><?=($row["w3_error"] ? "<font style='font-size: .8em;' color='red'>".($row["w3_diff"] > 0 ? " +" : " ").($row["w3_diff"]/10)."%</font>" : "")?></td>
+		<td><?=$row["weight1"]/1000?><?=($row["w1_error"] ? "<font style='font-size: .8em;' color='red'>".($row["w1_diff"] > 0 ? " +" : " ").($row["w1_diff"]/10)."%</font>" : "")?></td>
+		<td><?=$row["weight2"]/1000?><?=($row["w2_error"] ? "<font style='font-size: .8em;' color='red'>".($row["w2_diff"] > 0 ? " +" : " ").($row["w2_diff"]/10)."%</font>" : "")?></td>
+		<td><?=$row["weight3"]/1000?><?=($row["w3_error"] ? "<font style='font-size: .8em;' color='red'>".($row["w3_diff"] > 0 ? " +" : " ").($row["w3_diff"]/10)."%</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
 		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
 		<td class="bg-gray"><?=$cassette?></td>
