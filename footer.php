@@ -27,7 +27,7 @@
 	box-shadow: 0 -1px 4px rgba(0,0,0,0.2);
 	text-align: center;
 	line-height: 25px;
-			">&copy; <?=( date("Y") )?> ООО &laquo;<a href="https://konstanta.ltd" target="_blank">Константа</a>&raquo;</div>
+			">&copy; <?=( date("Y") )?> <a href="https://konstanta.ltd" target="_blank">ООО &laquo;Константа&raquo;</a></div>
 
 <script>
 	$(document).ready(function(){
