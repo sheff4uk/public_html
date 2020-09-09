@@ -180,7 +180,7 @@ function src_url($src) {
 	<nav class="navbar">
 		<div class="page">
 		<div class="navbar-header" id="main">
-			<a class="navbar-brand" href="/" title="На главную" style="position: relative;"><?=$company_name?></a>
+			<a class="navbar-brand" href="/" title="На главную" style="position: relative;"><?=$company_name?> <sub>β</sub></a>
 		</div>
 <?
 	if( !empty($_SESSION['id']) ) {
