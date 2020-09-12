@@ -5,7 +5,7 @@ include "header.php";
 include "./forms/cubetest_form.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
-if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
+if( !$_GET["pb_date_from"] and !$_GET["pb_date_to"] ) {
 	if( !$_GET["date_from"] ) {
 		$date = new DateTime('-6 days');
 		$_GET["date_from"] = date_format($date, 'Y-m-d');
@@ -69,37 +69,39 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 		<?
 		$query = "
 			SELECT LB.LB_ID
-				,CW.CW_ID
+				,PB.CW_ID
 				,CW.item
-				,LB.batch_date
-				,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
+				,PB.pb_date
+				,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 				,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 				,LB.mix_density
-				,DATE_FORMAT(LB.batch_date + INTERVAL 1 DAY, '%d.%m.%y') test_date_format
+				,DATE_FORMAT(PB.pb_date + INTERVAL 1 DAY, '%d.%m.%y') test_date_format
 				,DATE_FORMAT(LB.batch_time, '%H:%i') test_time_format
-				,LB.batch_date + INTERVAL 1 DAY test_date
+				,PB.pb_date + INTERVAL 1 DAY test_date
 				,24 delay
-				,CAST(CONCAT(LB.batch_date + INTERVAL 1 DAY, ' ', LB.batch_time) as datetime) test_date_time
+				,CAST(CONCAT(PB.pb_date + INTERVAL 1 DAY, ' ', LB.batch_time) as datetime) test_date_time
 			FROM list__Batch LB
-			JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+			JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 24
 			WHERE LB.test = 1
 				AND LCT.LCT_ID IS NULL
 			UNION ALL
 			SELECT LB.LB_ID
-				,CW.CW_ID
+				,PB.CW_ID
 				,CW.item
-				,LB.batch_date
-				,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
+				,PB.pb_date
+				,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 				,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 				,LB.mix_density
-				,DATE_FORMAT(LB.batch_date + INTERVAL 3 DAY, '%d.%m.%y') test_date_format
+				,DATE_FORMAT(PB.pb_date + INTERVAL 3 DAY, '%d.%m.%y') test_date_format
 				,DATE_FORMAT(LB.batch_time, '%H:%i') test_time_format
-				,LB.batch_date + INTERVAL 3 DAY test_date
+				,PB.pb_date + INTERVAL 3 DAY test_date
 				,72 delay
-				,CAST(CONCAT(LB.batch_date + INTERVAL 3 DAY, ' ', LB.batch_time) as datetime) test_date_time
+				,CAST(CONCAT(PB.pb_date + INTERVAL 3 DAY, ' ', LB.batch_time) as datetime) test_date_time
 			FROM list__Batch LB
-			JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+			JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 72
 			WHERE LB.test = 1
 				AND LCT.LCT_ID IS NULL
@@ -113,7 +115,7 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 			?>
 			<tr>
 				<td class="bg-gray"><?=$row["item"]?></td>
-				<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
+				<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["pb_date"]?>&date_to=<?=$row["pb_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
 				<td class="bg-gray"><?=$row["batch_time_format"]?></td>
 				<td class="bg-gray"><?=$row["mix_density"]/1000?></td>
 				<td class="<?=$error?>"><?=$row["test_date_format"]?></td>
@@ -144,8 +146,8 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
-			<input name="batch_date_from" type="date" value="<?=$_GET["batch_date_from"]?>" class="<?=$_GET["batch_date_from"] ? "filtered" : ""?>">
-			<input name="batch_date_to" type="date" value="<?=$_GET["batch_date_to"]?>" class="<?=$_GET["batch_date_to"] ? "filtered" : ""?>">
+			<input name="pb_date_from" type="date" value="<?=$_GET["pb_date_from"]?>" class="<?=$_GET["pb_date_from"] ? "filtered" : ""?>">
+			<input name="pb_date_to" type="date" value="<?=$_GET["pb_date_to"]?>" class="<?=$_GET["pb_date_to"] ? "filtered" : ""?>">
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -253,11 +255,11 @@ $query = "
 		,DATE_FORMAT(LCT.test_date, '%d.%m.%y') test_date
 		,DATE_FORMAT(LCT.test_time, '%H:%i') test_time
 		,CW.item
-		,LB.CW_ID
-		,LB.batch_date batch_date
-		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
+		,PB.CW_ID
+		,PB.pb_date pb_date
+		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 		,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
-		,TIMESTAMPDIFF(HOUR, CAST(CONCAT(LB.batch_date, ' ', LB.batch_time) as datetime), CAST(CONCAT(LCT.test_date, ' ', LCT.test_time) as datetime)) delay_fact
+		,TIMESTAMPDIFF(HOUR, CAST(CONCAT(PB.pb_date, ' ', LB.batch_time) as datetime), CAST(CONCAT(LCT.test_date, ' ', LCT.test_time) as datetime)) delay_fact
 		,LCT.delay
 		,LB.mix_density
 		,LCT.cube_weight
@@ -266,14 +268,15 @@ $query = "
 		,DATE_FORMAT(LCT.last_edit, '%d.%m.%y в %H:%i:%s') last_edit
 	FROM list__CubeTest LCT
 	JOIN list__Batch LB ON LB.LB_ID = LCT.LB_ID
-	JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND LCT.test_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND LCT.test_date <= '{$_GET["date_to"]}'" : "")."
-		".($_GET["batch_date_from"] ? "AND LB.batch_date >= '{$_GET["batch_date_from"]}'" : "")."
-		".($_GET["batch_date_to"] ? "AND LB.batch_date <= '{$_GET["batch_date_to"]}'" : "")."
-		".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		".($_GET["pb_date_from"] ? "AND PB.pb_date >= '{$_GET["pb_date_from"]}'" : "")."
+		".($_GET["pb_date_to"] ? "AND PB.pb_date <= '{$_GET["pb_date_to"]}'" : "")."
+		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		".($_GET["delay"] ? "AND LCT.delay={$_GET["delay"]}" : "")."
 	ORDER BY LCT.test_date DESC, LCT.test_time DESC
 ";
@@ -282,7 +285,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	?>
 	<tr id="<?=$row["LCT_ID"]?>">
 		<td class="bg-gray"><?=$row["item"]?></td>
-		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["batch_date"]?>&date_to=<?=$row["batch_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
+		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["pb_date"]?>&date_to=<?=$row["pb_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
 		<td class="bg-gray"><?=$row["batch_time_format"]?></td>
 		<td class="bg-gray"><?=$row["mix_density"]/1000?></td>
 		<td><?=$row["test_date"]?></td>
@@ -302,14 +305,14 @@ while( $row = mysqli_fetch_array($res) ) {
 <script>
 	$(function() {
 		// При выборе даты заливки сбрасывается дата испытания
-		$('input[name="batch_date_from"], input[name="batch_date_to"]').change(function() {
+		$('input[name="pb_date_from"], input[name="pb_date_to"]').change(function() {
 			$('input[name="date_from"]').val('');
 			$('input[name="date_to"]').val('');
 		});
 		// При выборе даты испытания сбрасывается дата заливки
 		$('input[name="date_from"], input[name="date_to"]').change(function() {
-			$('input[name="batch_date_from"]').val('');
-			$('input[name="batch_date_to"]').val('');
+			$('input[name="pb_date_from"]').val('');
+			$('input[name="pb_date_to"]').val('');
 		});
 	});
 </script>

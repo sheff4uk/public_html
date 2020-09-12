@@ -15,6 +15,87 @@ if( !$_GET["date_to"] ) {
 }
 ?>
 
+<style>
+	#batch_plan {
+		position: relative;
+	}
+	#batch_plan:hover > div {
+		height: 300px;
+		opacity: 1;
+	}
+	#batch_plan > div {
+		background: #fff;
+		height: 0px;
+		border: 1px solid #bbb;
+		padding: 10px;
+		border-radius: 5px;
+		margin-top: 10px;
+		z-index: 2;
+		position: absolute;
+		top: -10px;
+		left: 0px;
+		width: 100%;
+		overflow: auto;
+		opacity: 0;
+		transition: .3s;
+		-webkit-transition: .3s;
+		box-shadow: 5px 5px 8px #666;
+	}
+	#batch_plan > div table {
+		width: 100%;
+		table-layout: fixed;
+	}
+</style>
+
+<div id='batch_plan'>
+	<a href="#" class="button" style="width: 100%; z-index: -1;">Планируемые заливки</a>
+	<div>
+		<table>
+			<thead>
+				<tr>
+					<th>Дата</th>
+					<th>Противовес</th>
+					<th>Замесов</th>
+					<th>Заливок</th>
+					<th>План</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody style="text-align: center;">
+		<?
+		$query = "
+			SELECT PB.PB_ID
+				,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
+				,CW.item
+				,PB.batches
+				,PB.batches * CW.fillings fillings
+				,PB.batches * CW.fillings * CW.in_cassette plan
+			FROM plan__Batch PB
+			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+			WHERE PB.fakt = 0
+				AND PB.pb_date <= NOW()
+			ORDER BY PB.pb_date, PB.CW_ID
+		";
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		while( $row = mysqli_fetch_array($res) ) {
+			?>
+			<tr>
+				<td><?=$row["pb_date_format"]?></td>
+				<td><?=$row["item"]?></td>
+				<td><?=$row["batches"]?></td>
+				<td><?=$row["fillings"]?></td>
+				<td><?=$row["plan"]?></td>
+				<td><a href="#" class="add_checklist" PB_ID="<?=$row["PB_ID"]?>" title="Внести данные чеклиста оператора"><i class="fa fa-plus-square fa-lg"></i></a></td>
+			</tr>
+			<?
+
+		}
+		?>
+			</tbody>
+		</table>
+	</div>
+</div>
+
 <!--Фильтр-->
 <div id="filter">
 	<h3>Фильтр</h3>
@@ -105,7 +186,6 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th>Дата<br>Противовес</th>
 			<th>Время</th>
-			<th>Оператор</th>
 			<th>Рецепт</th>
 			<th>Куб раствора, кг</th>
 			<th>Окалина,<br>кг ±5</th>
@@ -115,37 +195,37 @@ foreach ($_GET as &$value) {
 			<th>Вода, л</th>
 			<th colspan="2">№ кассеты</th>
 			<th>Недолив</th>
+			<th>Оператор</th>
 			<th></th>
 		</tr>
 	</thead>
-	<tbody style="text-align: center;">
 
 <?
 // Получаем список дат и противовесов и кол-во замесов на эти даты
 $query = "
-	SELECT LB.batch_date
-		,MIN(LB.batch_time) batch_time
-		,LB.CW_ID
-		,SUM(1) cnt
-	FROM list__Batch LB
+	SELECT PB.PB_ID
+		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
+		,CW.item
+		,PB.CW_ID
+		,PB.batches
+	FROM plan__Batch PB
+	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	WHERE 1
-		".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
-		".($_GET["date_to"] ? "AND LB.batch_date <= '{$_GET["date_to"]}'" : "")."
-		".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	GROUP BY LB.batch_date, LB.CW_ID
-	ORDER BY LB.batch_date DESC, batch_time
+		".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
+		".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+	ORDER BY PB.pb_date DESC, PB.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$cnt = $row["cnt"];
+	$cnt = $row["batches"];
+	echo "<tbody id='PB{$row["PB_ID"]}' style='text-align: center; border-bottom: 2px solid #333;'>";
 
 	$query = "
 		SELECT LB.LB_ID
-			,CW.item
 			,OP.name
-			,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date
-			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time
+			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 			,LB.io_density
 			,LB.sn_density
 			,LB.cs_density
@@ -159,16 +239,15 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.test
 			,mix_letter(LB.LB_ID) letter
 			,mix_id(LB.LB_ID) MF_ID
-			,mix_diff(LB.CW_ID, LB.mix_density) mix_diff
+			,mix_diff({$row["CW_ID"]}, LB.mix_density) mix_diff
 			,mix_io_diff(mix_id(LB.LB_ID), LB.iron_oxide) io_diff
 			,mix_sn_diff(mix_id(LB.LB_ID), LB.sand) sn_diff
 			,mix_cs_diff(mix_id(LB.LB_ID), LB.crushed_stone) cs_diff
 			,mix_cm_diff(mix_id(LB.LB_ID), LB.cement) cm_diff
 			,mix_wt_diff(mix_id(LB.LB_ID), LB.water) wt_diff
 		FROM list__Batch LB
-		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
-		WHERE LB.batch_date LIKE '{$row["batch_date"]}' AND LB.CW_ID = {$row["CW_ID"]}
+		WHERE LB.PB_ID = {$row["PB_ID"]}
 		ORDER BY LB.batch_time ASC
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -194,19 +273,14 @@ while( $row = mysqli_fetch_array($res) ) {
 			}
 		}
 
+		echo "<tr id='{$subrow["LB_ID"]}'>";
+
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
-			echo "<tr style='border-top: 2px solid #333;' id='{$subrow["LB_ID"]}'>";
-			//echo "<td rowspan='{$cnt}' class='bg-gray'>{$subrow["batch_date"]}<br><b>{$subrow["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
-			echo "<td rowspan='{$cnt}' class='bg-gray'>{$subrow["batch_date"]}<br><b>{$subrow["item"]}</b></td>";
-			$cnt = 0;
-		}
-		else {
-			echo "<tr id='{$subrow["LB_ID"]}'>";
+			echo "<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'>{$row["pb_date_format"]}<br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
 		}
 		?>
-				<td><?=$subrow["batch_time"]?><?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?></td>
-				<td><?=$subrow["name"]?></td>
+				<td><?=$subrow["batch_time_format"]?><?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?></td>
 		<td><span class="nowrap"><?=$subrow["letter"] ? "<a href='mix_formula.php#{$subrow["MF_ID"]}' target='_blank'><b>{$subrow["letter"]}</b></a> " : "<i class='fas fa-exclamation-triangle' style='color: red;' title='Подходящий рецепт не обнаружен'></i> "?><?=($subrow["io_density"] ? "<i title='Плотность окалины' style='text-decoration: underline;'>".($subrow["io_density"]/1000)."</i> " : "")?><?=($subrow["sn_density"] ? "<i title='Плотность КМП' style='text-decoration: underline;'>".($subrow["sn_density"]/1000)."</i> " : "")?><?=($subrow["cs_density"] ? "<i title='Плотность отсева' style='text-decoration: underline;'>".($subrow["cs_density"]/1000)."</i>" : "")?></span></td>
 				<td><?=$subrow["mix_density"]/1000?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
 				<td class="bg-gray" <?=($subrow["letter"] ? "" : "style='color: red;'")?>><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
@@ -216,16 +290,21 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td class="bg-gray" <?=($subrow["letter"] ? "" : "style='color: red;'")?>><?=$subrow["water"]?><?=($subrow["wt_diff"] ? "<font style='font-size: .8em;' color='red'> ".($subrow["wt_diff"])."</font>" : "")?></td>
 				<td colspan="2" class="nowrap"><?=$cassette?></td>
 				<td><?=$subrow["underfilling"]?></td>
-				<td><a href="#" class="add_checklist" LB_ID="<?=$subrow["LB_ID"]?>" title="Изменить данные заливок"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
+				<td><?=$subrow["name"]?></td>
+				<?
+				// Выводим общую ячейку с кнопкой редактирования
+				if( $cnt ) {
+					echo "<td rowspan='{$cnt}'><a href='#' class='add_checklist' PB_ID='{$row["PB_ID"]}' title='Изменить чеклист оператора'><i class='fa fa-pencil-alt fa-lg'></i></a></td>";
+					$cnt = 0;
+				}
+				?>
 			</tr>
 		<?
 	}
+	echo "</tbody>";
 }
 ?>
-	</tbody>
 </table>
-
-<div id="add_btn" class="add_checklist" CW_ID="<?=$_GET["CW_ID"]?>" batch_date="<?=$_GET["batch_date"]?>" OP_ID="<?=$_GET["OP_ID"]?>" title="Внести данные заливок"></div>
 
 <?
 include "footer.php";

@@ -4,9 +4,9 @@ include_once "../checkrights.php";
 $LB_ID = $_GET["LB_ID"];
 
 $query = "
-	SELECT LB.CW_ID
+	SELECT PB.CW_ID
 		,LB.OP_ID
-		,LB.batch_date
+		,PB.pb_date
 		,LB.batch_time
 		,LB.io_density
 		,LB.sn_density
@@ -22,6 +22,7 @@ $query = "
 		,IF(MAX(LO.LO_ID) OR MAX(LP.LP_ID), 1, 0) is_link
 		,IF(LCT.LCT_ID, 1, 0) is_test
 	FROM list__Batch LB
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 	LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 	LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
@@ -32,7 +33,7 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) )
 {
-	$LB_data = array( "CW_ID"=>$row["CW_ID"], "OP_ID"=>$row["OP_ID"], "batch_date"=>$row["batch_date"], "batch_time"=>$row["batch_time"], "io_density"=>$row["io_density"]/1000, "sn_density"=>$row["sn_density"]/1000, "cs_density"=>$row["cs_density"]/1000, "mix_density"=>$row["mix_density"]/1000, "iron_oxide"=>$row["iron_oxide"], "sand"=>$row["sand"], "crushed_stone"=>$row["crushed_stone"], "cement"=>$row["cement"], "water"=>$row["water"], "underfilling"=>$row["underfilling"], "test"=>$row["test"], "is_link"=>$row["is_link"], "is_test"=>$row["is_test"] );
+	$LB_data = array( "CW_ID"=>$row["CW_ID"], "OP_ID"=>$row["OP_ID"], "pb_date"=>$row["pb_date"], "batch_time"=>$row["batch_time"], "io_density"=>$row["io_density"]/1000, "sn_density"=>$row["sn_density"]/1000, "cs_density"=>$row["cs_density"]/1000, "mix_density"=>$row["mix_density"]/1000, "iron_oxide"=>$row["iron_oxide"], "sand"=>$row["sand"], "crushed_stone"=>$row["crushed_stone"], "cement"=>$row["cement"], "water"=>$row["water"], "underfilling"=>$row["underfilling"], "test"=>$row["test"], "is_link"=>$row["is_link"], "is_test"=>$row["is_test"] );
 }
 
 echo json_encode($LB_data);

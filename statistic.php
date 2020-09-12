@@ -121,9 +121,9 @@ foreach ($_GET as &$value) {
 <?
 // Получаем список дат и список залитых деталей на эти даты
 $query = "
-	SELECT LB.batch_date
-		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') date
-		,COUNT(distinct(LB.CW_ID)) item_cnt
+	SELECT PB.pb_date
+		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') date
+		,COUNT(distinct(PB.CW_ID)) item_cnt
 		,SUM(IFNULL(LO.o_not_spill,0)) + SUM(IFNULL(LP.p_not_spill,0)) not_spill
 		,SUM(IFNULL(LO.o_crack,0)) + SUM(IFNULL(LP.p_crack,0)) crack
 		,SUM(IFNULL(LO.o_chipped,0)) + SUM(IFNULL(LP.p_chipped,0)) chipped
@@ -134,17 +134,18 @@ $query = "
 		,SUM(IF(LO.w1_error OR LO.w2_error OR LO.w3_error, 1, NULL)) not_spec
 		,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
 	FROM list__Batch LB
-	JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 	LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 	LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
 	WHERE 1
-		".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
-		".($_GET["date_to"] ? "AND LB.batch_date <= '{$_GET["date_to"]}'" : "")."
-		".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	GROUP BY LB.batch_date
-	ORDER BY LB.batch_date DESC
+		".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
+		".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+	GROUP BY PB.pb_date
+	ORDER BY PB.pb_date DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -152,7 +153,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 	$query = "
 		SELECT CW.item
-			,LB.CW_ID
+			,PB.CW_ID
 			,IFNULL(SUM(LO.o_not_spill), '-') o_not_spill
 			,IFNULL(SUM(LO.o_crack), '-') o_crack
 			,IFNULL(SUM(LO.o_chipped), '-') o_chipped
@@ -166,30 +167,21 @@ while( $row = mysqli_fetch_array($res) ) {
 			,SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval
 			,SUM(IF(LO.w1_error OR LO.w2_error OR LO.w3_error, 1, NULL)) not_spec
 			,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
+			,PB.batches * CW.fillings * CW.in_cassette plan
 		FROM list__Batch LB
-		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
-		WHERE LB.batch_date LIKE '{$row["batch_date"]}'
-			".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
-			".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-		GROUP BY LB.batch_date, LB.CW_ID
-		ORDER BY LB.batch_date DESC, LB.CW_ID
+		WHERE PB.pb_date LIKE '{$row["pb_date"]}'
+			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		GROUP BY PB.pb_date, PB.CW_ID
+		ORDER BY PB.pb_date DESC, PB.CW_ID
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
-		// Узнаем план
-		$query = "
-			SELECT PP.batches * CW.fillings * CW.in_cassette plan
-			FROM plan__Production PP
-			JOIN CounterWeight CW ON CW.CW_ID = PP.CW_ID
-			WHERE PP.CW_ID = {$subrow["CW_ID"]}
-				AND PP.pp_date LIKE '{$row["batch_date"]}'
-		";
-		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		$subsubrow = mysqli_fetch_array($subsubres);
-
 		// Выводим общую ячейку с датой заливки
 		if( $item_cnt ) {
 			$item_cnt++;
@@ -203,23 +195,23 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		echo "<td>{$subrow["item"]}</td>";
 		echo "<td>{$subrow["cnt"]}</td>";
-		echo "<td style='color:red;'><a href='opening.php?batch_date_from={$row["batch_date"]}&amp;batch_date_to={$row["batch_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;int24=1' target='_blank'>{$subrow["o_interval"]}</a></td>";
-		echo "<td><a href='packing.php?batch_date_from={$row["batch_date"]}&amp;batch_date_to={$row["batch_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;int120=1' target='_blank'>{$subrow["p_interval"]}</a></td>";
-		echo "<td><a href='opening.php?batch_date_from={$row["batch_date"]}&amp;batch_date_to={$row["batch_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spec=1' target='_blank'>{$subrow["not_spec"]}</a></td>";
-		echo "<td><a href='opening.php?batch_date_from={$row["batch_date"]}&amp;batch_date_to={$row["batch_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spill=1' target='_blank'>{$subrow["o_not_spill"]}</a> / <a href='packing.php?batch_date_from={$row["batch_date"]}&amp;batch_date_to={$row["batch_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spill=1' target='_blank'>{$subrow["p_not_spill"]}</a></td>";
-		echo "<td><a href='opening.php?batch_date_from={$row["batch_date"]}&amp;batch_date_to={$row["batch_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;crack=1' target='_blank'>{$subrow["o_crack"]}</a> / <a href='packing.php?batch_date_from={$row["batch_date"]}&amp;batch_date_to={$row["batch_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;crack=1' target='_blank'>{$subrow["p_crack"]}</a></td>";
-		echo "<td><a href='opening.php?batch_date_from={$row["batch_date"]}&amp;batch_date_to={$row["batch_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["o_chipped"]}</a> / <a href='packing.php?batch_date_from={$row["batch_date"]}&amp;batch_date_to={$row["batch_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["p_chipped"]}</a></td>";
-		echo "<td><a href='opening.php?batch_date_from={$row["batch_date"]}&amp;batch_date_to={$row["batch_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["o_def_form"]}</a> / <a href='packing.php?batch_date_from={$row["batch_date"]}&amp;batch_date_to={$row["batch_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["p_def_form"]}</a></td>";
+		echo "<td style='color:red;'><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;int24=1' target='_blank'>{$subrow["o_interval"]}</a></td>";
+		echo "<td><a href='packing.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;int120=1' target='_blank'>{$subrow["p_interval"]}</a></td>";
+		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spec=1' target='_blank'>{$subrow["not_spec"]}</a></td>";
+		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spill=1' target='_blank'>{$subrow["o_not_spill"]}</a> / <a href='packing.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spill=1' target='_blank'>{$subrow["p_not_spill"]}</a></td>";
+		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;crack=1' target='_blank'>{$subrow["o_crack"]}</a> / <a href='packing.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;crack=1' target='_blank'>{$subrow["p_crack"]}</a></td>";
+		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["o_chipped"]}</a> / <a href='packing.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["p_chipped"]}</a></td>";
+		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["o_def_form"]}</a> / <a href='packing.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["p_def_form"]}</a></td>";
 
 		$total = $subrow["o_not_spill"] + $subrow["p_not_spill"] + $subrow["o_crack"] + $subrow["p_crack"] + $subrow["o_chipped"] + $subrow["p_chipped"] + $subrow["o_def_form"] + $subrow["p_def_form"];
 		$percent_total = round($total / $subrow["fakt"] * 100, 2);
 		echo "<td>{$total}</td>";
-		echo "<td>{$subsubrow["plan"]}</td>";
+		echo "<td>{$subrow["plan"]}</td>";
 		echo "<td>{$subrow["fakt"]}</td>";
 		echo "<td>{$percent_total} %</td>";
 		echo "</tr>";
 
-		$total_plan += $subsubrow["plan"];
+		$total_plan += $subrow["plan"];
 	}
 	echo "<tr class='summary'>";
 	echo "<td>Итог:</td>";
@@ -245,72 +237,73 @@ while( $row = mysqli_fetch_array($res) ) {
 // Выводим итог, если есть фильтр
 if( $filter ) {
 	$query = "
-		SELECT
-			COUNT(distinct(LB.CW_ID)) item_cnt,
-			SUM(IFNULL(LO.o_not_spill,0)) + SUM(IFNULL(LP.p_not_spill,0)) not_spill,
-			SUM(IFNULL(LO.o_crack,0)) + SUM(IFNULL(LP.p_crack,0)) crack,
-			SUM(IFNULL(LO.o_chipped,0)) + SUM(IFNULL(LP.p_chipped,0)) chipped,
-			SUM(IFNULL(LO.o_def_form,0)) + SUM(IFNULL(LP.p_def_form,0)) def_form,
-			SUM(1) cnt,
-			SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval,
-			SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval,
-			SUM(IF(LO.w1_error OR LO.w2_error OR LO.w3_error, 1, NULL)) not_spec,
-			SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
+		SELECT COUNT(distinct(PB.CW_ID)) item_cnt
+			,SUM(IFNULL(LO.o_not_spill,0)) + SUM(IFNULL(LP.p_not_spill,0)) not_spill
+			,SUM(IFNULL(LO.o_crack,0)) + SUM(IFNULL(LP.p_crack,0)) crack
+			,SUM(IFNULL(LO.o_chipped,0)) + SUM(IFNULL(LP.p_chipped,0)) chipped
+			,SUM(IFNULL(LO.o_def_form,0)) + SUM(IFNULL(LP.p_def_form,0)) def_form
+			,SUM(1) cnt
+			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
+			,SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval
+			,SUM(IF(LO.w1_error OR LO.w2_error OR LO.w3_error, 1, NULL)) not_spec
+			,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
 		FROM list__Batch LB
-		JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
 		WHERE 1
-			".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
-			".($_GET["date_to"] ? "AND LB.batch_date <= '{$_GET["date_to"]}'" : "")."
-			".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
-			".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+			".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
+			".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
+			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
 		$item_cnt = $row["item_cnt"];
 
 		$query = "
-			SELECT
-				CW.item,
-				LB.CW_ID,
-				IFNULL(SUM(LO.o_not_spill), '-') o_not_spill,
-				IFNULL(SUM(LO.o_crack), '-') o_crack,
-				IFNULL(SUM(LO.o_chipped), '-') o_chipped,
-				IFNULL(SUM(LO.o_def_form), '-') o_def_form,
-				IFNULL(SUM(LP.p_not_spill), '-') p_not_spill,
-				IFNULL(SUM(LP.p_crack), '-') p_crack,
-				IFNULL(SUM(LP.p_chipped), '-') p_chipped,
-				IFNULL(SUM(LP.p_def_form), '-') p_def_form,
-				SUM(1) cnt,
-				SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval,
-				SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval,
-				SUM(IF(LO.w1_error OR LO.w2_error OR LO.w3_error, 1, NULL)) not_spec,
-				SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
+			SELECT CW.item
+				,PB.CW_ID
+				,IFNULL(SUM(LO.o_not_spill), '-') o_not_spill
+				,IFNULL(SUM(LO.o_crack), '-') o_crack
+				,IFNULL(SUM(LO.o_chipped), '-') o_chipped
+				,IFNULL(SUM(LO.o_def_form), '-') o_def_form
+				,IFNULL(SUM(LP.p_not_spill), '-') p_not_spill
+				,IFNULL(SUM(LP.p_crack), '-') p_crack
+				,IFNULL(SUM(LP.p_chipped), '-') p_chipped
+				,IFNULL(SUM(LP.p_def_form), '-') p_def_form
+				,SUM(1) cnt
+				,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
+				,SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval
+				,SUM(IF(LO.w1_error OR LO.w2_error OR LO.w3_error, 1, NULL)) not_spec
+				,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
 			FROM list__Batch LB
-			JOIN CounterWeight CW ON CW.CW_ID = LB.CW_ID
+			JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 			LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 			LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
 			WHERE 1
-				".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
-				".($_GET["date_to"] ? "AND LB.batch_date <= '{$_GET["date_to"]}'" : "")."
-				".($_GET["CW_ID"] ? "AND LB.CW_ID={$_GET["CW_ID"]}" : "")."
-				".($_GET["CB_ID"] ? "AND LB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-			GROUP BY LB.CW_ID
-			ORDER BY LB.CW_ID
+				".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
+				".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
+				".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+				".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+			GROUP BY PB.CW_ID
+			ORDER BY PB.CW_ID
 		";
 		$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $subrow = mysqli_fetch_array($subres) ) {
 			// Узнаем план
 			$query = "
-				SELECT SUM(PP.batches * CW.fillings * CW.in_cassette) plan
-				FROM plan__Production PP
-				JOIN CounterWeight CW ON CW.CW_ID = PP.CW_ID
-				WHERE PP.CW_ID = {$subrow["CW_ID"]}
-					".($_GET["date_from"] ? "AND PP.pp_date >= '{$_GET["date_from"]}'" : "")."
-					".($_GET["date_to"] ? "AND PP.pp_date <= '{$_GET["date_to"]}'" : "")."
+				SELECT SUM(PB.batches * CW.fillings * CW.in_cassette) plan
+				FROM plan__Batch PB
+				JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+				WHERE PB.fakt = 1
+					AND PB.CW_ID = {$subrow["CW_ID"]}
+					".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
+					".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
 			";
 			$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			$subsubrow = mysqli_fetch_array($subsubres);
@@ -328,13 +321,13 @@ if( $filter ) {
 
 			echo "<td>{$subrow["item"]}</td>";
 			echo "<td>{$subrow["cnt"]}</td>";
-			echo "<td style='color:red;'><a href='opening.php?batch_date_from={$_GET["date_from"]}&amp;batch_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;int24=1' target='_blank'>{$subrow["o_interval"]}</a></td>";
-			echo "<td><a href='packing.php?batch_date_from={$_GET["date_from"]}&amp;batch_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;int120=1' target='_blank'>{$subrow["p_interval"]}</a></td>";
-			echo "<td><a href='opening.php?batch_date_from={$_GET["date_from"]}&amp;batch_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spec=1' target='_blank'>{$subrow["not_spec"]}</a></td>";
-			echo "<td><a href='opening.php?batch_date_from={$_GET["date_from"]}&amp;batch_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spill=1' target='_blank'>{$subrow["o_not_spill"]}</a> / <a href='packing.php?batch_date_from={$_GET["date_from"]}&amp;batch_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spill=1' target='_blank'>{$subrow["p_not_spill"]}</a></td>";
-			echo "<td><a href='opening.php?batch_date_from={$_GET["date_from"]}&amp;batch_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;crack=1' target='_blank'>{$subrow["o_crack"]}</a> / <a href='packing.php?batch_date_from={$_GET["date_from"]}&amp;batch_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;crack=1' target='_blank'>{$subrow["p_crack"]}</a></td>";
-			echo "<td><a href='opening.php?batch_date_from={$_GET["date_from"]}&amp;batch_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["o_chipped"]}</a> / <a href='packing.php?batch_date_from={$_GET["date_from"]}&amp;batch_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["p_chipped"]}</a></td>";
-			echo "<td><a href='opening.php?batch_date_from={$_GET["date_from"]}&amp;batch_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["o_def_form"]}</a> / <a href='packing.php?batch_date_from={$_GET["date_from"]}&amp;batch_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["p_def_form"]}</a></td>";
+			echo "<td style='color:red;'><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;int24=1' target='_blank'>{$subrow["o_interval"]}</a></td>";
+			echo "<td><a href='packing.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;int120=1' target='_blank'>{$subrow["p_interval"]}</a></td>";
+			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spec=1' target='_blank'>{$subrow["not_spec"]}</a></td>";
+			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spill=1' target='_blank'>{$subrow["o_not_spill"]}</a> / <a href='packing.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spill=1' target='_blank'>{$subrow["p_not_spill"]}</a></td>";
+			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;crack=1' target='_blank'>{$subrow["o_crack"]}</a> / <a href='packing.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;crack=1' target='_blank'>{$subrow["p_crack"]}</a></td>";
+			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["o_chipped"]}</a> / <a href='packing.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["p_chipped"]}</a></td>";
+			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["o_def_form"]}</a> / <a href='packing.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["p_def_form"]}</a></td>";
 
 			$total = $subrow["o_not_spill"] + $subrow["p_not_spill"] + $subrow["o_crack"] + $subrow["p_crack"] + $subrow["o_chipped"] + $subrow["p_chipped"] + $subrow["o_def_form"] + $subrow["p_def_form"];
 			$percent_total = round($total / $subrow["fakt"] * 100, 2);

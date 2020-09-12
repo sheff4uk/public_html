@@ -6,33 +6,33 @@ include "../config.php";
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link rel='stylesheet' type='text/css' href='../css/font-awesome.min.css'>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 
 <?
-$PP_ID = $_GET["PP_ID"];
+$PB_ID = $_GET["PB_ID"];
 
 $query = "
-	SELECT DATE_FORMAT(PP.pp_date, '%d.%m.%Y') pp_date_format
-		,PP.CW_ID
-		,PP.batches
+	SELECT DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
+		,PB.CW_ID
+		,PB.batches
 		,CW.item
 		,CW.fillings
 		,CONCAT(ROUND(CW.min_density/1000, 2), '&ndash;', ROUND(CW.max_density/1000, 2)) spec
-	FROM plan__Production PP
-	JOIN CounterWeight CW ON CW.CW_ID = PP.CW_ID
-	WHERE PP_ID = {$PP_ID}
+	FROM plan__Batch PB
+	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	WHERE PB_ID = {$PB_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
 
 $batches = $row["batches"];
 $item = $row["item"];
-$pp_date = $row["pp_date_format"];
+$pb_date = $row["pb_date_format"];
 $fillings = $row["fillings"];
 $CW_ID = $row["CW_ID"];
 $spec = $row["spec"];
 
-echo "<title>Чеклист оператора для {$item} от {$pp_date}</title>";
+echo "<title>Чеклист оператора для {$item} от {$pb_date}</title>";
 ?>
 	<style type="text/css" media="print">
 		@page { size: landscape; }
@@ -69,8 +69,7 @@ echo "<title>Чеклист оператора для {$item} от {$pp_date}</t
 		<tr>
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
 			<th style="font-size: 2em;"><?=$item?></th>
-			<th style="font-size: 2em;"><?=$pp_date?></th>
-			<th>ФИО__________________</th>
+			<th style="font-size: 2em;"><?=$pb_date?></th>
 		</tr>
 	</thead>
 </table>
@@ -95,9 +94,9 @@ $row = mysqli_fetch_array($res);
 ?>
 
 <table>
-	<thead>
+	<thead style="word-wrap: break-word;">
 		<tr>
-			<th rowspan="3" width="40">№<br>п/п</th>
+			<th rowspan="3" width="30">№<br>п/п</th>
 			<th rowspan="3">Время замеса</th>
 			<th rowspan="2" width="30" style="word-wrap: break-word;">Рецепт</th>
 			<th colspan="<?=(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0) + ($row["cs"] ? 1 : 0))?>">Масса куба, кг</th>
@@ -107,7 +106,9 @@ $row = mysqli_fetch_array($res);
 			<?=($row["cement"] ? "<th rowspan='2'>Цемент, кг</th>" : "")?>
 			<?=($row["water"] ? "<th rowspan='2'>Вода, кг</th>" : "")?>
 			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 60)?>">№ кассеты<h2>Замес на <?=$fillings?> кассеты</h2></th>
-			<th rowspan="3">Недолив</th>
+			<th rowspan="3" width="40">Недолив</th>
+			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
+			<th rowspan="3">Оператор</th>
 		</tr>
 		<tr>
 			<?=(($row["io"] ? "<th>Окалины</th>" : ""))?>
@@ -150,6 +151,8 @@ for ($i = 1; $i <= $batches; $i++) {
 			".($row["cement"] ? "<td></td>" : "")."
 			".($row["water"] ? "<td></td>" : "")."
 			{$fillings_cell}
+			<td></td>
+			<td style='text-align: center;'><i class='far fa-square'></i></td>
 			<td></td>
 		</tr>
 	";

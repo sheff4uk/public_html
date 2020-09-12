@@ -4,27 +4,27 @@ include_once "../config.php";
 // Сохранение/редактирование производственного плана
 if( isset($_POST["CW_ID"]) ) {
 	session_start();
-	$pp_date = $_POST["pp_date"];
+	$pb_date = $_POST["pb_date"];
 	$CW_ID = $_POST["CW_ID"];
 	$batches = $_POST["batches"];
 
-	if( $_POST["PP_ID"] ) { // Редактируем
+	if( $_POST["PB_ID"] ) { // Редактируем
 		$query = "
-			UPDATE plan__Production
-			SET pp_date = '{$pp_date}'
+			UPDATE plan__Batch
+			SET pb_date = '{$pb_date}'
 				,CW_ID = {$CW_ID}
 				,batches = {$batches}
-			WHERE PP_ID = {$_POST["PP_ID"]}
+			WHERE PB_ID = {$_POST["PB_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 		}
-		$PP_ID = $_POST["PP_ID"];
+		$PB_ID = $_POST["PB_ID"];
 	}
 	else { // Добавляем
 		$query = "
-			INSERT INTO plan__Production
-			SET pp_date = '{$pp_date}'
+			INSERT INTO plan__Batch
+			SET pb_date = '{$pb_date}'
 				,CW_ID = {$CW_ID}
 				,batches = {$batches}
 		";
@@ -33,7 +33,7 @@ if( isset($_POST["CW_ID"]) ) {
 		}
 		else {
 			$add = 1;
-			$PP_ID = mysqli_insert_id( $mysqli );
+			$PB_ID = mysqli_insert_id( $mysqli );
 		}
 	}
 
@@ -42,33 +42,33 @@ if( isset($_POST["CW_ID"]) ) {
 	}
 
 	// Получаем неделю
-	$query = "SELECT YEARWEEK('{$pp_date}', 1) week";
+	$query = "SELECT YEARWEEK('{$pb_date}', 1) week";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
 	$week = $row["week"];
 
 	// Перенаправление в журнал
 	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/plan_production.php?week='.$week.'&pp_date='.$pp_date.'&add#'.$PP_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/plan_batch.php?week='.$week.'&pb_date='.$pb_date.'&add#'.$PB_ID.'">');
 	}
 	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/plan_production.php?week='.$week.'#'.$PP_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/plan_batch.php?week='.$week.'#'.$PB_ID.'">');
 	}
 }
 ?>
 
 <style>
-	#plan_production_form table input,
-	#plan_production_form table select {
+	#plan_batch_form table input,
+	#plan_batch_form table select {
 		font-size: 1.2em;
 	}
 </style>
 
-<div id='plan_production_form' title='Данные производственного плана' style='display:none;'>
-	<form method='post' action="/forms/plan_production_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
+<div id='plan_batch_form' title='Данные производственного плана' style='display:none;'>
+	<form method='post' action="/forms/plan_batch_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
-			<input type="hidden" name="PP_ID">
+			<input type="hidden" name="PB_ID">
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
@@ -82,7 +82,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td><input type="date" name="pp_date" required></td>
+						<td><input type="date" name="pb_date" required></td>
 						<td>
 							<select name="CW_ID" style="width: 150px;" required>
 								<option value=""></option>
@@ -127,38 +127,38 @@ this.subbut.value='Подождите, пожалуйста!';">
 //		?>
 
 		// Кнопка добавления
-		$('.add_pp').click( function() {
+		$('.add_pb').click( function() {
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
-			var PP_ID = $(this).attr("PP_ID"),
-				pp_date = $(this).attr("pp_date");
+			var PB_ID = $(this).attr("PB_ID"),
+				pb_date = $(this).attr("pb_date");
 
 			// В случае редактирования заполняем форму
-			if( PP_ID ) {
+			if( PB_ID ) {
 				// Данные аяксом
 				$.ajax({
-					url: "/ajax/plan_production_json.php?PP_ID=" + PP_ID,
-					success: function(msg) { pp_data = msg; },
+					url: "/ajax/plan_batch_json.php?PB_ID=" + PB_ID,
+					success: function(msg) { pb_data = msg; },
 					dataType: "json",
 					async: false
 				});
 
-				$('#plan_production_form input[name="PP_ID"]').val(PP_ID);
-				$('#plan_production_form input[name="pp_date"]').val(pp_data['pp_date']);
-				$('#plan_production_form select[name="CW_ID"]').val(pp_data['CW_ID']);
-				$('#plan_production_form input[name="batches"]').val(pp_data['batches']);
-				$('#plan_production_form input[name="fillings"]').val(pp_data['fillings']);
-				$('#plan_production_form input[name="amount"]').val(pp_data['amount']);
+				$('#plan_batch_form input[name="PB_ID"]').val(PB_ID);
+				$('#plan_batch_form input[name="pb_date"]').val(pb_data['pb_date']);
+				$('#plan_batch_form select[name="CW_ID"]').val(pb_data['CW_ID']);
+				$('#plan_batch_form input[name="batches"]').val(pb_data['batches']);
+				$('#plan_batch_form input[name="fillings"]').val(pb_data['fillings']);
+				$('#plan_batch_form input[name="amount"]').val(pb_data['amount']);
 			}
 			// Иначе очищаем форму
 			else {
-				$('#plan_production_form table input').val('');
-				$('#plan_production_form table select').val('');
-				$('#plan_production_form table input[name="pp_date"]').val(pp_date);
+				$('#plan_batch_form table input').val('');
+				$('#plan_batch_form table select').val('');
+				$('#plan_batch_form table input[name="pb_date"]').val(pb_date);
 			}
 
-			$('#plan_production_form').dialog({
+			$('#plan_batch_form').dialog({
 				resizable: false,
 				width: 1000,
 				modal: true,
@@ -169,13 +169,13 @@ this.subbut.value='Подождите, пожалуйста!';">
 		});
 
 		// При изменении противовеса или замесов пересчитываем заливки и детали
-		$('#plan_production_form select[name="CW_ID"], #plan_production_form input[name="batches"]').change(function() {
-			var fillings = $('#plan_production_form select[name="CW_ID"] option:selected').attr('fillings'),
-				in_cassette = $('#plan_production_form select[name="CW_ID"] option:selected').attr('in_cassette'),
-				batches = $('#plan_production_form input[name="batches"]').val();
+		$('#plan_batch_form select[name="CW_ID"], #plan_batch_form input[name="batches"]').change(function() {
+			var fillings = $('#plan_batch_form select[name="CW_ID"] option:selected').attr('fillings'),
+				in_cassette = $('#plan_batch_form select[name="CW_ID"] option:selected').attr('in_cassette'),
+				batches = $('#plan_batch_form input[name="batches"]').val();
 
-			$('#plan_production_form input[name="fillings"]').val(batches * fillings);
-			$('#plan_production_form input[name="amount"]').val(batches * fillings * in_cassette);
+			$('#plan_batch_form input[name="fillings"]').val(batches * fillings);
+			$('#plan_batch_form input[name="amount"]').val(batches * fillings * in_cassette);
 		});
 	});
 </script>
