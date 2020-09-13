@@ -208,14 +208,17 @@ $query = "
 		,CW.item
 		,PB.CW_ID
 		,PB.batches
+		,MIN(LB.batch_time) time
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	ORDER BY PB.pb_date DESC, PB.CW_ID
+	GROUP BY PB.PB_ID
+	ORDER BY PB.pb_date DESC, time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
