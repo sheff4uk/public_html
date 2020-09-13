@@ -29,6 +29,7 @@ $CW_ID = $row["CW_ID"];
 $spec = $row["spec"];
 
 $html = "
+	".(!$fakt ? "<h3 style='color:red; text-align: center;'>Предупреждение!<br>Перед заполнением формы удостоверьтесь, что фактическое число замесов совпадает с запланированным.<br>В противном случае отредактируйте план заливки.</h3>" : "")."
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
 	<input type='hidden' name='batches' value='{$batches}'>
 	<input type='hidden' name='fakt' value='{$fakt}'>
