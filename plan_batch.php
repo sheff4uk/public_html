@@ -129,6 +129,7 @@ foreach ($_GET as &$value) {
 $query = "
 	SELECT SUM(1) cnt
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
+		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
 		,PB.pb_date
 		,SUM(PB.batches) batches
 		,SUM(PB.batches * CW.fillings) fillings
@@ -140,7 +141,7 @@ $query = "
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	GROUP BY PB.pb_date
-	ORDER BY PB.pb_date DESC, PB.CW_ID
+	ORDER BY PB.pb_date, PB.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -174,7 +175,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		if( $cnt ) {
 			$cnt++;
 			echo "<tr id='{$subrow["PB_ID"]}' style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$row["pb_date_format"]}</td>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$row["pb_date_weekday"]}<br>{$row["pb_date_format"]}</td>";
 			$cnt = 0;
 		}
 		else {

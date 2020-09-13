@@ -73,7 +73,7 @@ $html .= "
 				".($row["water"] ? "<th rowspan='2'>Вода, кг</th>" : "")."
 				<th rowspan='3' colspan='{$fillings}' width='".($fillings * 60)."'>№ кассеты<h2>Замес на {$fillings} кассеты</h2></th>
 				<th rowspan='3'>Недолив</th>
-				<th rowspan='3' width='30'><i class='fas fa-cube' title='Испытания кубов'></i></th>
+				<th rowspan='3' width='40'><i class='fas fa-cube' title='Испытания кубов'></i></th>
 				<th rowspan='3'>Оператор</th>
 			</tr>
 			<tr>
@@ -115,9 +115,12 @@ if( $fakt ) {
 			,LB.water
 			,LB.underfilling
 			,LB.test
+			,IF(LCT.LCT_ID, 1, 0) is_test
 		FROM list__Batch LB
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
+		LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID
 		WHERE LB.PB_ID = {$PB_ID}
+		GROUP BY LB.LB_ID
 		ORDER BY LB.batch_time ASC
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -126,15 +129,19 @@ if( $fakt ) {
 		$i++;
 		// Номера кассет
 		$query = "
-			SELECT LF.LF_ID, LF.cassette
+			SELECT LF.LF_ID
+				,LF.cassette
+				,IF(LO.LO_ID OR LP.LP_ID, 1, 0) is_link
 			FROM list__Filling LF
+			LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+			LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
 			WHERE LF.LB_ID = {$subrow["LB_ID"]}
 			ORDER BY LF.LF_ID
 		";
 		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$fillings_cell = "";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
-			$fillings_cell .= "<td><input type='number' min='1' max='{$cassetts}' name='cassette[{$subrow["LB_ID"]}][{$subsubrow["LF_ID"]}]' value='{$subsubrow["cassette"]}' style='width: 60px;' required></td>";
+			$fillings_cell .= "<td style='position: relative;'><input type='number' min='1' max='{$cassetts}' name='cassette[{$subrow["LB_ID"]}][{$subsubrow["LF_ID"]}]' value='{$subsubrow["cassette"]}' style='width: 60px;' required ".($subsubrow["is_link"] ? "readonly" : "").">".($subsubrow["is_link"] ? "<i id='date_notice' class='fas fa-question-circle' style='position: absolute; right: 0px; top: 8px;' title='Номер кассеты не редактируется так как есть связанные этапы расформовки или упаковки.'></i>" : "")."</td>";
 		}
 
 		// Дропдаун операторов
@@ -171,7 +178,7 @@ if( $fakt ) {
 				".($row["water"] ? "<td><input type='number' min='0' name='water[{$subrow["LB_ID"]}]' value='{$subrow["water"]}' style='width: 70px;' required></td>" : "")."
 				{$fillings_cell}
 				<td><input type='number' min='0' max='{$in_cassette}' name='underfilling[{$subrow["LB_ID"]}]' value='{$subrow["underfilling"]}' style='width: 60px;'></td>
-				<td><input type='checkbox' name='test[{$subrow["LB_ID"]}]' ".($subrow["test"] ? "checked" : "")." value='1'></td>
+				<td class='nowrap'><input type='checkbox' name='test[{$subrow["LB_ID"]}]' ".($subrow["test"] ? "checked" : "")." ".($subrow["is_test"] ? "disabled" : "")." value='1'>".($subrow["is_test"] ? "<i id='test_notice' class='fas fa-question-circle' title='Не редактируется так как есть связанные испытания куба.'></i>" : "")."</td>
 				<td>{$operators}</td>
 			</tr>
 		";
