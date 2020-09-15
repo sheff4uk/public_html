@@ -72,7 +72,7 @@ if( !$_GET["date_to"] ) {
 				,PB.batches * CW.fillings * CW.in_cassette plan
 			FROM plan__Batch PB
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-			WHERE PB.fakt = 0
+			WHERE PB.fakt = 0 AND PB.batches > 0
 				AND PB.pb_date <= NOW()
 			ORDER BY PB.pb_date, PB.CW_ID
 		";
