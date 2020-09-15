@@ -151,7 +151,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				// В случае клонирования очищаем идентификатор и дату
 				if( $(this).hasClass('clone') ) {
 					$('#plan_batch_form input[name="PB_ID"]').val('');
-					$('#plan_batch_form table input[name="pb_date"]').val('');
+					$('#plan_batch_form table input[name="pb_date"]').val(pb_date);
 				}
 				else {
 					$('#plan_batch_form input[name="PB_ID"]').val(PB_ID);
