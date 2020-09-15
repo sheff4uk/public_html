@@ -188,8 +188,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$subrow["fillings"]?></td>
 			<td><?=$subrow["plan"]?></td>
 			<td>
-				<?=(!$subrow["fakt"] ? "<a href='#' class='add_pb' PB_ID='{$subrow["PB_ID"]}' title='Изменить данные производственного плана'><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?>
-				<a href="printforms/checklist_blank.php?PB_ID=<?=$subrow["PB_ID"]?>" class="print" title="Бланк чеклиста оператора"><i class="fas fa-print fa-lg"></i></a></td>
+				<a href='#' class='add_pb clone' PB_ID='<?=$subrow["PB_ID"]?>' title='Клонировать план заливки'><i class='fa fa-clone fa-lg'></i></a>
+				<?=(!$subrow["fakt"] ? "<a href='#' class='add_pb' PB_ID='{$subrow["PB_ID"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a><a href='printforms/checklist_blank.php?PB_ID={$subrow["PB_ID"]}' class='print' title='Бланк чеклиста оператора'><i class='fas fa-print fa-lg'></i></a>" : "")?>
+			</td>
 		</tr>
 		<?
 
@@ -216,7 +217,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<div id="add_btn" class="add_pb" pb_date="<?=$_GET["pb_date"]?>" title="Внести данные производственного плана"></div>
+<div id="add_btn" class="add_pb" pb_date="<?=$_GET["pb_date"]?>" title="Внести данные плана заливки"></div>
 
 <script>
 	$(function() {

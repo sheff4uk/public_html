@@ -144,15 +144,23 @@ this.subbut.value='Подождите, пожалуйста!';">
 					async: false
 				});
 
-				$('#plan_batch_form input[name="PB_ID"]').val(PB_ID);
-				$('#plan_batch_form input[name="pb_date"]').val(pb_data['pb_date']);
 				$('#plan_batch_form select[name="CW_ID"]').val(pb_data['CW_ID']);
 				$('#plan_batch_form input[name="batches"]').val(pb_data['batches']);
 				$('#plan_batch_form input[name="fillings"]').val(pb_data['fillings']);
 				$('#plan_batch_form input[name="amount"]').val(pb_data['amount']);
+				// В случае клонирования очищаем идентификатор и дату
+				if( $(this).hasClass('clone') ) {
+					$('#plan_batch_form input[name="PB_ID"]').val('');
+					$('#plan_batch_form table input[name="pb_date"]').val('');
+				}
+				else {
+					$('#plan_batch_form input[name="PB_ID"]').val(PB_ID);
+					$('#plan_batch_form input[name="pb_date"]').val(pb_data['pb_date']);
+				}
 			}
 			// Иначе очищаем форму
 			else {
+				$('#plan_batch_form input[name="PB_ID"]').val('');
 				$('#plan_batch_form table input').val('');
 				$('#plan_batch_form table select').val('');
 				$('#plan_batch_form table input[name="pb_date"]').val(pb_date);
