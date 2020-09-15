@@ -63,37 +63,24 @@ $html .= "
 	<table style='table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
 		<thead>
 			<tr>
-				<th rowspan='3' width='30'>№<br>п/п</th>
-				<th rowspan='3'>Время замеса</th>
-				<th rowspan='2' width='30' style='word-wrap: break-word;'>Рецепт</th>
+				<th rowspan='2' width='30'>№<br>п/п</th>
+				<th rowspan='2'>Время замеса</th>
 				<th colspan='".(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0) + ($row["cs"] ? 1 : 0))."'>Масса куба, кг</th>
 				".($row["iron_oxide"] ? "<th rowspan='2'>Окалина, кг</th>" : "")."
 				".($row["sand"] ? "<th rowspan='2'>КМП, кг</th>" : "")."
 				".($row["crushed_stone"] ? "<th rowspan='2'>Отсев, кг</th>" : "")."
 				".($row["cement"] ? "<th rowspan='2'>Цемент, кг</th>" : "")."
 				".($row["water"] ? "<th rowspan='2'>Вода, кг</th>" : "")."
-				<th rowspan='3' colspan='{$fillings}' width='".($fillings * 60)."'>№ кассеты<h2>Замес на {$fillings} кассеты</h2></th>
-				<th rowspan='3'>Недолив</th>
-				<th rowspan='3' width='40'><i class='fas fa-cube' title='Испытания кубов'></i></th>
-				<th rowspan='3'>Оператор</th>
+				<th rowspan='2' colspan='{$fillings}' width='".($fillings * 60)."'>№ кассеты</th>
+				<th rowspan='2'>Недолив</th>
+				<th rowspan='2' width='40'><i class='fas fa-cube' title='Испытания кубов'></i></th>
+				<th rowspan='2'>Оператор</th>
 			</tr>
 			<tr>
 				".(($row["io"] ? "<th>Окалины</th>" : ""))."
 				".(($row["sn"] ? "<th>КМП</th>" : ""))."
 				".(($row["cs"] ? "<th>Отсева</th>" : ""))."
 				<th>Раствора</th>
-			</tr>
-			<tr>
-				<th>{$row["ltr"]}</th>
-				".(($row["io"] ? "<th class='nowrap'>{$row["io"]}</th>" : ""))."
-				".(($row["sn"] ? "<th class='nowrap'>{$row["sn"]}</th>" : ""))."
-				".(($row["cs"] ? "<th class='nowrap'>{$row["cs"]}</th>" : ""))."
-				<th class='nowrap'>{$spec}</th>
-				".($row["iron_oxide"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")."
-				".($row["sand"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")."
-				".($row["crushed_stone"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")."
-				".($row["cement"] ? "<th class='nowrap'>{$row["cement"]}</th>" : "")."
-				".($row["water"] ? "<th class='nowrap'>{$row["water"]}</th>" : "")."
 			</tr>
 		</thead>
 		<tbody>
@@ -167,7 +154,6 @@ if( $fakt ) {
 			<tr>
 				<td style='text-align: center;'>{$i}</td>
 				<td><input type='time' name='batch_time[{$subrow["LB_ID"]}]' value='{$subrow["batch_time_format"]}' style='width: 70px;' required></td>
-				<td></td>
 				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$subrow["LB_ID"]}]' value='".($subrow["io_density"]/1000)."' style='width: 70px;' required></td>" : "")."
 				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$subrow["LB_ID"]}]' value='".($subrow["sn_density"]/1000)."' style='width: 70px;' required></td>" : "")."
 				".($row["cs"] ? "<td><input type='number' min='1' max='2' step='0.01' name='cs_density[{$subrow["LB_ID"]}]' value='".($subrow["cs_density"]/1000)."' style='width: 70px;' required></td>" : "")."
@@ -214,7 +200,6 @@ else {
 			<tr>
 				<td style='text-align: center;'>{$i}</td>
 				<td><input type='time' name='batch_time[{$i}]' style='width: 70px;' required></td>
-				<td></td>
 				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$i}]' style='width: 70px;' required></td>" : "")."
 				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$i}]' style='width: 70px;' required></td>" : "")."
 				".($row["cs"] ? "<td><input type='number' min='1' max='2' step='0.01' name='cs_density[{$i}]' style='width: 70px;' required></td>" : "")."
