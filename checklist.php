@@ -260,19 +260,22 @@ while( $row = mysqli_fetch_array($res) ) {
 			SELECT LF.cassette
 				,LO.o_date
 				,LO.LO_ID
+				,SUM(1) dbl
 			FROM list__Filling LF
+			LEFT JOIN list__Filling SLF ON SLF.cassette = LF.cassette AND SLF.lf_date = LF.lf_date
 			LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 			WHERE LF.LB_ID = {$subrow["LB_ID"]}
+			GROUP BY LF.LF_ID
 			ORDER BY LF.LF_ID
 		";
 		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$cassette = "";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
 			if( $subsubrow["LO_ID"] ) {
-				$cassette .= "<a href='opening.php?o_date_from={$subsubrow["o_date"]}&o_date_to={$subsubrow["o_date"]}#{$subsubrow["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette'>{$subsubrow["cassette"]}</b></a>";
+				$cassette .= "<a href='opening.php?o_date_from={$subsubrow["o_date"]}&o_date_to={$subsubrow["o_date"]}#{$subsubrow["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette' style='".($subsubrow["dbl"] > 1 ? "color: red;" : "")."'>{$subsubrow["cassette"]}</b></a>";
 			}
 			else {
-				$cassette .= "<b class='cassette'>{$subsubrow["cassette"]}</b>";
+				$cassette .= "<b class='cassette' style='".($subsubrow["dbl"] > 1 ? "color: red;" : "")."'>{$subsubrow["cassette"]}</b>";
 			}
 		}
 
