@@ -1,7 +1,7 @@
 <?
 include_once "../config.php";
 
-// Сохранение/редактирование производственного плана
+// Сохранение/редактирование плана заливки
 if( isset($_POST["CW_ID"]) ) {
 	session_start();
 	$pb_date = $_POST["pb_date"];
@@ -38,7 +38,7 @@ if( isset($_POST["CW_ID"]) ) {
 	}
 
 	if( count($_SESSION["error"]) == 0) {
-		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
+		$_SESSION["success"][] = $add ? "Новая запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 
 	// Получаем неделю
@@ -64,7 +64,7 @@ if( isset($_POST["CW_ID"]) ) {
 	}
 </style>
 
-<div id='plan_batch_form' title='Данные производственного плана' style='display:none;'>
+<div id='plan_batch_form' title='Данные плана заливки' style='display:none;'>
 	<form method='post' action="/forms/plan_batch_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>

@@ -147,6 +147,11 @@ if( !$_GET["date_to"] ) {
 			</select>
 		</div>
 
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>№ кассеты:</span>
+			<input type="number" min="1" max="<?=$cassettes?>" name="cassette" value="<?=$_GET["cassette"]?>" class="<?=$_GET["cassette"] ? "filtered" : ""?>" style="width: 80px;">
+		</div>
+
 		<button style="float: right;">Фильтр</button>
 	</form>
 </div>
