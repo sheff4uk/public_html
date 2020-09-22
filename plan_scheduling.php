@@ -190,7 +190,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$subrow["item"]?></td>
 			<td><?=$subrow["pallets"]?></td>
 			<td><?=$subrow["plan"]?></td>
-		<td class="bg-gray" <?=($subrow["fakt"] ? "" : "style='opacity: .7;'")?>><a href="plan_batch.php?week=<?=$subrow["week"]?>#<?=$subrow["PB_ID"]?>" target="_blank"><?=$subrow["filling_plan"]?></a></td>
+		<td class="bg-gray"><a href="plan_batch.php?week=<?=$subrow["week"]?>#<?=$subrow["PB_ID"]?>" target="_blank" <?=($subrow["fakt"] ? "" : "style='opacity: .7;'")?>><?=$subrow["filling_plan"]?></a></td>
 			<td>
 				<a href='#' class='add_ps clone' ps_date="<?=$_GET["ps_date"]?>" PS_ID='<?=$subrow["PS_ID"]?>' title='Клонировать план отгрузки'><i class='fa fa-clone fa-lg'></i></a>
 				<a href='#' class='add_ps' PS_ID='<?=$subrow["PS_ID"]?>' title='Изменить данные плана отгрузки'><i class='fa fa-pencil-alt fa-lg'></i></a>
