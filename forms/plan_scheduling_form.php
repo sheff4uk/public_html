@@ -98,7 +98,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 								?>
 							</select>
 						</td>
-						<td><input type="number" name="pallets" min="0" max="30" style="width: 70px;" required></td>
+						<td><input type="number" name="pallets" min="0" max="50" style="width: 70px;" required></td>
 						<td><input type="number" name="amount" style="width: 70px;" readonly></td>
 					</tr>
 				</tbody>
