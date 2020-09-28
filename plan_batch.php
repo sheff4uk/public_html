@@ -21,7 +21,7 @@ if( !$_GET["week"] ) {
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Неделя:</span>
-			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>">
+			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
 				<?
 				$query = "
 					SELECT YEARWEEK(NOW(), 1) week, INSERT(YEARWEEK(NOW(), 1), 5, 0, '-w') week_format
