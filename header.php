@@ -191,7 +191,8 @@ function src_url($src) {
 		$menu["Операции"]["Упаковка"] = "packing.php";
 		$menu["Доп. данные"]["Суточный&nbsp;брак"] = "daily_reject.php";
 		$menu["Доп. данные"]["Испытания&nbsp;кубов"] = "cubetest.php";
-		$menu["Статистика"] = "statistic.php";
+		$menu["Статистика"]["Брак"] = "statistic.php";
+		$menu["Статистика"]["Расход&nbsp;сырья"] = "consumption.php";
 		$menu["<i class='fas fa-cog fa-lg'></i>"]["Рецепты"] = "mix_formula.php";
 		$menu["Выход {$USR_Icon}"] = "exit.php";
 	}
