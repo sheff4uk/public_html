@@ -203,9 +203,9 @@ $query = "
 		,LO.weight1
 		,LO.weight2
 		,LO.weight3
-		,LO.w1_diff
-		,LO.w2_diff
-		,LO.w3_diff
+		,IF(ABS(LO.w1_diff) <= 30, NULL, IF(LO.w1_diff > 30, LO.w1_diff - 30, LO.w1_diff + 30)) w1_diff
+		,IF(ABS(LO.w2_diff) <= 30, NULL, IF(LO.w2_diff > 30, LO.w2_diff - 30, LO.w2_diff + 30)) w2_diff
+		,IF(ABS(LO.w3_diff) <= 30, NULL, IF(LO.w3_diff > 30, LO.w3_diff - 30, LO.w3_diff + 30)) w3_diff
 		,LO.w1_error
 		,LO.w2_error
 		,LO.w3_error
