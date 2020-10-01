@@ -120,6 +120,7 @@ foreach ($_GET as &$value) {
 			<th>Замесов</th>
 			<th>Заливок</th>
 			<th>План</th>
+			<th>Расчетное время, ч</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -181,12 +182,14 @@ while( $row = mysqli_fetch_array($res) ) {
 		else {
 			echo "<tr id='{$subrow["PB_ID"]}'>";
 		}
-
+		$intdiv = intdiv($subrow["batches"], 4);
+		$mod = $subrow["batches"] % 4;
 		?>
 			<td><?=$subrow["item"]?></td>
 			<td><?=$subrow["batches"]?></td>
 			<td><?=$subrow["fillings"]?></td>
 			<td><?=$subrow["plan"]?></td>
+			<td class='bg-gray'><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td>
 				<a href='#' class='add_pb clone' pb_date="<?=$_GET["pb_date"]?>" PB_ID='<?=$subrow["PB_ID"]?>' title='Клонировать план заливки'><i class='fa fa-clone fa-lg'></i></a>
 				<?=(!$subrow["fakt"] ? "<a href='#' class='add_pb' PB_ID='{$subrow["PB_ID"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a><a href='printforms/checklist_blank.php?PB_ID={$subrow["PB_ID"]}' class='print' title='Бланк чеклиста оператора'><i class='fas fa-print fa-lg'></i></a>" : "")?>
@@ -195,16 +198,21 @@ while( $row = mysqli_fetch_array($res) ) {
 		<?
 
 	}
+	$intdiv = intdiv($row["batches"], 4);
+	$mod = $row["batches"] % 4;
 ?>
 		<tr class="summary">
 			<td>Итог:</td>
 			<td><?=$row["batches"]?></td>
 			<td><?=$row["fillings"]?></td>
 			<td><?=$row["plan"]?></td>
+			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td></td>
 		</tr>
 <?
 }
+$intdiv = intdiv($batches, 4);
+$mod = $batches % 4;
 ?>
 		<tr class="total">
 			<td></td>
@@ -212,6 +220,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$batches?></td>
 			<td><?=$fillings?></td>
 			<td><?=$plan?></td>
+			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td></td>
 		</tr>
 	</tbody>
