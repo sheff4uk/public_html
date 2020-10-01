@@ -147,6 +147,7 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$cnt = $row["cnt"];
+	$d_batches = 0;
 
 	$query = "
 		SELECT PB.PB_ID
@@ -168,6 +169,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
+//		$cnts += $subrow["batches"];
 		$batches += $subrow["batches"];
 		$fillings += $subrow["fillings"];
 		$plan += $subrow["plan"];
@@ -182,8 +184,16 @@ while( $row = mysqli_fetch_array($res) ) {
 		else {
 			echo "<tr id='{$subrow["PB_ID"]}'>";
 		}
-		$intdiv = intdiv($subrow["batches"], 4);
-		$mod = $subrow["batches"] % 4;
+		if($subrow["batches"] > 0) {
+			$intdiv = intdiv($subrow["batches"] + 1, 4);
+			$mod = ($subrow["batches"] + 1) % 4;
+			$d_batches += $subrow["batches"] + 1;
+			$w_batches += $subrow["batches"] + 1;
+		}
+		else {
+			$intdiv = 0;
+			$mod = 0;
+		}
 		?>
 			<td><?=$subrow["item"]?></td>
 			<td><?=$subrow["batches"]?></td>
@@ -198,8 +208,14 @@ while( $row = mysqli_fetch_array($res) ) {
 		<?
 
 	}
-	$intdiv = intdiv($row["batches"], 4);
-	$mod = $row["batches"] % 4;
+	if($d_batches > 0) {
+		$intdiv = intdiv($d_batches, 4);
+		$mod = $d_batches % 4;
+	}
+	else {
+		$intdiv = 0;
+		$mod = 0;
+	}
 ?>
 		<tr class="summary">
 			<td>Итог:</td>
@@ -211,8 +227,14 @@ while( $row = mysqli_fetch_array($res) ) {
 		</tr>
 <?
 }
-$intdiv = intdiv($batches, 4);
-$mod = $batches % 4;
+if($w_batches > 0) {
+	$intdiv = intdiv($w_batches, 4);
+	$mod = $w_batches % 4;
+}
+else {
+	$intdiv = 0;
+	$mod = 0;
+}
 ?>
 		<tr class="total">
 			<td></td>
