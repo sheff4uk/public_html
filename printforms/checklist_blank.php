@@ -17,6 +17,7 @@ $query = "
 		,PB.batches
 		,CW.item
 		,CW.fillings
+		,CW.cubetests
 		,CONCAT(ROUND(CW.min_density/1000, 2), '&ndash;', ROUND(CW.max_density/1000, 2)) spec
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -29,8 +30,17 @@ $batches = $row["batches"];
 $item = $row["item"];
 $pb_date = $row["pb_date_format"];
 $fillings = $row["fillings"];
+$cubetests = $row["cubetests"];
 $CW_ID = $row["CW_ID"];
 $spec = $row["spec"];
+
+// Массив с номерами контрольных замесов (кубы)
+if( $cubetests == 1 ) {
+	$tests = array(round($batches/2));
+}
+elseif( $cubetests == 3 ) {
+	$tests = array(1, round($batches/2), $batches);
+}
 
 echo "<title>Чеклист оператора для {$item} от {$pb_date}</title>";
 ?>
@@ -152,7 +162,7 @@ for ($i = 1; $i <= $batches; $i++) {
 			".($row["water"] ? "<td></td>" : "")."
 			{$fillings_cell}
 			<td></td>
-			<td style='text-align: center;'><i class='far fa-square'></i></td>
+			<td style='text-align: center;'>".(in_array($i, $tests) ? "<i class='fas fa-check-square'></i>" : "<i class='far fa-square'></i>")."</td>
 			<td></td>
 		</tr>
 	";
