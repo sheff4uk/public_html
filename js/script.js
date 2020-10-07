@@ -43,9 +43,11 @@ $(function(){
 
 	// Шапка таблицы фиксируется на месте
 	$(window).scroll(function(){
-		var scrollTop = $(window).scrollTop();
+		var scrollTop = $(window).scrollTop(),
+			width = $('.main_table').width();
+		//alert(width);
 		if(scrollTop != 0) {
-			$(".main_table thead").css({'position':'fixed', 'width':'980px', 'display':'inherit', 'table-layout':'fixed', 'top':'50px', 'z-index':'3'});
+			$(".main_table thead").css({'position':'fixed', 'width':width, 'display':'inherit', 'table-layout':'fixed', 'top':'50px', 'z-index':'3'});
 		}
 		else {
 			$(".main_table thead").css({'display':'contents'});
