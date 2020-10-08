@@ -3,6 +3,7 @@
 $path = dirname($argv[0], 2);
 $key = $argv[1];
 $mtel = $argv[2];
+echo $path."/config.php";
 include $path."/config.php";
 // Проверка доступа
 if( $key != $script_key ) die('Access denied!');
