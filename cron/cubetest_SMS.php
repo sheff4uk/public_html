@@ -4,7 +4,7 @@
 $key = $argv[1];
 $mtel = $argv[2];
 echo $argv[0];
-echo dirname($argv[0], 2);
+echo dirname($argv[0]);
 //echo $path."/config.php";
 //include $path."/config.php";
 // Проверка доступа
