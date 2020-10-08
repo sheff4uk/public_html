@@ -2,12 +2,9 @@
 $path = dirname(dirname($argv[0]));
 $key = $argv[1];
 $mtel = $argv[2];
-//echo $path."/config.php";
 include $path."/config.php";
 // Проверка доступа
-echo $key."<br>";
-echo $script_key."<br>";
-//if( $key != $script_key ) die('Access denied!');
+if( $key != $script_key ) die('Access denied!');
 
 $query = "
 	SELECT CW.item
@@ -40,15 +37,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	$text .= "{$row["item"]} {$row["time"]} [{$row["delay"]}]\n";
 }
 if( $text ) {
-	echo $text;
-	//$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=".($mtel)."&msg=".urlencode($text)."&json=1");
+	$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=".($mtel)."&msg=".urlencode($text)."&json=1");
 }
-//$json = json_decode($body);
-//if( $json ) { // Получен ответ от сервера
-//	if( $json->status == "OK" ) { // Запрос выполнился
-//		$_SESSION["sms_code"] = $sms_code;
-//	}
-//	else $_SESSION["error"][] = "Запрос не выполнился (возможно ошибка авторизации, параметрах, итд...) Код ошибки: $json->status_code Текст ошибки: $json->status_text";
-//}
-//else $_SESSION["error"][] = "Запрос не выполнился Не удалось установить связь с сервером.";
 ?>
