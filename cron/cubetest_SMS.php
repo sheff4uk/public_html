@@ -1,12 +1,9 @@
 #!/usr/bin/php
 <?
-//$path = dirname($argv[0], 2);
+$path = dirname(dirname($argv[0]));
 $key = $argv[1];
 $mtel = $argv[2];
-//echo $argv[0];
-echo dirname(dirname($argv[0]));
-//echo $path."/config.php";
-//include $path."/config.php";
+include $path."/config.php";
 // Проверка доступа
 if( $key != $script_key ) die('Access denied!');
 
