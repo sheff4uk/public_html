@@ -169,7 +169,7 @@ foreach ($_GET as &$value) {
 			<th rowspan="2"><i class="far fa-lg fa-hourglass" title="Интервал в часах с моента заливки."></i></th>
 			<th rowspan="2">№ поста</th>
 			<th colspan="4">Кол-во брака, шт</th>
-			<th colspan="3">Взвешивания, кг ±3%</th>
+			<th colspan="3">Взвешивания, кг</th>
 			<th rowspan="2">Противовес</th>
 			<th rowspan="2">Дата заливки</th>
 			<th rowspan="2">№ кассеты</th>
@@ -203,12 +203,9 @@ $query = "
 		,LO.weight1
 		,LO.weight2
 		,LO.weight3
-		,IF(ABS(LO.w1_diff) <= 30, NULL, IF(LO.w1_diff > 30, LO.w1_diff - 30, LO.w1_diff + 30)) w1_diff
-		,IF(ABS(LO.w2_diff) <= 30, NULL, IF(LO.w2_diff > 30, LO.w2_diff - 30, LO.w2_diff + 30)) w2_diff
-		,IF(ABS(LO.w3_diff) <= 30, NULL, IF(LO.w3_diff > 30, LO.w3_diff - 30, LO.w3_diff + 30)) w3_diff
-		,LO.w1_error
-		,LO.w2_error
-		,LO.w3_error
+		,IF(LO.weight1 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight1 > CW.max_weight, CW.max_weight - LO.weight1, LO.weight1 - CW.min_weight)) w1_diff
+		,IF(LO.weight2 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight2 > CW.max_weight, CW.max_weight - LO.weight2, LO.weight2 - CW.min_weight)) w2_diff
+		,IF(LO.weight3 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight3 > CW.max_weight, CW.max_weight - LO.weight3, LO.weight3 - CW.min_weight)) w3_diff
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 		,LF.cassette
 		,CW.item
@@ -231,7 +228,7 @@ $query = "
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		".($_GET["int24"] ? "AND o_interval(LO.LO_ID) < 24" : "")."
-		".($_GET["not_spec"] ? "AND (LO.w1_error OR LO.w2_error OR LO.w3_error)" : "")."
+		".($_GET["not_spec"] ? "AND (NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3))" : "")."
 		".($_GET["not_spill"] ? "AND LO.o_not_spill" : "")."
 		".($_GET["crack"] ? "AND LO.o_crack" : "")."
 		".($_GET["chipped"] ? "AND LO.o_chipped" : "")."
@@ -256,9 +253,9 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td style="color: red;"><?=$row["o_crack"]?></td>
 		<td style="color: red;"><?=$row["o_chipped"]?></td>
 		<td style="color: red;"><?=$row["o_def_form"]?></td>
-		<td><?=$row["weight1"]/1000?><?=($row["w1_error"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w1_diff"] > 0 ? " +" : " ").($row["w1_diff"]/10)."%</font>" : "")?></td>
-		<td><?=$row["weight2"]/1000?><?=($row["w2_error"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w2_diff"] > 0 ? " +" : " ").($row["w2_diff"]/10)."%</font>" : "")?></td>
-		<td><?=$row["weight3"]/1000?><?=($row["w3_error"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w3_diff"] > 0 ? " +" : " ").($row["w3_diff"]/10)."%</font>" : "")?></td>
+		<td><?=$row["weight1"]/1000?><?=($row["w1_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w1_diff"] > 0 ? " +" : " ").($row["w1_diff"]/1000)."</font>" : "")?></td>
+		<td><?=$row["weight2"]/1000?><?=($row["w2_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w2_diff"] > 0 ? " +" : " ").($row["w2_diff"]/1000)."</font>" : "")?></td>
+		<td><?=$row["weight3"]/1000?><?=($row["w3_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w3_diff"] > 0 ? " +" : " ").($row["w3_diff"]/1000)."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
 		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["pb_date"]?>&date_to=<?=$row["pb_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
 		<td class="bg-gray"><?=$cassette?></td>
