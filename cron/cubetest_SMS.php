@@ -1,11 +1,12 @@
-#!/usr/bin/php
 <?
 $path = dirname(dirname($argv[0]));
 $key = $argv[1];
 $mtel = $argv[2];
-echo $path."/config.php";
+//echo $path."/config.php";
 include $path."/config.php";
 // Проверка доступа
+echo $key."<br>";
+echo $script_key."<br>";
 //if( $key != $script_key ) die('Access denied!');
 
 $query = "
