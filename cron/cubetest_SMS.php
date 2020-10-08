@@ -1,14 +1,12 @@
 #!/usr/bin/php
 <?
-//echo $argv[0];
-//echo $argv[1];
-//echo $argv[2];
-include "../config.php";
+$path = dirname($argv[0], 2);
+$key = $argv[1];
+$mtel = $argv[2];
+include $path."/config.php";
 // Проверка доступа
-if( $argv[1] != $script_key ) die('Access denied!');
+if( $key != $script_key ) die('Access denied!');
 
-$mtel = $_GET["mtel"];
-echo $mtel;
 $query = "
 	SELECT CW.item
 		,DATE_FORMAT(LB.batch_time, '%H:%i') time
