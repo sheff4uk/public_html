@@ -1,5 +1,6 @@
+#!/usr/bin/php
 <?
-include "/usr/bin/php ~/kis.konstanta.ltd/public_html/config.php";
+include "../config.php";
 $mtel = '79297254369';
 
 $query = "
