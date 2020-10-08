@@ -1,6 +1,6 @@
-#!/usr/bin/php ~/kis.konstanta.ltd/public_html
 <?
-include "../config.php";
+#!/usr/bin/php ~/kis.konstanta.ltd/public_html
+//include "../config.php";
 // Проверка доступа
 if( $_GET["key"] != $script_key ) die('Access denied!');
 
