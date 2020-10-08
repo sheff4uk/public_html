@@ -5,7 +5,7 @@ include "../config.php";
 if( $_GET["key"] != $script_key ) die('Access denied!');
 
 $mtel = $_GET["mtel"];
-
+echo $mtel;
 $query = "
 	SELECT CW.item
 		,DATE_FORMAT(LB.batch_time, '%H:%i') time
