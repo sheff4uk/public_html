@@ -1,4 +1,8 @@
+#!/usr/bin/php
 <?
+echo $argv[0];
+echo $argv[1];
+echo $argv[2];
 include "../config.php";
 // Проверка доступа
 //if( $_GET["key"] != $script_key ) die('Access denied!');
@@ -16,8 +20,7 @@ $query = "
 	WHERE LB.test = 1
 		AND LCT.LCT_ID IS NULL
 		AND PB.pb_date + INTERVAL 1 DAY = CURDATE()
-		#AND HOUR(LB.batch_time) = HOUR(CURTIME())
-		AND HOUR(LB.batch_time) = 14
+		AND HOUR(LB.batch_time) = HOUR(CURTIME())
 	UNION ALL
 	SELECT CW.item
 		,DATE_FORMAT(LB.batch_time, '%H:%i') time
@@ -29,8 +32,7 @@ $query = "
 	WHERE LB.test = 1
 		AND LCT.LCT_ID IS NULL
 		AND PB.pb_date + INTERVAL 3 DAY = CURDATE()
-		#AND HOUR(LB.batch_time) = HOUR(CURTIME())
-		AND HOUR(LB.batch_time) = 14
+		AND HOUR(LB.batch_time) = HOUR(CURTIME())
 	ORDER BY time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
