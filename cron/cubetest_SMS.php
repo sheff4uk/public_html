@@ -1,11 +1,11 @@
 #!/usr/local/bin/php
 <?
-echo $argv[0];
-echo $argv[1];
-echo $argv[2];
+//echo $argv[0];
+//echo $argv[1];
+//echo $argv[2];
 include "../config.php";
 // Проверка доступа
-//if( $_GET["key"] != $script_key ) die('Access denied!');
+if( $argv[1] != $script_key ) die('Access denied!');
 
 $mtel = $_GET["mtel"];
 echo $mtel;
