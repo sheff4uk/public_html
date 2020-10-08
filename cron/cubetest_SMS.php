@@ -6,7 +6,7 @@ $mtel = $argv[2];
 echo $path."/config.php";
 include $path."/config.php";
 // Проверка доступа
-if( $key != $script_key ) die('Access denied!');
+//if( $key != $script_key ) die('Access denied!');
 
 $query = "
 	SELECT CW.item
