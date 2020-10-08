@@ -1,7 +1,10 @@
 #!/usr/bin/php
 <?
 include "../config.php";
-$mtel = '79297254369';
+// Проверка доступа
+if( $_GET["key"] != $script_key ) die('Access denied!');
+
+$mtel = $_GET["mtel"];
 
 $query = "
 	SELECT CW.item
@@ -34,9 +37,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$text .= "{$row["item"]} {$row["time"]} [{$row["delay"]}]\n";
 }
 if( $text ) {
-	//$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=".($mtel)."&msg=".urlencode($text)."&json=1");
-	$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=79091427682&msg=".urlencode($text)."&json=1&test=1");
-	//$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=79226686875&msg=".urlencode($text)."&json=1");
+	$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=".($mtel)."&msg=".urlencode($text)."&json=1");
 }
 //$json = json_decode($body);
 //if( $json ) { // Получен ответ от сервера
