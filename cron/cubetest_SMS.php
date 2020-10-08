@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/local/bin/php
 <?
 echo $argv[0];
 echo $argv[1];
