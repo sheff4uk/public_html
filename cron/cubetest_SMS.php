@@ -17,7 +17,8 @@ $query = "
 	WHERE LB.test = 1
 		AND LCT.LCT_ID IS NULL
 		AND PB.pb_date + INTERVAL 1 DAY = CURDATE()
-		AND HOUR(LB.batch_time) = HOUR(CURTIME())
+		#AND HOUR(LB.batch_time) = HOUR(CURTIME())
+		AND HOUR(LB.batch_time) = 14
 	UNION ALL
 	SELECT CW.item
 		,DATE_FORMAT(LB.batch_time, '%H:%i') time
@@ -29,7 +30,8 @@ $query = "
 	WHERE LB.test = 1
 		AND LCT.LCT_ID IS NULL
 		AND PB.pb_date + INTERVAL 3 DAY = CURDATE()
-		AND HOUR(LB.batch_time) = HOUR(CURTIME())
+		#AND HOUR(LB.batch_time) = HOUR(CURTIME())
+		AND HOUR(LB.batch_time) = 14
 	ORDER BY time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -37,7 +39,8 @@ while( $row = mysqli_fetch_array($res) ) {
 	$text .= "{$row["item"]} {$row["time"]} [{$row["delay"]}]\n";
 }
 if( $text ) {
-	$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=".($mtel)."&msg=".urlencode($text)."&json=1");
+	echo $text;
+	//$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=".($mtel)."&msg=".urlencode($text)."&json=1");
 }
 //$json = json_decode($body);
 //if( $json ) { // Получен ответ от сервера
