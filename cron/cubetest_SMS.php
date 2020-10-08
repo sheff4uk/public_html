@@ -1,5 +1,5 @@
-#!/usr/local/bin/php
 <?
+#!/usr/local/bin/php
 include "../config.php";
 // Проверка доступа
 if( $_GET["key"] != $script_key ) die('Access denied!');
