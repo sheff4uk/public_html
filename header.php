@@ -19,7 +19,7 @@ function src_url($src) {
 	<title><?=$title?></title>
 <!--	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css">-->
 	<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?v=2">
-	<link rel='stylesheet' type='text/css' href='css/style.css?18'>
+	<link rel='stylesheet' type='text/css' href='css/style.css?19'>
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 <!--	<link rel='stylesheet' type='text/css' href='css/font-awesome.min.css'>-->
 	<link rel='stylesheet' type='text/css' href='css/buttons.css'>
@@ -184,15 +184,15 @@ function src_url($src) {
 		</div>
 <?
 	if( !empty($_SESSION['id']) ) {
-		$menu["Планы"]["Отгрузка"] = "plan_scheduling.php";
-		$menu["Планы"]["Заливка"] = "plan_batch.php";
-		$menu["Операции"]["Заливка"] = "checklist.php";
-		$menu["Операции"]["Расформовка"] = "opening.php";
-		$menu["Операции"]["Упаковка"] = "packing.php";
-		$menu["Доп. данные"]["Суточный&nbsp;брак"] = "daily_reject.php";
-		$menu["Доп. данные"]["Испытания&nbsp;кубов"] = "cubetest.php";
+		$menu["Планы"]["<i class='fas fa-fill fa-lg'></i> Заливка"] = "plan_batch.php";
+		$menu["Планы"]["<i class='fas fa-truck fa-lg'></i> Отгрузка"] = "plan_scheduling.php";
+		$menu["Операции"]["<i class='fas fa-fill-drip fa-lg'></i> Заливка"] = "checklist.php";
+		$menu["Операции"]["<i class='fas fa-expand fa-lg'></i> Расформовка"] = "opening.php";
+		$menu["Операции"]["<i class='fas fa-pallet fa-lg'></i> Упаковка"] = "packing.php";
+		$menu["Доп. данные"]["<i class='fas fa-cube fa-lg'></i> Испытания кубов"] = "cubetest.php";
+		$menu["Доп. данные"]["<i class='fas fa-trash fa-lg'></i> Суточный брак"] = "daily_reject.php";
 		$menu["Статистика"]["Брак"] = "statistic.php";
-		$menu["Статистика"]["Расход&nbsp;сырья"] = "consumption.php";
+		$menu["Статистика"]["Расход сырья"] = "consumption.php";
 		$menu["<i class='fas fa-cog fa-lg'></i>"]["Рецепты"] = "mix_formula.php";
 		$menu["Выход {$USR_Icon}"] = "exit.php";
 	}

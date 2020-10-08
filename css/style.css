@@ -422,6 +422,7 @@ ul.navbar-nav, .navbar-nav ul {
 	padding: 15px 15px;
 	font-size: 14px;
 	background: #222;
+	white-space: nowrap;
 }
 .navbar-nav > li > div {
 	color: #fff;
