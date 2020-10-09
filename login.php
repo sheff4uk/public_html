@@ -84,7 +84,7 @@ switch( $_GET["do"] ) {
 	case "smscode":
 		if( isset($_SESSION["sms_code"]) ) die();
 		$sms_code = rand(1000, 9999);
-		$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=".($_SESSION['mtel'])."&msg=Пароль:+".($sms_code)."&json=1");
+		$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=".($_SESSION['mtel'])."&msg=Код доступа:+".($sms_code)."&json=1");
 		$json = json_decode($body);
 		if( $json ) { // Получен ответ от сервера
 			if( $json->status == "OK" ) { // Запрос выполнился

@@ -14,6 +14,7 @@ if( isset($_POST["CW_ID"]) ) {
 			SET pb_date = '{$pb_date}'
 				,CW_ID = {$CW_ID}
 				,batches = {$batches}
+				,editor = {$_SESSION['id']}
 			WHERE PB_ID = {$_POST["PB_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -27,6 +28,7 @@ if( isset($_POST["CW_ID"]) ) {
 			SET pb_date = '{$pb_date}'
 				,CW_ID = {$CW_ID}
 				,batches = {$batches}
+				,author = {$_SESSION['id']}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
