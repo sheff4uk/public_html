@@ -17,6 +17,8 @@ if( isset($_POST["CW_ID"]) ) {
 				,editor = {$_SESSION['id']}
 			WHERE PB_ID = {$_POST["PB_ID"]}
 		";
+		echo $query;
+		die();
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 		}
