@@ -104,11 +104,6 @@ foreach ($_GET as &$value) {
 				active: "false"
 			});
 		});
-
-//		$('#filter input[name="date_from"]').change(function() {
-//			var val = $(this).val();
-//			$('#filter input[name="date_to"]').val(val);
-//		});
 	});
 </script>
 
@@ -247,6 +242,59 @@ else {
 		</tr>
 	</tbody>
 </table>
+
+<div>
+	<h3>Журнал изменений</h3>
+	<table>
+		<thead>
+			<tr>
+				<th colspan="2">Время</th>
+				<th>Дата</th>
+				<th>Противовес</th>
+				<th>Замесов</th>
+				<th>Автор</th>
+				<th>Ссылка</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?
+			$query = "
+				SELECT PBL.PB_ID
+					,Friendly_date(PBL.date_time) friendly_date
+					,DATE_FORMAT(PBL.date_time, '%H:%i') time
+					,DATE_FORMAT(PB.pb_date, '%d:%m:%y') pb_date_format
+					,CW.item
+					,CONCAT('<n style=\"text-decoration: line-through;\">', SPBL.batches, '</n>&nbsp;<i class=\"fas fa-arrow-right\"></i>&nbsp;') prev_batches
+					,PBL.batches
+					,USR_Icon(PBL.author) usr_icon
+				FROM plan__BatchLog PBL
+				LEFT JOIN plan__BatchLog SPBL ON SPBL.PBL_ID = PBL.prev_ID
+				JOIN plan__Batch PB ON PB.PB_ID = PBL.PB_ID
+					".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
+					".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+					".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+				JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+				WHERE PBL.date_time IS NOT NULL
+				ORDER BY PBL.date_time DESC
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $row = mysqli_fetch_array($res) ) {
+			?>
+				<tr>
+					<td><?=$row["friendly_date"]?></td>
+					<td><?=$row["time"]?></td>
+					<td class="bg-gray"><?=$row["pb_date_format"]?></td>
+					<td class="bg-gray"><?=$row["item"]?></td>
+					<td class="bg-gray" style="text-align: center;"><?=$row["prev_batches"]?><?=$row["batches"]?></td>
+					<td style="text-align: center;"><?=$row["usr_icon"]?></td>
+					<td style="text-align: center;"><a href="#<?=$row["PB_ID"]?>"><i class="fas fa-link fa-lg"></i></a></td>
+				</tr>
+			<?
+			}
+			?>
+		</tbody>
+	</table>
+</div>
 
 <div id="add_btn" class="add_pb" pb_date="<?=$_GET["pb_date"]?>" title="Внести данные плана заливки"></div>
 

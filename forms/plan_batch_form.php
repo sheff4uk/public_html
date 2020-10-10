@@ -2,19 +2,15 @@
 include_once "../config.php";
 
 // Сохранение/редактирование плана заливки
-if( isset($_POST["CW_ID"]) ) {
+if( isset($_POST["batches"]) ) {
 	session_start();
-	$pb_date = $_POST["pb_date"];
-	$CW_ID = $_POST["CW_ID"];
 	$batches = $_POST["batches"];
 
 	if( $_POST["PB_ID"] ) { // Редактируем
 		$query = "
 			UPDATE plan__Batch
-			SET pb_date = '{$pb_date}'
-				,CW_ID = {$CW_ID}
-				,batches = {$batches}
-				,editor = {$_SESSION['id']}
+			SET batches = {$batches}
+				,author = {$_SESSION['id']}
 			WHERE PB_ID = {$_POST["PB_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -23,6 +19,8 @@ if( isset($_POST["CW_ID"]) ) {
 		$PB_ID = $_POST["PB_ID"];
 	}
 	else { // Добавляем
+		$pb_date = $_POST["pb_date"];
+		$CW_ID = $_POST["CW_ID"];
 		$query = "
 			INSERT INTO plan__Batch
 			SET pb_date = '{$pb_date}'
@@ -146,7 +144,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					async: false
 				});
 
-				$('#plan_batch_form select[name="CW_ID"]').val(pb_data['CW_ID']);
+				$('#plan_batch_form select[name="CW_ID"]').val(pb_data['CW_ID']).attr('disabled', true);
 				$('#plan_batch_form input[name="batches"]').val(pb_data['batches']);
 				$('#plan_batch_form input[name="fillings"]').val(pb_data['fillings']);
 				$('#plan_batch_form input[name="amount"]').val(pb_data['amount']);
@@ -157,14 +155,14 @@ this.subbut.value='Подождите, пожалуйста!';">
 				}
 				else {
 					$('#plan_batch_form input[name="PB_ID"]').val(PB_ID);
-					$('#plan_batch_form input[name="pb_date"]').val(pb_data['pb_date']);
+					$('#plan_batch_form input[name="pb_date"]').val(pb_data['pb_date']).attr('disabled', true);
 				}
 			}
 			// Иначе очищаем форму
 			else {
 				$('#plan_batch_form input[name="PB_ID"]').val('');
-				$('#plan_batch_form table input').val('');
-				$('#plan_batch_form table select').val('');
+				$('#plan_batch_form table input').val('').attr('disabled', false);
+				$('#plan_batch_form table select').val('').attr('disabled', false);
 				$('#plan_batch_form table input[name="pb_date"]').val(pb_date);
 			}
 
