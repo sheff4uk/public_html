@@ -117,7 +117,10 @@ $row = mysqli_fetch_array($res);
 			<?=($row["crushed_stone"] ? "<th rowspan='2'>Отсев, кг</th>" : "")?>
 			<?=($row["cement"] ? "<th rowspan='2'>Цемент, кг</th>" : "")?>
 			<?=($row["water"] ? "<th rowspan='2'>Вода, кг</th>" : "")?>
-			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 60)?>">№ кассеты<h2>Замес на <?=$fillings?> кассеты</h2></th>
+			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 60)?>">
+				№ кассеты
+<!--				<h2>Замес на <?=$fillings?> кассеты</h2>-->
+			</th>
 			<th rowspan="3" width="40">Недолив</th>
 			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
 			<th rowspan="3">Оператор</th>
