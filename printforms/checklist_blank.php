@@ -13,6 +13,7 @@ $PB_ID = $_GET["PB_ID"];
 
 $query = "
 	SELECT DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
+		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
 		,PB.CW_ID
 		,PB.batches
 		,CW.item
@@ -29,6 +30,7 @@ $row = mysqli_fetch_array($res);
 $batches = $row["batches"];
 $item = $row["item"];
 $pb_date = $row["pb_date_format"];
+$pb_weekday = $row["pb_date_weekday"];
 $fillings = $row["fillings"];
 $cubetests = $row["cubetests"];
 $CW_ID = $row["CW_ID"];
@@ -79,7 +81,7 @@ echo "<title>Чеклист оператора для {$item} от {$pb_date}</t
 		<tr>
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
 			<th style="font-size: 2em;"><?=$item?></th>
-			<th style="font-size: 2em;"><?=$pb_date?></th>
+			<th><n style="font-size: 2em;"><?=$pb_date?></n>&nbsp;<?=$pb_weekday?></th>
 		</tr>
 	</thead>
 </table>
