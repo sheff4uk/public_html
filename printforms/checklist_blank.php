@@ -162,7 +162,7 @@ for ($i = 1; $i <= $batches; $i++) {
 			".($row["water"] ? "<td></td>" : "")."
 			{$fillings_cell}
 			<td></td>
-			<td style='text-align: center;'>".(in_array($i, $tests) ? "<i class='fas fa-check-square'></i>" : "<i class='far fa-square'></i>")."</td>
+			<td style='text-align: center;'>".(in_array($i, $tests) ? "<i class='far fa-square fa-lg'></i>" : "<i class='far fa-square' style='opacity: .5;'></i>")."</td>
 			<td></td>
 		</tr>
 	";
