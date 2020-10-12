@@ -262,7 +262,7 @@ else {
 				SELECT PBL.PB_ID
 					,Friendly_date(PBL.date_time) friendly_date
 					,DATE_FORMAT(PBL.date_time, '%H:%i') time
-					,DATE_FORMAT(PB.pb_date, '%d:%m:%y') pb_date_format
+					,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 					,CW.item
 					,CONCAT('<n style=\"text-decoration: line-through;\">', SPBL.batches, '</n>&nbsp;<i class=\"fas fa-arrow-right\"></i>&nbsp;') prev_batches
 					,PBL.batches
