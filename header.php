@@ -184,6 +184,7 @@ function src_url($src) {
 		</div>
 <?
 	if( !empty($_SESSION['id']) ) {
+		$menu["Бланки"] = "blanks.php";
 		$menu["Планы"]["<i class='fas fa-fill fa-lg'></i> Заливка"] = "plan_batch.php";
 		$menu["Планы"]["<i class='fas fa-truck fa-lg'></i> Отгрузка"] = "plan_scheduling.php";
 		$menu["Операции"]["<i class='fas fa-fill-drip fa-lg'></i> Заливка"] = "checklist.php";
