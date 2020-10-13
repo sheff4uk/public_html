@@ -170,6 +170,7 @@ foreach ($_GET as &$value) {
 			<th rowspan="2">№ поста</th>
 			<th colspan="4">Кол-во брака, шт</th>
 			<th colspan="3">Взвешивания, кг</th>
+			<th rowspan="2">Куб раствора, кг</th>
 			<th rowspan="2">Противовес</th>
 			<th rowspan="2">Дата заливки</th>
 			<th rowspan="2">№ кассеты</th>
@@ -214,6 +215,8 @@ $query = "
 		,LB.LB_ID
 		,LP.LP_ID
 		,LP.p_date
+		,LB.mix_density
+		,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
 	FROM list__Opening LO
 	LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 	LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
@@ -256,6 +259,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["weight1"]/1000?><?=($row["w1_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w1_diff"] > 0 ? " +" : " ").($row["w1_diff"]/1000)."</font>" : "")?></td>
 		<td><?=$row["weight2"]/1000?><?=($row["w2_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w2_diff"] > 0 ? " +" : " ").($row["w2_diff"]/1000)."</font>" : "")?></td>
 		<td><?=$row["weight3"]/1000?><?=($row["w3_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w3_diff"] > 0 ? " +" : " ").($row["w3_diff"]/1000)."</font>" : "")?></td>
+		<td class="bg-gray"><?=$row["mix_density"]/1000?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").($row["mix_diff"]/1000)."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
 		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["pb_date"]?>&date_to=<?=$row["pb_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
 		<td class="bg-gray"><?=$cassette?></td>
