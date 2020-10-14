@@ -11,6 +11,10 @@ if( !$_GET["week"] ) {
 	$row = mysqli_fetch_array($res);
 	$_GET["week"] = $row["week"];
 }
+// Узнаем сегодняшнюю дату
+$date = new DateTime();
+$today = date_format($date, 'd.m.y');
+
 ?>
 
 <!--Фильтр-->
@@ -197,7 +201,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td class='bg-gray'><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td>
 				<a href='#' class='add_pb clone' pb_date="<?=$_GET["pb_date"]?>" PB_ID='<?=$subrow["PB_ID"]?>' title='Клонировать план заливки'><i class='fa fa-clone fa-lg'></i></a>
-				<?=(!$subrow["fakt"] ? "<a href='#' class='add_pb' PB_ID='{$subrow["PB_ID"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a><a href='printforms/checklist_blank.php?PB_ID={$subrow["PB_ID"]}' class='print' title='Бланк чеклиста оператора'><i class='fas fa-print fa-lg'></i></a>" : "")?>
+				<?=(!$subrow["fakt"] ? "<a href='#' class='add_pb' PB_ID='{$subrow["PB_ID"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?>
+				<?=((!$subrow["fakt"] and $row["pb_date_format"] == $today) ? "<a href='printforms/checklist_blank.php?PB_ID={$subrow["PB_ID"]}' class='print' title='Бланк чеклиста оператора'><i class='fas fa-print fa-lg'></i></a>" : "")?>
 			</td>
 		</tr>
 		<?
