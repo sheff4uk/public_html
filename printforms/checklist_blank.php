@@ -29,7 +29,7 @@ $row = mysqli_fetch_array($res);
 
 $batches = $row["batches"];
 $item = $row["item"];
-$pb_date = $row["pb_date_format"];
+$pb_date_format = $row["pb_date_format"];
 $pb_weekday = $row["pb_date_weekday"];
 $fillings = $row["fillings"];
 $cubetests = $row["cubetests"];
@@ -81,7 +81,7 @@ echo "<title>Чеклист оператора для {$item} от {$pb_date}</t
 		<tr>
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
 			<th style="font-size: 2em;"><?=$item?></th>
-			<th><n style="font-size: 2em;"><?=$pb_date?></n>&nbsp;<?=$pb_weekday?></th>
+			<th><n style="font-size: 2em;"><?=$pb_date_format?></n>&nbsp;<?=$pb_weekday?></th>
 		</tr>
 	</thead>
 </table>

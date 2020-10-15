@@ -5,6 +5,8 @@ $PB_ID = $_GET["PB_ID"];
 
 $query = "
 	SELECT DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
+		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
+		,PB.pb_date
 		,PB.CW_ID
 		,PB.batches
 		,PB.fakt
@@ -22,7 +24,9 @@ $row = mysqli_fetch_array($res);
 $batches = $row["batches"];
 $fakt = $row["fakt"];
 $item = $row["item"];
-$pb_date = $row["pb_date_format"];
+$pb_date_format = $row["pb_date_format"];
+$pb_weekday = $row["pb_date_weekday"];
+$pb_date = $row["pb_date"];
 $fillings = $row["fillings"];
 $in_cassette = $row["in_cassette"];
 $CW_ID = $row["CW_ID"];
@@ -37,24 +41,26 @@ $html = "
 		<tr>
 			<td style='border: 1px solid black; line-height: 1em;'><img src='/img/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></td>
 			<td style='font-size: 2em; border: 1px solid black; line-height: 1em;'>{$item}</td>
-			<td style='font-size: 2em; border: 1px solid black; line-height: 1em;'>{$pb_date}</td>
+			<td style='border: 1px solid black; line-height: 1em;'><n style='font-size: 2em;'>{$pb_date_format}</n>&nbsp;{$pb_weekday}</td>
 		</tr>
 	</table>
 ";
 
 // Данные рецепта
 $query = "
-	SELECT GROUP_CONCAT(CONCAT('<span style=\'font-size: 1.5em;\'>', letter, '</span>') ORDER BY letter SEPARATOR '<br>') ltr
-		,GROUP_CONCAT(CONCAT(ROUND(io_min/1000, 2), '&ndash;', ROUND(io_max/1000, 2)) ORDER BY letter SEPARATOR '<br>') io
-		,GROUP_CONCAT(CONCAT(ROUND(sn_min/1000, 2), '&ndash;', ROUND(sn_max/1000, 2)) ORDER BY letter SEPARATOR '<br>') sn
-		,GROUP_CONCAT(CONCAT(ROUND(cs_min/1000, 2), '&ndash;', ROUND(cs_max/1000, 2)) ORDER BY letter SEPARATOR '<br>') cs
-		,GROUP_CONCAT(distinct CONCAT(iron_oxide, ' ±5') ORDER BY letter SEPARATOR '<br>') iron_oxide
-		,GROUP_CONCAT(distinct CONCAT(sand, ' ±5') ORDER BY letter SEPARATOR '<br>') sand
-		,GROUP_CONCAT(distinct CONCAT(crushed_stone, ' ±5') ORDER BY letter SEPARATOR '<br>') crushed_stone
-		,GROUP_CONCAT(distinct CONCAT(cement, ' ±2') ORDER BY letter SEPARATOR '<br>') cement
-		,GROUP_CONCAT(distinct CONCAT('min ', water) ORDER BY letter SEPARATOR '<br>') water
-	FROM MixFormula
-	WHERE CW_ID = {$CW_ID}
+	SELECT GROUP_CONCAT(CONCAT('<span style=\'font-size: 1.5em;\' class=\'nowrap\'>', MF.letter, MFV.version, '</span>') ORDER BY MF.letter SEPARATOR '<br>') ltr
+		,GROUP_CONCAT(CONCAT(ROUND(MF.io_min/1000, 2), '&ndash;', ROUND(MF.io_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') io
+		,GROUP_CONCAT(CONCAT(ROUND(MF.sn_min/1000, 2), '&ndash;', ROUND(MF.sn_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') sn
+		,GROUP_CONCAT(CONCAT(ROUND(MF.cs_min/1000, 2), '&ndash;', ROUND(MF.cs_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') cs
+		,GROUP_CONCAT(distinct CONCAT(MFV.iron_oxide, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') iron_oxide
+		,GROUP_CONCAT(distinct CONCAT(MFV.sand, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') sand
+		,GROUP_CONCAT(distinct CONCAT(MFV.crushed_stone, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') crushed_stone
+		,GROUP_CONCAT(distinct CONCAT(MFV.cement, ' ±2') ORDER BY MF.letter SEPARATOR '<br>') cement
+		,GROUP_CONCAT(distinct CONCAT('min ', MFV.water) ORDER BY MF.letter SEPARATOR '<br>') water
+	FROM MixFormula MF
+	JOIN MixFormulaVersions MFV ON MFV.MF_ID = MF.MF_ID
+		AND '{$pb_date}' BETWEEN MFV.from AND MFV.to
+	WHERE MF.CW_ID = {$CW_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
@@ -63,24 +69,37 @@ $html .= "
 	<table style='table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
 		<thead>
 			<tr>
-				<th rowspan='2' width='30'>№<br>п/п</th>
-				<th rowspan='2'>Время замеса</th>
+				<th rowspan='3' width='30'>№<br>п/п</th>
+				<th rowspan='3'>Время замеса</th>
+				<th rowspan='2' width='30' style='word-wrap: break-word;'>Рецепт</th>
 				<th colspan='".(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0) + ($row["cs"] ? 1 : 0))."'>Масса куба, кг</th>
 				".($row["iron_oxide"] ? "<th rowspan='2'>Окалина, кг</th>" : "")."
 				".($row["sand"] ? "<th rowspan='2'>КМП, кг</th>" : "")."
 				".($row["crushed_stone"] ? "<th rowspan='2'>Отсев, кг</th>" : "")."
 				".($row["cement"] ? "<th rowspan='2'>Цемент, кг</th>" : "")."
 				".($row["water"] ? "<th rowspan='2'>Вода, кг</th>" : "")."
-				<th rowspan='2' colspan='{$fillings}' width='".($fillings * 60)."'>№ кассеты</th>
-				<th rowspan='2'>Недолив</th>
-				<th rowspan='2' width='40'><i class='fas fa-cube' title='Испытания кубов'></i></th>
-				<th rowspan='2'>Оператор</th>
+				<th rowspan='3' colspan='{$fillings}' width='".($fillings * 60)."'>№ кассеты</th>
+				<th rowspan='3'>Недолив</th>
+				<th rowspan='3' width='40'><i class='fas fa-cube' title='Испытания кубов'></i></th>
+				<th rowspan='3'>Оператор</th>
 			</tr>
 			<tr>
 				".(($row["io"] ? "<th>Окалины</th>" : ""))."
 				".(($row["sn"] ? "<th>КМП</th>" : ""))."
 				".(($row["cs"] ? "<th>Отсева</th>" : ""))."
 				<th>Раствора</th>
+			</tr>
+			<tr>
+				<th>{$row["ltr"]}</th>
+				".(($row["io"] ? "<th class='nowrap'>{$row["io"]}</th>" : ""))."
+				".(($row["sn"] ? "<th class='nowrap'>{$row["sn"]}</th>" : ""))."
+				".(($row["cs"] ? "<th class='nowrap'>{$row["cs"]}</th>" : ""))."
+				<th class='nowrap'>{$spec}</th>
+				".($row["iron_oxide"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")."
+				".($row["sand"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")."
+				".($row["crushed_stone"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")."
+				".($row["cement"] ? "<th class='nowrap'>{$row["cement"]}</th>" : "")."
+				".($row["water"] ? "<th class='nowrap'>{$row["water"]}</th>" : "")."
 			</tr>
 		</thead>
 		<tbody>
@@ -154,6 +173,7 @@ if( $fakt ) {
 			<tr>
 				<td style='text-align: center;'>{$i}</td>
 				<td><input type='time' name='batch_time[{$subrow["LB_ID"]}]' value='{$subrow["batch_time_format"]}' style='width: 70px;' required></td>
+				<td></td>
 				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$subrow["LB_ID"]}]' value='".($subrow["io_density"]/1000)."' style='width: 70px;' required></td>" : "")."
 				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$subrow["LB_ID"]}]' value='".($subrow["sn_density"]/1000)."' style='width: 70px;' required></td>" : "")."
 				".($row["cs"] ? "<td><input type='number' min='1' max='2' step='0.01' name='cs_density[{$subrow["LB_ID"]}]' value='".($subrow["cs_density"]/1000)."' style='width: 70px;' required></td>" : "")."
@@ -200,6 +220,7 @@ else {
 			<tr>
 				<td style='text-align: center;'>{$i}</td>
 				<td><input type='time' name='batch_time[{$i}]' style='width: 70px;' required></td>
+				<td></td>
 				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$i}]' style='width: 70px;' required></td>" : "")."
 				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$i}]' style='width: 70px;' required></td>" : "")."
 				".($row["cs"] ? "<td><input type='number' min='1' max='2' step='0.01' name='cs_density[{$i}]' style='width: 70px;' required></td>" : "")."
