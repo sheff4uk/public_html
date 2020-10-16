@@ -100,7 +100,7 @@ $query = "
 		,GROUP_CONCAT(distinct CONCAT('min ', MFV.water) ORDER BY MF.letter SEPARATOR '<br>') water
 	FROM MixFormula MF
 	JOIN MixFormulaVersions MFV ON MFV.MF_ID = MF.MF_ID
-		AND NOW() BETWEEN MFV.from AND MFV.to
+		AND NOW() BETWEEN MFV.date_from AND MFV.date_to
 	WHERE MF.CW_ID = {$CW_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

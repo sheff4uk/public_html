@@ -119,6 +119,7 @@ foreach ($_GET as &$value) {
 			<th>Замесов</th>
 			<th>Заливок</th>
 			<th>План</th>
+			<th>Факт</th>
 			<th>Расчетное время, ч</th>
 			<th></th>
 		</tr>
@@ -134,6 +135,7 @@ $query = "
 		,SUM(PB.batches) batches
 		,SUM(PB.batches * CW.fillings) fillings
 		,SUM(PB.batches * CW.fillings * CW.in_cassette) plan
+		,SUM(PB.fakt * CW.fillings * CW.in_cassette) fakt
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	WHERE 1
@@ -147,6 +149,7 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	$cnt = $row["cnt"];
 	$d_batches = 0;
+	$d_underfilling = 0;
 
 	$query = "
 		SELECT PB.PB_ID
@@ -157,21 +160,26 @@ while( $row = mysqli_fetch_array($res) ) {
 			,PB.batches
 			,PB.batches * CW.fillings fillings
 			,PB.batches * CW.fillings * CW.in_cassette plan
-			,PB.fakt
+			,PB.fakt * CW.fillings * CW.in_cassette fakt
+			,IFNULL(SUM(LB.underfilling), 0) underfilling
 		FROM plan__Batch PB
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 		WHERE 1
 			AND PB.pb_date = '{$row["pb_date"]}'
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		GROUP BY PB.PB_ID
 		ORDER BY PB.pb_date DESC, PB.CW_ID
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
-//		$cnts += $subrow["batches"];
 		$batches += $subrow["batches"];
 		$fillings += $subrow["fillings"];
 		$plan += $subrow["plan"];
+		$fakt += $subrow["fakt"];
+		$underfilling += $subrow["underfilling"];
+		$d_underfilling += $subrow["underfilling"];
 
 		// Выводим общую ячейку с датой заливки
 		if( $cnt ) {
@@ -198,6 +206,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$subrow["batches"]?></td>
 			<td><?=$subrow["fillings"]?></td>
 			<td><?=$subrow["plan"]?></td>
+			<td class='bg-gray'><?=($subrow["fakt"] - $subrow["underfilling"])?></td>
 			<td class='bg-gray'><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td>
 				<a href='#' class='add_pb clone' pb_date="<?=$_GET["pb_date"]?>" PB_ID='<?=$subrow["PB_ID"]?>' title='Клонировать план заливки'><i class='fa fa-clone fa-lg'></i></a>
@@ -222,6 +231,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["batches"]?></td>
 			<td><?=$row["fillings"]?></td>
 			<td><?=$row["plan"]?></td>
+			<td><?=($row["fakt"] - $d_underfilling)?></td>
 			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td></td>
 		</tr>
@@ -242,6 +252,7 @@ else {
 			<td><?=$batches?></td>
 			<td><?=$fillings?></td>
 			<td><?=$plan?></td>
+			<td><?=($fakt - $underfilling)?></td>
 			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td></td>
 		</tr>

@@ -41,7 +41,7 @@ $query = "
 		,MF.sn_max
 		,MF.cs_min
 		,MF.cs_max
-		,GROUP_CONCAT(CONCAT('<b>', MFV.version, '</b> (с ', DATE_FORMAT(MFV.from, '%d.%m.%Y %T'), ' по ', DATE_FORMAT(MFV.to, '%d.%m.%Y %T'), ')') SEPARATOR '<br>') version
+		,GROUP_CONCAT(CONCAT('<b>', MFV.version, '</b> (с ', DATE_FORMAT(MFV.date_from, '%d.%m.%Y'), ' по ', DATE_FORMAT(MFV.date_to, '%d.%m.%Y'), ')') SEPARATOR '<br>') version
 		,GROUP_CONCAT(MFV.iron_oxide SEPARATOR '<br>') iron_oxide
 		,GROUP_CONCAT(MFV.sand SEPARATOR '<br>') sand
 		,GROUP_CONCAT(MFV.crushed_stone SEPARATOR '<br>') crushed_stone

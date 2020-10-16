@@ -213,6 +213,7 @@ $query = "
 		,CW.item
 		,PB.CW_ID
 		,PB.batches
+		,PB.fakt
 		,MIN(LB.batch_time) time
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -227,7 +228,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$cnt = $row["batches"];
+	$cnt = $row["fakt"];
 	echo "<tbody id='PB{$row["PB_ID"]}' style='text-align: center; border-bottom: 2px solid #333;'>";
 
 	$query = "
@@ -289,7 +290,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
-			echo "<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'>{$row["pb_date_format"]}<br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
+			echo "<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'>{$row["pb_date_format"]}<br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>По плану: <b>{$row["batches"]}</b></td>";
 		}
 		?>
 				<td><?=$subrow["batch_time_format"]?><?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?></td>

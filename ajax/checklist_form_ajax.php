@@ -1,8 +1,8 @@
 <?
 include_once "../checkrights.php";
 
+$max_batches = 30; // Максимально возможное число замесов
 $PB_ID = $_GET["PB_ID"];
-
 $query = "
 	SELECT DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
 		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
@@ -33,10 +33,8 @@ $CW_ID = $row["CW_ID"];
 $spec = $row["spec"];
 
 $html = "
-	".(!$fakt ? "<h3 style='color:red; text-align: center;'>Предупреждение!<br>Перед заполнением формы удостоверьтесь, что фактическое число замесов совпадает с запланированным.<br>В противном случае отредактируйте план заливки.</h3>" : "")."
+	<p style='text-align: center; font-size: 2em;'>Число замесов: <input type='number' name='fakt' id='rows' min='".($fakt ? $fakt : "1")."' max='{$max_batches}' value='".($fakt ? $fakt : $batches)."'></p>
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
-	<input type='hidden' name='batches' value='{$batches}'>
-	<input type='hidden' name='fakt' value='{$fakt}'>
 	<table style='table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
 		<tr>
 			<td style='border: 1px solid black; line-height: 1em;'><img src='/img/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></td>
@@ -59,7 +57,7 @@ $query = "
 		,GROUP_CONCAT(distinct CONCAT('min ', MFV.water) ORDER BY MF.letter SEPARATOR '<br>') water
 	FROM MixFormula MF
 	JOIN MixFormulaVersions MFV ON MFV.MF_ID = MF.MF_ID
-		AND '{$pb_date}' BETWEEN MFV.from AND MFV.to
+		AND '{$pb_date}' BETWEEN MFV.date_from AND MFV.date_to
 	WHERE MF.CW_ID = {$CW_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -105,7 +103,7 @@ $html .= "
 		<tbody>
 ";
 
-// Редактирование или добавление
+// Выводим сохраненные замесы в случае редактирования
 if( $fakt ) {
 	$query = "
 		SELECT LB.LB_ID
@@ -170,7 +168,7 @@ if( $fakt ) {
 		";
 
 		$html .= "
-			<tr>
+			<tr class='batch_row' num='{$i}'>
 				<td style='text-align: center;'>{$i}</td>
 				<td><input type='time' name='batch_time[{$subrow["LB_ID"]}]' value='{$subrow["batch_time_format"]}' style='width: 70px;' required></td>
 				<td></td>
@@ -191,52 +189,51 @@ if( $fakt ) {
 		";
 	}
 }
-else {
-	for ($i = 1; $i <= $batches; $i++) {
-		// Номера кассет
-		$fillings_cell = '';
-		for ($j = 1; $j <= $fillings; $j++) {
-			$fillings_cell .= "<td><input type='number' min='1' max='{$cassetts}' name='cassette[{$i}][{$j}]' style='width: 60px;' required></td>";
-		}
-
-		// Дропдаун операторов
-		$operators = "
-			<select name='OP_ID[{$i}]' style='width: 70px;' required>
-				<option value=''></option>
-		";
-		$query = "
-			SELECT OP.OP_ID, OP.name
-			FROM Operator OP
-		";
-		$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		while( $subrow = mysqli_fetch_array($subres) ) {
-			$operators .= "<option value='{$subrow["OP_ID"]}'>{$subrow["name"]}</option>";
-		}
-		$operators .= "
-			</select>
-		";
-
-		$html .= "
-			<tr>
-				<td style='text-align: center;'>{$i}</td>
-				<td><input type='time' name='batch_time[{$i}]' style='width: 70px;' required></td>
-				<td></td>
-				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$i}]' style='width: 70px;' required></td>" : "")."
-				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$i}]' style='width: 70px;' required></td>" : "")."
-				".($row["cs"] ? "<td><input type='number' min='1' max='2' step='0.01' name='cs_density[{$i}]' style='width: 70px;' required></td>" : "")."
-				<td><input type='number' min='2' max='4' step='0.01' name='mix_density[{$i}]' style='width: 70px;' required></td>
-				".($row["iron_oxide"] ? "<td><input type='number' min='0' name='iron_oxide[{$i}]' style='width: 70px;' required></td>" : "")."
-				".($row["sand"] ? "<td><input type='number' min='0' name='sand[{$i}]' style='width: 70px;' required></td>" : "")."
-				".($row["crushed_stone"] ? "<td><input type='number' min='0' name='crushed_stone[{$i}]' style='width: 70px;' required></td>" : "")."
-				".($row["cement"] ? "<td><input type='number' min='0' name='cement[{$i}]' style='width: 70px;' required></td>" : "")."
-				".($row["water"] ? "<td><input type='number' min='0' name='water[{$i}]' style='width: 70px;' required></td>" : "")."
-				{$fillings_cell}
-				<td><input type='number' min='0' max='{$in_cassette}' name='underfilling[{$i}]' style='width: 60px;'></td>
-				<td><input type='checkbox' name='test[{$i}]' value='1'></td>
-				<td>{$operators}</td>
-			</tr>
-		";
+// Выводим пустые строки
+for ($i = $fakt + 1; $i <= $max_batches; $i++) {
+	// Номера кассет
+	$fillings_cell = '';
+	for ($j = 1; $j <= $fillings; $j++) {
+		$fillings_cell .= "<td><input type='number' min='1' max='{$cassetts}' name='cassette[n_{$i}][{$j}]' style='width: 60px;' required></td>";
 	}
+
+	// Дропдаун операторов
+	$operators = "
+		<select name='OP_ID[n_{$i}]' style='width: 70px;' required>
+			<option value=''></option>
+	";
+	$query = "
+		SELECT OP.OP_ID, OP.name
+		FROM Operator OP
+	";
+	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $subrow = mysqli_fetch_array($subres) ) {
+		$operators .= "<option value='{$subrow["OP_ID"]}'>{$subrow["name"]}</option>";
+	}
+	$operators .= "
+		</select>
+	";
+
+	$html .= "
+		<tr class='batch_row' num='{$i}'>
+			<td style='text-align: center;'>{$i}</td>
+			<td><input type='time' name='batch_time[n_{$i}]' style='width: 70px;' required></td>
+			<td></td>
+			".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[n_{$i}]' style='width: 70px;' required></td>" : "")."
+			".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[n_{$i}]' style='width: 70px;' required></td>" : "")."
+			".($row["cs"] ? "<td><input type='number' min='1' max='2' step='0.01' name='cs_density[n_{$i}]' style='width: 70px;' required></td>" : "")."
+			<td><input type='number' min='2' max='4' step='0.01' name='mix_density[n_{$i}]' style='width: 70px;' required></td>
+			".($row["iron_oxide"] ? "<td><input type='number' min='0' name='iron_oxide[n_{$i}]' style='width: 70px;' required></td>" : "")."
+			".($row["sand"] ? "<td><input type='number' min='0' name='sand[n_{$i}]' style='width: 70px;' required></td>" : "")."
+			".($row["crushed_stone"] ? "<td><input type='number' min='0' name='crushed_stone[n_{$i}]' style='width: 70px;' required></td>" : "")."
+			".($row["cement"] ? "<td><input type='number' min='0' name='cement[n_{$i}]' style='width: 70px;' required></td>" : "")."
+			".($row["water"] ? "<td><input type='number' min='0' name='water[n_{$i}]' style='width: 70px;' required></td>" : "")."
+			{$fillings_cell}
+			<td><input type='number' min='0' max='{$in_cassette}' name='underfilling[n_{$i}]' style='width: 60px;'></td>
+			<td><input type='checkbox' name='test[n_{$i}]' value='1'></td>
+			<td>{$operators}</td>
+		</tr>
+	";
 }
 
 $html .= "
@@ -246,4 +243,23 @@ $html .= "
 
 $html = str_replace("\n", "", addslashes($html));
 echo "$('#checklist_form fieldset').html('{$html}');";
+
+// Изменение числа строк в форме
+//echo "
+//	$('#checklist_form').on('change', '#rows', function() {
+//		var val = $(this).val();
+//		$('.batch_row').each(function(){
+//			var num = $(this).attr('num');
+//			if( num <= val ) {
+//				console.log(num+'-'+val);
+//				$(this).show();
+//				//$(this).find('input').prop('disabled', true);
+//			}
+//			else {
+//				$(this).hide();
+//				$(this).find('input').prop('disabled', true);
+//			}
+//		});
+//	});
+//";
 ?>
