@@ -192,6 +192,7 @@ function src_url($src) {
 		$menu["Операции"]["<i class='fas fa-pallet fa-lg'></i> Упаковка"] = "packing.php";
 		$menu["Доп. данные"]["<i class='fas fa-cube fa-lg'></i> Испытания кубов"] = "cubetest.php";
 		$menu["Доп. данные"]["<i class='fas fa-trash fa-lg'></i> Суточный брак"] = "daily_reject.php";
+		$menu["Статистика"]["<i class='fas fa-thermometer-half fa-lg'></i> Климат"] = "climate.php";
 		$menu["Статистика"]["Брак"] = "statistic.php";
 		$menu["Статистика"]["Расход сырья"] = "consumption.php";
 		$menu["<i class='fas fa-cog fa-lg'></i>"]["Рецепты"] = "mix_formula.php";
