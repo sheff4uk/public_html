@@ -40,7 +40,7 @@ function src_url($src) {
 <!--	<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0"></script>-->
 <!--	<script src="js/moment-with-locales.min.js" type="text/javascript"></script>-->
 <!--	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/ru.min.js"></script>-->
-	<script src="js/Chart.min.js" type="text/javascript"></script>
+	<script src="js/Chart.min.js?1" type="text/javascript"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/ru.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@0.1.1"></script>
