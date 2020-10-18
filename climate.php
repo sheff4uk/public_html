@@ -4,13 +4,13 @@ $title = 'Климат';
 include "header.php";
 
 $query = "
-	SELECT DATE_FORMAT(date_time, '%d.%m.%Y %H:30') time
+	SELECT DATE_FORMAT(date_time, '%d.%m.%Y %H:30') `time`
 		,ROUND(AVG(temperature), 1) temperature
 		,ROUND(AVG(humidity), 1) humidity
 	FROM Climate
-	WHERE date_time > NOW() - INTERVAL 7 DAY
-	GROUP BY HOUR(date_time)
-	ORDER BY date_time DESC
+	WHERE date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW() - INTERVAL 1 HOUR
+	GROUP BY `time`
+	ORDER BY `time`
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
