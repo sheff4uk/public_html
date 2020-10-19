@@ -8,7 +8,7 @@ $query = "
 		,ROUND(AVG(temperature), 1) temperature
 		,ROUND(AVG(humidity), 1) humidity
 	FROM Climate
-	WHERE date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW() #- INTERVAL 30 MINUTE
+	WHERE date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW() - INTERVAL 30 MINUTE
 	GROUP BY `time`
 	ORDER BY `time`
 ";
