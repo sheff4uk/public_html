@@ -42,7 +42,11 @@ if( isset($_POST["batches"]) ) {
 	}
 
 	// Получаем неделю
-	$query = "SELECT YEARWEEK('{$pb_date}', 1) week";
+	$query = "
+		SELECT YEARWEEK(pb_date, 1) week
+		FROM plan__Batch
+		WHERE PB_ID = {$PB_ID}
+		";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
 	$week = $row["week"];
