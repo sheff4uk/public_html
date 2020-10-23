@@ -120,6 +120,7 @@ foreach ($_GET as &$value) {
 			<th>Заливок</th>
 			<th>План</th>
 			<th>Факт</th>
+			<th>Недоливы</th>
 			<th>Расчетное время, ч</th>
 			<th></th>
 		</tr>
@@ -207,6 +208,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$subrow["fillings"]?></td>
 			<td><?=$subrow["plan"]?></td>
 			<td class='bg-gray'><?=($subrow["fakt"] - $subrow["underfilling"])?></td>
+			<td class='bg-gray'><?=$subrow["underfilling"]?></td>
 			<td class='bg-gray'><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td>
 				<a href='#' class='add_pb clone' pb_date="<?=$_GET["pb_date"]?>" PB_ID='<?=$subrow["PB_ID"]?>' title='Клонировать план заливки'><i class='fa fa-clone fa-lg'></i></a>
@@ -232,6 +234,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["fillings"]?></td>
 			<td><?=$row["plan"]?></td>
 			<td><?=($row["fakt"] - $d_underfilling)?></td>
+			<td><?=$d_underfilling?></td>
 			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td></td>
 		</tr>
@@ -253,6 +256,7 @@ else {
 			<td><?=$fillings?></td>
 			<td><?=$plan?></td>
 			<td><?=($fakt - $underfilling)?></td>
+			<td><?=$underfilling?></td>
 			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td></td>
 		</tr>
