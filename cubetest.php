@@ -264,6 +264,7 @@ $query = "
 		,LB.mix_density
 		,LCT.cube_weight
 		,LCT.pressure
+		,IF(LCT.delay = 24, IF(LCT.pressure < 20, 1, 0), IF(LCT.pressure < 30, 1, 0)) press_error
 		,IF(LCT.USR_ID, USR_Icon(LCT.USR_ID), '') USR_Icon
 		,DATE_FORMAT(LCT.last_edit, '%d.%m.%y в %H:%i:%s') last_edit
 	FROM list__CubeTest LCT
@@ -291,7 +292,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["test_date"]?></td>
 		<td><?=$row["test_time"]?></td>
 		<td><?=$row["cube_weight"]/1000?></td>
-		<td><?=$row["pressure"]?></td>
+		<td class="<?=($row["press_error"] ? "error" : "")?>"><?=$row["pressure"]?></td>
 		<td class="<?=($row["delay_fact"] != $row["delay"] ? "error" : "")?>"><?=$row["delay_fact"]?></td>
 		<td><a href="#" class="add_cubetest" LCT_ID="<?=$row["LCT_ID"]?>" title="Изменить данные испытания куба"><i class="fa fa-pencil-alt fa-lg"></i></a><?=$row["USR_Icon"]?><?=($row["last_edit"] ? "<i class='fas fa-clock' title='Сохранено ".$row["last_edit"]."'.></i>" : "")?></td>
 	</tr>
