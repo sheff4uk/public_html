@@ -53,6 +53,7 @@ echo "<title>Чеклист оператора для {$item} от {$pb_date}</t
 	<style>
 		body, td {
 			font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
+			font-size: 10pt;
 		}
 		table {
 			table-layout: fixed;
@@ -82,6 +83,7 @@ echo "<title>Чеклист оператора для {$item} от {$pb_date}</t
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
 			<th style="font-size: 2em;"><?=$item?></th>
 			<th><n style="font-size: 2em;"><?=$pb_date_format?></n>&nbsp;<?=$pb_weekday?></th>
+			<th><img src="../barcode.php?code=<?=$PB_ID?>" alt="barcode"></th>
 		</tr>
 	</thead>
 </table>
