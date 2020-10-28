@@ -142,14 +142,11 @@ this.subbut.value='Подождите, пожалуйста!';">
 </div>
 
 <script>
-
 	$(function() {
-		// Кнопка добавления чеклиста оператора
-		$('.add_checklist').click( function() {
+		// Функция открытия формы чеклиста оператора
+		function checklist_form(PB_ID) {
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
-
-			var PB_ID = $(this).attr("PB_ID");
 
 			//Рисуем форму
 			$.ajax({ url: "/ajax/checklist_form_ajax.php?PB_ID="+PB_ID, dataType: "script", async: false });
@@ -164,6 +161,34 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#checklist_form #rows').change();
 
 			return false;
+		}
+
+		// Считывание штрихкода
+		var barcode="";
+		$(document).keydown(function(e)
+		{
+			var code = (e.keyCode ? e.keyCode : e.which);
+			if( code==13 || code==9 )// Enter key hit. Tab key hit.
+			{
+				console.log(barcode);
+				if( barcode.length == 8 ) {
+					checklist_form(Number(barcode));
+					barcode="";
+					return false;
+				}
+				barcode="";
+			}
+			else
+			{
+				barcode=barcode+String.fromCharCode(code);
+			}
+		});
+
+		// Кнопка добавления чеклиста оператора
+		$('.add_checklist').click( function() {
+			var PB_ID = $(this).attr("PB_ID");
+
+			checklist_form(PB_ID);
 		});
 
 		// Изменение числа строк в форме
