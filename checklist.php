@@ -47,6 +47,7 @@ if( !$_GET["date_to"] ) {
 	}
 </style>
 
+<!--
 <div id='batch_plan'>
 	<a href="#" class="button" style="width: 100%; z-index: -1;">Планируемые заливки</a>
 	<div>
@@ -95,6 +96,7 @@ if( !$_GET["date_to"] ) {
 		</table>
 	</div>
 </div>
+-->
 
 <!--Фильтр-->
 <div id="filter">
