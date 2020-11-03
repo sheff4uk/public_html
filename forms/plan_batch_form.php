@@ -86,7 +86,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td><input type="date" name="pb_date" min="<?=date('Y-m-d', strtotime("-7 day"))?>" max="<?=date('Y-m-d', strtotime("+7 day"))?>" required></td>
+						<td><input type="date" name="pb_date" min="<?=date('Y-m-d')?>" max="<?=date('Y-m-d', strtotime("+7 day"))?>" required></td>
 						<td>
 							<select name="CW_ID" style="width: 150px;" required>
 								<option value=""></option>

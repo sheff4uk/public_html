@@ -163,6 +163,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			,PB.batches * CW.fillings * CW.in_cassette plan
 			,PB.fakt * CW.fillings * CW.in_cassette fakt
 			,IFNULL(SUM(LB.underfilling), 0) underfilling
+			,IF(PB.fakt = 0 AND PB.pb_date >= CURRENT_DATE (), 1, 0) editable
+			,IF(PB.fakt = 0 AND PB.pb_date = CURRENT_DATE (), 1, 0) printable
 		FROM plan__Batch PB
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
@@ -212,8 +214,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td class='bg-gray'><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td>
 				<a href='#' class='add_pb clone' pb_date="<?=$_GET["pb_date"]?>" PB_ID='<?=$subrow["PB_ID"]?>' title='Клонировать план заливки'><i class='fa fa-clone fa-lg'></i></a>
-				<?=(!$subrow["fakt"] ? "<a href='#' class='add_pb' PB_ID='{$subrow["PB_ID"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?>
-				<?=((!$subrow["fakt"] and $row["pb_date_format"] == $today) ? "<a href='printforms/checklist_blank.php?PB_ID={$subrow["PB_ID"]}' class='print' title='Бланк чеклиста оператора'><i class='fas fa-print fa-lg'></i></a>" : "")?>
+				<?=($subrow["editable"] ? "<a href='#' class='add_pb' PB_ID='{$subrow["PB_ID"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?>
+				<?=($subrow["printable"] ? "<a href='printforms/checklist_blank.php?PB_ID={$subrow["PB_ID"]}' class='print' title='Бланк чеклиста оператора'><i class='fas fa-print fa-lg'></i></a>" : "")?>
 			</td>
 		</tr>
 		<?
