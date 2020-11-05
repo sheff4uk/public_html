@@ -189,6 +189,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 			var PB_ID = $(this).attr("PB_ID");
 
 			checklist_form(PB_ID);
+
+			return false;
 		});
 
 		// Изменение числа строк в форме
