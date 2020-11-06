@@ -69,8 +69,8 @@ if( isset($_POST["cassette"]) ) {
 	$query = "
 		SELECT YEARWEEK(o_date, 1) week
 		FROM list__Opening
-		WHERE LO_ID = {$_POST["LO_ID"]}
-		";
+		WHERE LO_ID = {$LO_ID}
+	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
 	$week = $row["week"];
