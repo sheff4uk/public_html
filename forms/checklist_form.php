@@ -159,6 +159,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			});
 
 			$('#checklist_form #rows').change();
+			$('#checklist_form input[type=time]').change();
 
 			return false;
 		}
@@ -211,6 +212,15 @@ this.subbut.value='Подождите, пожалуйста!';">
 					$(this).find('select').prop('required', false);
 				}
 			});
+		});
+
+		// Ограничения при выборе времени
+		$('#checklist_form').on('change', 'input[type=time]', function() {
+			var val = $(this).val();
+			var max = moment.utc(val,'HH:mm').add(-1,'minutes').format('HH:mm');
+			var min = moment.utc(val,'HH:mm').add(1,'minutes').format('HH:mm');
+			$(this).parents('tr').prev().children().children('input[type=time]').attr('max', max);
+			$(this).parents('tr').next().children().children('input[type=time]').attr('min', min);
 		});
 	});
 </script>

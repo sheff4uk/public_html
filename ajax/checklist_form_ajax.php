@@ -240,23 +240,4 @@ $html .= "
 
 $html = str_replace("\n", "", addslashes($html));
 echo "$('#checklist_form fieldset').html('{$html}');";
-
-// Изменение числа строк в форме
-//echo "
-//	$('#checklist_form').on('change', '#rows', function() {
-//		var val = $(this).val();
-//		$('.batch_row').each(function(){
-//			var num = $(this).attr('num');
-//			if( num <= val ) {
-//				console.log(num+'-'+val);
-//				$(this).show();
-//				//$(this).find('input').prop('disabled', true);
-//			}
-//			else {
-//				$(this).hide();
-//				$(this).find('input').prop('disabled', true);
-//			}
-//		});
-//	});
-//";
 ?>
