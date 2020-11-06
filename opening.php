@@ -208,7 +208,7 @@ $query = "
 		,IF(LO.weight2 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight2 > CW.max_weight, LO.weight2 - CW.max_weight, LO.weight2 - CW.min_weight)) w2_diff
 		,IF(LO.weight3 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight3 > CW.max_weight, LO.weight3 - CW.max_weight, LO.weight3 - CW.min_weight)) w3_diff
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
-		,LF.cassette
+		,LO.cassette
 		,CW.item
 		,PB.pb_date
 		,PB.CW_ID

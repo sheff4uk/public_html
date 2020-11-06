@@ -2,9 +2,9 @@
 include_once "../config.php";
 
 // Сохранение/редактирование расформовки
-if( isset($_POST["LF_ID"]) ) {
+if( isset($_POST["cassette"]) ) {
 	session_start();
-	$LF_ID = $_POST["LF_ID"];
+	$cassette = $_POST["cassette"];
 	$o_post = $_POST["o_post"];
 	$o_date = $_POST["o_date"];
 	$o_time = $_POST["o_time"];
@@ -19,7 +19,7 @@ if( isset($_POST["LF_ID"]) ) {
 	if( $_POST["LO_ID"] ) { // Редактируем
 		$query = "
 			UPDATE list__Opening
-			SET LF_ID = {$LF_ID}
+			SET cassette = {$cassette}
 				,o_post = {$o_post}
 				,o_date = '{$o_date}'
 				,o_time = '{$o_time}'
@@ -40,7 +40,7 @@ if( isset($_POST["LF_ID"]) ) {
 	else { // Добавляем
 		$query = "
 			INSERT INTO list__Opening
-			SET LF_ID = {$LF_ID}
+			SET cassette = {$cassette}
 				,o_post = {$o_post}
 				,o_date = '{$o_date}'
 				,o_time = '{$o_time}'
@@ -87,13 +87,6 @@ if( isset($_POST["LF_ID"]) ) {
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="LO_ID">
-
-			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-				<span>Заливка:</span>
-				<select name="LF_ID" id="filling_select" style="width: 300px;" required>
-					<!--Данные аяксом-->
-				</select>
-			</div>
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 				<span>Дата расформовки:</span>
 				<input type="date" name="o_date" required>
@@ -106,6 +99,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
+						<th rowspan="2">№ кассеты</th>
 						<th rowspan="2">Время</th>
 						<th colspan="4">Кол-во брака, шт</th>
 						<th colspan="3">Взвешивания, кг</th>
@@ -122,6 +116,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
+						<td><input type='number' min='1' max='<?=$cassetts?>' name='cassette' style='width: 60px;' required></td>
 						<td><input type='time' name='o_time' required></td>
 						<td><input type="number" name="o_not_spill" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="o_crack" min="0" style="width: 70px;"></td>
@@ -143,17 +138,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 <script>
 	$(function() {
-//		<?
-//		if( isset($_GET["add"]) ) {
-//		?>
-//		// Если было добавление расформовки, автоматичеки открывается форма для новой записи
-//		$(document).ready(function() {
-//			$('#add_btn').click();
-//		});
-//		<?
-//		}
-//		?>
-
 		// Кнопка добавления расформовки
 		$('.add_opening').click( function() {
 			// Проверяем сессию
@@ -172,13 +156,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 					dataType: "json",
 					async: false
 				});
-				// Генерируем список свободных заливок
-				$.ajax({ url: "/ajax/filling_select.php?LF_ID=" + opening_data['LF_ID'] + "&type=1", dataType: "script", async: true });
-
 				// Идентификатор расформовки
 				$('#opening_form input[name="LO_ID"]').val(LO_ID);
 				// № поста
 				$('#opening_form input[name="o_post"]').val(opening_data['o_post']);
+				// № кассеты
+				$('#opening_form input[name="cassette"]').val(opening_data['cassette']);
 				// Дата/время расформовки
 				$('#opening_form input[name="o_date"]').val(opening_data['o_date']);
 				$('#opening_form input[name="o_time"]').val(opening_data['o_time']);

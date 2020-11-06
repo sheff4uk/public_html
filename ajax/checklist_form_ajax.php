@@ -136,17 +136,14 @@ if( $fakt ) {
 		$query = "
 			SELECT LF.LF_ID
 				,LF.cassette
-				,IF(LO.LO_ID OR LP.LP_ID, 1, 0) is_link
 			FROM list__Filling LF
-			LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
-			LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
 			WHERE LF.LB_ID = {$subrow["LB_ID"]}
 			ORDER BY LF.LF_ID
 		";
 		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$fillings_cell = "";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
-			$fillings_cell .= "<td style='position: relative;'><input type='number' min='1' max='{$cassetts}' name='cassette[{$subrow["LB_ID"]}][{$subsubrow["LF_ID"]}]' value='{$subsubrow["cassette"]}' style='width: 60px;' required ".($subsubrow["is_link"] ? "readonly" : "").">".($subsubrow["is_link"] ? "<i id='date_notice' class='fas fa-question-circle' style='position: absolute; right: 0px; top: 8px;' title='Номер кассеты не редактируется так как есть связанные этапы расформовки или упаковки.'></i>" : "")."</td>";
+			$fillings_cell .= "<td style='position: relative;'><input type='number' min='1' max='{$cassetts}' name='cassette[{$subrow["LB_ID"]}][{$subsubrow["LF_ID"]}]' value='{$subsubrow["cassette"]}' style='width: 60px;' required ".($subsubrow["is_link"] ? "readonly" : "")."></td>";
 		}
 
 		// Дропдаун операторов
