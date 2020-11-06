@@ -11,10 +11,6 @@ if( !$_GET["week"] ) {
 	$row = mysqli_fetch_array($res);
 	$_GET["week"] = $row["week"];
 }
-// Узнаем сегодняшнюю дату
-$date = new DateTime();
-$today = date_format($date, 'd.m.y');
-
 ?>
 
 <!--Фильтр-->
@@ -28,16 +24,29 @@ $today = date_format($date, 'd.m.y');
 			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
 				<?
 				$query = "
-					SELECT YEARWEEK(NOW(), 1) week, INSERT(YEARWEEK(NOW(), 1), 5, 0, '-w') week_format
+					SELECT YEAR(NOW()) year
 					UNION
-					SELECT YEARWEEK(pb_date, 1) week, INSERT(YEARWEEK(pb_date, 1), 5, 0, '-w') week_format
+					SELECT YEAR(pb_date) year
 					FROM plan__Batch
-					ORDER BY week DESC
+					ORDER BY year DESC
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
-					$selected = ($row["week"] == $_GET["week"]) ? "selected" : "";
-					echo "<option value='{$row["week"]}' {$selected}>{$row["week_format"]}</option>";
+					echo "<optgroup label='{$row["year"]}'>";
+					$query = "
+						SELECT YEARWEEK(NOW(), 1) week, WEEK(NOW(), 1) week_format
+						UNION
+						SELECT YEARWEEK(pb_date, 1) week, WEEK(pb_date, 1) week_format
+						FROM plan__Batch
+						WHERE YEAR(pb_date) = {$row["year"]}
+						ORDER BY week DESC
+					";
+					$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $subrow = mysqli_fetch_array($subres) ) {
+						$selected = ($subrow["week"] == $_GET["week"]) ? "selected" : "";
+						echo "<option value='{$subrow["week"]}' {$selected}>{$subrow["week_format"]}</option>";
+					}
+					echo "</optgroup>";
 				}
 				?>
 			</select>

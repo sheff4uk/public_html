@@ -115,8 +115,18 @@ if( isset($_POST["PB_ID"]) ) {
 		$_SESSION["success"][] = "Данные чек-листа оператора успешно сохранены.";
 	}
 
+	// Получаем неделю
+	$query = "
+		SELECT YEARWEEK(pb_date, 1) week
+		FROM plan__Batch
+		WHERE PB_ID = {$_POST["PB_ID"]}
+		";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$week = $row["week"];
+
 	// Перенаправление в журнал чек листов оператора
-	exit ('<meta http-equiv="refresh" content="0; url=/checklist.php?date_from='.$pb_date.'&date_to='.$pb_date.'&#PB'.$_POST["PB_ID"].'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/checklist.php?week='.$week.'&#PB'.$_POST["PB_ID"].'">');
 }
 ///////////////////////////////////////////////////////
 ?>

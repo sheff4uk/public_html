@@ -4,14 +4,13 @@ $title = 'Заливка';
 include "header.php";
 include "./forms/checklist_form.php";
 //die("<h1>Ведутся работы</h1>");
-// Если в фильтре не установлен период, показываем последние 7 дней
-if( !$_GET["date_from"] ) {
-	$date = new DateTime('-6 days');
-	$_GET["date_from"] = date_format($date, 'Y-m-d');
-}
-if( !$_GET["date_to"] ) {
-	$date = new DateTime('-0 days');
-	$_GET["date_to"] = date_format($date, 'Y-m-d');
+
+// Если в фильтре не установлена неделя, показываем текущую
+if( !$_GET["week"] ) {
+	$query = "SELECT YEARWEEK(NOW(), 1) week";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$_GET["week"] = $row["week"];
 }
 ?>
 
@@ -105,10 +104,37 @@ if( !$_GET["date_to"] ) {
 		<a href="/checklist.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
-			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
-			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
-			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
-			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
+			<span>Неделя:</span>
+			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT YEAR(NOW()) year
+					UNION
+					SELECT YEAR(pb_date) year
+					FROM plan__Batch
+					ORDER BY year DESC
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					echo "<optgroup label='{$row["year"]}'>";
+					$query = "
+						SELECT YEARWEEK(NOW(), 1) week, WEEK(NOW(), 1) week_format
+						UNION
+						SELECT YEARWEEK(pb_date, 1) week, WEEK(pb_date, 1) week_format
+						FROM plan__Batch
+						WHERE YEAR(pb_date) = {$row["year"]}
+						ORDER BY week DESC
+					";
+					$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $subrow = mysqli_fetch_array($subres) ) {
+						$selected = ($subrow["week"] == $_GET["week"]) ? "selected" : "";
+						echo "<option value='{$subrow["week"]}' {$selected}>{$subrow["week_format"]}</option>";
+					}
+					echo "</optgroup>";
+				}
+				?>
+			</select>
+			<i class="fas fa-question-circle" title="По умолчанию устанавливаются текущая неделя."></i>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -223,12 +249,11 @@ $query = "
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 	WHERE 1
-		".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
-		".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	GROUP BY PB.PB_ID
-	ORDER BY PB.pb_date DESC, time
+	ORDER BY PB.pb_date ASC, time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {

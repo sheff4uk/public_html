@@ -4,16 +4,12 @@ $title = 'Расформовка';
 include "header.php";
 include "./forms/opening_form.php";
 
-// Если в фильтре не установлен период, показываем последние 7 дней
-if( !$_GET["pb_date_from"] and !$_GET["pb_date_to"] ) {
-	if( !$_GET["o_date_from"] ) {
-		$date = new DateTime('-6 days');
-		$_GET["o_date_from"] = date_format($date, 'Y-m-d');
-	}
-	if( !$_GET["o_date_to"] ) {
-		$date = new DateTime('-0 days');
-		$_GET["o_date_to"] = date_format($date, 'Y-m-d');
-	}
+// Если в фильтре не установлена неделя, показываем текущую
+if( !$_GET["week"] ) {
+	$query = "SELECT YEARWEEK(NOW(), 1) week";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$_GET["week"] = $row["week"];
 }
 ?>
 
@@ -24,16 +20,37 @@ if( !$_GET["pb_date_from"] and !$_GET["pb_date_to"] ) {
 		<a href="/opening.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
-			<span style="display: inline-block; width: 200px;">Дата расформовки между:</span>
-			<input name="o_date_from" type="date" value="<?=$_GET["o_date_from"]?>" class="<?=$_GET["o_date_from"] ? "filtered" : ""?>">
-			<input name="o_date_to" type="date" value="<?=$_GET["o_date_to"]?>" class="<?=$_GET["o_date_to"] ? "filtered" : ""?>">
-			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
-		</div>
-
-		<div class="nowrap" style="margin-bottom: 10px;">
-			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
-			<input name="pb_date_from" type="date" value="<?=$_GET["pb_date_from"]?>" class="<?=$_GET["pb_date_from"] ? "filtered" : ""?>">
-			<input name="pb_date_to" type="date" value="<?=$_GET["pb_date_to"]?>" class="<?=$_GET["pb_date_to"] ? "filtered" : ""?>">
+			<span>Неделя:</span>
+			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT YEAR(NOW()) year
+					UNION
+					SELECT YEAR(o_date) year
+					FROM list__Opening
+					ORDER BY year DESC
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					echo "<optgroup label='{$row["year"]}'>";
+					$query = "
+						SELECT YEARWEEK(NOW(), 1) week, WEEK(NOW(), 1) week_format
+						UNION
+						SELECT YEARWEEK(o_date, 1) week, WEEK(o_date, 1) week_format
+						FROM list__Opening
+						WHERE YEAR(o_date) = {$row["year"]}
+						ORDER BY week DESC
+					";
+					$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $subrow = mysqli_fetch_array($subres) ) {
+						$selected = ($subrow["week"] == $_GET["week"]) ? "selected" : "";
+						echo "<option value='{$subrow["week"]}' {$selected}>{$subrow["week_format"]}</option>";
+					}
+					echo "</optgroup>";
+				}
+				?>
+			</select>
+			<i class="fas fa-question-circle" title="По умолчанию устанавливаются текущая неделя."></i>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -224,10 +241,7 @@ $query = "
 	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
 	WHERE 1
-		".($_GET["o_date_from"] ? "AND LO.o_date >= '{$_GET["o_date_from"]}'" : "")."
-		".($_GET["o_date_to"] ? "AND LO.o_date <= '{$_GET["o_date_to"]}'" : "")."
-		".($_GET["pb_date_from"] ? "AND PB.pb_date >= '{$_GET["pb_date_from"]}'" : "")."
-		".($_GET["pb_date_to"] ? "AND PB.pb_date <= '{$_GET["pb_date_to"]}'" : "")."
+		".($_GET["week"] ? "AND YEARWEEK(LO.o_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		".($_GET["int24"] ? "AND o_interval(LO.LO_ID) < 24" : "")."
@@ -236,7 +250,7 @@ $query = "
 		".($_GET["crack"] ? "AND LO.o_crack" : "")."
 		".($_GET["chipped"] ? "AND LO.o_chipped" : "")."
 		".($_GET["def_form"] ? "AND LO.o_def_form" : "")."
-	ORDER BY LO.o_date DESC, LO.o_time, LO.o_post
+	ORDER BY LO.o_date, LO.o_time, LO.o_post
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
