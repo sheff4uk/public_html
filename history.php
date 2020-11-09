@@ -9,7 +9,7 @@ $query = "
 		,DATE_FORMAT(ADDTIME(CONVERT(lf_date, DATETIME), lf_time), '%d.%m.%Y %H:%i') `time`
 	FROM list__Filling
 	WHERE ADDTIME(CONVERT(lf_date, DATETIME), lf_time) BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
-		AND cassette <= 50
+		AND cassette <= 30
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -22,7 +22,7 @@ $query = "
 		,DATE_FORMAT(ADDTIME(CONVERT(o_date, DATETIME), o_time), '%d.%m.%Y %H:%i') `time`
 	FROM list__Opening
 	WHERE ADDTIME(CONVERT(o_date, DATETIME), o_time) BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
-		AND cassette <= 50
+		AND cassette <= 30
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -30,7 +30,7 @@ while( $row = mysqli_fetch_array($res) ) {
 }
 
 //for ($i = 1; $i <= $cassetts; $i++) {
-for ($i = 1; $i <= 50; $i++) {
+for ($i = 1; $i <= 30; $i++) {
 	$xLabels .= "'[{$i}]',";
 }
 ?>
