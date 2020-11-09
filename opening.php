@@ -171,11 +171,6 @@ foreach ($_GET as &$value) {
 				active: "false"
 			});
 		});
-
-//		$('#filter input[name="date_from"]').change(function() {
-//			var val = $(this).val();
-//			$('#filter input[name="date_to"]').val(val);
-//		});
 	});
 </script>
 
@@ -227,7 +222,7 @@ $query = "
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 		,LO.cassette
 		,CW.item
-		,PB.pb_date
+		,YEARWEEK(PB.pb_date, 1) pb_week
 		,PB.CW_ID
 		,LB.LB_ID
 		,LP.LP_ID
@@ -275,7 +270,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["weight3"]/1000?><?=($row["w3_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w3_diff"] > 0 ? " +" : " ").($row["w3_diff"]/1000)."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["mix_density"]/1000?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").($row["mix_diff"]/1000)."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
-		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["pb_date"]?>&date_to=<?=$row["pb_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
+		<td class="bg-gray"><a href="checklist.php?week=<?=$row["pb_week"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
 		<td class="bg-gray"><?=$cassette?></td>
 		<td><a href="#" class="add_opening" LO_ID="<?=$row["LO_ID"]?>" title="Изменить данные расформовки"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
@@ -287,29 +282,6 @@ while( $row = mysqli_fetch_array($res) ) {
 </table>
 
 <div id="add_btn" class="add_opening" o_date="<?=$_GET["o_date"]?>" o_post="<?=$_GET["o_post"]?>" title="Внести данные расформовки"></div>
-
-<script>
-	$(function() {
-		// При выборе даты заливки сбрасываются даты расформовки
-		$('input[name="pb_date_from"]').change(function() {
-			$('input[name="o_date_from"]').val('');
-			$('input[name="o_date_to"]').val('');
-		});
-		$('input[name="pb_date_to"]').change(function() {
-			$('input[name="o_date_from"]').val('');
-			$('input[name="o_date_to"]').val('');
-		});
-		// При выборе даты расформовки сбрасываются даты заливки
-		$('input[name="o_date_from"]').change(function() {
-			$('input[name="pb_date_from"]').val('');
-			$('input[name="pb_date_to"]').val('');
-		});
-		$('input[name="o_date_to"]').change(function() {
-			$('input[name="pb_date_from"]').val('');
-			$('input[name="pb_date_to"]').val('');
-		});
-	});
-</script>
 
 <?
 include "footer.php";
