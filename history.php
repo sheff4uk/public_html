@@ -9,11 +9,11 @@ $query = "
 		,DATE_FORMAT(ADDTIME(CONVERT(lf_date, DATETIME), lf_time), '%d.%m.%Y %H:%i') `time`
 	FROM list__Filling
 	WHERE ADDTIME(CONVERT(lf_date, DATETIME), lf_time) BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
-		AND cassette <= 30
+		#AND cassette <= 30
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$filling_data .= "{x:'[{$row["cassette"]}]',y:'{$row["time"]}'},";
+	$filling_data .= "{x:'{$row["time"]}', y:'[{$row["cassette"]}]'},";
 }
 
 // Массив расформовок
@@ -22,20 +22,21 @@ $query = "
 		,DATE_FORMAT(ADDTIME(CONVERT(o_date, DATETIME), o_time), '%d.%m.%Y %H:%i') `time`
 	FROM list__Opening
 	WHERE ADDTIME(CONVERT(o_date, DATETIME), o_time) BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
-		AND cassette <= 30
+		#AND cassette <= 30
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$opening_data .= "{x:'[{$row["cassette"]}]',y:'{$row["time"]}'},";
+	$opening_data .= "{x:'{$row["time"]}', y:'[{$row["cassette"]}]'},";
 }
 
-//for ($i = 1; $i <= $cassetts; $i++) {
-for ($i = 1; $i <= 30; $i++) {
-	$xLabels .= "'[{$i}]',";
+for ($i = 1; $i <= $cassetts; $i++) {
+	$yLabels .= "'[{$i}]',";
 }
 ?>
 
-<canvas id="canvas"></canvas>
+<div class="chart-container" style="position: relative; height:3200px;">
+	<canvas id="canvas"></canvas>
+</div>
 
 <script>
 	var timeFormat = 'DD.MM.YYYY HH:mm';
@@ -52,8 +53,7 @@ for ($i = 1; $i <= 30; $i++) {
 	var config = {
 		type: 'scatter',
 		data: {
-			xLabels: [<?=$xLabels?>],
-			yLabels: [ // Date Objects
+			xLabels: [ // Date Objects
 				newDate(0),
 				newDate(-1),
 				newDate(-2),
@@ -63,6 +63,7 @@ for ($i = 1; $i <= 30; $i++) {
 				newDate(-6),
 				newDate(-7)
 			],
+			yLabels: [<?=$yLabels?>],
 			datasets: [{
 				label: 'Заливка',
 				backgroundColor: 'rgba(255, 0, 0, .5)',
@@ -80,19 +81,14 @@ for ($i = 1; $i <= 30; $i++) {
 			}]
 		},
 		options: {
+			maintainAspectRatio: false,
+			//aspectRatio: 3,
 			title: {
 				//display: true,
 				text: 'История кассет'
 			},
 			scales: {
 				xAxes: [{
-					type: 'category',
-					scaleLabel: {
-						display: true,
-						labelString: '№ кассеты'
-					}
-				}],
-				yAxes: [{
 					type: 'time',
 					time: {
 						parser: timeFormat,
@@ -104,7 +100,15 @@ for ($i = 1; $i <= 30; $i++) {
 						labelString: 'Время'
 					},
 					ticks: {
-						reverse: true
+						reverse: false
+					},
+					position: 'top'
+				}],
+				yAxes: [{
+					type: 'category',
+					scaleLabel: {
+						display: true,
+						labelString: '№ кассеты'
 					}
 				}]
 			}
