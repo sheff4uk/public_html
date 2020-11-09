@@ -65,22 +65,27 @@ if( isset($_POST["cassette"]) ) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 
-	// Получаем неделю
-	$query = "
-		SELECT YEARWEEK(o_date, 1) week
-		FROM list__Opening
-		WHERE LO_ID = {$LO_ID}
-	";
-	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-	$row = mysqli_fetch_array($res);
-	$week = $row["week"];
+	if( $LO_ID ) {
+		// Получаем неделю
+		$query = "
+			SELECT YEARWEEK(o_date, 1) week
+			FROM list__Opening
+			WHERE LO_ID = {$LO_ID}
+		";
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		$row = mysqli_fetch_array($res);
+		$week = $row["week"];
 
-	// Перенаправление в журнал маршрутных листов
-	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/opening.php?week='.$week.'&o_date='.$o_date.'&o_post='.$o_post.'&add#'.$LO_ID.'">');
+		// Перенаправление в журнал маршрутных листов
+		if( $add ) {
+			exit ('<meta http-equiv="refresh" content="0; url=/opening.php?week='.$week.'&o_date='.$o_date.'&o_post='.$o_post.'&add#'.$LO_ID.'">');
+		}
+		else {
+			exit ('<meta http-equiv="refresh" content="0; url=/opening.php?week='.$week.'#'.$LO_ID.'">');
+		}
 	}
 	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/opening.php?week='.$week.'#'.$LO_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/opening.php">');
 	}
 }
 ?>
