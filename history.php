@@ -13,7 +13,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$filling_data .= "{x:'[{$row["cassette"]}]', y: '{$row["time"]}'},";
+	$filling_data .= "{x:'[{$row["cassette"]}]',y:'{$row["time"]}'},";
 }
 
 // Массив расформовок
@@ -26,12 +26,12 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$opening_data .= "{x:'[{$row["cassette"]}]', y: '{$row["time"]}'},";
+	$opening_data .= "{x:'[{$row["cassette"]}]',y:'{$row["time"]}'},";
 }
 
 //for ($i = 1; $i <= $cassetts; $i++) {
 for ($i = 1; $i <= 50; $i++) {
-	$xLabels .= "'[{$i}]', ";
+	$xLabels .= "'[{$i}]',";
 }
 ?>
 
