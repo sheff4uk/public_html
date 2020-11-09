@@ -8,7 +8,8 @@ $query = "
 	SELECT cassette
 		,DATE_FORMAT(ADDTIME(CONVERT(lf_date, DATETIME), lf_time), '%d.%m.%Y %H:%i') `time`
 	FROM list__Filling
-	WHERE ADDTIME(CONVERT(lf_date, DATETIME), lf_time) BETWEEN NOW() - INTERVAL 3 DAY AND NOW()
+	WHERE ADDTIME(CONVERT(lf_date, DATETIME), lf_time) BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
+		AND cassette <= 50
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -20,14 +21,16 @@ $query = "
 	SELECT cassette
 		,DATE_FORMAT(ADDTIME(CONVERT(o_date, DATETIME), o_time), '%d.%m.%Y %H:%i') `time`
 	FROM list__Opening
-	WHERE ADDTIME(CONVERT(o_date, DATETIME), o_time) BETWEEN NOW() - INTERVAL 3 DAY AND NOW()
+	WHERE ADDTIME(CONVERT(o_date, DATETIME), o_time) BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
+		AND cassette <= 50
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$opening_data .= "{x:'[{$row["cassette"]}]', y: '{$row["time"]}'},";
 }
 
-for ($i = 1; $i <= $cassetts; $i++) {
+//for ($i = 1; $i <= $cassetts; $i++) {
+for ($i = 1; $i <= 50; $i++) {
 	$xLabels .= "'[{$i}]', ";
 }
 ?>
