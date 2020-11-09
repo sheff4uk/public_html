@@ -208,11 +208,6 @@ foreach ($_GET as &$value) {
 				active: "false"
 			});
 		});
-
-//		$('#filter input[name="date_from"]').change(function() {
-//			var val = $(this).val();
-//			$('#filter input[name="date_to"]').val(val);
-//		});
 	});
 </script>
 
@@ -294,7 +289,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		// Получаем список кассет
 		$query = "
 			SELECT LF.cassette
-				,LO.o_date
+				,YEARWEEK(LO.o_date, 1) o_week
 				,LO.LO_ID
 				,SUM(1) dbl
 			FROM list__Filling LF
@@ -308,7 +303,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		$cassette = "";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
 			if( $subsubrow["LO_ID"] ) {
-				$cassette .= "<a href='opening.php?o_date_from={$subsubrow["o_date"]}&o_date_to={$subsubrow["o_date"]}#{$subsubrow["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette' style='".($subsubrow["dbl"] > 1 ? "color: red;" : "")."'>{$subsubrow["cassette"]}</b></a>";
+				$cassette .= "<a href='opening.php?week={$subsubrow["o_week"]}&CW_ID={$row["CW_ID"]}#{$subsubrow["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette' style='".($subsubrow["dbl"] > 1 ? "color: red;" : "")."'>{$subsubrow["cassette"]}</b></a>";
 			}
 			else {
 				$cassette .= "<b class='cassette' style='".($subsubrow["dbl"] > 1 ? "color: red;" : "")."'>{$subsubrow["cassette"]}</b>";
