@@ -20,7 +20,7 @@ SELECT SUB.cassette
 		JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-		HAVING date_time BETWEEN NOW() - INTERVAL 14 DAY AND NOW()
+		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
 
 		UNION ALL
 
@@ -34,7 +34,7 @@ SELECT SUB.cassette
 		LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 		LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 		LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-		HAVING date_time BETWEEN NOW() - INTERVAL 14 DAY AND NOW()
+		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
 	) SUB
 	ORDER BY SUB.cassette, SUB.date_time
 ";
