@@ -3,35 +3,56 @@ include "config.php";
 $title = 'История кассеты';
 include "header.php";
 
-// Массив заливок
+// Список событий
 $query = "
-	SELECT cassette
-		,DATE_FORMAT(ADDTIME(CONVERT(lf_date, DATETIME), lf_time), '%d.%m.%Y %H:%i') `time`
-	FROM list__Filling
-	WHERE ADDTIME(CONVERT(lf_date, DATETIME), lf_time) BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
-		#AND cassette <= 30
-";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-while( $row = mysqli_fetch_array($res) ) {
-	$filling_data .= "{x:'{$row["time"]}', y:'[{$row["cassette"]}]'},";
-}
+	SELECT SUB.cassette
+		,SUB.LF_ID
+		,DATE_FORMAT(SUB.date_time, '%d.%m.%Y %H:%i') date_time_format
+		,SUB.link
+	FROM (
+		SELECT cassette
+			,LF_ID
+			,ADDTIME(CONVERT(lf_date, DATETIME), lf_time) date_time
+			,NULL `link`
+		FROM list__Filling
+		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
 
-// Массив расформовок
-$query = "
-	SELECT cassette
-		,DATE_FORMAT(ADDTIME(CONVERT(o_date, DATETIME), o_time), '%d.%m.%Y %H:%i') `time`
-	FROM list__Opening
-	WHERE ADDTIME(CONVERT(o_date, DATETIME), o_time) BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
-		#AND cassette <= 30
+		UNION ALL
+
+		SELECT cassette
+			,NULL
+			,ADDTIME(CONVERT(o_date, DATETIME), o_time) date_time
+			,LF_ID
+		FROM list__Opening
+		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
+	) SUB
+	ORDER BY SUB.cassette, SUB.date_time
 ";
+$cassette = 0;
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$opening_data .= "{x:'{$row["time"]}', y:'[{$row["cassette"]}]'},";
+	// Когда сменилась кассета, делаем разрыв
+	if( $row["cassette"] != $cassette ) {
+		$cassette = $row["cassette"];
+		$hist_data .= "{NaN},";
+		$backgroundColor .= "'',";
+	}
+	// Перед заливкой делаем разрыв
+	if( $row["LF_ID"] ) {
+		$hist_data .= "{NaN},";
+		$backgroundColor .= "'','red',";
+	}
+	else {
+		$backgroundColor .= "'blue',";
+	}
+	$hist_data .= "{x:'{$row["date_time_format"]}', y:{$row["cassette"]}},";
 }
 
 for ($i = 1; $i <= $cassetts; $i++) {
-	$yLabels .= "'[{$i}]',";
+	$yLabels .= "{$i},";
 }
+
+$filling_data = "{x:'10.11.2020 01:00', y:1},{x:'10.11.2020 00:01', y:1},{x:'08.11.2020 00:01', y:1},{NaN},{x:'06.11.2020 00:01', y:1},{x:'04.11.2020 00:01', y:1},";
 ?>
 
 <div class="chart-container" style="position: relative; height:3200px;">
@@ -51,7 +72,8 @@ for ($i = 1; $i <= $cassetts; $i++) {
 
 	var color = Chart.helpers.color;
 	var config = {
-		type: 'scatter',
+		//type: 'scatter',
+		type: 'line',
 		data: {
 			xLabels: [ // Date Objects
 				newDate(0),
@@ -65,34 +87,25 @@ for ($i = 1; $i <= $cassetts; $i++) {
 			],
 			yLabels: [<?=$yLabels?>],
 			datasets: [{
-				label: 'Заливка',
-				backgroundColor: 'rgba(255, 0, 0, .5)',
-				//borderWidth: 2,
-				borderColor: 'rgba(255, 0, 0, 1)',
+				label: 'Кассета',
+				borderColor: 'blue',
+				backgroundColor: [<?=$backgroundColor?>],
 				fill: false,
-				data: [<?=$filling_data?>],
-			}, {
-				label: 'Расформовка',
-				backgroundColor: 'rgba(0, 0, 255, .5)',
-				//borderWidth: 2,
-				borderColor: 'rgba(0, 0, 255, 1)',
-				fill: false,
-				data: [<?=$opening_data?>],
+				data: [<?=$hist_data?>],
+				pointRadius: 4,
 			}]
 		},
 		options: {
 			maintainAspectRatio: false,
-			//aspectRatio: 3,
-			title: {
-				//display: true,
-				text: 'История кассет'
+			legend: {
+				display: false
 			},
 			scales: {
 				xAxes: [{
 					type: 'time',
 					time: {
+						unit: 'day',
 						parser: timeFormat,
-						//round: 'hour',
 						tooltipFormat: 'll HH:mm'
 					},
 					scaleLabel: {
@@ -102,7 +115,7 @@ for ($i = 1; $i <= $cassetts; $i++) {
 					ticks: {
 						reverse: false
 					},
-					position: 'top'
+					position: 'top',
 				}],
 				yAxes: [{
 					type: 'category',
