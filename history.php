@@ -1,6 +1,6 @@
 <?
 include "config.php";
-$title = 'История кассеты';
+$title = 'История кассет';
 include "header.php";
 
 // Список событий
