@@ -34,17 +34,24 @@ if( !$_GET["week"] ) {
 				while( $row = mysqli_fetch_array($res) ) {
 					echo "<optgroup label='{$row["year"]}'>";
 					$query = "
-						SELECT YEARWEEK(NOW(), 1) week, WEEK(NOW(), 1) week_format
+						SELECT YEARWEEK(NOW(), 1) week
+							,WEEK(NOW(), 1) week_format
+							,DATE_FORMAT(adddate(NOW(), INTERVAL 2-DAYOFWEEK(NOW()) DAY), '%e %b') WeekStart
+							,DATE_FORMAT(adddate(NOW(), INTERVAL 8-DAYOFWEEK(NOW()) DAY), '%e %b') WeekEnd
 						UNION
-						SELECT YEARWEEK(o_date, 1) week, WEEK(o_date, 1) week_format
+						SELECT YEARWEEK(o_date, 1) week
+							,WEEK(o_date, 1) week_format
+							,DATE_FORMAT(adddate(o_date, INTERVAL 2-DAYOFWEEK(o_date) DAY), '%e %b') WeekStart
+							,DATE_FORMAT(adddate(o_date, INTERVAL 8-DAYOFWEEK(o_date) DAY), '%e %b') WeekEnd
 						FROM list__Opening
 						WHERE YEAR(o_date) = {$row["year"]}
+						GROUP BY week
 						ORDER BY week DESC
 					";
 					$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $subrow = mysqli_fetch_array($subres) ) {
 						$selected = ($subrow["week"] == $_GET["week"]) ? "selected" : "";
-						echo "<option value='{$subrow["week"]}' {$selected}>{$subrow["week_format"]}</option>";
+						echo "<option value='{$subrow["week"]}' {$selected}>{$subrow["week_format"]} [{$subrow["WeekStart"]} - {$subrow["WeekEnd"]}]</option>";
 					}
 					echo "</optgroup>";
 				}
