@@ -105,6 +105,7 @@ $filling_data = "{x:'10.11.2020 01:00', y:1},{x:'10.11.2020 00:01', y:1},{x:'08.
 					type: 'time',
 					gridLines: {
 						color: 'red',
+						zeroLineColor: 'red',
 						drawBorder: false
 					},
 					time: {
