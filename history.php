@@ -5,30 +5,42 @@ include "header.php";
 
 // Список событий
 $query = "
-	SELECT SUB.cassette
+SELECT SUB.cassette
 		,SUB.LF_ID
 		,DATE_FORMAT(SUB.date_time, '%d.%m.%Y %H:%i') date_time_format
 		,SUB.link
+		,SUB.item
 	FROM (
-		SELECT cassette
-			,LF_ID
-			,ADDTIME(CONVERT(lf_date, DATETIME), lf_time) date_time
+		SELECT LF.cassette
+			,LF.LF_ID
+			,ADDTIME(CONVERT(LF.lf_date, DATETIME), LF.lf_time) date_time
 			,NULL `link`
-		FROM list__Filling
+			,CW.item
+		FROM list__Filling LF
+		JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
 
 		UNION ALL
 
-		SELECT cassette
+		SELECT LO.cassette
 			,NULL
-			,ADDTIME(CONVERT(o_date, DATETIME), o_time) date_time
-			,LF_ID
-		FROM list__Opening
+			,ADDTIME(CONVERT(LO.o_date, DATETIME), LO.o_time) date_time
+			,LO.LF_ID
+			,CW.item
+		FROM list__Opening LO
+		LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+		LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+		LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+		LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
 	) SUB
 	ORDER BY SUB.cassette, SUB.date_time
 ";
 $cassette = 0;
+$i = 1;
+$items = array();
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	// Когда сменилась кассета, делаем разрыв
@@ -36,23 +48,24 @@ while( $row = mysqli_fetch_array($res) ) {
 		$cassette = $row["cassette"];
 		$hist_data .= "{NaN},";
 		$backgroundColor .= "'',";
+		$items[$i++] = $row["item"];
 	}
 	// Перед заливкой делаем разрыв
 	if( $row["LF_ID"] ) {
 		$hist_data .= "{NaN},";
 		$backgroundColor .= "'','red',";
+		$items[$i++] = $row["item"];
 	}
 	else {
 		$backgroundColor .= "'blue',";
 	}
 	$hist_data .= "{x:'{$row["date_time_format"]}', y:{$row["cassette"]}},";
+	$items[$i++] = $row["item"];
 }
 
 for ($i = 1; $i <= $cassetts; $i++) {
 	$yLabels .= "{$i},";
 }
-
-$filling_data = "{x:'10.11.2020 01:00', y:1},{x:'10.11.2020 00:01', y:1},{x:'08.11.2020 00:01', y:1},{NaN},{x:'06.11.2020 00:01', y:1},{x:'04.11.2020 00:01', y:1},";
 ?>
 
 <div class="chart-container" style="position: relative; height:3200px;">
@@ -60,6 +73,8 @@ $filling_data = "{x:'10.11.2020 01:00', y:1},{x:'10.11.2020 00:01', y:1},{x:'08.
 </div>
 
 <script>
+	items = <?= json_encode($items); ?>;
+
 	var timeFormat = 'DD.MM.YYYY HH:mm';
 
 	function newDate(days) {
@@ -99,6 +114,13 @@ $filling_data = "{x:'10.11.2020 01:00', y:1},{x:'10.11.2020 00:01', y:1},{x:'08.
 			maintainAspectRatio: false,
 			legend: {
 				display: false
+			},
+			tooltips: {
+				callbacks: {
+					afterLabel: function(tooltipItem, data) {
+						return '(' + items[tooltipItem.index] + ')';
+					}
+				}
 			},
 			scales: {
 				xAxes: [{
