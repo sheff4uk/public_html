@@ -63,16 +63,16 @@ while( $row = mysqli_fetch_array($res) ) {
 		$hist_data .= "{NaN},";
 		$pointRadius .= "3,";
 		$backgroundColor .= "'',";
-		$items[0][$i] = $row["item"];
-		$interval[0][$i] = $row["interval"];
+		$items[1][$i] = $row["item"];
+		$interval[1][$i] = $row["interval"];
 		$i++;
 		// Если новая строка началась с расформовки, рисуем линию сначала
 		if( $row["link"] ) {
 			$backgroundColor .= "'blue',";
 			$hist_data .= "{x:'{$start}', y:{$row["cassette"]}},";
 			$pointRadius .= "0,";
-			$items[0][$i] = $row["item"];
-			$interval[0][$i] = $row["interval"];
+			$items[1][$i] = $row["item"];
+			$interval[1][$i] = $row["interval"];
 			$i++;
 		}
 	}
@@ -81,8 +81,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		$hist_data .= "{NaN},";
 		$pointRadius .= "3,";
 		$backgroundColor .= "'','red',";
-		$items[0][$i] = $row["item"];
-		$interval[0][$i] = $row["interval"];
+		$items[1][$i] = $row["item"];
+		$interval[1][$i] = $row["interval"];
 		$i++;
 	}
 	else {
@@ -90,8 +90,8 @@ while( $row = mysqli_fetch_array($res) ) {
 	}
 	$hist_data .= "{x:'{$row["date_time_format"]}', y:{$row["cassette"]}},";
 	$pointRadius .= "3,";
-	$items[0][$i] = $row["item"];
-	$interval[0][$i] = $row["interval"];
+	$items[1][$i] = $row["item"];
+	$interval[1][$i] = $row["interval"];
 	$i++;
 }
 
@@ -147,16 +147,16 @@ while( $row = mysqli_fetch_array($res) ) {
 		$hist_dataErr .= "{NaN},";
 		$pointRadiusErr .= "3,";
 		$backgroundColorErr .= "'',";
-		$items[1][$i] = $row["item"];
-		$interval[1][$i] = $row["interval"];
+		$items[0][$i] = $row["item"];
+		$interval[0][$i] = $row["interval"];
 		$i++;
 		// Если новая строка началась с расформовки, рисуем линию сначала
 		if( $row["link"] ) {
 			$backgroundColorErr .= "'blue',";
 			$hist_dataErr .= "{x:'{$start}', y:{$row["cassette"]}},";
 			$pointRadiusErr .= "0,";
-			$items[1][$i] = $row["item"];
-			$interval[1][$i] = $row["interval"];
+			$items[0][$i] = $row["item"];
+			$interval[0][$i] = $row["interval"];
 			$i++;
 		}
 	}
@@ -165,8 +165,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		$hist_dataErr .= "{NaN},";
 		$pointRadiusErr .= "3,";
 		$backgroundColorErr .= "'','red',";
-		$items[1][$i] = $row["item"];
-		$interval[1][$i] = $row["interval"];
+		$items[0][$i] = $row["item"];
+		$interval[0][$i] = $row["interval"];
 		$i++;
 	}
 	else {
@@ -174,8 +174,8 @@ while( $row = mysqli_fetch_array($res) ) {
 	}
 	$hist_dataErr .= "{x:'{$row["date_time_format"]}', y:{$row["cassette"]}},";
 	$pointRadiusErr .= "3,";
-	$items[1][$i] = $row["item"];
-	$interval[1][$i] = $row["interval"];
+	$items[0][$i] = $row["item"];
+	$interval[0][$i] = $row["interval"];
 	$i++;
 }
 
@@ -220,22 +220,18 @@ for ($i = 1; $i <= $cassetts; $i++) {
 			yLabels: [<?=$yLabels?>],
 			datasets: [{
 				label: 'Кассета',
-				borderColor: 'blue',
-				backgroundColor: [<?=$backgroundColor?>],
-				fill: false,
-				data: [<?=$hist_data?>],
-				pointRadius: [<?=$pointRadius?>],
-				//borderDash: [5,5],
-				//borderDashOffset: 0
-			},{
-				label: 'Кассета',
 				borderColor: 'red',
 				backgroundColor: [<?=$backgroundColorErr?>],
 				fill: false,
 				data: [<?=$hist_dataErr?>],
 				pointRadius: [<?=$pointRadiusErr?>],
-				//borderDash: [5,5],
-				//borderDashOffset: 5
+			},{
+				label: 'Кассета',
+				borderColor: 'blue',
+				backgroundColor: [<?=$backgroundColor?>],
+				fill: false,
+				data: [<?=$hist_data?>],
+				pointRadius: [<?=$pointRadius?>],
 			}]
 		},
 		options: {
