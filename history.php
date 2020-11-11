@@ -9,24 +9,29 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 $row = mysqli_fetch_array($res);
 $start = $row["start"];
 
-// Список событий
+// Список событий большен 24 часов
 $query = "
 SELECT SUB.cassette
 		,SUB.LF_ID
 		,DATE_FORMAT(SUB.date_time, '%d.%m.%Y %H:%i') date_time_format
 		,SUB.link
 		,SUB.item
+		,SUB.interval
 	FROM (
 		SELECT LF.cassette
 			,LF.LF_ID
 			,ADDTIME(CONVERT(LF.lf_date, DATETIME), LF.lf_time) date_time
 			,NULL `link`
 			,CW.item
+			,NULL `interval`
 		FROM list__Filling LF
 		JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+		GROUP BY LF.LF_ID
 		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
+			AND IFNULL(MAX(o_interval(LO.LO_ID)), 24) >= 24
 
 		UNION ALL
 
@@ -35,18 +40,21 @@ SELECT SUB.cassette
 			,ADDTIME(CONVERT(LO.o_date, DATETIME), LO.o_time) date_time
 			,LO.LF_ID
 			,CW.item
+			,o_interval(LO.LO_ID)
 		FROM list__Opening LO
 		LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 		LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 		LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 		LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		WHERE o_interval(LO.LO_ID) >= 24
 		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
 	) SUB
 	ORDER BY SUB.cassette, SUB.date_time
 ";
 $cassette = 0;
-$i = 1;
+$i = 0;
 $items = array();
+$interval = array();
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	// Когда сменилась кассета, делаем разрыв
@@ -55,13 +63,17 @@ while( $row = mysqli_fetch_array($res) ) {
 		$hist_data .= "{NaN},";
 		$pointRadius .= "3,";
 		$backgroundColor .= "'',";
-		$items[$i++] = $row["item"];
+		$items[0][$i] = $row["item"];
+		$interval[0][$i] = $row["interval"];
+		$i++;
 		// Если новая строка началась с расформовки, рисуем линию сначала
 		if( $row["link"] ) {
 			$backgroundColor .= "'blue',";
 			$hist_data .= "{x:'{$start}', y:{$row["cassette"]}},";
 			$pointRadius .= "0,";
-			$items[$i++] = $row["item"];
+			$items[0][$i] = $row["item"];
+			$interval[0][$i] = $row["interval"];
+			$i++;
 		}
 	}
 	// Перед заливкой делаем разрыв
@@ -69,14 +81,102 @@ while( $row = mysqli_fetch_array($res) ) {
 		$hist_data .= "{NaN},";
 		$pointRadius .= "3,";
 		$backgroundColor .= "'','red',";
-		$items[$i++] = $row["item"];
+		$items[0][$i] = $row["item"];
+		$interval[0][$i] = $row["interval"];
+		$i++;
 	}
 	else {
 		$backgroundColor .= "'blue',";
 	}
 	$hist_data .= "{x:'{$row["date_time_format"]}', y:{$row["cassette"]}},";
 	$pointRadius .= "3,";
-	$items[$i++] = $row["item"];
+	$items[0][$i] = $row["item"];
+	$interval[0][$i] = $row["interval"];
+	$i++;
+}
+
+// Список событий меньше 24 часов
+$query = "
+SELECT SUB.cassette
+		,SUB.LF_ID
+		,DATE_FORMAT(SUB.date_time, '%d.%m.%Y %H:%i') date_time_format
+		,SUB.link
+		,SUB.item
+		,SUB.interval
+	FROM (
+		SELECT LF.cassette
+			,LF.LF_ID
+			,ADDTIME(CONVERT(LF.lf_date, DATETIME), LF.lf_time) date_time
+			,NULL `link`
+			,CW.item
+			,NULL `interval`
+		FROM list__Filling LF
+		JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+		GROUP BY LF.LF_ID
+		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
+			AND MIN(o_interval(LO.LO_ID)) < 24
+
+		UNION ALL
+
+		SELECT LO.cassette
+			,NULL
+			,ADDTIME(CONVERT(LO.o_date, DATETIME), LO.o_time) date_time
+			,LO.LF_ID
+			,CW.item
+			,o_interval(LO.LO_ID)
+		FROM list__Opening LO
+		LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+		LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+		LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+		LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		WHERE o_interval(LO.LO_ID) < 24
+		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
+	) SUB
+	ORDER BY SUB.cassette, SUB.date_time
+";
+$cassette = 0;
+$i = 0;
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+while( $row = mysqli_fetch_array($res) ) {
+	// Когда сменилась кассета, делаем разрыв
+	if( $row["cassette"] != $cassette ) {
+		$cassette = $row["cassette"];
+		$hist_dataErr .= "{NaN},";
+		$pointRadiusErr .= "3,";
+		$backgroundColorErr .= "'',";
+		$items[1][$i] = $row["item"];
+		$interval[1][$i] = $row["interval"];
+		$i++;
+		// Если новая строка началась с расформовки, рисуем линию сначала
+		if( $row["link"] ) {
+			$backgroundColorErr .= "'blue',";
+			$hist_dataErr .= "{x:'{$start}', y:{$row["cassette"]}},";
+			$pointRadiusErr .= "0,";
+			$items[1][$i] = $row["item"];
+			$interval[1][$i] = $row["interval"];
+			$i++;
+		}
+	}
+	// Перед заливкой делаем разрыв
+	if( $row["LF_ID"] ) {
+		$hist_dataErr .= "{NaN},";
+		$pointRadiusErr .= "3,";
+		$backgroundColorErr .= "'','red',";
+		$items[1][$i] = $row["item"];
+		$interval[1][$i] = $row["interval"];
+		$i++;
+	}
+	else {
+		$backgroundColorErr .= "'blue',";
+	}
+	$hist_dataErr .= "{x:'{$row["date_time_format"]}', y:{$row["cassette"]}},";
+	$pointRadiusErr .= "3,";
+	$items[1][$i] = $row["item"];
+	$interval[1][$i] = $row["interval"];
+	$i++;
 }
 
 for ($i = 1; $i <= $cassetts; $i++) {
@@ -89,7 +189,8 @@ for ($i = 1; $i <= $cassetts; $i++) {
 </div>
 
 <script>
-	items = <?= json_encode($items); ?>;
+	var items = <?= json_encode($items); ?>;
+	var interval = <?= json_encode($interval); ?>;
 
 	var timeFormat = 'DD.MM.YYYY HH:mm';
 
@@ -124,6 +225,17 @@ for ($i = 1; $i <= $cassetts; $i++) {
 				fill: false,
 				data: [<?=$hist_data?>],
 				pointRadius: [<?=$pointRadius?>],
+				borderDash: [5,5],
+				borderDashOffset: 0
+			},{
+				label: 'Кассета',
+				borderColor: 'red',
+				backgroundColor: [<?=$backgroundColorErr?>],
+				fill: false,
+				data: [<?=$hist_dataErr?>],
+				pointRadius: [<?=$pointRadiusErr?>],
+				borderDash: [5,5],
+				borderDashOffset: 5
 			}]
 		},
 		options: {
@@ -134,8 +246,12 @@ for ($i = 1; $i <= $cassetts; $i++) {
 			tooltips: {
 				callbacks: {
 					afterLabel: function(tooltipItem, data) {
-						return '(' + items[tooltipItem.index] + ')';
-					}
+						var label = 'Код: ' + items[tooltipItem.datasetIndex][tooltipItem.index];
+						if( interval[tooltipItem.datasetIndex][tooltipItem.index] ) {
+							label += '\nИнтервал: ' +interval[tooltipItem.datasetIndex][tooltipItem.index]+ ' ч.';
+						}
+						return label;
+					},
 				}
 			},
 			scales: {
