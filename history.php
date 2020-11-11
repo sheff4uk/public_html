@@ -61,7 +61,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	if( $row["cassette"] != $cassette ) {
 		$cassette = $row["cassette"];
 		$hist_data .= "{NaN},";
-		$pointRadius .= "3,";
+		$pointRadius .= "4,";
 		$backgroundColor .= "'',";
 		$items[1][$i] = $row["item"];
 		$interval[1][$i] = $row["interval"];
@@ -79,7 +79,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	// Перед заливкой делаем разрыв
 	if( $row["LF_ID"] ) {
 		$hist_data .= "{NaN},";
-		$pointRadius .= "3,";
+		$pointRadius .= "4,";
 		$backgroundColor .= "'','red',";
 		$items[1][$i] = $row["item"];
 		$interval[1][$i] = $row["interval"];
@@ -89,7 +89,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		$backgroundColor .= "'blue',";
 	}
 	$hist_data .= "{x:'{$row["date_time_format"]}', y:{$row["cassette"]}},";
-	$pointRadius .= "3,";
+	$pointRadius .= "4,";
 	$items[1][$i] = $row["item"];
 	$interval[1][$i] = $row["interval"];
 	$i++;
@@ -145,7 +145,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	if( $row["cassette"] != $cassette ) {
 		$cassette = $row["cassette"];
 		$hist_dataErr .= "{NaN},";
-		$pointRadiusErr .= "3,";
+		$pointRadiusErr .= "4,";
 		$backgroundColorErr .= "'',";
 		$items[0][$i] = $row["item"];
 		$interval[0][$i] = $row["interval"];
@@ -163,7 +163,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	// Перед заливкой делаем разрыв
 	if( $row["LF_ID"] ) {
 		$hist_dataErr .= "{NaN},";
-		$pointRadiusErr .= "3,";
+		$pointRadiusErr .= "4,";
 		$backgroundColorErr .= "'','red',";
 		$items[0][$i] = $row["item"];
 		$interval[0][$i] = $row["interval"];
@@ -173,7 +173,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		$backgroundColorErr .= "'blue',";
 	}
 	$hist_dataErr .= "{x:'{$row["date_time_format"]}', y:{$row["cassette"]}},";
-	$pointRadiusErr .= "3,";
+	$pointRadiusErr .= "4,";
 	$items[0][$i] = $row["item"];
 	$interval[0][$i] = $row["interval"];
 	$i++;
@@ -221,7 +221,6 @@ for ($i = 1; $i <= $cassetts; $i++) {
 			datasets: [{
 				label: 'Кассета',
 				borderColor: 'red',
-				borderWidth: 3,
 				backgroundColor: [<?=$backgroundColorErr?>],
 				fill: false,
 				data: [<?=$hist_dataErr?>],
@@ -229,7 +228,6 @@ for ($i = 1; $i <= $cassetts; $i++) {
 			},{
 				label: 'Кассета',
 				borderColor: 'blue',
-				borderWidth: 3,
 				backgroundColor: [<?=$backgroundColor?>],
 				fill: false,
 				data: [<?=$hist_data?>],
