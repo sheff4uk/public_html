@@ -225,8 +225,8 @@ for ($i = 1; $i <= $cassetts; $i++) {
 				fill: false,
 				data: [<?=$hist_data?>],
 				pointRadius: [<?=$pointRadius?>],
-				borderDash: [5,5],
-				borderDashOffset: 0
+				//borderDash: [5,5],
+				//borderDashOffset: 0
 			},{
 				label: 'Кассета',
 				borderColor: 'red',
@@ -234,8 +234,8 @@ for ($i = 1; $i <= $cassetts; $i++) {
 				fill: false,
 				data: [<?=$hist_dataErr?>],
 				pointRadius: [<?=$pointRadiusErr?>],
-				borderDash: [5,5],
-				borderDashOffset: 5
+				//borderDash: [5,5],
+				//borderDashOffset: 5
 			}]
 		},
 		options: {
