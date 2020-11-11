@@ -221,6 +221,7 @@ for ($i = 1; $i <= $cassetts; $i++) {
 			datasets: [{
 				label: 'Кассета',
 				borderColor: 'red',
+				borderWidth: 3,
 				backgroundColor: [<?=$backgroundColorErr?>],
 				fill: false,
 				data: [<?=$hist_dataErr?>],
@@ -228,6 +229,7 @@ for ($i = 1; $i <= $cassetts; $i++) {
 			},{
 				label: 'Кассета',
 				borderColor: 'blue',
+				borderWidth: 3,
 				backgroundColor: [<?=$backgroundColor?>],
 				fill: false,
 				data: [<?=$hist_data?>],
