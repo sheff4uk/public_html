@@ -3,6 +3,12 @@ include "config.php";
 $title = 'История кассет';
 include "header.php";
 
+// Ранняя дата
+$query = "SELECT DATE_FORMAT(NOW() - INTERVAL 7 DAY, '%d.%m.%Y %H:%i') start";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$start = $row["start"];
+
 // Список событий
 $query = "
 SELECT SUB.cassette
@@ -47,12 +53,21 @@ while( $row = mysqli_fetch_array($res) ) {
 	if( $row["cassette"] != $cassette ) {
 		$cassette = $row["cassette"];
 		$hist_data .= "{NaN},";
+		$pointRadius .= "3,";
 		$backgroundColor .= "'',";
 		$items[$i++] = $row["item"];
+		// Если новая строка началась с расформовки, рисуем линию сначала
+		if( $row["link"] ) {
+			$backgroundColor .= "'blue',";
+			$hist_data .= "{x:'{$start}', y:{$row["cassette"]}},";
+			$pointRadius .= "0,";
+			$items[$i++] = $row["item"];
+		}
 	}
 	// Перед заливкой делаем разрыв
 	if( $row["LF_ID"] ) {
 		$hist_data .= "{NaN},";
+		$pointRadius .= "3,";
 		$backgroundColor .= "'','red',";
 		$items[$i++] = $row["item"];
 	}
@@ -60,6 +75,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		$backgroundColor .= "'blue',";
 	}
 	$hist_data .= "{x:'{$row["date_time_format"]}', y:{$row["cassette"]}},";
+	$pointRadius .= "3,";
 	$items[$i++] = $row["item"];
 }
 
@@ -107,7 +123,7 @@ for ($i = 1; $i <= $cassetts; $i++) {
 				backgroundColor: [<?=$backgroundColor?>],
 				fill: false,
 				data: [<?=$hist_data?>],
-				pointRadius: 4,
+				pointRadius: [<?=$pointRadius?>],
 			}]
 		},
 		options: {
