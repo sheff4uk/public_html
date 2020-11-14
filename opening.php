@@ -210,6 +210,7 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th colspan="2">Расформовка</th>
+			<th rowspan="2">№ кассеты</th>
 			<th rowspan="2"><i class="far fa-lg fa-hourglass" title="Интервал в часах с моента заливки."></i></th>
 			<th rowspan="2">№ поста</th>
 			<th colspan="4">Кол-во брака, шт</th>
@@ -217,7 +218,6 @@ foreach ($_GET as &$value) {
 			<th rowspan="2">Куб раствора, кг</th>
 			<th rowspan="2">Противовес</th>
 			<th rowspan="2">Дата заливки</th>
-			<th rowspan="2">№ кассеты</th>
 			<th rowspan="2"></th>
 		</tr>
 		<tr>
@@ -299,6 +299,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	<tr id="<?=$row["LO_ID"]?>">
 		<td><?=$row["o_date"]?></td>
 		<td><?=$row["o_time"]?></td>
+		<td><?=$cassette?></td>
 		<td <?=($row["o_interval"] < 24 ? "class='error'" : "")?>><?=$row["o_interval"]?></td>
 		<td><?=$row["o_post"]?></td>
 		<td style="color: red;"><?=$row["o_not_spill"]?></td>
@@ -311,7 +312,6 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td class="bg-gray"><?=$row["mix_density"]/1000?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").($row["mix_diff"]/1000)."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
 		<td class="bg-gray"><a href="filling.php?week=<?=$row["pb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
-		<td class="bg-gray"><?=$cassette?></td>
 		<td><a href="#" class="add_opening" LO_ID="<?=$row["LO_ID"]?>" title="Изменить данные расформовки"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?
