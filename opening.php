@@ -263,10 +263,10 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	if( $row["LP_ID"] ) {
-		$cassette = "<a href='packing.php?p_date_from={$row["p_date"]}&p_date_to={$row["p_date"]}#{$row["LP_ID"]}' title='Упаковка' target='_blank'><b class='cassette' style='".($subsubrow["dbl"] > 1 ? "color: red;" : "")."'>{$row["cassette"]}</b></a>";
+		$cassette = "<a href='packing.php?p_date_from={$row["p_date"]}&p_date_to={$row["p_date"]}#{$row["LP_ID"]}' title='Упаковка' target='_blank'><b class='cassette' style='".($row["dbl"] > 1 ? "color: red;" : "")."'>{$row["cassette"]}</b></a>";
 	}
 	else {
-		$cassette = "<b class='cassette' style='".($subsubrow["dbl"] > 1 ? "color: red;" : "")."'>{$row["cassette"]}</b>";
+		$cassette = "<b class='cassette' style='".($row["dbl"] > 1 ? "color: red;" : "")."'>{$row["cassette"]}</b>";
 	}
 	?>
 	<tr id="<?=$row["LO_ID"]?>">
