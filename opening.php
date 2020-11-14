@@ -238,7 +238,6 @@ foreach ($_GET as &$value) {
 $query = "
 	SELECT LO.LO_ID
 		,LO.o_post
-		,DATE_FORMAT(LO.o_date, '%W') o_date_weekday
 		,DATE_FORMAT(LO.o_date, '%d.%m.%y') o_date
 		,DATE_FORMAT(LO.o_time, '%H:%i') o_time
 		,o_interval(LO.LO_ID) o_interval
@@ -296,27 +295,9 @@ while( $row = mysqli_fetch_array($res) ) {
 	else {
 		$cassette = "<b class='cassette' style='".($row["dbl"] > 1 ? "color: red;" : "")."'>{$row["cassette"]}</b>";
 	}
-
-	echo "<tr id='{$row["LO_ID"]}' style='".(($weekday and $weekday != $row["o_date_weekday"]) ? "border-top: 10px solid #333;" : "")."'>";
-	$weekday = $row["o_date_weekday"];
-	if( $date != $row["o_date"] ) {
-		echo "<td rowspan='1'>{$row["o_date_weekday"]}<br>{$row["o_date"]}</td>";
-		$id = $row["LO_ID"];
-		$date = $row["o_date"];
-	}
-	else {
 	?>
-		<script>
-				var rowspan = parseInt($('tr#<?=$id?> td').first().attr('rowspan')) + 1;
-				$('tr#<?=$id?> td').first().attr('rowspan', rowspan);
-		</script>
-	<?
-	}
-	?>
-<!--
-	<tr id="<?=$row["LO_ID"]?>">
+	<tr id="<?=$row["LO_ID"]?>" style="<?=(($o_date and $o_date != $row["o_date"]) ? "border-top: 10px solid #333;" : "")?>">
 		<td><?=$row["o_date"]?></td>
--->
 		<td><?=$row["o_time"]?></td>
 		<td><?=$cassette?></td>
 		<td <?=($row["o_interval"] < 24 ? "class='error'" : "")?>><?=$row["o_interval"]?></td>
@@ -334,6 +315,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><a href="#" class="add_opening" LO_ID="<?=$row["LO_ID"]?>" title="Изменить данные расформовки"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?
+	$o_date = $row["o_date"];
 }
 
 // Выводим собранные ошибки вверку экрана
