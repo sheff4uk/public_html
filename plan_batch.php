@@ -36,13 +36,13 @@ if( !$_GET["week"] ) {
 					$query = "
 						SELECT YEARWEEK(NOW(), 1) week
 							,WEEK(NOW(), 1) week_format
-							,DATE_FORMAT(adddate(NOW(), INTERVAL 2-DAYOFWEEK(NOW()) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(NOW(), INTERVAL 8-DAYOFWEEK(NOW()) DAY), '%e %b') WeekEnd
+							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 0-WEEKDAY(CURDATE()) DAY), '%e %b') WeekStart
+							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 6-WEEKDAY(CURDATE()) DAY), '%e %b') WeekEnd
 						UNION
 						SELECT YEARWEEK(pb_date, 1) week
 							,WEEK(pb_date, 1) week_format
-							,DATE_FORMAT(adddate(pb_date, INTERVAL 2-DAYOFWEEK(pb_date) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(pb_date, INTERVAL 8-DAYOFWEEK(pb_date) DAY), '%e %b') WeekEnd
+							,DATE_FORMAT(adddate(pb_date, INTERVAL 0-WEEKDAY(pb_date) DAY), '%e %b') WeekStart
+							,DATE_FORMAT(adddate(pb_date, INTERVAL 6-WEEKDAY(pb_date) DAY), '%e %b') WeekEnd
 						FROM plan__Batch
 						WHERE YEAR(pb_date) = {$row["year"]}
 						GROUP BY week

@@ -61,13 +61,13 @@ while( $row = mysqli_fetch_array($res) ) {
 					$query = "
 						SELECT YEARWEEK(NOW(), 1) week
 							,WEEK(NOW(), 1) week_format
-							,DATE_FORMAT(adddate(NOW(), INTERVAL 2-DAYOFWEEK(NOW()) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(NOW(), INTERVAL 8-DAYOFWEEK(NOW()) DAY), '%e %b') WeekEnd
+							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 0-WEEKDAY(CURDATE()) DAY), '%e %b') WeekStart
+							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 6-WEEKDAY(CURDATE()) DAY), '%e %b') WeekEnd
 						UNION
 						SELECT YEARWEEK(o_date, 1) week
 							,WEEK(o_date, 1) week_format
-							,DATE_FORMAT(adddate(o_date, INTERVAL 2-DAYOFWEEK(o_date) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(o_date, INTERVAL 8-DAYOFWEEK(o_date) DAY), '%e %b') WeekEnd
+							,DATE_FORMAT(adddate(o_date, INTERVAL 0-WEEKDAY(o_date) DAY), '%e %b') WeekStart
+							,DATE_FORMAT(adddate(o_date, INTERVAL 6-WEEKDAY(o_date) DAY), '%e %b') WeekEnd
 						FROM list__Opening
 						WHERE YEAR(o_date) = {$row["year"]}
 						GROUP BY week

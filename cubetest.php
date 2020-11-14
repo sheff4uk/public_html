@@ -150,13 +150,13 @@ if( !$_GET["week"] ) {
 					$query = "
 						SELECT YEARWEEK(NOW(), 1) week
 							,WEEK(NOW(), 1) week_format
-							,DATE_FORMAT(adddate(NOW(), INTERVAL 2-DAYOFWEEK(NOW()) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(NOW(), INTERVAL 8-DAYOFWEEK(NOW()) DAY), '%e %b') WeekEnd
+							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 0-WEEKDAY(CURDATE()) DAY), '%e %b') WeekStart
+							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 6-WEEKDAY(CURDATE()) DAY), '%e %b') WeekEnd
 						UNION
 						SELECT YEARWEEK(test_date, 1) week
 							,WEEK(test_date, 1) week_format
-							,DATE_FORMAT(adddate(test_date, INTERVAL 2-DAYOFWEEK(test_date) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(test_date, INTERVAL 8-DAYOFWEEK(test_date) DAY), '%e %b') WeekEnd
+							,DATE_FORMAT(adddate(test_date, INTERVAL 0-WEEKDAY(test_date) DAY), '%e %b') WeekStart
+							,DATE_FORMAT(adddate(test_date, INTERVAL 6-WEEKDAY(test_date) DAY), '%e %b') WeekEnd
 						FROM list__CubeTest
 						WHERE YEAR(test_date) = {$row["year"]}
 						GROUP BY week
