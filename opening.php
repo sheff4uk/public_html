@@ -11,9 +11,6 @@ if( !$_GET["week"] ) {
 	$row = mysqli_fetch_array($res);
 	$_GET["week"] = $row["week"];
 }
-
-// Собираем ошибки на экране
-
 ?>
 
 <!--Фильтр-->
@@ -262,6 +259,11 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
+	// Собираем ошибки номеров кассет
+	if($row["dbl"] > 1) {
+		$_SESSION["error"][] = "Кассета <a href='#{$row["LO_ID"]}'><b class='cassette'>{$row["cassette"]}</b></a> расформована повторно.";
+	}
+
 	if( $row["LP_ID"] ) {
 		$cassette = "<a href='packing.php?p_date_from={$row["p_date"]}&p_date_to={$row["p_date"]}#{$row["LP_ID"]}' title='Упаковка' target='_blank'><b class='cassette' style='".($row["dbl"] > 1 ? "color: red;" : "")."'>{$row["cassette"]}</b></a>";
 	}
