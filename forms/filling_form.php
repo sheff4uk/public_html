@@ -126,20 +126,20 @@ if( isset($_POST["PB_ID"]) ) {
 	$week = $row["week"];
 
 	// Перенаправление в журнал чек листов оператора
-	exit ('<meta http-equiv="refresh" content="0; url=/checklist.php?week='.$week.'&#PB'.$_POST["PB_ID"].'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/filling.php?week='.$week.'&#PB'.$_POST["PB_ID"].'">');
 }
 ///////////////////////////////////////////////////////
 ?>
 <!-- Форма чек листа оператора -->
 <style>
-	#checklist_form table input,
-	#checklist_form table select {
+	#filling_form table input,
+	#filling_form table select {
 /*		font-size: 1.2em;*/
 	}
 </style>
 
-<div id='checklist_form' title='Чеклист оператора' style='display:none;'>
-	<form method='post' action="/forms/checklist_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
+<div id='filling_form' title='Чеклист оператора' style='display:none;'>
+	<form method='post' action="/forms/filling_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<!--Содержимое формы аяксом-->
@@ -154,22 +154,22 @@ this.subbut.value='Подождите, пожалуйста!';">
 <script>
 	$(function() {
 		// Функция открытия формы чеклиста оператора
-		function checklist_form(PB_ID) {
+		function filling_form(PB_ID) {
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
 			//Рисуем форму
-			$.ajax({ url: "/ajax/checklist_form_ajax.php?PB_ID="+PB_ID, dataType: "script", async: false });
+			$.ajax({ url: "/ajax/filling_form_ajax.php?PB_ID="+PB_ID, dataType: "script", async: false });
 
-			$('#checklist_form').dialog({
+			$('#filling_form').dialog({
 				resizable: false,
 				width: 1000,
 				modal: true,
 				closeText: 'Закрыть'
 			});
 
-			$('#checklist_form #rows').change();
-			$('#checklist_form input[type=time]').change();
+			$('#filling_form #rows').change();
+			$('#filling_form input[type=time]').change();
 
 			return false;
 		}
@@ -183,7 +183,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			{
 				console.log(barcode);
 				if( barcode.length == 8 ) {
-					checklist_form(Number(barcode));
+					filling_form(Number(barcode));
 					barcode="";
 					return false;
 				}
@@ -196,16 +196,16 @@ this.subbut.value='Подождите, пожалуйста!';">
 		});
 
 		// Кнопка добавления чеклиста оператора
-		$('.add_checklist').click( function() {
+		$('.add_filling').click( function() {
 			var PB_ID = $(this).attr("PB_ID");
 
-			checklist_form(PB_ID);
+			filling_form(PB_ID);
 
 			return false;
 		});
 
 		// Изменение числа строк в форме
-		$('#checklist_form').on('change', '#rows', function() {
+		$('#filling_form').on('change', '#rows', function() {
 			var val = parseInt($(this).val());
 			$('.batch_row').each(function(){
 				var num = parseInt($(this).attr('num'));
@@ -225,7 +225,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 		});
 
 		// Ограничения при выборе времени
-		$('#checklist_form').on('change', 'input[type=time]', function() {
+		$('#filling_form').on('change', 'input[type=time]', function() {
 			var val = $(this).val();
 			var max = moment.utc(val,'HH:mm').add(-1,'minutes').format('HH:mm');
 			var min = moment.utc(val,'HH:mm').add(1,'minutes').format('HH:mm');

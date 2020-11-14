@@ -4,16 +4,12 @@ $title = 'Протокол испытаний куба';
 include "header.php";
 include "./forms/cubetest_form.php";
 
-// Если в фильтре не установлен период, показываем последние 7 дней
-if( !$_GET["pb_date_from"] and !$_GET["pb_date_to"] ) {
-	if( !$_GET["date_from"] ) {
-		$date = new DateTime('-6 days');
-		$_GET["date_from"] = date_format($date, 'Y-m-d');
-	}
-	if( !$_GET["date_to"] ) {
-		$date = new DateTime('-0 days');
-		$_GET["date_to"] = date_format($date, 'Y-m-d');
-	}
+// Если в фильтре не установлена неделя, показываем текущую
+if( !$_GET["week"] ) {
+	$query = "SELECT YEARWEEK(NOW(), 1) week";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$_GET["week"] = $row["week"];
 }
 ?>
 
@@ -71,7 +67,7 @@ if( !$_GET["pb_date_from"] and !$_GET["pb_date_to"] ) {
 			SELECT LB.LB_ID
 				,PB.CW_ID
 				,CW.item
-				,PB.pb_date
+				,YEARWEEK(PB.pb_date, 1) pb_week
 				,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 				,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 				,LB.mix_density
@@ -90,7 +86,7 @@ if( !$_GET["pb_date_from"] and !$_GET["pb_date_to"] ) {
 			SELECT LB.LB_ID
 				,PB.CW_ID
 				,CW.item
-				,PB.pb_date
+				,YEARWEEK(PB.pb_date, 1) pb_week
 				,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 				,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 				,LB.mix_density
@@ -115,7 +111,7 @@ if( !$_GET["pb_date_from"] and !$_GET["pb_date_to"] ) {
 			?>
 			<tr>
 				<td class="bg-gray"><?=$row["item"]?></td>
-				<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["pb_date"]?>&date_to=<?=$row["pb_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
+				<td class="bg-gray"><a href="filling.php?week=<?=$row["pb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
 				<td class="bg-gray"><?=$row["batch_time_format"]?></td>
 				<td class="bg-gray"><?=$row["mix_density"]/1000?></td>
 				<td class="<?=$error?>"><?=$row["test_date_format"]?></td>
@@ -138,16 +134,44 @@ if( !$_GET["pb_date_from"] and !$_GET["pb_date_to"] ) {
 		<a href="/cubetest.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
-			<span style="display: inline-block; width: 200px;">Дата испытания между:</span>
-			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
-			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
-			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
-		</div>
-
-		<div class="nowrap" style="margin-bottom: 10px;">
-			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
-			<input name="pb_date_from" type="date" value="<?=$_GET["pb_date_from"]?>" class="<?=$_GET["pb_date_from"] ? "filtered" : ""?>">
-			<input name="pb_date_to" type="date" value="<?=$_GET["pb_date_to"]?>" class="<?=$_GET["pb_date_to"] ? "filtered" : ""?>">
+			<span>Неделя:</span>
+			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT YEAR(NOW()) year
+					UNION
+					SELECT YEAR(test_date) year
+					FROM list__CubeTest
+					ORDER BY year DESC
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					echo "<optgroup label='{$row["year"]}'>";
+					$query = "
+						SELECT YEARWEEK(NOW(), 1) week
+							,WEEK(NOW(), 1) week_format
+							,DATE_FORMAT(adddate(NOW(), INTERVAL 2-DAYOFWEEK(NOW()) DAY), '%e %b') WeekStart
+							,DATE_FORMAT(adddate(NOW(), INTERVAL 8-DAYOFWEEK(NOW()) DAY), '%e %b') WeekEnd
+						UNION
+						SELECT YEARWEEK(test_date, 1) week
+							,WEEK(test_date, 1) week_format
+							,DATE_FORMAT(adddate(test_date, INTERVAL 2-DAYOFWEEK(test_date) DAY), '%e %b') WeekStart
+							,DATE_FORMAT(adddate(test_date, INTERVAL 8-DAYOFWEEK(test_date) DAY), '%e %b') WeekEnd
+						FROM list__CubeTest
+						WHERE YEAR(test_date) = {$row["year"]}
+						GROUP BY week
+						ORDER BY week DESC
+					";
+					$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $subrow = mysqli_fetch_array($subres) ) {
+						$selected = ($subrow["week"] == $_GET["week"]) ? "selected" : "";
+						echo "<option value='{$subrow["week"]}' {$selected}>{$subrow["week_format"]} [{$subrow["WeekStart"]} - {$subrow["WeekEnd"]}]</option>";
+					}
+					echo "</optgroup>";
+				}
+				?>
+			</select>
+			<i class="fas fa-question-circle" title="По умолчанию устанавливаются текущая неделя."></i>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -256,7 +280,7 @@ $query = "
 		,DATE_FORMAT(LCT.test_time, '%H:%i') test_time
 		,CW.item
 		,PB.CW_ID
-		,PB.pb_date pb_date
+		,YEARWEEK(PB.pb_date, 1) pb_week
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 		,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 		,TIMESTAMPDIFF(HOUR, CAST(CONCAT(PB.pb_date, ' ', LB.batch_time) as datetime), CAST(CONCAT(LCT.test_date, ' ', LCT.test_time) as datetime)) delay_fact
@@ -272,10 +296,7 @@ $query = "
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	WHERE 1
-		".($_GET["date_from"] ? "AND LCT.test_date >= '{$_GET["date_from"]}'" : "")."
-		".($_GET["date_to"] ? "AND LCT.test_date <= '{$_GET["date_to"]}'" : "")."
-		".($_GET["pb_date_from"] ? "AND PB.pb_date >= '{$_GET["pb_date_from"]}'" : "")."
-		".($_GET["pb_date_to"] ? "AND PB.pb_date <= '{$_GET["pb_date_to"]}'" : "")."
+		".($_GET["week"] ? "AND YEARWEEK(LCT.test_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		".($_GET["delay"] ? "AND LCT.delay={$_GET["delay"]}" : "")."
@@ -286,7 +307,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	?>
 	<tr id="<?=$row["LCT_ID"]?>">
 		<td class="bg-gray"><?=$row["item"]?></td>
-		<td class="bg-gray"><a href="checklist.php?date_from=<?=$row["pb_date"]?>&date_to=<?=$row["pb_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
+		<td class="bg-gray"><a href="filling.php?week=<?=$row["pb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
 		<td class="bg-gray"><?=$row["batch_time_format"]?></td>
 		<td class="bg-gray"><?=$row["mix_density"]/1000?></td>
 		<td><?=$row["test_date"]?></td>
@@ -302,21 +323,6 @@ while( $row = mysqli_fetch_array($res) ) {
 
 	</tbody>
 </table>
-
-<script>
-	$(function() {
-		// При выборе даты заливки сбрасывается дата испытания
-		$('input[name="pb_date_from"], input[name="pb_date_to"]').change(function() {
-			$('input[name="date_from"]').val('');
-			$('input[name="date_to"]').val('');
-		});
-		// При выборе даты испытания сбрасывается дата заливки
-		$('input[name="date_from"], input[name="date_to"]').change(function() {
-			$('input[name="pb_date_from"]').val('');
-			$('input[name="pb_date_to"]').val('');
-		});
-	});
-</script>
 
 <?
 include "footer.php";

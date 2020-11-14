@@ -239,5 +239,5 @@ $html .= "
 ";
 
 $html = str_replace("\n", "", addslashes($html));
-echo "$('#checklist_form fieldset').html('{$html}');";
+echo "$('#filling_form fieldset').html('{$html}');";
 ?>

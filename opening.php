@@ -277,7 +277,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["weight3"]/1000?><?=($row["w3_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w3_diff"] > 0 ? " +" : " ").($row["w3_diff"]/1000)."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["mix_density"]/1000?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").($row["mix_diff"]/1000)."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
-		<td class="bg-gray"><a href="checklist.php?week=<?=$row["pb_week"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
+		<td class="bg-gray"><a href="filling.php?week=<?=$row["pb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
 		<td class="bg-gray"><?=$cassette?></td>
 		<td><a href="#" class="add_opening" LO_ID="<?=$row["LO_ID"]?>" title="Изменить данные расформовки"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>

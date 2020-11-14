@@ -2,7 +2,7 @@
 include "config.php";
 $title = 'Заливка';
 include "header.php";
-include "./forms/checklist_form.php";
+include "./forms/filling_form.php";
 //die("<h1>Ведутся работы</h1>");
 
 // Если в фильтре не установлена неделя, показываем текущую
@@ -85,7 +85,7 @@ if( !$_GET["week"] ) {
 				<td><?=$row["batches"]?></td>
 				<td><?=$row["fillings"]?></td>
 				<td><?=$row["plan"]?></td>
-				<td><a href="#" class="add_checklist" PB_ID="<?=$row["PB_ID"]?>" title="Внести данные чеклиста оператора"><i class="fa fa-plus-square fa-lg"></i></a></td>
+				<td><a href="#" class="add_filling" PB_ID="<?=$row["PB_ID"]?>" title="Внести данные чеклиста оператора"><i class="fa fa-plus-square fa-lg"></i></a></td>
 			</tr>
 			<?
 
@@ -101,7 +101,7 @@ if( !$_GET["week"] ) {
 <div id="filter">
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
-		<a href="/checklist.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+		<a href="/filling.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Неделя:</span>
@@ -310,7 +310,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		$cassette = "";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
 			if( $subsubrow["LO_ID"] ) {
-				$cassette .= "<a href='opening.php?week={$subsubrow["o_week"]}&CW_ID={$row["CW_ID"]}#{$subsubrow["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette' style='".($subsubrow["dbl"] > 1 ? "color: red;" : "")."'>{$subsubrow["cassette"]}</b></a>";
+				$cassette .= "<a href='opening.php?week={$subsubrow["o_week"]}#{$subsubrow["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette' style='".($subsubrow["dbl"] > 1 ? "color: red;" : "")."'>{$subsubrow["cassette"]}</b></a>";
 			}
 			else {
 				$cassette .= "<b class='cassette' style='".($subsubrow["dbl"] > 1 ? "color: red;" : "")."'>{$subsubrow["cassette"]}</b>";
@@ -338,7 +338,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<?
 				// Выводим общую ячейку с кнопкой редактирования
 				if( $cnt ) {
-					echo "<td rowspan='{$cnt}'><a href='#' class='add_checklist' PB_ID='{$row["PB_ID"]}' title='Изменить чеклист оператора'><i class='fa fa-pencil-alt fa-lg'></i></a></td>";
+					echo "<td rowspan='{$cnt}'><a href='#' class='add_filling' PB_ID='{$row["PB_ID"]}' title='Изменить чеклист оператора'><i class='fa fa-pencil-alt fa-lg'></i></a></td>";
 					$cnt = 0;
 				}
 				?>
