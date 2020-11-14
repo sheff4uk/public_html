@@ -11,6 +11,9 @@ if( !$_GET["week"] ) {
 	$row = mysqli_fetch_array($res);
 	$_GET["week"] = $row["week"];
 }
+
+// Собираем ошибки на экране
+
 ?>
 
 <!--Фильтр-->
@@ -236,7 +239,9 @@ $query = "
 		,LP.p_date
 		,LB.mix_density
 		,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
+		,SUM(1) dbl
 	FROM list__Opening LO
+	JOIN list__Opening SLO ON SLO.cassette = LO.cassette AND SLO.LF_ID = LO.LF_ID
 	LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 	LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
@@ -252,15 +257,16 @@ $query = "
 		".($_GET["crack"] ? "AND LO.o_crack" : "")."
 		".($_GET["chipped"] ? "AND LO.o_chipped" : "")."
 		".($_GET["def_form"] ? "AND LO.o_def_form" : "")."
+	GROUP BY LO.LO_ID
 	ORDER BY LO.o_date, LO.o_time, LO.o_post
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	if( $row["LP_ID"] ) {
-		$cassette = "<a href='packing.php?p_date_from={$row["p_date"]}&p_date_to={$row["p_date"]}#{$row["LP_ID"]}' title='Упаковка' target='_blank'><b class='cassette'>{$row["cassette"]}</b></a>";
+		$cassette = "<a href='packing.php?p_date_from={$row["p_date"]}&p_date_to={$row["p_date"]}#{$row["LP_ID"]}' title='Упаковка' target='_blank'><b class='cassette' style='".($subsubrow["dbl"] > 1 ? "color: red;" : "")."'>{$row["cassette"]}</b></a>";
 	}
 	else {
-		$cassette = "<b class='cassette'>{$row["cassette"]}</b>";
+		$cassette = "<b class='cassette' style='".($subsubrow["dbl"] > 1 ? "color: red;" : "")."'>{$row["cassette"]}</b>";
 	}
 	?>
 	<tr id="<?=$row["LO_ID"]?>">
