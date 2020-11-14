@@ -29,7 +29,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$errors .= "<p>Кассета <b class='cassette'>{$row["cassette"]}</b> залита <a href='filling.php?week={$row["week"]}#{$row["LB_ID"]}'>{$row["lf_date_format"]} {$row["lf_time_format"]}</a>. Нет данных по расформовке.</p>";
+	$errors .= "<p>Кассета <b class='cassette'>{$row["cassette"]}</b> залита <a href='filling.php?week={$row["week"]}#{$row["LB_ID"]}' target='_blank'>{$row["lf_date_format"]} {$row["lf_time_format"]}</a>. Нет данных по расформовке.</p>";
 }
 ?>
 
