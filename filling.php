@@ -241,6 +241,7 @@ foreach ($_GET as &$value) {
 // Получаем список дат и противовесов и кол-во замесов на эти даты
 $query = "
 	SELECT PB.PB_ID
+		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 		,CW.item
 		,PB.CW_ID
@@ -260,7 +261,8 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$cnt = $row["fakt"];
-	echo "<tbody id='PB{$row["PB_ID"]}' style='text-align: center; border-bottom: 2px solid #333;'>";
+	echo "<tbody id='PB{$row["PB_ID"]}' style='text-align: center; border-bottom: 2px solid #333; ".(($weekday and $weekday != $row["pb_date_weekday"]) ? " border-top: 10px solid #333;" : "")."'>";
+	$weekday = $row["pb_date_weekday"];
 
 	$query = "
 		SELECT LB.LB_ID
@@ -321,10 +323,10 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
-			echo "<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'>{$row["pb_date_format"]}<br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>По плану: <b>{$row["batches"]}</b></td>";
+			echo "<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'>{$row["pb_date_weekday"]}<br>{$row["pb_date_format"]}<br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>По плану: <b>{$row["batches"]}</b></td>";
 		}
 		?>
-				<td><?=$subrow["batch_time_format"]?><?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?></td>
+		<td><?=$subrow["batch_time_format"]?><?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?></td>
 		<td><span class="nowrap"><?=$subrow["version"] ? "<a href='mix_formula.php#{$subrow["MF_ID"]}' target='_blank'><b>{$subrow["letter"]}{$subrow["version"]}</b></a> " : "<i class='fas fa-exclamation-triangle' style='color: red;' title='Подходящий рецепт не обнаружен'></i> "?><?=($subrow["io_density"] ? "<i title='Плотность окалины' style='text-decoration: underline;'>".($subrow["io_density"]/1000)."</i> " : "")?><?=($subrow["sn_density"] ? "<i title='Плотность КМП' style='text-decoration: underline;'>".($subrow["sn_density"]/1000)."</i> " : "")?><?=($subrow["cs_density"] ? "<i title='Плотность отсева' style='text-decoration: underline;'>".($subrow["cs_density"]/1000)."</i>" : "")?></span></td>
 				<td><?=$subrow["mix_density"]/1000?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
 				<td class="bg-gray" <?=($subrow["version"] ? "" : "style='color: red;'")?>><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>

@@ -170,7 +170,6 @@ while( $row = mysqli_fetch_array($res) ) {
 
 	$query = "
 		SELECT PS.PS_ID
-			,DATE_FORMAT(PS.ps_date, '%d.%m.%y') ps_date_format
 			,PS.ps_date
 			,CW.item
 			,PS.CW_ID

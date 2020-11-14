@@ -170,7 +170,6 @@ while( $row = mysqli_fetch_array($res) ) {
 
 	$query = "
 		SELECT PB.PB_ID
-			,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 			,PB.pb_date
 			,CW.item
 			,PB.CW_ID
@@ -286,8 +285,8 @@ else {
 	<table>
 		<thead>
 			<tr>
-				<th colspan="2">Время</th>
-				<th>Дата</th>
+				<th colspan="2">Время изменения</th>
+				<th>День</th>
 				<th>Противовес</th>
 				<th>Замесов</th>
 				<th>Автор</th>
