@@ -13,6 +13,11 @@ if( !$_GET["week"] ) {
 }
 ?>
 
+<fieldset id="errors" style="color: red; border-color: red; display: none;">
+	<legend><h3>Ошибки:</h3></legend>
+	<div></div>
+</fieldset>
+
 <!--Фильтр-->
 <div id="filter">
 	<h3>Фильтр</h3>
@@ -261,7 +266,7 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	// Собираем ошибки номеров кассет
 	if($row["dbl"] > 1) {
-		$_SESSION["error"][] = "Кассета <a href='#{$row["LO_ID"]}'><b class='cassette'>{$row["cassette"]}</b></a> расформована повторно.";
+		$errors .= "<p>Кассета <a href='#{$row["LO_ID"]}'><b class='cassette'>{$row["cassette"]}</b></a> расформована повторно.</p>";
 	}
 
 	if( $row["LP_ID"] ) {
@@ -290,6 +295,19 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><a href="#" class="add_opening" LO_ID="<?=$row["LO_ID"]?>" title="Изменить данные расформовки"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?
+}
+
+// Выводим собранные ошибки вверку экрана
+if( $errors ) {
+	$_SESSION["error"][] = "Обнаружены ошибки в номерах кассет. Пожалуйста исправьте.";
+?>
+<script>
+	$(function() {
+		$('#errors div').html("<?=$errors?>");
+		$('#errors').show('fast');
+	});
+</script>
+<?
 }
 ?>
 
