@@ -25,7 +25,8 @@ $query = "
 	WHERE 1
 		AND LO.LO_ID IS NULL
 		AND YEARWEEK(LF.lf_date + INTERVAL 1 DAY, 1) LIKE '{$_GET["week"]}'
-	HAVING (SELECT LF_ID FROM list__Filling WHERE cassette = LF.cassette AND lf_date > LF.lf_date LIMIT 1) IS NOT NULL
+		AND(SELECT LF_ID FROM list__Filling WHERE cassette = LF.cassette AND lf_date > LF.lf_date LIMIT 1) IS NOT NULL
+	ORDER BY LF.lf_date, LF.lf_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
