@@ -278,7 +278,8 @@ for ($i = 1; $i <= $cassetts; $i++) {
 					scaleLabel: {
 						display: true,
 						labelString: '№ кассеты'
-					}
+					},
+					position: 'right',
 				}]
 			}
 		}
