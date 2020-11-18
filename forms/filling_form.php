@@ -23,7 +23,6 @@ if( isset($_POST["PB_ID"]) ) {
 			$batch_time = $value;
 			$io_density = $_POST["io_density"][$key] ? $_POST["io_density"][$key]*1000 : "NULL";
 			$sn_density = $_POST["sn_density"][$key] ? $_POST["sn_density"][$key]*1000 : "NULL";
-			$cs_density = $_POST["cs_density"][$key] ? $_POST["cs_density"][$key]*1000 : "NULL";
 			$mix_density = $_POST["mix_density"][$key]*1000;
 			$iron_oxide = $_POST["iron_oxide"][$key] ? $_POST["iron_oxide"][$key] : "NULL";
 			$sand = $_POST["sand"][$key] ? $_POST["sand"][$key] : "NULL";
@@ -41,7 +40,6 @@ if( isset($_POST["PB_ID"]) ) {
 						,batch_time = '{$batch_time}'
 						,io_density = {$io_density}
 						,sn_density = {$sn_density}
-						,cs_density = {$cs_density}
 						,mix_density = {$mix_density}
 						,iron_oxide = {$iron_oxide}
 						,sand = {$sand}
@@ -73,7 +71,6 @@ if( isset($_POST["PB_ID"]) ) {
 						,batch_time = '{$batch_time}'
 						,io_density = {$io_density}
 						,sn_density = {$sn_density}
-						,cs_density = {$cs_density}
 						,mix_density = {$mix_density}
 						,iron_oxide = {$iron_oxide}
 						,sand = {$sand}

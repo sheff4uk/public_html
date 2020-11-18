@@ -10,13 +10,11 @@ if( isset($_POST["CW_ID"]) ) {
 	$io_max = $_POST["io_max"] ? $_POST["io_max"] * 1000 : "NULL";
 	$sn_min = $_POST["sn_min"] ? $_POST["sn_min"] * 1000 : "NULL";
 	$sn_max = $_POST["sn_max"] ? $_POST["sn_max"] * 1000 : "NULL";
-	$cs_min = $_POST["cs_min"] ? $_POST["cs_min"] * 1000 : "NULL";
-	$cs_max = $_POST["cs_max"] ? $_POST["cs_max"] * 1000 : "NULL";
-	$iron_oxide = $_POST["iron_oxide"] ? $_POST["iron_oxide"] : "NULL";
-	$sand = $_POST["sand"] ? $_POST["sand"] : "NULL";
-	$crushed_stone = $_POST["crushed_stone"] ? $_POST["crushed_stone"] : "NULL";
-	$cement = $_POST["cement"] ? $_POST["cement"] : "NULL";
-	$water = $_POST["water"] ? $_POST["water"] : "NULL";
+	$iron_oxide = ($_POST["iron_oxide"] != '') ? $_POST["iron_oxide"] : "NULL";
+	$sand = ($_POST["sand"] != '') ? $_POST["sand"] : "NULL";
+	$crushed_stone = ($_POST["crushed_stone"] != '') ? $_POST["crushed_stone"] : "NULL";
+	$cement = ($_POST["cement"] != '') ? $_POST["cement"] : "NULL";
+	$water = ($_POST["water"] != '') ? $_POST["water"] : "NULL";
 
 	if( $_POST["MF_ID"] ) { // Редактируем
 		$query = "
@@ -27,8 +25,6 @@ if( isset($_POST["CW_ID"]) ) {
 				,io_max = {$io_max}
 				,sn_min = {$sn_min}
 				,sn_max = {$sn_max}
-				,cs_min = {$cs_min}
-				,cs_max = {$cs_max}
 				,iron_oxide = {$iron_oxide}
 				,sand = {$sand}
 				,crushed_stone = {$crushed_stone}
@@ -50,8 +46,6 @@ if( isset($_POST["CW_ID"]) ) {
 				,io_max = {$io_max}
 				,sn_min = {$sn_min}
 				,sn_max = {$sn_max}
-				,cs_min = {$cs_min}
-				,cs_max = {$cs_max}
 				,iron_oxide = {$iron_oxide}
 				,sand = {$sand}
 				,crushed_stone = {$crushed_stone}
@@ -94,13 +88,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th rowspan="2">Противовес</th>
 						<th rowspan="2">Литера</th>
-						<th colspan="3">Условия применения</th>
+						<th colspan="2">Условия применения</th>
 						<th colspan="5">Рецепт</th>
 					</tr>
 					<tr>
 						<th>Окалина между</th>
 						<th>КМП между</th>
-						<th>Отсев между</th>
 						<th>Окалина, кг</th>
 						<th>КМП, кг</th>
 						<th>Отсев, кг</th>
@@ -118,7 +111,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 									SELECT CW.CW_ID
 										,CW.item
 										,CW.fillings
-										,CW.type
+										#,CW.type
 										,SUM(MF.io_min) io
 										,SUM(MF.sn_min) sn
 										,SUM(MF.cs_min) cs
@@ -140,29 +133,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 								<option value="A">A</option>
 								<option value="B">B</option>
 								<option value="C">C</option>
-								<option value="D">D</option>
-								<option value="E">E</option>
-								<option value="F">F</option>
-								<option value="G">G</option>
-								<option value="H">H</option>
-								<option value="I">I</option>
-								<option value="J">J</option>
-								<option value="K">K</option>
-								<option value="L">L</option>
-								<option value="M">M</option>
-								<option value="N">N</option>
-								<option value="O">O</option>
-								<option value="P">P</option>
-								<option value="Q">Q</option>
-								<option value="R">R</option>
-								<option value="S">S</option>
-								<option value="T">T</option>
-								<option value="U">U</option>
-								<option value="V">V</option>
-								<option value="W">W</option>
-								<option value="X">X</option>
-								<option value="Y">Y</option>
-								<option value="Z">Z</option>
 							</select>
 						</td>
 						<td class="bg-gray">
@@ -173,15 +143,11 @@ this.subbut.value='Подождите, пожалуйста!';">
 							от<input type="number" min="1" max="2" step="0.01" name="sn_min" style="width: 70px; display: inline-block;">
 							до<input type="number" min="1" max="2" step="0.01" name="sn_max" style="width: 70px; display: inline-block;">
 						</td>
-						<td class="bg-gray">
-							от<input type="number" min="1" max="2" step="0.01" name="cs_min" style="width: 70px; display: inline-block;">
-							до<input type="number" min="1" max="2" step="0.01" name="cs_max" style="width: 70px; display: inline-block;">
-						</td>
-						<td><input type="number" name="iron_oxide" min="0" style="width: 80px;"></td>
-						<td><input type="number" name="sand" min="0" style="width: 80px;"></td>
-						<td><input type="number" name="crushed_stone" min="0" style="width: 80px;"></td>
-						<td><input type="number" name="cement" min="0" style="width: 80px;" required></td>
-						<td><input type="number" name="water" min="0" style="width: 80px;" required></td>
+						<td style="background: #a52a2a80;"><input type="number" name="iron_oxide" min="0" style="width: 80px;"></td>
+						<td style="background: #f4a46082;"><input type="number" name="sand" min="0" style="width: 80px;"></td>
+						<td style="background: #8b45137a;"><input type="number" name="crushed_stone" min="0" style="width: 80px;"></td>
+						<td style="background: #7080906b;"><input type="number" name="cement" min="0" style="width: 80px;" required></td>
+						<td style="background: #1e90ff85;"><input type="number" name="water" min="0" style="width: 80px;" required></td>
 					</tr>
 				</tbody>
 			</table>
