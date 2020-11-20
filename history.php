@@ -53,10 +53,10 @@ $query = "
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 			".($_GET["CW_ID"] ? "AND PB.CW_ID = {$_GET["CW_ID"]}" : "")."
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		GROUP BY LF.LF_ID
 		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
-			AND MIN(o_interval(LO.LO_ID)) < 24
+			AND IFNULL(MIN(o_interval(LO.LO_ID)), 24) < 24
 
 		UNION ALL
 
@@ -139,10 +139,10 @@ $query = "
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 			".($_GET["CW_ID"] ? "AND PB.CW_ID = {$_GET["CW_ID"]}" : "")."
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		GROUP BY LF.LF_ID
 		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
-			AND MAX(o_interval(LO.LO_ID)) >= 24
+			AND IFNULL(MAX(o_interval(LO.LO_ID)), 24) >= 24
 
 		UNION ALL
 
