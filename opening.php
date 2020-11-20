@@ -301,7 +301,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["o_date"]?></td>
 		<td><?=$row["o_time"]?></td>
 		<td><?=$cassette?></td>
-		<td <?=($row["o_interval"] < 24 ? "class='error'" : "")?>><?=$row["o_interval"]?></td>
+		<td style="background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
 		<td><?=$row["o_post"]?></td>
 		<td style="color: red;"><?=$row["o_not_spill"]?></td>
 		<td style="color: red;"><?=$row["o_crack"]?></td>
