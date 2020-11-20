@@ -2,7 +2,28 @@
 include "config.php";
 $title = 'История кассет';
 include "header.php";
+?>
 
+<form method="get" style="font-size: 1.5em;">
+	<span>Код противовеса:</span>
+	<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;" onchange="this.form.submit()">
+		<option value="">Все коды</option>
+		<?
+		$query = "
+			SELECT CW.CW_ID, CW.item
+			FROM CounterWeight CW
+			ORDER BY CW.CW_ID
+		";
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		while( $row = mysqli_fetch_array($res) ) {
+			$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
+			echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
+		}
+		?>
+	</select>
+</form>
+
+<?
 // Ранняя дата
 $query = "SELECT DATE_FORMAT(NOW() - INTERVAL 7 DAY, '%d.%m.%Y %H:%i') start";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -30,6 +51,7 @@ $query = "
 		FROM list__Filling LF
 		JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+			".($_GET["CW_ID"] ? "AND PB.CW_ID = {$_GET["CW_ID"]}" : "")."
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		GROUP BY LF.LF_ID
@@ -45,10 +67,11 @@ $query = "
 			,CW.item
 			,o_interval(LO.LO_ID)
 		FROM list__Opening LO
-		LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
-		LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
-		LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-		LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+		JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+			".($_GET["CW_ID"] ? "AND PB.CW_ID = {$_GET["CW_ID"]}" : "")."
+		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		WHERE o_interval(LO.LO_ID) < 24
 		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
 	) SUB
@@ -114,11 +137,12 @@ $query = "
 		FROM list__Filling LF
 		JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+			".($_GET["CW_ID"] ? "AND PB.CW_ID = {$_GET["CW_ID"]}" : "")."
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		GROUP BY LF.LF_ID
 		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
-			AND IFNULL(MAX(o_interval(LO.LO_ID)), 24) >= 24
+			AND MAX(o_interval(LO.LO_ID)) >= 24
 
 		UNION ALL
 
@@ -129,10 +153,11 @@ $query = "
 			,CW.item
 			,o_interval(LO.LO_ID)
 		FROM list__Opening LO
-		LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
-		LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
-		LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-		LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+		JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+			".($_GET["CW_ID"] ? "AND PB.CW_ID = {$_GET["CW_ID"]}" : "")."
+		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		WHERE o_interval(LO.LO_ID) >= 24
 		HAVING date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW()
 	) SUB
