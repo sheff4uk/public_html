@@ -50,11 +50,11 @@ $query = "
 		,GROUP_CONCAT(CONCAT(ROUND(MF.io_min/1000, 2), '&ndash;', ROUND(MF.io_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') io
 		,GROUP_CONCAT(CONCAT(ROUND(MF.sn_min/1000, 2), '&ndash;', ROUND(MF.sn_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') sn
 		,GROUP_CONCAT(CONCAT(ROUND(MF.cs_min/1000, 2), '&ndash;', ROUND(MF.cs_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') cs
-		,GROUP_CONCAT(distinct CONCAT(MF.iron_oxide, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') iron_oxide
-		,GROUP_CONCAT(distinct CONCAT(MF.sand, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') sand
-		,GROUP_CONCAT(distinct CONCAT(MF.crushed_stone, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') crushed_stone
-		,GROUP_CONCAT(distinct CONCAT(MF.cement, ' ±2') ORDER BY MF.letter SEPARATOR '<br>') cement
-		,GROUP_CONCAT(distinct CONCAT('min ', MF.water) ORDER BY MF.letter SEPARATOR '<br>') water
+		,GROUP_CONCAT(CONCAT(MF.iron_oxide, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') iron_oxide
+		,GROUP_CONCAT(CONCAT(MF.sand, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') sand
+		,GROUP_CONCAT(CONCAT(MF.crushed_stone, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') crushed_stone
+		,GROUP_CONCAT(CONCAT(MF.cement, ' ±2') ORDER BY MF.letter SEPARATOR '<br>') cement
+		,GROUP_CONCAT(CONCAT('min ', MF.water) ORDER BY MF.letter SEPARATOR '<br>') water
 	FROM MixFormula MF
 	WHERE MF.CW_ID = {$CW_ID}
 ";
