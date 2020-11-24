@@ -50,14 +50,14 @@ while( $row = mysqli_fetch_array($res) ) {
 				newDate(-1)
 			],
 			datasets: [{
-				label: 'Температура <<',
+				label: '<< Температура',
 				backgroundColor: 'rgba(255, 0, 0, .5)',
 				//borderWidth: 2,
 				borderColor: 'rgba(255, 0, 0, 1)',
 				fill: false,
 				data: [<?=$t1_data?>],
 			}, {
-				label: 'Влажность <<',
+				label: '<< Влажность',
 				backgroundColor: 'rgba(0, 0, 255, .5)',
 				//borderWidth: 2,
 				borderColor: 'rgba(0, 0, 255, 1)',
