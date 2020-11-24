@@ -5,10 +5,10 @@ include "header.php";
 
 $query = "
 	SELECT DATE_FORMAT(date_time, '%d.%m.%Y %H:30') `time`
-		,ROUND(AVG(t1), 1) t1
-		,ROUND(AVG(h1), 1) h1
-		,ROUND(AVG(t2), 1) t2
-		,ROUND(AVG(h2), 1) h2
+		,IFNULL(ROUND(AVG(t1), 1), 'NaN') t1
+		,IFNULL(ROUND(AVG(h1), 1), 'NaN') h1
+		,IFNULL(ROUND(AVG(t2), 1), 'NaN') t2
+		,IFNULL(ROUND(AVG(h2), 1), 'NaN') h2
 	FROM Climate
 	WHERE date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW() - INTERVAL 30 MINUTE
 	GROUP BY `time`
