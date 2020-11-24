@@ -7,7 +7,8 @@ $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
 
 // Проверка доступа
-if( !(strpos($ip, "92.255") === 0) ) die('Access denied!');
+//if( !(strpos($ip, "92.255") === 0) ) die('Access denied!');
+if( !(strpos($ip, "85.93") === 0) ) die('Access denied!');
 
 
 // Записываем в базу переданные показания
