@@ -76,15 +76,6 @@ while( $row = mysqli_fetch_array($res) ) {
 				newDate(-1)
 			],
 			datasets: [{
-				label: 'h, max',
-				fill: false,
-				backgroundColor: 'rgba(0, 0, 255, 1)',
-				borderWidth: 2,
-				pointRadius: 0,
-				pointHoverRadius: 0,
-				borderColor: 'rgba(0, 0, 255, 1)',
-				data: [{x: '<?=$start?>', y: 75}, {x: '<?=$end?>', y: 75}, ],
-			}, {
 				label: 't, min',
 				fill: false,
 				backgroundColor: 'rgba(255, 0, 0, 1)',
@@ -93,6 +84,15 @@ while( $row = mysqli_fetch_array($res) ) {
 				pointHoverRadius: 0,
 				borderColor: 'rgba(255, 0, 0, 1)',
 				data: [{x: '<?=$start?>', y: 15}, {x: '<?=$end?>', y: 15}, ],
+			}, {
+				label: 'h, max',
+				fill: false,
+				backgroundColor: 'rgba(0, 0, 255, 1)',
+				borderWidth: 2,
+				pointRadius: 0,
+				pointHoverRadius: 0,
+				borderColor: 'rgba(0, 0, 255, 1)',
+				data: [{x: '<?=$start?>', y: 75}, {x: '<?=$end?>', y: 75}, ],
 			}, {
 				label: 't, Созревание',
 				backgroundColor: 'rgba(255, 100, 50, .5)',
