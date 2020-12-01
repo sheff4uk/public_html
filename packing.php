@@ -195,14 +195,14 @@ $query = "
 		,PB.pb_date
 		,PB.CW_ID
 		,LB.LB_ID
-		,LO.LO_ID
-		,LO.o_date
+		#,LO.LO_ID
+		#,LO.o_date
 	FROM list__Packing LP
 	LEFT JOIN list__Filling LF ON LF.LF_ID = LP.LF_ID
 	LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+	#LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 	WHERE 1
 		".($_GET["p_date_from"] ? "AND LP.p_date >= '{$_GET["p_date_from"]}'" : "")."
 		".($_GET["p_date_to"] ? "AND LP.p_date <= '{$_GET["p_date_to"]}'" : "")."
@@ -219,12 +219,12 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	if( $row["LO_ID"] ) {
-		$cassette = "<a href='opening.php?o_date_from={$row["o_date"]}&o_date_to={$row["o_date"]}#{$row["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette'>{$row["cassette"]}</b></a>";
-	}
-	else {
+	//if( $row["LO_ID"] ) {
+	//	$cassette = "<a href='opening.php?o_date_from={$row["o_date"]}&o_date_to={$row["o_date"]}#{$row["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette'>{$row["cassette"]}</b></a>";
+	//}
+	//else {
 		$cassette = "<b class='cassette'>{$row["cassette"]}</b>";
-	}
+	//}
 	?>
 	<tr id="<?=$row["LP_ID"]?>">
 		<td><?=$row["p_date"]?></td>
