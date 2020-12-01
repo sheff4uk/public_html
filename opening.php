@@ -249,9 +249,9 @@ $query = "
 		,LO.weight1
 		,LO.weight2
 		,LO.weight3
-		,IF(LO.weight1 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight1 > CW.max_weight, LO.weight1 - CW.max_weight, LO.weight1 - CW.min_weight)) w1_diff
-		,IF(LO.weight2 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight2 > CW.max_weight, LO.weight2 - CW.max_weight, LO.weight2 - CW.min_weight)) w2_diff
-		,IF(LO.weight3 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight3 > CW.max_weight, LO.weight3 - CW.max_weight, LO.weight3 - CW.min_weight)) w3_diff
+		#,IF(LO.weight1 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight1 > CW.max_weight, LO.weight1 - CW.max_weight, LO.weight1 - CW.min_weight)) w1_diff
+		#,IF(LO.weight2 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight2 > CW.max_weight, LO.weight2 - CW.max_weight, LO.weight2 - CW.min_weight)) w2_diff
+		#,IF(LO.weight3 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight3 > CW.max_weight, LO.weight3 - CW.max_weight, LO.weight3 - CW.min_weight)) w3_diff
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 		,LO.cassette
 		,CW.item
