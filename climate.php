@@ -38,7 +38,7 @@ $query = "
 	FROM Climate
 	WHERE date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW() - INTERVAL 30 MINUTE
 	GROUP BY `time`
-	ORDER BY `time`
+	ORDER BY date_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
