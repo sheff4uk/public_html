@@ -12,6 +12,9 @@ if( !$_GET["week"] ) {
 	$_GET["week"] = $row["week"];
 }
 
+$CAS = isset($_GET["CAS"]) ? $_GET["CAS"] : array();
+$CASs = implode(",", $CAS);
+
 // Начинаем собирать ошибки
 $query = "
 	SELECT LB.LB_ID
@@ -124,6 +127,18 @@ while( $row = mysqli_fetch_array($res) ) {
 			</select>
 		</div>
 
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>№№ Кассет:</span>
+			<select name="CAS[]" class="<?=$_GET["CAS"] ? "filtered" : ""?>" style="width: 350px;" multiple>
+				<?
+				for ($i = 1; $i <= $cassetts; $i++) {
+					$selected = in_array($i, $_GET["CAS"]) ? "selected" : "";
+					echo "<option value='{$i}' {$selected}>{$i}</option>";
+				}
+				?>
+			</select>
+		</div>
+
 		<div style="margin-bottom: 10px;">
 			<fieldset>
 				<legend>Нарушение тех. процесса:</legend>
@@ -191,7 +206,7 @@ foreach ($_GET as &$value) {
 ?>
 
 <script>
-	$(document).ready(function() {
+	$(function() {
 		$( "#filter" ).accordion({
 			active: <?=($filter ? "0" : "false")?>,
 			collapsible: true,
@@ -203,6 +218,14 @@ foreach ($_GET as &$value) {
 			$( "#filter" ).accordion({
 				active: "false"
 			});
+		});
+
+		$('select[name="CAS[]"]').select2({
+			placeholder: "Выберите интересующие номера кассет",
+			allowClear: true,
+			//closeOnSelect: false,
+			scrollAfterSelect: false,
+			language: "ru"
 		});
 	});
 </script>
@@ -280,6 +303,7 @@ $query = "
 		".($_GET["crack"] ? "AND LO.o_crack" : "")."
 		".($_GET["chipped"] ? "AND LO.o_chipped" : "")."
 		".($_GET["def_form"] ? "AND LO.o_def_form" : "")."
+		".($CASs ? "AND LO.cassette IN({$CASs})" : "")."
 	GROUP BY LO.LO_ID
 	ORDER BY LO.o_date, LO.o_time, LO.o_post
 ";

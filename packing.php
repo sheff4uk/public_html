@@ -15,6 +15,10 @@ if( !$_GET["pb_date_from"] and !$_GET["pb_date_to"] ) {
 		$_GET["p_date_to"] = date_format($date, 'Y-m-d');
 	}
 }
+
+$CAS = isset($_GET["CAS"]) ? $_GET["CAS"] : array();
+$CASs = implode(",", $CAS);
+
 ?>
 
 <!--Фильтр-->
@@ -69,6 +73,18 @@ if( !$_GET["pb_date_from"] and !$_GET["pb_date_to"] ) {
 				while( $row = mysqli_fetch_array($res) ) {
 					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
 					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>№№ Кассет:</span>
+			<select name="CAS[]" class="<?=$_GET["CAS"] ? "filtered" : ""?>" style="width: 350px;" multiple>
+				<?
+				for ($i = 1; $i <= $cassetts; $i++) {
+					$selected = in_array($i, $_GET["CAS"]) ? "selected" : "";
+					echo "<option value='{$i}' {$selected}>{$i}</option>";
 				}
 				?>
 			</select>
@@ -134,7 +150,7 @@ foreach ($_GET as &$value) {
 ?>
 
 <script>
-	$(document).ready(function() {
+	$(function() {
 		$( "#filter" ).accordion({
 			active: <?=($filter ? "0" : "false")?>,
 			collapsible: true,
@@ -146,6 +162,14 @@ foreach ($_GET as &$value) {
 			$( "#filter" ).accordion({
 				active: "false"
 			});
+		});
+
+		$('select[name="CAS[]"]').select2({
+			placeholder: "Выберите интересующие номера кассет",
+			allowClear: true,
+			//closeOnSelect: false,
+			scrollAfterSelect: false,
+			language: "ru"
 		});
 
 //		$('#filter input[name="date_from"]').change(function() {
@@ -215,6 +239,7 @@ $query = "
 		".($_GET["crack"] ? "AND LP.p_crack" : "")."
 		".($_GET["chipped"] ? "AND LP.p_chipped" : "")."
 		".($_GET["def_form"] ? "AND LP.p_def_form" : "")."
+		".($CASs ? "AND LF.cassette IN({$CASs})" : "")."
 	ORDER BY LP.p_date DESC, LP.p_time, LP.p_post
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
