@@ -21,8 +21,8 @@ echo "<h2>Последние показания: <span style='color: rgba(255, 1
 
 // Узнаем время начала и время окончания
 $query = "
-	SELECT DATE_FORMAT(NOW() - INTERVAL 7 DAY, '%d.%m.%Y %H:30') `start`
-		,DATE_FORMAT(NOW() - INTERVAL 30 MINUTE, '%d.%m.%Y %H:30') `end`
+	SELECT DATE_FORMAT(NOW() - INTERVAL 12 DAY, '%d.%m.%Y %H:30') `start`
+		,DATE_FORMAT(NOW() - INTERVAL 5 DAY, '%d.%m.%Y %H:30') `end`
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
@@ -31,12 +31,12 @@ $end = $row["end"];
 
 $query = "
 	SELECT DATE_FORMAT(date_time, '%d.%m.%Y %H:30') `time`
-		,IFNULL(ROUND(AVG(t1), 1), 'NaN') t1
+		,IFNULL(ROUND(AVG(t1+2), 1), 'NaN') t1
 		,IFNULL(ROUND(AVG(t2), 1), 'NaN') t2
 		,IFNULL(ROUND(AVG(h1), 1), 'NaN') h1
 		,IFNULL(ROUND(AVG(h2), 1), 'NaN') h2
 	FROM Climate
-	WHERE date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW() - INTERVAL 30 MINUTE
+	WHERE date_time BETWEEN NOW() - INTERVAL 12 DAY AND NOW() - INTERVAL 5 DAY
 	GROUP BY `time`
 	ORDER BY date_time
 ";
@@ -67,13 +67,13 @@ while( $row = mysqli_fetch_array($res) ) {
 		type: 'line',
 		data: {
 			labels: [ // Date Objects
+				newDate(-12),
+				newDate(-11),
+				newDate(-10),
+				newDate(-9),
+				newDate(-8),
 				newDate(-7),
-				newDate(-6),
-				newDate(-5),
-				newDate(-4),
-				newDate(-3),
-				newDate(-2),
-				newDate(-1)
+				newDate(-6)
 			],
 			datasets: [{
 				label: 't, min',
