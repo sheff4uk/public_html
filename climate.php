@@ -31,8 +31,8 @@ $end = $row["end"];
 
 $query = "
 	SELECT DATE_FORMAT(date_time, '%d.%m.%Y %H:30') `time`
-		,IFNULL(ROUND(AVG(t1+2), 1), 'NaN') t1
-		,IFNULL(ROUND(AVG(t2), 1), 'NaN') t2
+		,IFNULL(ROUND(AVG(t1), 1), 'NaN') t1
+		,IFNULL(ROUND(AVG(t2+2), 1), 'NaN') t2
 		,IFNULL(ROUND(AVG(h1), 1), 'NaN') h1
 		,IFNULL(ROUND(AVG(h2), 1), 'NaN') h2
 	FROM Climate
