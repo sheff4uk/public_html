@@ -17,12 +17,12 @@ $t2 = $row["t2"];
 $h1 = $row["h1"];
 $h2 = $row["h2"];
 
-echo "<h2>Последние показания: <span style='color: rgba(255, 100, 50, 1);' title='Участок созревания'>{$t1}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(255, 200, 0, 1);' title='Участок расформовки'>{$t2}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(100, 100, 255, 1);' title='Участок созревания'>{$h1}%</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(200, 0, 255, 1);' title='Участок расформовки'>{$h2}%</span></h2>";
+//echo "<h2>Последние показания: <span style='color: rgba(255, 100, 50, 1);' title='Участок созревания'>{$t1}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(255, 200, 0, 1);' title='Участок расформовки'>{$t2}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(100, 100, 255, 1);' title='Участок созревания'>{$h1}%</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(200, 0, 255, 1);' title='Участок расформовки'>{$h2}%</span></h2>";
 
 // Узнаем время начала и время окончания
 $query = "
-	SELECT DATE_FORMAT(NOW() - INTERVAL 7 DAY, '%d.%m.%Y %H:30') `start`
-		,DATE_FORMAT(NOW() - INTERVAL 30 MINUTE, '%d.%m.%Y %H:30') `end`
+	SELECT DATE_FORMAT(NOW() - INTERVAL 14 DAY, '%d.%m.%Y %H:30') `start`
+		,DATE_FORMAT(NOW() - INTERVAL 7 DAY, '%d.%m.%Y %H:30') `end`
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
@@ -36,7 +36,7 @@ $query = "
 		,IFNULL(ROUND(AVG(h1), 1), 'NaN') h1
 		,IFNULL(ROUND(AVG(h2), 1), 'NaN') h2
 	FROM Climate
-	WHERE date_time BETWEEN NOW() - INTERVAL 7 DAY AND NOW() - INTERVAL 30 MINUTE
+	WHERE date_time BETWEEN NOW() - INTERVAL 14 DAY AND NOW() - INTERVAL 7 DAY
 	GROUP BY `time`
 	ORDER BY date_time
 ";
@@ -67,16 +67,16 @@ while( $row = mysqli_fetch_array($res) ) {
 		type: 'line',
 		data: {
 			labels: [ // Date Objects
-				newDate(-7),
-				newDate(-6),
-				newDate(-5),
-				newDate(-4),
-				newDate(-3),
-				newDate(-2),
-				newDate(-1)
+				newDate(-14),
+				newDate(-13),
+				newDate(-12),
+				newDate(-11),
+				newDate(-10),
+				newDate(-9),
+				newDate(-8)
 			],
 			datasets: [{
-				label: 't, min',
+				label: 'Температура, min',
 				fill: false,
 				backgroundColor: 'rgba(255, 0, 0, 1)',
 				borderWidth: 2,
@@ -85,7 +85,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				borderColor: 'rgba(255, 0, 0, 1)',
 				data: [{x: '<?=$start?>', y: 15}, {x: '<?=$end?>', y: 15}, ],
 			}, {
-				label: 'h, min',
+				label: 'Влажность, min',
 				fill: false,
 				backgroundColor: 'rgba(0, 0, 255, 1)',
 				borderWidth: 2,
@@ -94,31 +94,31 @@ while( $row = mysqli_fetch_array($res) ) {
 				borderColor: 'rgba(0, 0, 255, 1)',
 				data: [{x: '<?=$start?>', y: 75}, {x: '<?=$end?>', y: 75}, ],
 			}, {
-				label: 't, Созревание',
+				label: 'Температура',
 				backgroundColor: 'rgba(255, 100, 50, .5)',
 				//borderWidth: 2,
 				pointRadius: 0,
 				borderColor: 'rgba(255, 100, 50, 1)',
 				fill: false,
 				data: [<?=$t1_data?>],
+//			}, {
+//				label: 't, Расформовка',
+//				backgroundColor: 'rgba(255, 200, 0, .5)',
+//				//borderWidth: 2,
+//				pointRadius: 0,
+//				borderColor: 'rgba(255, 200, 0, 1)',
+//				fill: false,
+//				data: [<?=$t2_data?>],
+//			}, {
+//				label: 'h, Созревание',
+//				backgroundColor: 'rgba(100, 100, 255, .5)',
+//				//borderWidth: 2,
+//				pointRadius: 0,
+//				borderColor: 'rgba(100, 100, 255, 1)',
+//				fill: false,
+//				data: [<?=$h1_data?>],
 			}, {
-				label: 't, Расформовка',
-				backgroundColor: 'rgba(255, 200, 0, .5)',
-				//borderWidth: 2,
-				pointRadius: 0,
-				borderColor: 'rgba(255, 200, 0, 1)',
-				fill: false,
-				data: [<?=$t2_data?>],
-			}, {
-				label: 'h, Созревание',
-				backgroundColor: 'rgba(100, 100, 255, .5)',
-				//borderWidth: 2,
-				pointRadius: 0,
-				borderColor: 'rgba(100, 100, 255, 1)',
-				fill: false,
-				data: [<?=$h1_data?>],
-			}, {
-				label: 'h, Расформовка',
+				label: 'Влажность',
 				backgroundColor: 'rgba(200, 0, 255, .5)',
 				//borderWidth: 2,
 				pointRadius: 0,
