@@ -36,7 +36,7 @@ if( $type == 2 ) {
 		LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
 		WHERE LP.LP_ID IS NULL
 		".($LF_ID ? "OR LF.LF_ID = {$LF_ID}" : "")."
-		ORDER BY PB.pb_date, LF.cassette
+		ORDER BY PB.pb_date DESC, LF.cassette
 	";
 }
 
