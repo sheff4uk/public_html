@@ -44,6 +44,25 @@ if( !$_GET["date"] ) {
 			<input name="date" type="date" value="<?=$_GET["date"]?>" class="<?=$_GET["date"] ? "filtered" : ""?>" onchange="this.form.submit();">
 		</div>
 
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>Бренд:</span>
+			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT CB.CB_ID, CB.brand
+					FROM ClientBrand CB
+					ORDER BY CB.CB_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
+					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+
 		<button style="float: right;">Фильтр</button>
 	</form>
 </div>
@@ -103,6 +122,7 @@ $query = "
 	JOIN CounterWeight CW ON CW.CW_ID = SR.CW_ID
 	WHERE 1
 		".($_GET["date"] ? "AND SR.sr_date = '{$_GET["date"]}'" : "")."
+		".($_GET["CB_ID"] ? "AND SR.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	ORDER BY SR.sr_date DESC, SR.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -133,7 +153,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_reject_report.php?sr_date=<?=$_GET["date"]?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
+<div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_reject_report.php?sr_date=<?=$_GET["date"]?>&CB_ID=<?=$_GET["CB_ID"]?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
 <div id="add_btn" class="add_reject" sr_date="<?=$_GET["sr_date_format"]?>" title="Внести данные"></div>
 
 <script>

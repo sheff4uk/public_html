@@ -79,6 +79,7 @@ $query = "
 	FROM ShellReject SR
 	JOIN CounterWeight CW ON CW.CW_ID = SR.CW_ID
 	WHERE SR.sr_date = '{$sr_date}'
+		".($_GET["CB_ID"] ? "AND SR.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	ORDER BY SR.sr_date DESC, SR.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
