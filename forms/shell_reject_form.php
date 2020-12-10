@@ -93,7 +93,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 								$query = "
 									SELECT CW.CW_ID, CW.item
 									FROM CounterWeight CW
-									WHERE CW.CB_ID = 2
 									ORDER BY CW.CW_ID
 								";
 								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
