@@ -107,6 +107,7 @@ foreach ($_GET as &$value) {
 			<th>Противовес</th>
 			<th>Расформовка</th>
 			<th>Упаковка</th>
+			<th>Всего</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -138,6 +139,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["item"]?></td>
 		<td><?=$row["o_reject_cnt"]?></td>
 		<td><?=$row["p_reject_cnt"]?></td>
+		<td><?=($row["o_reject_cnt"] + $row["p_reject_cnt"])?></td>
 		<td><a href="#" class="add_reject" LDR_ID="<?=$row["LDR_ID"]?>" title="Изменить данные cуточного брака"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?
@@ -148,6 +150,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Итог:</td>
 			<td><?=$o_reject?></td>
 			<td><?=$p_reject?></td>
+			<td><?=($o_reject + $p_reject)?></td>
 			<td></td>
 		</tr>
 	</tbody>
