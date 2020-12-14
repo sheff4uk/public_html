@@ -34,6 +34,7 @@ if( isset($_POST["CW_ID"]) ) {
 				,CW_ID = {$CW_ID}
 				,sr_cnt = {$sr_cnt}
 				,exfolation = {$exfolation}
+				,crack = {$crack}
 				,chipped = {$chipped}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
