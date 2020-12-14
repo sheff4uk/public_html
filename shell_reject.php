@@ -4,10 +4,14 @@ $title = 'Списание форм';
 include "header.php";
 include "./forms/shell_reject_form.php";
 
-// Если в фильтре не установлена дата, показываем сегодня
-if( !$_GET["date"] ) {
-	$date = new DateTime();
-	$_GET["date"] = date_format($date, 'Y-m-d');
+// Если в фильтре не установлен период, показываем последние 7 дней
+if( !$_GET["date_from"] ) {
+	$date = new DateTime('-6 days');
+	$_GET["date_from"] = date_format($date, 'Y-m-d');
+}
+if( !$_GET["date_to"] ) {
+	$date = new DateTime('-0 days');
+	$_GET["date_to"] = date_format($date, 'Y-m-d');
 }
 ?>
 
@@ -40,8 +44,29 @@ if( !$_GET["date"] ) {
 		<a href="/shell_reject.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
-			<span style="display: inline-block; width: 100px;">Дата:</span>
-			<input name="date" type="date" value="<?=$_GET["date"]?>" class="<?=$_GET["date"] ? "filtered" : ""?>" onchange="this.form.submit();">
+			<span style="display: inline-block; width: 200px;">Дата списания между:</span>
+			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
+			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
+			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
+		</div>
+
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>Код противовеса:</span>
+			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT CW.CW_ID, CW.item
+					FROM CounterWeight CW
+					ORDER BY CW.CW_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
+					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
+				}
+				?>
+			</select>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -123,7 +148,9 @@ $query = "
 	FROM ShellReject SR
 	JOIN CounterWeight CW ON CW.CW_ID = SR.CW_ID
 	WHERE 1
-		".($_GET["date"] ? "AND SR.sr_date = '{$_GET["date"]}'" : "")."
+		".($_GET["date_from"] ? "AND SR.sr_date >= '{$_GET["date_from"]}'" : "")."
+		".($_GET["date_to"] ? "AND SR.sr_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["CW_ID"] ? "AND SR.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND SR.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	ORDER BY SR.sr_date DESC, SR.CW_ID
 ";
@@ -158,7 +185,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_reject_report.php?sr_date=<?=$_GET["date"]?>&CB_ID=<?=$_GET["CB_ID"]?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
+<!--<div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_reject_report.php?sr_date=<?=$_GET["date"]?>&CB_ID=<?=$_GET["CB_ID"]?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>-->
 <div id="add_btn" class="add_reject" sr_date="<?=$_GET["sr_date"]?>" title="Внести данные"></div>
 
 <script>
