@@ -82,9 +82,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th>Противовес</th>
 						<th>Кол-во дефектных форм</th>
-						<th>Отслоение</th>
-						<th>Трещина</th>
-						<th>Скол</th>
+						<th>Отслоения</th>
+						<th>Трещины</th>
+						<th>Сколы</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
