@@ -9,6 +9,7 @@ if( isset($_POST["CW_ID"]) ) {
 	$sr_cnt = $_POST["sr_cnt"];
 	$exfolation = $_POST["exfolation"] ? $_POST["exfolation"] : "NULL";
 	$crack = $_POST["crack"] ? $_POST["crack"] : "NULL";
+	$chipped = $_POST["chipped"] ? $_POST["chipped"] : "NULL";
 
 	if( $_POST["SR_ID"] ) { // Редактируем
 		$query = "
@@ -18,6 +19,7 @@ if( isset($_POST["CW_ID"]) ) {
 				,sr_cnt = {$sr_cnt}
 				,exfolation = {$exfolation}
 				,crack = {$crack}
+				,chipped = {$chipped}
 			WHERE SR_ID = {$_POST["SR_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -32,7 +34,7 @@ if( isset($_POST["CW_ID"]) ) {
 				,CW_ID = {$CW_ID}
 				,sr_cnt = {$sr_cnt}
 				,exfolation = {$exfolation}
-				,crack = {$crack}
+				,chipped = {$chipped}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -80,8 +82,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th>Противовес</th>
 						<th>Кол-во дефектных форм</th>
-						<th>Отслоение материала рабочей поверхности</th>
-						<th>Трещина на рабочей поверхности формы</th>
+						<th>Отслоение</th>
+						<th>Трещина</th>
+						<th>Скол</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -105,6 +108,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td><input type="number" name="sr_cnt" min="1" style="width: 70px;" required></td>
 						<td><input type="number" name="exfolation" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="crack" min="0" style="width: 70px;"></td>
+						<td><input type="number" name="chipped" min="0" style="width: 70px;"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -142,6 +146,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#shell_reject_form input[name="sr_cnt"]').val(SR_data['sr_cnt']);
 				$('#shell_reject_form input[name="exfolation"]').val(SR_data['exfolation']);
 				$('#shell_reject_form input[name="crack"]').val(SR_data['crack']);
+				$('#shell_reject_form input[name="chipped"]').val(SR_data['chipped']);
 			}
 			// Иначе очищаем форму
 			else {

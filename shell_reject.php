@@ -105,6 +105,7 @@ foreach ($_GET as &$value) {
 			<th>Кол-во бракованных форм</th>
 			<th>Расслоений</th>
 			<th>Трещин</th>
+			<th>Сколов</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -118,6 +119,7 @@ $query = "
 		,SR.sr_cnt
 		,SR.exfolation
 		,SR.crack
+		,SR.chipped
 	FROM ShellReject SR
 	JOIN CounterWeight CW ON CW.CW_ID = SR.CW_ID
 	WHERE 1
@@ -130,6 +132,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$sr_cnt += $row["sr_cnt"];
 	$exfolation += $row["exfolation"];
 	$crack += $row["crack"];
+	$chipped += $row["chipped"];
 	?>
 	<tr id="<?=$row["SR_ID"]?>">
 		<td><?=$row["sr_date_format"]?></td>
@@ -137,6 +140,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["sr_cnt"]?></td>
 		<td><?=$row["exfolation"]?></td>
 		<td><?=$row["crack"]?></td>
+		<td><?=$row["chipped"]?></td>
 		<td><a href="#" class="add_reject" SR_ID="<?=$row["SR_ID"]?>" title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?
@@ -148,13 +152,14 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$sr_cnt?></td>
 			<td><?=$exfolation?></td>
 			<td><?=$crack?></td>
+			<td><?=$chipped?></td>
 			<td></td>
 		</tr>
 	</tbody>
 </table>
 
 <div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_reject_report.php?sr_date=<?=$_GET["date"]?>&CB_ID=<?=$_GET["CB_ID"]?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
-<div id="add_btn" class="add_reject" sr_date="<?=$_GET["sr_date_format"]?>" title="Внести данные"></div>
+<div id="add_btn" class="add_reject" sr_date="<?=$_GET["sr_date"]?>" title="Внести данные"></div>
 
 <script>
 	$(function() {

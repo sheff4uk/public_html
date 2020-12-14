@@ -65,6 +65,7 @@ echo "<title>Shells replacement report on {$sr_date}</title>";
 			<th>Number of rejected shells</th>
 			<th>Exfolation of the work surface material</th>
 			<th>Crack on the working surface of the shell</th>
+			<th>Chipped on the working surface of the shell</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
@@ -76,6 +77,7 @@ $query = "
 		,SR.sr_cnt
 		,SR.exfolation
 		,SR.crack
+		,SR.chipped
 	FROM ShellReject SR
 	JOIN CounterWeight CW ON CW.CW_ID = SR.CW_ID
 	WHERE SR.sr_date = '{$sr_date}'
@@ -87,12 +89,14 @@ while( $row = mysqli_fetch_array($res) ) {
 	$sr_cnt += $row["sr_cnt"];
 	$exfolation += $row["exfolation"];
 	$crack += $row["crack"];
+	$chipped += $row["chipped"];
 	?>
 	<tr>
 		<td><?=$row["item"]?></td>
 		<td><?=$row["sr_cnt"]?></td>
 		<td><?=$row["exfolation"]?></td>
 		<td><?=$row["crack"]?></td>
+		<td><?=$row["chipped"]?></td>
 	</tr>
 	<?
 }
@@ -102,6 +106,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$sr_cnt?></td>
 			<td><?=$exfolation?></td>
 			<td><?=$crack?></td>
+			<td><?=$chipped?></td>
 		</tr>
 	</tbody>
 </table>
