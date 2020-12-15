@@ -145,7 +145,7 @@ foreach ($_GET as &$value) {
 
 <?
 $query = "
-	SELECT COUNT(DISTINCT(PB.PB_ID)) cnt
+	SELECT SUM(1) cnt
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
 		,PB.pb_date
@@ -153,10 +153,9 @@ $query = "
 		,SUM(PB.batches * CW.fillings) fillings
 		,SUM(PB.batches * CW.fillings * CW.in_cassette) plan
 		,SUM(PB.fakt * CW.fillings * CW.in_cassette) fakt
-		,IF(SUM(PB.batches) = SUM(PB.fakt), TIMESTAMPDIFF(MINUTE, MAX(CAST(CONCAT(LB.batch_date, ' ', LB.batch_time) AS DATETIME)), CAST(CONCAT(PB.pb_date, ' 23:59:59') AS DATETIME)), NULL) diff
+		,IF(SUM(PB.batches) = SUM(PB.fakt), (SELECT TIMESTAMPDIFF(MINUTE, MAX(CAST(CONCAT(batch_date, ' ', batch_time) AS DATETIME)), CAST(CONCAT(PB.pb_date, ' 23:59:59') AS DATETIME)) FROM list__Batch WHERE PB_ID IN (SELECT PB_ID FROM plan__Batch WHERE pb_date = PB.pb_date)), NULL) diff
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 	WHERE 1
 		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
