@@ -5,6 +5,8 @@ $max_batches = 30; // Максимально возможное число за�
 $PB_ID = $_GET["PB_ID"];
 $query = "
 	SELECT DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
+		,PB.pb_date - INTERVAL 1 DAY pb_date_min
+		,PB.pb_date + INTERVAL 2 DAY pb_date_max
 		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
 		,PB.pb_date
 		,PB.CW_ID
@@ -14,9 +16,11 @@ $query = "
 		,CW.fillings
 		,CW.in_cassette
 		,CONCAT(ROUND(CW.min_density/1000, 2), '&ndash;', ROUND(CW.max_density/1000, 2)) spec
+		,MIN(LB.batch_date) batch_date
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	WHERE PB_ID = {$PB_ID}
+	LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
+	WHERE PB.PB_ID = {$PB_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
@@ -25,15 +29,20 @@ $batches = $row["batches"];
 $fakt = $row["fakt"];
 $item = $row["item"];
 $pb_date_format = $row["pb_date_format"];
+$pb_date_min = $row["pb_date_min"];
+$pb_date_max = $row["pb_date_max"];
 $pb_weekday = $row["pb_date_weekday"];
 $pb_date = $row["pb_date"];
 $fillings = $row["fillings"];
 $in_cassette = $row["in_cassette"];
 $CW_ID = $row["CW_ID"];
 $spec = $row["spec"];
+$batch_date = $row["batch_date"];
 
 $html = "
-	<p style='text-align: center; font-size: 2em;'>Число замесов: <input type='number' name='fakt' id='rows' min='".($fakt ? $fakt : "1")."' max='{$max_batches}' value='".($fakt ? $fakt : $batches)."'></p>
+	<p style='text-align: center; font-size: 1.5em;'>Фактическая дата первого замеса: <input type='date' name='batch_date' value='{$batch_date}' min='{$pb_date_min}' max='{$pb_date_max}' style='width: 250px;' required></p>
+	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
+	<p style='display: none; text-align: center; font-size: 2em;'>Число замесов: <input type='number' name='fakt' id='rows' min='".($fakt ? $fakt : "1")."' max='{$max_batches}' value='".($fakt ? $fakt : $batches)."'></p>
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
 	<table style='table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
 		<tr>
@@ -76,7 +85,7 @@ $html .= "
 				".($row["water"] ? "<th rowspan='2'>Вода, кг</th>" : "")."
 				<th rowspan='3' colspan='{$fillings}' width='".($fillings * 60)."'>№ кассеты</th>
 				<th rowspan='3'>Недолив</th>
-				<th rowspan='3' width='30'><i class='fas fa-cube' title='Испытания кубов'></i></th>
+				<th rowspan='3' width='30'><i class='fas fa-cube' title='Испытание куба'></i></th>
 				<th rowspan='3'>Оператор</th>
 			</tr>
 			<tr>
@@ -123,7 +132,7 @@ if( $fakt ) {
 		LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID
 		WHERE LB.PB_ID = {$PB_ID}
 		GROUP BY LB.LB_ID
-		ORDER BY LB.batch_time ASC
+		ORDER BY LB.batch_date, LB.batch_time
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$i = 0;
@@ -165,7 +174,7 @@ if( $fakt ) {
 			<tr class='batch_row' num='{$i}'>
 				<td style='text-align: center; font-size: 1.2em;'>{$i}</td>
 				<td><input type='time' name='batch_time[{$subrow["LB_ID"]}]' value='{$subrow["batch_time_format"]}' style='width: 70px;' required></td>
-				<td></td>
+				<td><att></att></td>
 				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$subrow["LB_ID"]}]' value='".($subrow["io_density"]/1000)."' style='width: 70px;' required></td>" : "")."
 				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$subrow["LB_ID"]}]' value='".($subrow["sn_density"]/1000)."' style='width: 70px;' required></td>" : "")."
 				<td><input type='number' min='2' max='4' step='0.01' name='mix_density[{$subrow["LB_ID"]}]' value='".($subrow["mix_density"]/1000)."' style='width: 70px;' required></td>
@@ -211,7 +220,7 @@ for ($i = $fakt + 1; $i <= $max_batches; $i++) {
 		<tr class='batch_row' num='{$i}'>
 			<td style='text-align: center; font-size: 1.2em;'>{$i}</td>
 			<td><input type='time' name='batch_time[n_{$i}]' style='width: 70px;' required></td>
-			<td></td>
+			<td><att></att></td>
 			".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[n_{$i}]' style='width: 70px;' required></td>" : "")."
 			".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[n_{$i}]' style='width: 70px;' required></td>" : "")."
 			<td><input type='number' min='2' max='4' step='0.01' name='mix_density[n_{$i}]' style='width: 70px;' required></td>

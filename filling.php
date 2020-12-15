@@ -221,8 +221,8 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th>Дата<br>Противовес</th>
-			<th>Время</th>
+			<th>План. дата замеса</th>
+			<th>Факт. время замеса</th>
 			<th>Рецепт</th>
 			<th>Куб раствора, кг</th>
 			<th>Окалина,<br>кг ±5</th>
@@ -242,7 +242,7 @@ foreach ($_GET as &$value) {
 $query = "
 	SELECT PB.PB_ID
 		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
-		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
+		,DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
 		,CW.item
 		,PB.CW_ID
 		,PB.batches
@@ -267,6 +267,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$query = "
 		SELECT LB.LB_ID
 			,OP.name
+			,DATE_FORMAT(LB.batch_date, '%a') batch_date_format
 			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 			,LB.io_density
 			,LB.sn_density
@@ -289,7 +290,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		FROM list__Batch LB
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
 		WHERE LB.PB_ID = {$row["PB_ID"]}
-		ORDER BY LB.batch_time ASC
+		ORDER BY LB.batch_date, LB.batch_time
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
@@ -321,10 +322,10 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
-			echo "<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'>{$row["pb_date_weekday"]}<br>{$row["pb_date_format"]}<br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>По плану: <b>{$row["batches"]}</b></td>";
+			echo "<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'>{$row["pb_date_weekday"]}<br>{$row["pb_date_format"]}<br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
 		}
 		?>
-		<td><?=$subrow["batch_time_format"]?><?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?></td>
+		<td><?=$subrow["batch_date_format"]?> <?=$subrow["batch_time_format"]?></td>
 		<td><span class="nowrap"><?=$subrow["MF_ID"] ? "<a href='mix_formula.php#{$subrow["MF_ID"]}' target='_blank'><b>{$subrow["letter"]}</b></a> " : "<i class='fas fa-exclamation-triangle' style='color: red;' title='Подходящий рецепт не обнаружен'></i> "?><?=($subrow["io_density"] ? "<i title='Плотность окалины' style='text-decoration: underline; background: #a52a2a80;'>".($subrow["io_density"]/1000)."</i> " : "")?><?=($subrow["sn_density"] ? "<i title='Плотность КМП' style='text-decoration: underline; background: #f4a46082;'>".($subrow["sn_density"]/1000)."</i> " : "")?></span></td>
 				<td><?=$subrow["mix_density"]/1000?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
 				<td style="background: #a52a2a80; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
@@ -333,7 +334,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td style="background: #7080906b; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["cement"]?><?=($subrow["cm_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cm_diff"] > 0 ? " +" : " ").($subrow["cm_diff"])."</font>" : "")?></td>
 				<td style="background: #1e90ff85; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["water"]?><?=($subrow["wt_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["wt_diff"])."</font>" : "")?></td>
 				<td colspan="2" class="nowrap"><?=$cassette?></td>
-				<td><?=$subrow["underfilling"]?></td>
+				<td><?=$subrow["underfilling"]?> <?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?></td>
 				<td><?=$subrow["name"]?></td>
 				<?
 				// Выводим общую ячейку с кнопкой редактирования

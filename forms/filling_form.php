@@ -13,11 +13,12 @@ if( isset($_POST["PB_ID"]) ) {
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$pb_date = $row["pb_date"];
+	//$pb_date = $row["pb_date"];
 	$fakt = $row["fakt"];
 
 	// Сохраняем данные из формы
 	if( $fakt <= $_POST["fakt"] ) { // Новое число замесов не может быть меньше уже существующего кол-ва
+		$batch_date = $_POST["batch_date"];
 		// Построчное считывание формы
 		foreach ($_POST["batch_time"] as $key => $value) {
 			$batch_time = $value;
@@ -33,10 +34,20 @@ if( isset($_POST["PB_ID"]) ) {
 			$test = $_POST["test"][$key] ? 1 : 0;
 			$OP_ID = $_POST["OP_ID"][$key];
 
+			// Вычисляем дату замеса
+			$query = "
+				SELECT IF('{$batch_time}' < '{$last_time}', '{$batch_date}' + INTERVAL 1 DAY, '{$batch_date}') batch_date
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			$row = mysqli_fetch_array($res);
+			$batch_date = $row["batch_date"];
+			$last_time = $batch_time;
+
 			if( strpos($key,"n_") === 0 ) { // Добавляем замес
 				$query = "
 					INSERT INTO list__Batch
 					SET PB_ID = {$_POST["PB_ID"]}
+						,batch_date = '{$batch_date}'
 						,batch_time = '{$batch_time}'
 						,io_density = {$io_density}
 						,sn_density = {$sn_density}
@@ -68,6 +79,7 @@ if( isset($_POST["PB_ID"]) ) {
 				$query = "
 					UPDATE list__Batch
 					SET PB_ID = {$_POST["PB_ID"]}
+						,batch_date = '{$batch_date}'
 						,batch_time = '{$batch_time}'
 						,io_density = {$io_density}
 						,sn_density = {$sn_density}
@@ -221,13 +233,42 @@ this.subbut.value='Подождите, пожалуйста!';">
 			});
 		});
 
-		// Ограничения при выборе времени
+//		// Ограничения при выборе времени
+//		$('#filling_form').on('change', 'input[type=time]', function() {
+//			var val = $(this).val();
+//			var max = moment.utc(val,'HH:mm').add(-1,'minutes').format('HH:mm');
+//			var min = moment.utc(val,'HH:mm').add(1,'minutes').format('HH:mm');
+//			$(this).parents('tr').prev().children().children('input[type=time]').attr('max', max);
+//			$(this).parents('tr').next().children().children('input[type=time]').attr('min', min);
+//		});
+
+		// Предупреждение при переходе на следующие сутки
 		$('#filling_form').on('change', 'input[type=time]', function() {
 			var val = $(this).val();
-			var max = moment.utc(val,'HH:mm').add(-1,'minutes').format('HH:mm');
-			var min = moment.utc(val,'HH:mm').add(1,'minutes').format('HH:mm');
-			$(this).parents('tr').prev().children().children('input[type=time]').attr('max', max);
-			$(this).parents('tr').next().children().children('input[type=time]').attr('min', min);
+			var prev = $(this).parents('tr').prev().children().children('input[type=time]').val();
+			var next = $(this).parents('tr').next().children().children('input[type=time]').val();
+			var att = '<i class="fas fa-exclamation-triangle" style="color: red;" title="Переход на следующие сутки"></i>';
+
+			// Если время стало меньше предыдущего, предупреждение о переходе на новые сутки
+			if( moment.utc(val,'HH:mm') < moment.utc(prev,'HH:mm') ) {
+				$(this).parents('tr').children().children('att').html(att);
+			}
+			else {
+				$(this).parents('tr').children().children('att').html('');
+			}
+
+			// Если время стало больше следующего, у следующего времени предупреждение
+			if( moment.utc(val,'HH:mm') > moment.utc(next,'HH:mm') ) {
+				$(this).parents('tr').next().children().children('att').html(att);
+			}
+			else {
+				$(this).parents('tr').next().children().children('att').html('');
+			}
+
+//			var max = moment.utc(val,'HH:mm').add(-1,'minutes').format('HH:mm');
+//			var min = moment.utc(val,'HH:mm').add(1,'minutes').format('HH:mm');
+//			$(this).parents('tr').prev().children().children('input[type=time]').attr('max', max);
+//			$(this).parents('tr').next().children().children('input[type=time]').attr('min', min);
 		});
 	});
 </script>
