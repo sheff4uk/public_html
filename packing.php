@@ -5,7 +5,7 @@ include "header.php";
 include "./forms/packing_form.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
-if( !$_GET["pb_date_from"] and !$_GET["pb_date_to"] ) {
+if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 	if( !$_GET["p_date_from"] ) {
 		$date = new DateTime('-6 days');
 		$_GET["p_date_from"] = date_format($date, 'Y-m-d');
@@ -36,8 +36,8 @@ $CASs = implode(",", $CAS);
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
-			<input name="pb_date_from" type="date" value="<?=$_GET["pb_date_from"]?>" class="<?=$_GET["pb_date_from"] ? "filtered" : ""?>">
-			<input name="pb_date_to" type="date" value="<?=$_GET["pb_date_to"]?>" class="<?=$_GET["pb_date_to"] ? "filtered" : ""?>">
+			<input name="batch_date_from" type="date" value="<?=$_GET["batch_date_from"]?>" class="<?=$_GET["batch_date_from"] ? "filtered" : ""?>">
+			<input name="batch_date_to" type="date" value="<?=$_GET["batch_date_to"]?>" class="<?=$_GET["batch_date_to"] ? "filtered" : ""?>">
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -213,10 +213,10 @@ $query = "
 		,LP.p_crack
 		,LP.p_chipped
 		,LP.p_def_form
-		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
+		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 		,LF.cassette
 		,CW.item
-		,PB.pb_date
+		,YEARWEEK(PB.pb_date, 1) pb_week
 		,PB.CW_ID
 		,LB.LB_ID
 		#,LO.LO_ID
@@ -230,8 +230,8 @@ $query = "
 	WHERE 1
 		".($_GET["p_date_from"] ? "AND LP.p_date >= '{$_GET["p_date_from"]}'" : "")."
 		".($_GET["p_date_to"] ? "AND LP.p_date <= '{$_GET["p_date_to"]}'" : "")."
-		".($_GET["pb_date_from"] ? "AND PB.pb_date >= '{$_GET["pb_date_from"]}'" : "")."
-		".($_GET["pb_date_to"] ? "AND PB.pb_date <= '{$_GET["pb_date_to"]}'" : "")."
+		".($_GET["batch_date_from"] ? "AND LB.batch_date >= '{$_GET["batch_date_from"]}'" : "")."
+		".($_GET["batch_date_to"] ? "AND LB.batch_date <= '{$_GET["batch_date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		".($_GET["int120"] ? "AND p_interval(LP.LP_ID) < 120" : "")."
@@ -261,7 +261,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td style="color: red;"><?=$row["p_chipped"]?></td>
 		<td style="color: red;"><?=$row["p_def_form"]?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
-		<td class="bg-gray"><a href="filling.php?date_from=<?=$row["pb_date"]?>&date_to=<?=$row["pb_date"]?>&CW_ID=<?=$row["CW_ID"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["pb_date_format"]?></a></td>
+		<td class="bg-gray"><a href="filling.php?week=<?=$row["pb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
 		<td class="bg-gray"><?=$cassette?></td>
 		<td><a href="#" class="add_packing" LP_ID="<?=$row["LP_ID"]?>" title="Изменить данные упаковки"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
@@ -277,22 +277,22 @@ while( $row = mysqli_fetch_array($res) ) {
 <script>
 	$(function() {
 		// При выборе даты заливки сбрасываются даты упаковки
-		$('input[name="pb_date_from"]').change(function() {
+		$('input[name="batch_date_from"]').change(function() {
 			$('input[name="p_date_from"]').val('');
 			$('input[name="p_date_to"]').val('');
 		});
-		$('input[name="pb_date_to"]').change(function() {
+		$('input[name="batch_date_to"]').change(function() {
 			$('input[name="p_date_from"]').val('');
 			$('input[name="p_date_to"]').val('');
 		});
 		// При выборе даты упаковки сбрасываются даты заливки
 		$('input[name="p_date_from"]').change(function() {
-			$('input[name="pb_date_from"]').val('');
-			$('input[name="pb_date_to"]').val('');
+			$('input[name="batch_date_from"]').val('');
+			$('input[name="batch_date_to"]').val('');
 		});
 		$('input[name="p_date_to"]').change(function() {
-			$('input[name="pb_date_from"]').val('');
-			$('input[name="pb_date_to"]').val('');
+			$('input[name="batch_date_from"]').val('');
+			$('input[name="batch_date_to"]').val('');
 		});
 	});
 </script>
