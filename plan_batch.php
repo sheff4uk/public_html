@@ -145,7 +145,7 @@ foreach ($_GET as &$value) {
 
 <?
 $query = "
-	SELECT SUM(1) cnt
+	SELECT COUNT(DISTINCT(PB.PB_ID)) cnt
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
 		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
 		,PB.pb_date
@@ -153,14 +153,16 @@ $query = "
 		,SUM(PB.batches * CW.fillings) fillings
 		,SUM(PB.batches * CW.fillings * CW.in_cassette) plan
 		,SUM(PB.fakt * CW.fillings * CW.in_cassette) fakt
+		,IF(SUM(PB.batches) = SUM(PB.fakt), TIMESTAMPDIFF(MINUTE, MAX(CAST(CONCAT(LB.batch_date, ' ', LB.batch_time) AS DATETIME)), CAST(CONCAT(PB.pb_date, ' 23:59:59') AS DATETIME)), NULL) diff
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 	WHERE 1
 		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	GROUP BY PB.pb_date
-	ORDER BY PB.pb_date, PB.CW_ID
+	ORDER BY PB.pb_date
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -203,7 +205,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		if( $cnt ) {
 			$cnt++;
 			echo "<tr id='{$subrow["PB_ID"]}' style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$row["pb_date_weekday"]}<br>{$row["pb_date_format"]}</td>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$row["pb_date_weekday"]}<br>{$row["pb_date_format"]}<br>".($row["diff"] < 0 ? "Отставание: <b style='color: red;'>{$row["diff"]}</b> мин" : ($row["diff"] > 0 ? "Опережение: <b style='color: green;'>{$row["diff"]}</b> мин" : ""))."</td>";
 			$cnt = 0;
 		}
 		else {
