@@ -16,7 +16,7 @@ if( !$_GET["date_to"] ) {
 ?>
 
 <style>
-	#shell_report_btn {
+	#shell_arrival_btn {
 		text-align: center;
 		line-height: 68px;
 		color: #fff;
@@ -32,7 +32,23 @@ if( !$_GET["date_to"] ) {
 		background-color: #16A085;
 		box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
 	}
-	#shell_report_btn:hover {
+	#shell_reject_btn {
+		text-align: center;
+		line-height: 68px;
+		color: #fff;
+		bottom: 100px;
+		cursor: pointer;
+		width: 56px;
+		height: 56px;
+		opacity: .4;
+		position: fixed;
+		right: 20px;
+		z-index: 9;
+		border-radius: 50%;
+		background-color: #db4437;
+		box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+	}
+	#shell_arrival_btn:hover, #shell_reject_btn:hover {
 		opacity: 1;
 	}
 </style>
@@ -127,7 +143,8 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th>Дата</th>
 			<th>Противовес</th>
-			<th>Кол-во бракованных форм</th>
+			<th>Пришедших форм</th>
+			<th>Списанных форм</th>
 			<th>Отслоения</th>
 			<th>Трещины</th>
 			<th>Сколы</th>
@@ -138,13 +155,38 @@ foreach ($_GET as &$value) {
 
 <?
 $query = "
-	SELECT SR.SR_ID
-		,DATE_FORMAT(SR.sr_date, '%d.%m.%Y') sr_date_format
+	SELECT 'A' type
+		,SA.SA_ID ID
+		,DATE_FORMAT(SA.sa_date, '%d.%m.%Y') date_format
 		,CW.item
+		,SA.sa_cnt
+		,NULL sr_cnt
+		,NULL exfolation
+		,NULL crack
+		,NULL chipped
+		,SA.sa_date date
+		,SA.CW_ID
+	FROM ShellArrival SA
+	JOIN CounterWeight CW ON CW.CW_ID = SA.CW_ID
+	WHERE 1
+		".($_GET["date_from"] ? "AND SA.sa_date >= '{$_GET["date_from"]}'" : "")."
+		".($_GET["date_to"] ? "AND SA.sa_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["CW_ID"] ? "AND SA.CW_ID={$_GET["CW_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND SA.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+
+	UNION
+
+	SELECT 'R' type
+		,SR.SR_ID ID
+		,DATE_FORMAT(SR.sr_date, '%d.%m.%Y') date_format
+		,CW.item
+		,NULL sa_cnt
 		,SR.sr_cnt
 		,SR.exfolation
 		,SR.crack
 		,SR.chipped
+		,SR.sr_date date
+		,SR.CW_ID
 	FROM ShellReject SR
 	JOIN CounterWeight CW ON CW.CW_ID = SR.CW_ID
 	WHERE 1
@@ -152,23 +194,26 @@ $query = "
 		".($_GET["date_to"] ? "AND SR.sr_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND SR.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND SR.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	ORDER BY SR.sr_date, SR.CW_ID
+
+	ORDER BY date, CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
+	$sa_cnt += $row["sa_cnt"];
 	$sr_cnt += $row["sr_cnt"];
 	$exfolation += $row["exfolation"];
 	$crack += $row["crack"];
 	$chipped += $row["chipped"];
 	?>
-	<tr id="<?=$row["SR_ID"]?>">
-		<td><?=$row["sr_date_format"]?></td>
+	<tr id="<?=$row["type"]?><?=$row["ID"]?>">
+		<td><?=$row["date_format"]?></td>
 		<td><?=$row["item"]?></td>
-		<td><?=$row["sr_cnt"]?></td>
+		<td><b style="color: green;"><?=$row["sa_cnt"]?></b></td>
+		<td><b style="color: red;"><?=$row["sr_cnt"]?></b></td>
 		<td><?=$row["exfolation"]?></td>
 		<td><?=$row["crack"]?></td>
 		<td><?=$row["chipped"]?></td>
-		<td><a href="#" class="add_reject" SR_ID="<?=$row["SR_ID"]?>" title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
+		<td><a href="#" <?=($row["type"] == "A" ? "class='add_arrival' SA_ID='{$row["ID"]}'" : "class='add_reject' SR_ID='{$row["ID"]}'")?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?
 }
@@ -176,7 +221,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		<tr class="total">
 			<td></td>
 			<td>Итог:</td>
-			<td><?=$sr_cnt?></td>
+			<td><b><?=$sa_cnt?></b></td>
+			<td><b><?=$sr_cnt?></b></td>
 			<td><?=$exfolation?></td>
 			<td><?=$crack?></td>
 			<td><?=$chipped?></td>
@@ -185,8 +231,39 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
+<div>
+	<h3>Баланс форм</h3>
+	<table>
+		<thead>
+			<tr>
+				<th>Противовес</th>
+				<th>Кол-во форм</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?
+			$query = "
+				SELECT item, shell_balance
+				FROM CounterWeight
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $row = mysqli_fetch_array($res) ) {
+			?>
+				<tr>
+					<td style="text-align: center;"><?=$row["item"]?></td>
+					<td style="text-align: center;"><?=$row["shell_balance"]?></td>
+				</tr>
+			<?
+			}
+			?>
+		</tbody>
+	</table>
+</div>
+
 <!--<div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_reject_report.php?sr_date=<?=$_GET["date"]?>&CB_ID=<?=$_GET["CB_ID"]?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>-->
-<div id="add_btn" class="add_reject" sr_date="<?=$_GET["sr_date"]?>" title="Внести данные"></div>
+
+<div id="shell_arrival_btn" class="add_arrival" sa_date="<?=$_GET["sa_date"]?>" title="Приход форм"><i class="fas fa-2x fa-plus"></i></div>
+<div id="shell_reject_btn" class="add_reject" sr_date="<?=$_GET["sr_date"]?>" title="Списание форм"><i class="fas fa-2x fa-minus"></i></div>
 
 <script>
 	$(function() {
