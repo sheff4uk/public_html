@@ -249,7 +249,7 @@ $query = "
 		,PB.CW_ID
 		,PB.batches
 		,PB.fakt
-		,MIN(LB.batch_time) time
+		,MIN(CAST(CONCAT(LB.batch_date, ' ', LB.batch_time) AS DATETIME)) time
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
