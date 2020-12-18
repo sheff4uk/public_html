@@ -221,7 +221,7 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th>План. дата замеса</th>
+			<th>Цикл/неделя</th>
 			<th>Факт. время замеса</th>
 			<th>Рецепт</th>
 			<th>Куб раствора, кг</th>
@@ -241,7 +241,9 @@ foreach ($_GET as &$value) {
 // Получаем список дат и противовесов и кол-во замесов на эти даты
 $query = "
 	SELECT PB.PB_ID
-		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
+		,DATE_FORMAT(PB.pb_date, '%w') pb_date_weekday
+		,WEEK(PB.pb_date, 1) week
+		,CONCAT('[', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 0-WEEKDAY(PB.pb_date) DAY), '%e %b'), ' - ', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 6-WEEKDAY(PB.pb_date) DAY), '%e %b'), '] ', YEAR(PB.pb_date), ' г') week_range
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
 		,CW.item
 		,PB.CW_ID
@@ -322,7 +324,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
-			echo "<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'>{$row["pb_date_weekday"]}<br>{$row["pb_date_format"]}<br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
+			echo "<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'><h1>{$row["pb_date_weekday"]}</h1>Неделя: <b>{$row["week"]}</b><br><span class='nowrap'>{$row["week_range"]}</span><br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
 		}
 		?>
 		<td><?=$subrow["batch_date_format"]?> <?=$subrow["batch_time_format"]?></td>

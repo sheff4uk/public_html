@@ -13,7 +13,9 @@ $PB_ID = $_GET["PB_ID"];
 
 $query = "
 	SELECT DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
-		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
+		,DATE_FORMAT(PB.pb_date, '%w') pb_date_weekday
+		,WEEK(NOW(), 1) week
+		,CONCAT('[', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 0-WEEKDAY(PB.pb_date) DAY), '%e %b'), ' - ', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 6-WEEKDAY(PB.pb_date) DAY), '%e %b'), '] ', YEAR(PB.pb_date), ' г') week_range
 		,PB.CW_ID
 		,PB.batches
 		,CW.item
@@ -31,6 +33,8 @@ $batches = $row["batches"];
 $item = $row["item"];
 $pb_date_format = $row["pb_date_format"];
 $pb_weekday = $row["pb_date_weekday"];
+$week = $row["week"];
+$week_range = $row["week_range"];
 $fillings = $row["fillings"];
 $cubetests = $row["cubetests"];
 $CW_ID = $row["CW_ID"];
@@ -84,7 +88,8 @@ echo "<title>Чеклист оператора для {$item} от {$pb_date}</t
 		<tr>
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
 			<th style="font-size: 2em;"><?=$item?></th>
-			<th><n style="font-size: 2em;"><?=$pb_date_format?></n>&nbsp;<?=$pb_weekday?></th>
+			<th width="40"><n style="font-size: 3em;"><?=$pb_weekday?></n><br>цикл</th>
+			<th><n style="font-size: 3em;"><?=$week?></n> неделя<br><?=$week_range?></th>
 			<th><img src="../barcode.php?code=<?=$PB_ID?>" alt="barcode"></th>
 		</tr>
 	</thead>

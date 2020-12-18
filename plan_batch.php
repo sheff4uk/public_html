@@ -130,7 +130,7 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th>Дата</th>
+			<th>Цикл/неделя</th>
 			<th>Противовес</th>
 			<th>Замесов</th>
 			<th>Заливок</th>
@@ -147,7 +147,9 @@ foreach ($_GET as &$value) {
 $query = "
 	SELECT SUM(1) cnt
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
-		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
+		,DATE_FORMAT(PB.pb_date, '%w') pb_date_weekday
+		,WEEK(PB.pb_date, 1) week
+		,CONCAT('[', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 0-WEEKDAY(PB.pb_date) DAY), '%e %b'), ' - ', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 6-WEEKDAY(PB.pb_date) DAY), '%e %b'), '] ', YEAR(PB.pb_date), ' г') week_range
 		,PB.pb_date
 		,SUM(PB.batches) batches
 		,SUM(PB.batches * CW.fillings) fillings
@@ -204,7 +206,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		if( $cnt ) {
 			$cnt++;
 			echo "<tr id='{$subrow["PB_ID"]}' style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$row["pb_date_weekday"]}<br>{$row["pb_date_format"]}<br>".($row["diff"] < 0 ? "Отставание: <b style='color: red;'>{$row["diff"]}</b> мин" : ($row["diff"] > 0 ? "Опережение: <b style='color: green;'>{$row["diff"]}</b> мин" : ""))."</td>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h1>{$row["pb_date_weekday"]}</h1>Неделя: <b>{$row["week"]}</b><br><span class='nowrap'>{$row["week_range"]}</span><br>".($row["diff"] < 0 ? "Отставание: <b style='color: red;'>{$row["diff"]}</b> мин" : ($row["diff"] > 0 ? "Опережение: <b style='color: green;'>{$row["diff"]}</b> мин" : ""))."</td>";
 			$cnt = 0;
 		}
 		else {
