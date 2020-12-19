@@ -283,6 +283,107 @@ else {
 	</tbody>
 </table>
 
+<table>
+	<thead>
+		<tr>
+			<th>Дата</th>
+			<th>Противовес</th>
+			<th>Заливок</th>
+			<th>Деталей</th>
+			<th>Недоливы</th>
+		</tr>
+	</thead>
+	<tbody style="text-align: center;">
+
+<?
+$query = "
+	SELECT COUNT(distinct(PB.CW_ID)) cnt
+		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
+		,LB.batch_date
+		,COUNT(LF.LF_ID) fillings
+		,SUM(CW.in_cassette) fakt
+	FROM list__Batch LB
+	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	WHERE 1
+		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
+		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+	GROUP BY LB.batch_date
+	ORDER BY LB.batch_date
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+while( $row = mysqli_fetch_array($res) ) {
+	$cnt = $row["cnt"];
+	$d_batches = 0;
+	$d_underfilling = 0;
+
+	$query = "
+		SELECT LB.batch_date
+			,CW.item
+			,COUNT(LF.LF_ID) fillings
+			,SUM(CW.in_cassette) fakt
+			,ROUND(IFNULL(SUM(LB.underfilling / CW.fillings), 0)) underfilling
+		FROM list__Batch LB
+		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+		LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+		LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		WHERE 1
+			AND LB.batch_date = '{$row["batch_date"]}'
+			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		GROUP BY PB.CW_ID
+		ORDER BY PB.CW_ID
+	";
+	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $subrow = mysqli_fetch_array($subres) ) {
+		$fillings += $subrow["fillings"];
+		$fakt += $subrow["fakt"];
+		$underfilling += $subrow["underfilling"];
+		$d_underfilling += $subrow["underfilling"];
+
+		// Выводим общую ячейку с датой заливки
+		if( $cnt ) {
+			$cnt++;
+			echo "<tr style='border-top: 2px solid #333;'>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$row["batch_date_format"]}</td>";
+			$cnt = 0;
+		}
+		else {
+			echo "<tr id='{$subrow["PB_ID"]}'>";
+		}
+		?>
+			<td><?=$subrow["item"]?></td>
+			<td><?=$subrow["fillings"]?></td>
+			<td><?=($subrow["fakt"] - $subrow["underfilling"])?></td>
+			<td><?=$subrow["underfilling"]?></td>
+		</tr>
+		<?
+
+	}
+?>
+		<tr class="summary">
+			<td>Итог:</td>
+			<td><?=$row["fillings"]?></td>
+			<td><?=($row["fakt"] - $d_underfilling)?></td>
+			<td><?=$d_underfilling?></td>
+		</tr>
+<?
+}
+?>
+<!--
+		<tr class="total">
+			<td></td>
+			<td>Итог:</td>
+			<td><?=$fillings?></td>
+			<td><?=($fakt - $underfilling)?></td>
+			<td><?=$underfilling?></td>
+		</tr>
+-->
+	</tbody>
+</table>
+
 <div>
 	<h3>Журнал изменений</h3>
 	<table>
