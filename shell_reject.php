@@ -264,7 +264,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					WHERE sr_date BETWEEN CURDATE() - INTERVAL 3 MONTH AND CURDATE()
 					GROUP BY CW_ID
 				) SR ON SR.CW_ID = PB.CW_ID
-				WHERE PB.pb_date BETWEEN CURDATE() - INTERVAL 3 MONTH AND CURDATE()
+				WHERE 1
 					".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 					".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 				GROUP BY CW.CW_ID
