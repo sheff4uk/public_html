@@ -57,7 +57,7 @@ if( !$_GET["week"] ) {
 				}
 				?>
 			</select>
-			<i class="fas fa-question-circle" title="По умолчанию устанавливаются текущая неделя."></i>
+			<i class="fas fa-question-circle" title="По умолчанию устанавливается текущая неделя."></i>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -283,10 +283,11 @@ else {
 	</tbody>
 </table>
 
+<!--Посменная аналитика-->
 <table>
 	<thead>
 		<tr>
-			<th>Дата</th>
+			<th>Смена<br>Дата заливки</th>
 			<th>Противовес</th>
 			<th>Заливок</th>
 			<th>Деталей</th>
@@ -299,6 +300,7 @@ else {
 $query = "
 	SELECT COUNT(distinct(PB.CW_ID)) cnt
 		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
+		,shift(LB.batch_time) shift
 		,LB.batch_date
 		,COUNT(LF.LF_ID) fillings
 		,SUM(CW.in_cassette) fakt
@@ -310,8 +312,8 @@ $query = "
 		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	GROUP BY LB.batch_date
-	ORDER BY LB.batch_date
+	GROUP BY LB.batch_date, shift
+	ORDER BY LB.batch_date, shift
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -331,10 +333,11 @@ while( $row = mysqli_fetch_array($res) ) {
 		LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		WHERE 1
 			AND LB.batch_date = '{$row["batch_date"]}'
+			AND shift(LB.batch_time) = '{$row["shift"]}'
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		GROUP BY PB.CW_ID
-		ORDER BY PB.CW_ID
+		ORDER BY MIN(LB.batch_time)
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
@@ -347,7 +350,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		if( $cnt ) {
 			$cnt++;
 			echo "<tr style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$row["batch_date_format"]}</td>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h2>{$row["shift"]}</h2>{$row["batch_date_format"]}</td>";
 			$cnt = 0;
 		}
 		else {

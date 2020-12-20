@@ -194,7 +194,7 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 				}
 				?>
 			</select>
-			<i class="fas fa-question-circle" title="По умолчанию устанавливаются текущая неделя."></i>
+			<i class="fas fa-question-circle" title="По умолчанию устанавливается текущая неделя."></i>
 		</div>
 -->
 

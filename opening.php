@@ -86,7 +86,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				}
 				?>
 			</select>
-			<i class="fas fa-question-circle" title="По умолчанию устанавливаются текущая неделя."></i>
+			<i class="fas fa-question-circle" title="По умолчанию устанавливается текущая неделя."></i>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
