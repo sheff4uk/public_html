@@ -241,7 +241,7 @@ foreach ($_GET as &$value) {
 // Получаем список дат и противовесов и кол-во замесов на эти даты
 $query = "
 	SELECT PB.PB_ID
-		,DATE_FORMAT(PB.pb_date, '%w') pb_date_weekday
+		,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
 		,WEEK(PB.pb_date, 1) week
 		,CONCAT('[', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 0-WEEKDAY(PB.pb_date) DAY), '%e %b'), ' - ', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 6-WEEKDAY(PB.pb_date) DAY), '%e %b'), '] ', YEAR(PB.pb_date), ' г') week_range
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
