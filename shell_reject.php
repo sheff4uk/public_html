@@ -277,9 +277,9 @@ while( $row = mysqli_fetch_array($res) ) {
 					<td style="text-align: center;"><?=$row["shell_balance"]?></td>
 					<td style="text-align: center;"><?=$row["sr_cnt_avg"]?></td>
 					<td style="text-align: center; <?=($row["days_max"] < 0 ? "color: red;" : "")?>"><?=$row["max"]?></td>
-					<td style="text-align: center;"><?=($row["days_max"] < 0 ? "" : $row["days_max"])?></td>
+					<td style="text-align: center;"><?=($row["days_max"] < 0 ? "<i class='fas fa-exclamation-triangle' style='color: red;'></i>" : $row["days_max"])?></td>
 					<td style="text-align: center; <?=($row["days_often"] < 0 ? "color: red;" : "")?>"><?=$row["often"]?></td>
-					<td style="text-align: center;"><?=($row["days_often"] < 0 ? "" : $row["days_often"])?></td>
+					<td style="text-align: center;"><?=($row["days_often"] < 0 ? "<i class='fas fa-exclamation-triangle' style='color: red;'></i>" : $row["days_often"])?></td>
 				</tr>
 			<?
 			}
