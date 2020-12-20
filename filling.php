@@ -221,7 +221,7 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th>Цикл/неделя</th>
+			<th>Неделя/Цикл</th>
 			<th>Факт. время замеса</th>
 			<th>Рецепт</th>
 			<th>Куб раствора, кг</th>
@@ -324,7 +324,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
-			echo "<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'><h1>{$row["pb_date_weekday"]}</h1>Неделя: <b>{$row["week"]}</b><br><span class='nowrap'>{$row["week_range"]}</span><br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
+			echo "<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'><h1>{$row["week"]}/{$row["pb_date_weekday"]}</h1><span class='nowrap'>{$row["week_range"]}</span><br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
 		}
 		?>
 		<td><?=$subrow["batch_date_format"]?> <?=$subrow["batch_time_format"]?></td>

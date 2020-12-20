@@ -130,7 +130,7 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th>Цикл/неделя</th>
+			<th>Неделя/Цикл</th>
 			<th>Противовес</th>
 			<th>Замесов</th>
 			<th>Заливок</th>
@@ -206,7 +206,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		if( $cnt ) {
 			$cnt++;
 			echo "<tr id='{$subrow["PB_ID"]}' style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h1>{$row["pb_date_weekday"]}</h1>Неделя: <b>{$row["week"]}</b><br><span class='nowrap'>{$row["week_range"]}</span><br>".($row["diff"] < 0 ? "Отставание: <b style='color: red;'>{$row["diff"]}</b> мин" : ($row["diff"] > 0 ? "Опережение: <b style='color: green;'>{$row["diff"]}</b> мин" : ""))."</td>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h1>{$row["week"]}/{$row["pb_date_weekday"]}</h1><span class='nowrap'>{$row["week_range"]}</span><br>".($row["diff"] < 0 ? "Отставание: <b style='color: red;'>{$row["diff"]}</b> мин" : ($row["diff"] > 0 ? "Опережение: <b style='color: green;'>{$row["diff"]}</b> мин" : ""))."</td>";
 			$cnt = 0;
 		}
 		else {

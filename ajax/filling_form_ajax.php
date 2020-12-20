@@ -7,7 +7,7 @@ $query = "
 	SELECT PB.pb_date - INTERVAL 1 DAY pb_date_min
 		,PB.pb_date + INTERVAL 2 DAY pb_date_max
 		,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
-		,WEEK(NOW(), 1) week
+		,WEEK(PB.pb_date, 1) week
 		,CONCAT('[', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 0-WEEKDAY(PB.pb_date) DAY), '%e %b'), ' - ', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 6-WEEKDAY(PB.pb_date) DAY), '%e %b'), '] ', YEAR(PB.pb_date), ' г') week_range
 		,PB.pb_date
 		,PB.CW_ID
@@ -51,8 +51,8 @@ $html = "
 		<tr>
 			<td style='border: 1px solid black; line-height: 1em;'><img src='/img/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></td>
 			<td style='font-size: 2em; border: 1px solid black; line-height: 1em;'>{$item}</td>
-			<td style='border: 1px solid black; line-height: 1em;' width='40'><n style='font-size: 2em;'>{$pb_weekday}</n><br>цикл</td>
 			<td style='border: 1px solid black; line-height: 1em;'><n style='font-size: 2em;'>{$week}</n> неделя<br>{$week_range}</td>
+			<td style='border: 1px solid black; line-height: 1em;' width='40'><n style='font-size: 2em;'>{$pb_weekday}</n><br>цикл</td>
 		</tr>
 	</table>
 ";

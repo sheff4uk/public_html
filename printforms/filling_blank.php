@@ -14,7 +14,7 @@ $PB_ID = $_GET["PB_ID"];
 $query = "
 	SELECT DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
 		,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
-		,WEEK(NOW(), 1) week
+		,WEEK(PB.pb_date, 1) week
 		,CONCAT('[', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 0-WEEKDAY(PB.pb_date) DAY), '%e %b'), ' - ', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 6-WEEKDAY(PB.pb_date) DAY), '%e %b'), '] ', YEAR(PB.pb_date), ' г') week_range
 		,PB.CW_ID
 		,PB.batches
@@ -88,8 +88,8 @@ echo "<title>Чеклист оператора для {$item} от {$pb_date}</t
 		<tr>
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
 			<th style="font-size: 2em;"><?=$item?></th>
-			<th width="40"><n style="font-size: 3em;"><?=$pb_weekday?></n><br>цикл</th>
 			<th><n style="font-size: 3em;"><?=$week?></n> неделя<br><?=$week_range?></th>
+			<th width="40"><n style="font-size: 3em;"><?=$pb_weekday?></n><br>цикл</th>
 			<th><img src="../barcode.php?code=<?=$PB_ID?>" alt="barcode"></th>
 		</tr>
 	</thead>
