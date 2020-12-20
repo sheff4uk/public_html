@@ -255,8 +255,8 @@ while( $row = mysqli_fetch_array($res) ) {
 					,ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / SR.sr_cnt) `days_max`
 					,ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette `often`
 					,ROUND((CW.shell_balance - ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette) / SR.sr_cnt) `days_often`
-				FROM plan__Batch PB
-				JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+				FROM CounterWeight CW
+				LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID AND PB.pb_date BETWEEN CURDATE() - INTERVAL 3 MONTH AND CURDATE()
 				LEFT JOIN (
 					SELECT CW_ID
 						,SUM(sr_cnt) / DATEDIFF(CURDATE(), IF(CURDATE() - INTERVAL 3 MONTH < '2020-12-04', '2020-12-04', CURDATE() - INTERVAL 3 MONTH)) sr_cnt
@@ -267,7 +267,8 @@ while( $row = mysqli_fetch_array($res) ) {
 				WHERE PB.pb_date BETWEEN CURDATE() - INTERVAL 3 MONTH AND CURDATE()
 					".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 					".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-				GROUP BY PB.CW_ID
+				GROUP BY CW.CW_ID
+				ORDER BY CW.CW_ID
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
