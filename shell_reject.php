@@ -238,10 +238,11 @@ while( $row = mysqli_fetch_array($res) ) {
 			<tr>
 				<th>Противовес</th>
 				<th>Кол-во годных форм</th>
-				<th>Задействуется форм ПИКОВО<br>(за последные 3 месяца)</th>
-				<th>На сколько дней хватит запаса из расчета ПИКОВОГО использования с учетом текущей динамики списания форм</th>
-				<th>Задействуется форм ОБЫЧНО<br>(за последные 3 месяца)</th>
-				<th>На сколько дней хватит запаса из расчета ОБЫЧНОГО использования с учетом текущей динамики списания форм</th>
+				<th>Среднесуточная динамика списания форм</th>
+				<th>ПИКОВОЕ число эксплуатируемых форм<br>(за последные 3 месяца)</th>
+				<th>На сколько дней хватит запаса из расчета ПИКОВОЙ эксплуатации с учетом текущей динамики списания форм</th>
+				<th>ОБЫЧНОЕ число эксплуатируемых форм<br>(за последные 3 месяца)</th>
+				<th>На сколько дней хватит запаса из расчета ОБЫЧНОЙ эксплуатации с учетом текущей динамики списания форм</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -249,6 +250,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			$query = "
 				SELECT CW.item
 					,CW.shell_balance
+					,ROUND(SR.sr_cnt, 1) sr_cnt_avg
 					,MAX(PB.fakt) * CW.fillings * CW.in_cassette `max`
 					,ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / SR.sr_cnt) `days_max`
 					,ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette `often`
@@ -257,7 +259,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 				LEFT JOIN (
 					SELECT CW_ID
-						,AVG(sr_cnt) sr_cnt
+						,SUM(sr_cnt) / DATEDIFF(CURDATE(), IF(CURDATE() - INTERVAL 3 MONTH < '2020-12-04', '2020-12-04', CURDATE() - INTERVAL 3 MONTH)) sr_cnt
 					FROM ShellReject
 					WHERE sr_date BETWEEN CURDATE() - INTERVAL 3 MONTH AND CURDATE()
 					GROUP BY CW_ID
@@ -271,6 +273,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<tr>
 					<td style="text-align: center;"><?=$row["item"]?></td>
 					<td style="text-align: center;"><?=$row["shell_balance"]?></td>
+					<td style="text-align: center;"><?=$row["sr_cnt_avg"]?></td>
 					<td style="text-align: center; <?=($row["days_max"] < 0 ? "color: red;" : "")?>"><?=$row["max"]?></td>
 					<td style="text-align: center;"><?=($row["days_max"] < 0 ? "" : $row["days_max"])?></td>
 					<td style="text-align: center; <?=($row["days_often"] < 0 ? "color: red;" : "")?>"><?=$row["often"]?></td>
