@@ -300,6 +300,7 @@ else {
 $query = "
 	SELECT COUNT(distinct(PB.CW_ID)) cnt
 		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
+		,DATE_FORMAT(LB.batch_date, '%W') weekday_format
 		,shift(LB.batch_time) shift
 		,LB.batch_date
 		,COUNT(LF.LF_ID) fillings
@@ -350,7 +351,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		if( $cnt ) {
 			$cnt++;
 			echo "<tr style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h2>{$row["shift"]}</h2>{$row["batch_date_format"]}</td>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h2>{$row["shift"]}</h2>{$row["batch_date_format"]}<br>{$row["weekday_format"]}</td>";
 			$cnt = 0;
 		}
 		else {
