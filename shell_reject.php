@@ -265,6 +265,8 @@ while( $row = mysqli_fetch_array($res) ) {
 					GROUP BY CW_ID
 				) SR ON SR.CW_ID = PB.CW_ID
 				WHERE PB.pb_date BETWEEN CURDATE() - INTERVAL 3 MONTH AND CURDATE()
+					".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+					".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 				GROUP BY PB.CW_ID
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
