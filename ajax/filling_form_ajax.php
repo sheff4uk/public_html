@@ -4,10 +4,11 @@ include_once "../checkrights.php";
 $max_batches = 30; // Максимально возможное число замесов
 $PB_ID = $_GET["PB_ID"];
 $query = "
-	SELECT DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
-		,PB.pb_date - INTERVAL 1 DAY pb_date_min
+	SELECT PB.pb_date - INTERVAL 1 DAY pb_date_min
 		,PB.pb_date + INTERVAL 2 DAY pb_date_max
-		,DATE_FORMAT(PB.pb_date, '%W') pb_date_weekday
+		,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
+		,WEEK(NOW(), 1) week
+		,CONCAT('[', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 0-WEEKDAY(PB.pb_date) DAY), '%e %b'), ' - ', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 6-WEEKDAY(PB.pb_date) DAY), '%e %b'), '] ', YEAR(PB.pb_date), ' г') week_range
 		,PB.pb_date
 		,PB.CW_ID
 		,PB.batches
@@ -28,7 +29,9 @@ $row = mysqli_fetch_array($res);
 $batches = $row["batches"];
 $fakt = $row["fakt"];
 $item = $row["item"];
-$pb_date_format = $row["pb_date_format"];
+$pb_weekday = $row["pb_date_weekday"];
+$week = $row["week"];
+$week_range = $row["week_range"];
 $pb_date_min = $row["pb_date_min"];
 $pb_date_max = $row["pb_date_max"];
 $pb_weekday = $row["pb_date_weekday"];
@@ -48,7 +51,8 @@ $html = "
 		<tr>
 			<td style='border: 1px solid black; line-height: 1em;'><img src='/img/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></td>
 			<td style='font-size: 2em; border: 1px solid black; line-height: 1em;'>{$item}</td>
-			<td style='border: 1px solid black; line-height: 1em;'><n style='font-size: 2em;'>{$pb_date_format}</n>&nbsp;{$pb_weekday}</td>
+			<td style='border: 1px solid black; line-height: 1em;' width='40'><n style='font-size: 2em;'>{$pb_weekday}</n><br>цикл</td>
+			<td style='border: 1px solid black; line-height: 1em;'><n style='font-size: 2em;'>{$week}</n> неделя<br>{$week_range}</td>
 		</tr>
 	</table>
 ";
