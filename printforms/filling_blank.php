@@ -101,11 +101,16 @@ $query = "
 	SELECT GROUP_CONCAT(CONCAT('<span style=\'font-size: 1.5em;\' class=\'nowrap\'>', MF.letter, '</span>') ORDER BY MF.letter SEPARATOR '<br>') ltr
 		,GROUP_CONCAT(CONCAT(ROUND(MF.io_min/1000, 2), '&ndash;', ROUND(MF.io_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') io
 		,GROUP_CONCAT(CONCAT(ROUND(MF.sn_min/1000, 2), '&ndash;', ROUND(MF.sn_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') sn
-		,GROUP_CONCAT(CONCAT(MF.iron_oxide, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') iron_oxide
-		,GROUP_CONCAT(CONCAT(MF.sand, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') sand
-		,GROUP_CONCAT(CONCAT(MF.crushed_stone, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') crushed_stone
-		,GROUP_CONCAT(CONCAT(MF.cement, ' ±2') ORDER BY MF.letter SEPARATOR '<br>') cement
-		,GROUP_CONCAT(CONCAT('min ', MF.water) ORDER BY MF.letter SEPARATOR '<br>') water
+		,GROUP_CONCAT(IFNULL(CONCAT(MF.iron_oxide, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') iron_oxide
+		,GROUP_CONCAT(IFNULL(CONCAT(MF.sand, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') sand
+		,GROUP_CONCAT(IFNULL(CONCAT(MF.crushed_stone, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') crushed_stone
+		,GROUP_CONCAT(IFNULL(CONCAT(MF.cement, ' ±2'), 0) ORDER BY MF.letter SEPARATOR '<br>') cement
+		,GROUP_CONCAT(IFNULL(CONCAT('min ', MF.water), 0) ORDER BY MF.letter SEPARATOR '<br>') water
+		,COUNT(MF.iron_oxide) io_cnt
+		,COUNT(MF.sand) sn_cnt
+		,COUNT(MF.crushed_stone) cs_cnt
+		,COUNT(MF.cement) cm_cnt
+		,COUNT(MF.water) wt_cnt
 	FROM MixFormula MF
 	WHERE MF.CW_ID = {$CW_ID}
 ";
@@ -120,11 +125,11 @@ $row = mysqli_fetch_array($res);
 			<th rowspan="3">Время замеса</th>
 			<th rowspan="2" width="40" style="word-wrap: break-word;">Рецепт</th>
 			<th colspan="<?=(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0))?>" style="border-right: 4px solid;">Масса куба, кг</th>
-			<?=($row["iron_oxide"] ? "<th rowspan='2'>Окалина, кг</th>" : "")?>
-			<?=($row["sand"] ? "<th rowspan='2'>КМП, кг</th>" : "")?>
-			<?=($row["crushed_stone"] ? "<th rowspan='2'>Отсев, кг</th>" : "")?>
-			<?=($row["cement"] ? "<th rowspan='2'>Цемент, кг</th>" : "")?>
-			<?=($row["water"] ? "<th rowspan='2'>Вода, кг</th>" : "")?>
+			<?=($row["io_cnt"] ? "<th rowspan='2'>Окалина, кг</th>" : "")?>
+			<?=($row["sn_cnt"] ? "<th rowspan='2'>КМП, кг</th>" : "")?>
+			<?=($row["cs_cnt"] ? "<th rowspan='2'>Отсев, кг</th>" : "")?>
+			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент, кг</th>" : "")?>
+			<?=($row["wt_cnt"] ? "<th rowspan='2'>Вода, кг</th>" : "")?>
 			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 60)?>" style="border-left: 4px solid;">№ кассеты</th>
 			<th rowspan="3" width="40">Недолив</th>
 			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
@@ -140,11 +145,11 @@ $row = mysqli_fetch_array($res);
 			<?=(($row["io"] ? "<th class='nowrap'>{$row["io"]}</th>" : ""))?>
 			<?=(($row["sn"] ? "<th class='nowrap'>{$row["sn"]}</th>" : ""))?>
 			<th class="nowrap" style="border-right: 4px solid;"><?=$spec?></th>
-			<?=($row["iron_oxide"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")?>
-			<?=($row["sand"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")?>
-			<?=($row["crushed_stone"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")?>
-			<?=($row["cement"] ? "<th class='nowrap'>{$row["cement"]}</th>" : "")?>
-			<?=($row["water"] ? "<th class='nowrap'>{$row["water"]}</th>" : "")?>
+			<?=($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")?>
+			<?=($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")?>
+			<?=($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")?>
+			<?=($row["cm_cnt"] ? "<th class='nowrap'>{$row["cement"]}</th>" : "")?>
+			<?=($row["wt_cnt"] ? "<th class='nowrap'>{$row["water"]}</th>" : "")?>
 		</tr>
 	</thead>
 	<tbody>
@@ -163,11 +168,11 @@ for ($i = 1; $i <= $batches; $i++) {
 			".($row["io"] ? "<td></td>" : "")."
 			".($row["sn"] ? "<td></td>" : "")."
 			<td style='border-right: 4px solid;'></td>
-			".($row["iron_oxide"] ? "<td></td>" : "")."
-			".($row["sand"] ? "<td></td>" : "")."
-			".($row["crushed_stone"] ? "<td></td>" : "")."
-			".($row["cement"] ? "<td></td>" : "")."
-			".($row["water"] ? "<td></td>" : "")."
+			".($row["io_cnt"] ? "<td></td>" : "")."
+			".($row["sn_cnt"] ? "<td></td>" : "")."
+			".($row["cs_cnt"] ? "<td></td>" : "")."
+			".($row["cm_cnt"] ? "<td></td>" : "")."
+			".($row["wt_cnt"] ? "<td></td>" : "")."
 			{$fillings_cell}
 			<td></td>
 			<td style='text-align: center;'>".(in_array($i, $tests) ? "<i class='far fa-square fa-lg'></i>" : "<i class='far fa-square' style='opacity: .5;'></i>")."</td>
