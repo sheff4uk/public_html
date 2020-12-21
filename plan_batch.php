@@ -283,11 +283,11 @@ else {
 	</tbody>
 </table>
 
-<!--Посменная аналитика-->
+<!--Посуточная аналитика-->
 <table>
 	<thead>
 		<tr>
-			<th>Смена<br>Дата заливки</th>
+			<th>День заливки</th>
 			<th>Противовес</th>
 			<th>Заливок</th>
 			<th>Деталей</th>
@@ -297,11 +297,14 @@ else {
 	<tbody style="text-align: center;">
 
 <?
+$fillings = 0;
+$fakt = 0;
+$underfilling = 0;
+
 $query = "
 	SELECT COUNT(distinct(PB.CW_ID)) cnt
 		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 		,DATE_FORMAT(LB.batch_date, '%W') weekday_format
-		,shift(LB.batch_time) shift
 		,LB.batch_date
 		,COUNT(LF.LF_ID) fillings
 		,SUM(CW.in_cassette) fakt
@@ -313,8 +316,8 @@ $query = "
 		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	GROUP BY LB.batch_date, shift
-	ORDER BY LB.batch_date, shift
+	GROUP BY LB.batch_date
+	ORDER BY LB.batch_date
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -334,7 +337,6 @@ while( $row = mysqli_fetch_array($res) ) {
 		LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		WHERE 1
 			AND LB.batch_date = '{$row["batch_date"]}'
-			AND shift(LB.batch_time) = '{$row["shift"]}'
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		GROUP BY PB.CW_ID
@@ -351,7 +353,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		if( $cnt ) {
 			$cnt++;
 			echo "<tr style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h2>{$row["shift"]}</h2>{$row["batch_date_format"]}<br>{$row["weekday_format"]}</td>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h2>{$row["weekday_format"]}</h2>{$row["batch_date_format"]}</td>";
 			$cnt = 0;
 		}
 		else {
@@ -376,7 +378,6 @@ while( $row = mysqli_fetch_array($res) ) {
 <?
 }
 ?>
-<!--
 		<tr class="total">
 			<td></td>
 			<td>Итог:</td>
@@ -384,7 +385,6 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=($fakt - $underfilling)?></td>
 			<td><?=$underfilling?></td>
 		</tr>
--->
 	</tbody>
 </table>
 
