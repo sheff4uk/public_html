@@ -253,9 +253,10 @@ while( $row = mysqli_fetch_array($res) ) {
 					,ROUND(SR.sr_cnt, 1) sr_cnt_avg
 					,MAX(PB.fakt) * CW.fillings * CW.in_cassette `max`
 					,ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / SR.sr_cnt) `days_max`
-					,CONCAT(' (', DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / SR.sr_cnt) DAY, '%d.%m.%Y'), ')') `date_max`
+					,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / SR.sr_cnt) DAY, '%d.%m.%Y') `date_max`
 					,ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette `often`
 					,ROUND((CW.shell_balance - ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette) / SR.sr_cnt) `days_often`
+					,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette) / SR.sr_cnt) DAY, '%d.%m.%Y') `date_aften`
 				FROM CounterWeight CW
 				LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID AND PB.pb_date BETWEEN CURDATE() - INTERVAL 3 MONTH AND CURDATE()
 				LEFT JOIN (
@@ -279,7 +280,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					<td style="text-align: center;"><?=$row["shell_balance"]?></td>
 					<td style="text-align: center;"><?=$row["sr_cnt_avg"]?></td>
 					<td style="text-align: center; <?=($row["days_max"] < 0 ? "color: red;" : "")?>"><?=$row["max"]?></td>
-					<td style="text-align: center;"><?=($row["days_max"] < 0 ? "<i class='fas fa-exclamation-triangle' style='color: red;'></i>" : "{$row["days_max"]}{$row["date_max"]}")?></td>
+					<td style="text-align: center;"><?=($row["days_max"] < 0 ? "<i class='fas fa-exclamation-triangle' style='color: red;'></i>" : "{$row["days_max"]}<font style='font-size: .8em; display: block; line-height: .4em;'>{$row["date_max"]}</font>")?></td>
 					<td style="text-align: center; <?=($row["days_often"] < 0 ? "color: red;" : "")?>"><?=$row["often"]?></td>
 					<td style="text-align: center;"><?=($row["days_often"] < 0 ? "<i class='fas fa-exclamation-triangle' style='color: red;'></i>" : $row["days_often"])?></td>
 				</tr>
