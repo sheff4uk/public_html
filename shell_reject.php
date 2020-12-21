@@ -256,7 +256,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / SR.sr_cnt) DAY, '%d.%m.%Y') `date_max`
 					,ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette `often`
 					,ROUND((CW.shell_balance - ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette) / SR.sr_cnt) `days_often`
-					,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette) / SR.sr_cnt) DAY, '%d.%m.%Y') `date_aften`
+					,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette) / SR.sr_cnt) DAY, '%d.%m.%Y') `date_often`
 				FROM CounterWeight CW
 				LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID AND PB.pb_date BETWEEN CURDATE() - INTERVAL 3 MONTH AND CURDATE()
 				LEFT JOIN (
