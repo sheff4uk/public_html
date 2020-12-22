@@ -241,8 +241,8 @@ while( $row = mysqli_fetch_array($res) ) {
 				<th>Кол-во залитых противовесов за последние 14 дней</th>
 				<th>Кол-во списанных форм за последние 14 дней</th>
 				<th>Кол-во списанных форм на 10000 залитых противовесов за последние 14 дней</th>
-				<th>Сколько ОБЫЧНО форм задействовалось в производственном цикле за последние 3 месяца</th>
-				<th>Сколько МАКСИМАЛЬНО форм задействовалось в производственном цикле за последние 3 месяца</th>
+				<th>Сколько ОБЫЧНО форм задействовалось в производственном цикле</th>
+				<th>Сколько МАКСИМАЛЬНО форм задействовалось в производственном</th>
 				<th>Через сколько дней возникнет дефицит форм с учетом динамики списания последних 14 дней</th>
 				<th>Сколько требуется дополнительных форм чтобы обеспечить двухмесячный запас с учетом динамики списания последних 14 дней</th>
 			</tr>
@@ -262,7 +262,8 @@ while( $row = mysqli_fetch_array($res) ) {
 					,ROUND((WR.sr_cnt / 14) * (60 - ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / 14))) / CW.shell_pallet) * CW.shell_pallet `need`
 					,CEIL((CW.shell_balance - IFNULL(ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))), 0) * CW.fillings * CW.in_cassette) / CW.shell_pallet) `pallets`
 				FROM CounterWeight CW
-				LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID AND PB.pb_date BETWEEN (CURDATE() - INTERVAL 91 DAY) AND (CURDATE() - INTERVAL 1 DAY)
+				LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID
+					#AND PB.pb_date BETWEEN (CURDATE() - INTERVAL 91 DAY) AND (CURDATE() - INTERVAL 1 DAY)
 				# Число замесов за прошлые 2 недели
 				LEFT JOIN (
 					SELECT CW_ID
