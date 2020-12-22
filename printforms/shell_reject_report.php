@@ -78,8 +78,8 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 				,ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette `often`
 				,MAX(PB.fakt) * CW.fillings * CW.in_cassette `max`
 				,MAX(PB.fakt) * CW.fillings * CW.in_cassette - CW.shell_balance `need`
-				,ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / 14)) `days_max`
-				,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / 14)) DAY, '%d.%m.%Y') `date_max`
+				,ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) `days_max`
+				,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d/%m/%Y') `date_max`
 				,CEIL((CW.shell_balance - IFNULL(ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))), 0) * CW.fillings * CW.in_cassette) / CW.shell_pallet) `pallets`
 			FROM CounterWeight CW
 			LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID
@@ -116,7 +116,7 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 					<td><?=$row["sr_avg"]?></td>
 					<td style="<?=($row["max"] > $row["shell_balance"] ? "color: red;" : "")?>"><?=$row["max"]?></td>
 					<td style="color: red;"><?=($row["need"] > 0 ? $row["need"] : "")?></td>
-					<td><?=($row["days_max"] < 0 ? "" : "{$row["days_max"]}<font style='font-size: .8em; display: block; line-height: .4em;'>{$row["date_max"]}</font>")?></td>
+					<td><?=($row["days_max"] < 0 ? "" : "{$row["days_max"]} <sub>{$row["date_max"]}</sub>")?></td>
 				</tr>
 			<?
 		}
