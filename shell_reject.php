@@ -259,7 +259,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					,MAX(PB.fakt) * CW.fillings * CW.in_cassette `max`
 					,ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / 14)) `days_max`
 					,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / 14)) DAY, '%d.%m.%Y') `date_max`
-					,ROUND((WR.sr_cnt / 14) * (91 - ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / 14))) / CW.shell_pallet) * CW.shell_pallet `need`
+					,ROUND((WR.sr_cnt / 14) * (60 - ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / 14))) / CW.shell_pallet) * CW.shell_pallet `need`
 					,CEIL((CW.shell_balance - IFNULL(ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))), 0) * CW.fillings * CW.in_cassette) / CW.shell_pallet) `pallets`
 				FROM CounterWeight CW
 				LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID AND PB.pb_date BETWEEN (CURDATE() - INTERVAL 14 DAY) AND (CURDATE() - INTERVAL 1 DAY)
