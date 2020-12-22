@@ -114,7 +114,7 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 					<td><?=$row["shell_balance"]?></td>
 <!--					<td><?=$row["durability"]?></td>-->
 <!--					<td><?=$row["sr_avg"]?></td>-->
-					<td style="<?=($row["max"] > $row["shell_balance"] ? "color: red;" : "")?>"><?=$row["max"]?></td>
+					<td><?=$row["max"]?></td>
 					<td style="color: red;"><?=($row["need"] > 0 ? $row["need"] : "")?></td>
 <!--					<td><?=($row["days_max"] < 0 ? "" : "{$row["days_max"]} <sub>{$row["date_max"]}</sub>")?></td>-->
 				</tr>
