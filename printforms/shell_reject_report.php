@@ -61,11 +61,11 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 		<tr>
 			<th>Part-number</th>
 			<th>Number of OK shells</th>
-			<th>Average durability of shells in filling cycles</th>
-			<th>Daily average shell scrap</th>
+<!--			<th>Average durability of shells in filling cycles</th>-->
+<!--			<th>Daily average shell scrap</th>-->
 			<th>Peak value of shell in use</th>
 			<th>Shortage of shells</th>
-			<th>Days to shortage of shells to peak value based on current scrap level</th>
+<!--			<th>Days to shortage of shells to peak value based on current scrap level</th>-->
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
@@ -112,11 +112,11 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 				<tr>
 					<td><?=$row["item"]?></td>
 					<td><?=$row["shell_balance"]?></td>
-					<td><?=$row["durability"]?></td>
-					<td><?=$row["sr_avg"]?></td>
+<!--					<td><?=$row["durability"]?></td>-->
+<!--					<td><?=$row["sr_avg"]?></td>-->
 					<td style="<?=($row["max"] > $row["shell_balance"] ? "color: red;" : "")?>"><?=$row["max"]?></td>
 					<td style="color: red;"><?=($row["need"] > 0 ? $row["need"] : "")?></td>
-					<td><?=($row["days_max"] < 0 ? "" : "{$row["days_max"]} <sub>{$row["date_max"]}</sub>")?></td>
+<!--					<td><?=($row["days_max"] < 0 ? "" : "{$row["days_max"]} <sub>{$row["date_max"]}</sub>")?></td>-->
 				</tr>
 			<?
 		}
