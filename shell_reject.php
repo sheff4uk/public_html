@@ -16,6 +16,22 @@ if( !$_GET["date_to"] ) {
 ?>
 
 <style>
+	#shell_report_btn {
+		text-align: center;
+		line-height: 68px;
+		color: #fff;
+		bottom: 250px;
+		cursor: pointer;
+		width: 56px;
+		height: 56px;
+		opacity: .4;
+		position: fixed;
+		right: 20px;
+		z-index: 9;
+		border-radius: 50%;
+		background-color: #db4437;
+		box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+	}
 	#shell_arrival_btn {
 		text-align: center;
 		line-height: 68px;
@@ -232,17 +248,16 @@ while( $row = mysqli_fetch_array($res) ) {
 </table>
 
 <div>
-	<h3>Баланс форм</h3>
 	<table>
 		<thead>
 			<tr>
 				<th>Противовес</th>
 				<th>Кол-во годных форм</th>
 				<th>Средний ресурс форм до её списания в циклах заливки</th>
-				<th>Среднесуточное списание форм</th>
+				<th>Среднесуточное списание форм в штуках</th>
 				<th>Сколько ОБЫЧНО форм задействовалось в производственном цикле</th>
 				<th>Сколько МАКСИМАЛЬНО форм задействовалось в производственном цикле</th>
-				<th>Дефицит форм</th>
+				<th>Дефицит форм в штуках</th>
 				<th>Через сколько дней возникнет дефицит форм с учетом среднесуточного списания</th>
 			</tr>
 		</thead>
@@ -279,15 +294,13 @@ while( $row = mysqli_fetch_array($res) ) {
 					GROUP BY CW_ID
 				) WR ON WR.CW_ID = CW.CW_ID
 				WHERE 1
-					".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-					".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+					".($_GET["CW_ID"] ? "AND CW.CW_ID={$_GET["CW_ID"]}" : "")."
+					".($_GET["CB_ID"] ? "AND CW.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 				GROUP BY CW.CW_ID
 				ORDER BY CW.CW_ID
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
-				$percent_diff = $row["week_percent"] - $row["last_week_percent"];
-				$percent_diff = $percent_diff > 0 ? "+".$percent_diff : $percent_diff;
 				$pallets += $row["pallets"];
 				?>
 					<tr>
@@ -309,7 +322,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 <h3>Заполненность склада с формами: <?=round(($pallets < 0 ? 0 : $pallets) / 130 * 100)?>%</h3>
 
-<!--<div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_reject_report.php?sr_date=<?=$_GET["date"]?>&CB_ID=<?=$_GET["CB_ID"]?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>-->
+<div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_reject_report.php?CB_ID=2" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
 
 <div id="shell_arrival_btn" class="add_arrival" sa_date="<?=$_GET["sa_date"]?>" title="Приход форм"><i class="fas fa-2x fa-plus"></i></div>
 <div id="shell_reject_btn" class="add_reject" sr_date="<?=$_GET["sr_date"]?>" title="Списание форм"><i class="fas fa-2x fa-minus"></i></div>

@@ -8,12 +8,10 @@ include "../config.php";
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <?
-$sr_date = $_GET["sr_date"];
-
-$date = new DateTime($sr_date);
+$date = new DateTime();
 $sr_date_format = date_format($date, 'd/m/Y');
 
-echo "<title>Shells replacement report on {$sr_date}</title>";
+echo "<title>Shells report on {$sr_date_format}</title>";
 ?>
 	<style type="text/css" media="print">
 		@page { size: portrait; }
@@ -61,53 +59,68 @@ echo "<title>Shells replacement report on {$sr_date}</title>";
 <table>
 	<thead style="word-wrap: break-word;">
 		<tr>
-			<th>ITEM</th>
-			<th>Number of rejected shells</th>
-			<th>Exfolation of the work surface material</th>
-			<th>Crack on the working surface of the shell</th>
-			<th>Chipped on the working surface of the shell</th>
+			<th>Part-number</th>
+			<th>Number of OK shells</th>
+			<th>Average durability of shells in filling cycles</th>
+			<th>Daily average shell scrap</th>
+			<th>Peak value of shell in use</th>
+			<th>Shortage of shells</th>
+			<th>Days to shortage of shells to peak value based on current scrap level</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
-
-<?
-$query = "
-	SELECT SR.SR_ID
-		,CW.item
-		,SR.sr_cnt
-		,SR.exfolation
-		,SR.crack
-		,SR.chipped
-	FROM ShellReject SR
-	JOIN CounterWeight CW ON CW.CW_ID = SR.CW_ID
-	WHERE SR.sr_date = '{$sr_date}'
-		".($_GET["CB_ID"] ? "AND SR.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	ORDER BY SR.sr_date DESC, SR.CW_ID
-";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-while( $row = mysqli_fetch_array($res) ) {
-	$sr_cnt += $row["sr_cnt"];
-	$exfolation += $row["exfolation"];
-	$crack += $row["crack"];
-	$chipped += $row["chipped"];
-	?>
-	<tr>
-		<td><?=$row["item"]?></td>
-		<td><?=$row["sr_cnt"]?></td>
-		<td><?=$row["exfolation"]?></td>
-		<td><?=$row["crack"]?></td>
-		<td><?=$row["chipped"]?></td>
-	</tr>
-	<?
-}
-?>
-		<tr class="total">
-			<td>Total:</td>
-			<td><?=$sr_cnt?></td>
-			<td><?=$exfolation?></td>
-			<td><?=$crack?></td>
-			<td><?=$chipped?></td>
-		</tr>
+		<?
+		$query = "
+			SELECT CW.item
+				,CW.shell_balance
+				,ROUND((WB.batches * CW.fillings * CW.in_cassette) / WR.sr_cnt) `durability`
+				,ROUND(WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'), 1) `sr_avg`
+				,ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette `often`
+				,MAX(PB.fakt) * CW.fillings * CW.in_cassette `max`
+				,MAX(PB.fakt) * CW.fillings * CW.in_cassette - CW.shell_balance `need`
+				,ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / 14)) `days_max`
+				,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / 14)) DAY, '%d.%m.%Y') `date_max`
+				,CEIL((CW.shell_balance - IFNULL(ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))), 0) * CW.fillings * CW.in_cassette) / CW.shell_pallet) `pallets`
+			FROM CounterWeight CW
+			LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID
+				#AND PB.pb_date BETWEEN (CURDATE() - INTERVAL 91 DAY) AND (CURDATE() - INTERVAL 1 DAY)
+			# Число замесов с 04.12.2020
+			LEFT JOIN (
+				SELECT CW_ID
+					,SUM(fakt) batches
+				FROM plan__Batch
+				WHERE pb_date BETWEEN '2020-12-04' AND CURDATE() - INTERVAL 1 DAY
+				GROUP BY CW_ID
+			) WB ON WB.CW_ID = CW.CW_ID
+			# Число списаний с 04.12.2020
+			LEFT JOIN (
+				SELECT CW_ID
+					,SUM(sr_cnt) sr_cnt
+				FROM ShellReject
+				WHERE sr_date BETWEEN '2020-12-04' AND CURDATE() - INTERVAL 1 DAY
+				GROUP BY CW_ID
+			) WR ON WR.CW_ID = CW.CW_ID
+			WHERE 1
+				".($_GET["CB_ID"] ? "AND CW.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+			GROUP BY CW.CW_ID
+			ORDER BY CW.CW_ID
+		";
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		while( $row = mysqli_fetch_array($res) ) {
+			$pallets += $row["pallets"];
+			?>
+				<tr>
+					<td><?=$row["item"]?></td>
+					<td><?=$row["shell_balance"]?></td>
+					<td><?=$row["durability"]?></td>
+					<td><?=$row["sr_avg"]?></td>
+					<td style="<?=($row["max"] > $row["shell_balance"] ? "color: red;" : "")?>"><?=$row["max"]?></td>
+					<td style="color: red;"><?=($row["need"] > 0 ? $row["need"] : "")?></td>
+					<td><?=($row["days_max"] < 0 ? "" : "{$row["days_max"]}<font style='font-size: .8em; display: block; line-height: .4em;'>{$row["date_max"]}</font>")?></td>
+				</tr>
+			<?
+		}
+		?>
 	</tbody>
 </table>
 
