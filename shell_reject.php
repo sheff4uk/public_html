@@ -320,7 +320,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	</table>
 </div>
 
-<h3>Заполненность склада с формами: <?=round(($pallets < 0 ? 0 : $pallets) / 130 * 100)?>%</h3>
+<!--<h3>Заполненность склада с формами: <?=round(($pallets < 0 ? 0 : $pallets) / 130 * 100)?>%</h3>-->
 
 <div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_reject_report.php?CB_ID=2" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
 
