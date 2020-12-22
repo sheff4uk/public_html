@@ -238,11 +238,13 @@ while( $row = mysqli_fetch_array($res) ) {
 			<tr>
 				<th>Противовес</th>
 				<th>Кол-во годных форм</th>
-				<th>Среднесуточная динамика списания форм</th>
-				<th>ПИКОВОЕ число эксплуатируемых форм<br>(за последние 3 месяца)</th>
-				<th>Через сколько дней возникнет дефицит форм для ПИКОВОЙ эксплуатации с учетом текущей динамики списания</th>
-				<th>ОБЫЧНОЕ число эксплуатируемых форм<br>(за последние 3 месяца)</th>
-				<th>Через сколько дней возникнет дефицит форм для ОБЫЧНОЙ эксплуатации с учетом текущей динамики списания</th>
+				<th>Кол-во залитых противовесов за последние 14 дней</th>
+				<th>Кол-во списанных форм за последние 14 дней</th>
+				<th>Кол-во списанных форм на 10000 залитых противовесов за последние 14 дней</th>
+				<th>Сколько ОБЫЧНО форм задействовалось в производственном цикле за последние 14 дней</th>
+				<th>Сколько МАКСИМАЛЬНО форм задействовалось в производственном цикле за последние 14 дней</th>
+				<th>Через сколько дней возникнет дефицит форм с учетом динамики списания последних 14 дней</th>
+				<th>Сколько требуется дополнительных форм чтобы обеспечить трёхмесячный запас с учетом динамики списания последних 14 дней</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -250,22 +252,33 @@ while( $row = mysqli_fetch_array($res) ) {
 			$query = "
 				SELECT CW.item
 					,CW.shell_balance
-					,ROUND(SR.sr_cnt, 1) sr_cnt_avg
-					,MAX(PB.fakt) * CW.fillings * CW.in_cassette `max`
-					,ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / SR.sr_cnt) `days_max`
-					,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / SR.sr_cnt) DAY, '%d.%m.%Y') `date_max`
+					,WB.batches * CW.fillings * CW.in_cassette `details`
+					,WR.sr_cnt
+					,ROUND(WR.sr_cnt * (10000 / (WB.batches * CW.fillings * CW.in_cassette))) `sr_cnt_10000`
 					,ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette `often`
-					,ROUND((CW.shell_balance - ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette) / SR.sr_cnt) `days_often`
-					,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette) / SR.sr_cnt) DAY, '%d.%m.%Y') `date_often`
+					,MAX(PB.fakt) * CW.fillings * CW.in_cassette `max`
+					,ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / 14)) `days_max`
+					,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / 14)) DAY, '%d.%m.%Y') `date_max`
+					,ROUND((WR.sr_cnt / 14) * (91 - ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / 14)))) `need`
+					,CEIL((CW.shell_balance - IFNULL(ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))), 0) * CW.fillings * CW.in_cassette) / CW.form_pallet) `pallets`
 				FROM CounterWeight CW
-				LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID AND PB.pb_date BETWEEN CURDATE() - INTERVAL 3 MONTH AND CURDATE()
+				LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID AND PB.pb_date BETWEEN (CURDATE() - INTERVAL 14 DAY) AND (CURDATE() - INTERVAL 1 DAY)
+				# Число замесов за прошлые 2 недели
 				LEFT JOIN (
 					SELECT CW_ID
-						,SUM(sr_cnt) / DATEDIFF(CURDATE(), IF(CURDATE() - INTERVAL 3 MONTH < '2020-12-04', '2020-12-04', CURDATE() - INTERVAL 3 MONTH)) sr_cnt
-					FROM ShellReject
-					WHERE sr_date BETWEEN CURDATE() - INTERVAL 3 MONTH AND CURDATE()
+						,SUM(fakt) batches
+					FROM plan__Batch
+					WHERE pb_date BETWEEN (CURDATE() - INTERVAL 14 DAY) AND (CURDATE() - INTERVAL 1 DAY)
 					GROUP BY CW_ID
-				) SR ON SR.CW_ID = PB.CW_ID
+				) WB ON WB.CW_ID = CW.CW_ID
+				# Число списаний за прошлые 2 недели
+				LEFT JOIN (
+					SELECT CW_ID
+						,SUM(sr_cnt) sr_cnt
+					FROM ShellReject
+					WHERE sr_date BETWEEN (CURDATE() - INTERVAL 14 DAY) AND (CURDATE() - INTERVAL 1 DAY)
+					GROUP BY CW_ID
+				) WR ON WR.CW_ID = CW.CW_ID
 				WHERE 1
 					".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 					".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
@@ -274,22 +287,29 @@ while( $row = mysqli_fetch_array($res) ) {
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
-			?>
-				<tr>
-					<td style="text-align: center;"><?=$row["item"]?></td>
-					<td style="text-align: center;"><?=$row["shell_balance"]?></td>
-					<td style="text-align: center;"><?=$row["sr_cnt_avg"]?></td>
-					<td style="text-align: center; <?=($row["days_max"] < 0 ? "color: red;" : "")?>"><?=$row["max"]?></td>
-					<td style="text-align: center;"><?=($row["days_max"] < 0 ? "<i class='fas fa-exclamation-triangle' style='color: red;'></i>" : "{$row["days_max"]}<font style='font-size: .8em; display: block; line-height: .4em;'>{$row["date_max"]}</font>")?></td>
-					<td style="text-align: center; <?=($row["days_often"] < 0 ? "color: red;" : "")?>"><?=$row["often"]?></td>
-					<td style="text-align: center;"><?=($row["days_often"] < 0 ? "<i class='fas fa-exclamation-triangle' style='color: red;'></i>" : "{$row["days_often"]}<font style='font-size: .8em; display: block; line-height: .4em;'>{$row["date_often"]}</font>")?></td>
-				</tr>
-			<?
+				$percent_diff = $row["week_percent"] - $row["last_week_percent"];
+				$percent_diff = $percent_diff > 0 ? "+".$percent_diff : $percent_diff;
+				$pallets += $row["pallets"];
+				?>
+					<tr>
+						<td style="text-align: center;"><?=$row["item"]?></td>
+						<td style="text-align: center;"><?=$row["shell_balance"]?></td>
+						<td style="text-align: center;"><?=$row["details"]?></td>
+						<td style="text-align: center;"><?=$row["sr_cnt"]?></td>
+						<td style="text-align: center;"><?=$row["sr_cnt_10000"]?></td>
+						<td style="text-align: center; <?=($row["often"] > $row["shell_balance"] ? "color: red;" : "")?>"><?=$row["often"]?></td>
+						<td style="text-align: center; <?=($row["max"] > $row["shell_balance"] ? "color: red;" : "")?>"><?=$row["max"]?></td>
+						<td style="text-align: center;"><?=($row["days_max"] < 0 ? "<i class='fas fa-exclamation-triangle' style='color: red;'> Дефицит</i>" : "{$row["days_max"]}<font style='font-size: .8em; display: block; line-height: .4em;'>{$row["date_max"]}</font>")?></td>
+						<td style="text-align: center;"><?=($row["need"] > 0 ? $row["need"] : "")?></td>
+					</tr>
+				<?
 			}
 			?>
 		</tbody>
 	</table>
 </div>
+
+<h3>Заполненность склада с формами: <?=round(($pallets < 0 ? 0 : $pallets) / 130 * 100)?>%</h3>
 
 <!--<div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_reject_report.php?sr_date=<?=$_GET["date"]?>&CB_ID=<?=$_GET["CB_ID"]?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>-->
 
