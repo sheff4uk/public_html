@@ -64,7 +64,7 @@ if( !$_GET["date_to"] ) {
 		background-color: #db4437;
 		box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
 	}
-	#shell_arrival_btn:hover, #shell_reject_btn:hover {
+	#shell_arrival_btn:hover, #shell_reject_btn:hover, #shell_report_btn:hover {
 		opacity: 1;
 	}
 </style>
