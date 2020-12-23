@@ -15,7 +15,7 @@ $message = "
 		</tr>
 	</table>
 
-	<table>
+	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 		<thead style='word-wrap: break-word;'>
 			<tr>
 				<th>Part-number</th>
