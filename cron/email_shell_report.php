@@ -1,7 +1,12 @@
 <?
-include "config.php";
+$path = dirname(dirname($argv[0]));
+$key = $argv[1];
+$CB_ID = $argv[2];
+$to = $argv[3];
 
-$to  = "sheff4uk@gmail.com" ;
+include $path."/config.php";
+// Проверка доступа
+if( $key != $script_key ) die('Access denied!');
 
 $date = new DateTime();
 $sr_date_format = date_format($date, 'd/m/Y');
@@ -57,8 +62,7 @@ $query = "
 		WHERE sr_date BETWEEN '2020-12-04' AND CURDATE() - INTERVAL 1 DAY
 		GROUP BY CW_ID
 	) WR ON WR.CW_ID = CW.CW_ID
-	WHERE 1
-		".($_GET["CB_ID"] ? "AND CW.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+	WHERE CW.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$CB_ID})
 	GROUP BY CW.CW_ID
 	ORDER BY CW.CW_ID
 ";
