@@ -63,6 +63,7 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 			<th>Number of OK shells</th>
 <!--			<th>Average durability of shells in filling cycles</th>-->
 <!--			<th>Daily average shell scrap</th>-->
+			<th>Shell scrap on the past day</th>
 			<th>Peak value of shell in use</th>
 			<th>Shortage of shells</th>
 <!--			<th>Days to shortage of shells to peak value based on current scrap level</th>-->
@@ -81,7 +82,10 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 				,ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) `days_max`
 				,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d/%m/%Y') `date_max`
 				,CEIL((CW.shell_balance - IFNULL(ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))), 0) * CW.fillings * CW.in_cassette) / CW.shell_pallet) `pallets`
+				,SR.sr_cnt
 			FROM CounterWeight CW
+			LEFT JOIN ShellReject SR ON SR.CW_ID = CW.CW_ID
+				AND SR.sr_date = CURDATE() - INTERVAL 1 DAY
 			LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID
 				#AND PB.pb_date BETWEEN (CURDATE() - INTERVAL 91 DAY) AND (CURDATE() - INTERVAL 1 DAY)
 			# Число замесов с 04.12.2020
@@ -114,6 +118,7 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 					<td><?=$row["shell_balance"]?></td>
 <!--					<td><?=$row["durability"]?></td>-->
 <!--					<td><?=$row["sr_avg"]?></td>-->
+					<td><?=$row["sr_cnt"]?></td>
 					<td><?=$row["max"]?></td>
 					<td style="color: red;"><?=($row["need"] > 0 ? $row["need"] : "")?></td>
 <!--					<td><?=($row["days_max"] < 0 ? "" : "{$row["days_max"]} <sub>{$row["date_max"]}</sub>")?></td>-->

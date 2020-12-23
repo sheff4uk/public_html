@@ -254,7 +254,8 @@ while( $row = mysqli_fetch_array($res) ) {
 				<th>Противовес</th>
 				<th>Кол-во годных форм</th>
 				<th>Средний ресурс форм до её списания в циклах заливки</th>
-				<th>Среднесуточное списание форм в штуках</th>
+				<th>Среднесуточное списание форм</th>
+				<th>Списаний за прошедшие сутки</th>
 				<th>Сколько ОБЫЧНО форм задействовалось в производственном цикле</th>
 				<th>Сколько МАКСИМАЛЬНО форм задействовалось в производственном цикле</th>
 				<th>Дефицит форм в штуках</th>
@@ -274,7 +275,10 @@ while( $row = mysqli_fetch_array($res) ) {
 					,ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) `days_max`
 					,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d.%m.%Y') `date_max`
 					,CEIL((CW.shell_balance - IFNULL(ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))), 0) * CW.fillings * CW.in_cassette) / CW.shell_pallet) `pallets`
+					,SR.sr_cnt
 				FROM CounterWeight CW
+				LEFT JOIN ShellReject SR ON SR.CW_ID = CW.CW_ID
+					AND SR.sr_date = CURDATE() - INTERVAL 1 DAY
 				LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID
 					#AND PB.pb_date BETWEEN (CURDATE() - INTERVAL 91 DAY) AND (CURDATE() - INTERVAL 1 DAY)
 				# Число замесов с 04.12.2020
@@ -308,6 +312,7 @@ while( $row = mysqli_fetch_array($res) ) {
 						<td style="text-align: center;"><?=$row["shell_balance"]?></td>
 						<td style="text-align: center;"><?=$row["durability"]?></td>
 						<td style="text-align: center;"><?=$row["sr_avg"]?></td>
+						<td style="text-align: center;"><?=$row["sr_cnt"]?></td>
 						<td style="text-align: center; <?=($row["often"] > $row["shell_balance"] ? "color: red;" : "")?>"><?=$row["often"]?></td>
 						<td style="text-align: center; <?=($row["max"] > $row["shell_balance"] ? "color: red;" : "")?>"><?=$row["max"]?></td>
 						<td style="text-align: center; color: red;"><?=($row["need"] > 0 ? $row["need"] : "")?></td>
