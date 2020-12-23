@@ -77,6 +77,7 @@ while( $row = mysqli_fetch_array($res) ) {
 $message .= "
 		</tbody>
 	</table>
+	<p>This letter is generated automatically. Please do not answer it. If you have any questions, you can contact us by e-mail info@konstanta.ltd.</p>
 ";
 
 $headers  = "Content-type: text/html; charset=utf-8 \r\n";
