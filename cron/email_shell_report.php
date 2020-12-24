@@ -25,6 +25,7 @@ $message = "
 			<tr>
 				<th>Part-number</th>
 				<th>Number of OK shells</th>
+				<th>Shell scrap on the past day</th>
 				<th>Peak value of shell in use</th>
 				<th>Shortage of shells</th>
 			</tr>
