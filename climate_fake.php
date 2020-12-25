@@ -71,18 +71,24 @@ echo "<h2>Последние показания: <span style='color: rgba(255, 1
 
 // Узнаем время начала и время окончания
 $query = "
-	SELECT DATE_FORMAT(adddate(date_time, INTERVAL 0-WEEKDAY(date_time) DAY), '%d.%m.%Y %00:30') `start`
-		,DATE_FORMAT(adddate(date_time, INTERVAL 6-WEEKDAY(date_time) DAY), '%d.%m.%Y %23:30') `end`
+	SELECT DATE_FORMAT(adddate(date_time, INTERVAL 0-WEEKDAY(date_time) DAY), '%d.%m.%Y %00:30') `start_format`
+		,DATE_FORMAT(adddate(date_time, INTERVAL 6-WEEKDAY(date_time) DAY), '%d.%m.%Y %23:30') `end_format`
+		,DATE_FORMAT(adddate(date_time, INTERVAL 0-WEEKDAY(date_time) DAY), '%Y-%m-%d %00:00') `start`
+		,DATE_FORMAT(adddate(date_time, INTERVAL 6-WEEKDAY(date_time) DAY), '%Y-%m-%d %23:59') `end`
 		,DATEDIFF(adddate(date_time, INTERVAL 0-WEEKDAY(date_time) DAY), CURDATE()) `diff`
 	FROM Climate
 	WHERE YEARWEEK(date_time, 1) = {$_GET["week"]}
 	UNION
-	SELECT DATE_FORMAT(adddate(CURDATE(), INTERVAL 0-WEEKDAY(CURDATE()) DAY), '%d.%m.%Y %00:30') `start`
-		,DATE_FORMAT(adddate(CURDATE(), INTERVAL 6-WEEKDAY(CURDATE()) DAY), '%d.%m.%Y %23:30') `end`
+	SELECT DATE_FORMAT(adddate(CURDATE(), INTERVAL 0-WEEKDAY(CURDATE()) DAY), '%d.%m.%Y %00:30') `start_format`
+		,DATE_FORMAT(adddate(CURDATE(), INTERVAL 6-WEEKDAY(CURDATE()) DAY), '%d.%m.%Y %23:30') `end_format`
+		,DATE_FORMAT(adddate(CURDATE(), INTERVAL 0-WEEKDAY(CURDATE()) DAY), '%Y-%m-%d %00:00') `start`
+		,DATE_FORMAT(adddate(CURDATE(), INTERVAL 6-WEEKDAY(CURDATE()) DAY), '%Y-%m-%d %23:59') `end`
 		,DATEDIFF(adddate(CURDATE(), INTERVAL 0-WEEKDAY(CURDATE()) DAY), CURDATE()) `diff`
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
+$start_format = $row["start_format"];
+$end_format = $row["end_format"];
 $start = $row["start"];
 $end = $row["end"];
 $diff = $row["diff"];
@@ -94,7 +100,7 @@ $query = "
 		,IFNULL(ROUND(AVG(h1), 1), 'NaN') h1
 		,IFNULL(ROUND(AVG(h2), 1), 'NaN') h2
 	FROM Climate
-	WHERE date_time BETWEEN '2020-12-21 00:00:00' AND '2020-12-28 00:00:00'
+	WHERE date_time BETWEEN '{$start}' AND '{$end}'
 	GROUP BY `time`
 	ORDER BY date_time
 ";
@@ -139,7 +145,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				pointRadius: 0,
 				pointHoverRadius: 0,
 				borderColor: 'rgba(255, 0, 0, 1)',
-				data: [{x: '<?=$start?>', y: 15}, {x: '<?=$end?>', y: 15}, ],
+				data: [{x: '<?=$start_format?>', y: 15}, {x: '<?=$end_format?>', y: 15}, ],
 			}, {
 				label: 'h, min',
 				fill: false,
@@ -148,7 +154,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				pointRadius: 0,
 				pointHoverRadius: 0,
 				borderColor: 'rgba(0, 0, 255, 1)',
-				data: [{x: '<?=$start?>', y: 75}, {x: '<?=$end?>', y: 75}, ],
+				data: [{x: '<?=$start_format?>', y: 75}, {x: '<?=$end_format?>', y: 75}, ],
 			}, {
 				label: 't, Созревание',
 				backgroundColor: 'rgba(255, 100, 50, .5)',
