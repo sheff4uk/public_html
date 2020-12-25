@@ -67,7 +67,7 @@ $h2 = $row["h2"];
 </form>
 
 <?
-echo "<h2>Последние показания: <span style='color: rgba(255, 100, 50, 1);' title='Участок созревания'>{$t1}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(255, 200, 0, 1);' title='Участок расформовки'>{$t2}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(100, 100, 255, 1);' title='Участок созревания'>{$h1}%</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(200, 0, 255, 1);' title='Участок расформовки'>{$h2}%</span></h2>";
+echo "<h2>Текущие показания: <span style='color: rgba(255, 100, 50, 1);' title='Участок созревания'>{$t1}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(255, 200, 0, 1);' title='Участок расформовки'>{$t2}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(100, 100, 255, 1);' title='Участок созревания'>{$h1}%</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(200, 0, 255, 1);' title='Участок расформовки'>{$h2}%</span></h2>";
 
 // Узнаем время начала и время окончания
 $query = "
@@ -104,6 +104,7 @@ $query = "
 	GROUP BY `time`
 	ORDER BY date_time
 ";
+echo $query;
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$t1_data .= "{x: '{$row["time"]}', y: {$row["t1"]}}, ";
