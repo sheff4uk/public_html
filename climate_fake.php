@@ -104,7 +104,6 @@ $query = "
 	GROUP BY `time`
 	ORDER BY date_time
 ";
-echo $query;
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$t1_data .= "{x: '{$row["time"]}', y: {$row["t1"]}}, ";
