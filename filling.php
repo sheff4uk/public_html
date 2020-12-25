@@ -222,7 +222,7 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th>Неделя/Цикл</th>
-			<th>Факт. время замеса</th>
+			<th>Дата время замеса</th>
 			<th>Рецепт</th>
 			<th>Куб раствора, кг</th>
 			<th>Окалина,<br>кг ±5</th>
@@ -250,9 +250,13 @@ $query = "
 		,PB.batches
 		,PB.fakt
 		,MIN(CAST(CONCAT(LB.batch_date, ' ', LB.batch_time) AS DATETIME)) time
+		,IF(COUNT(LCT24.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT24.LCT_ID) * 2 / 3), 0) `24tests`
+		,IF(COUNT(LCT72.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT72.LCT_ID) * 2 / 3), 0) `72tests`
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
+	LEFT JOIN list__CubeTest LCT24 ON LCT24.LB_ID = LB.LB_ID AND LCT24.delay = 24
+	LEFT JOIN list__CubeTest LCT72 ON LCT72.LB_ID = LB.LB_ID AND LCT72.delay = 72
 	WHERE 1
 		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
@@ -262,6 +266,32 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
+	// Находим средний результат испытаний кубиков
+	$query = "
+		SELECT ROUND(AVG(SUB.pressure)) `pressure`
+		FROM (
+			SELECT LCT.pressure
+			FROM list__CubeTest LCT
+			JOIN list__Batch LB ON LB.LB_ID = LCT.LB_ID AND LB.PB_ID = {$row['PB_ID']}
+			WHERE LCT.delay = 24
+			ORDER BY LCT.pressure DESC
+			LIMIT {$row['24tests']}
+		) SUB
+		UNION ALL
+		SELECT ROUND(AVG(SUB.pressure)) `pressure`
+		FROM (
+			SELECT LCT.pressure
+			FROM list__CubeTest LCT
+			JOIN list__Batch LB ON LB.LB_ID = LCT.LB_ID AND LB.PB_ID = {$row['PB_ID']}
+			WHERE LCT.delay = 72
+			ORDER BY LCT.pressure DESC
+			LIMIT {$row['72tests']}
+		) SUB
+	";
+	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$test24 = mysqli_result($subres,0,'pressure');
+	$test72 = mysqli_result($subres,1,'pressure');
+
 	$cnt = $row["fakt"];
 	echo "<tbody id='PB{$row["PB_ID"]}' style='text-align: center; border-bottom: 2px solid #333; ".(($weekday and $weekday != $row["pb_date_weekday"]) ? " border-top: 10px solid #333;" : "")."'>";
 	$weekday = $row["pb_date_weekday"];
@@ -269,7 +299,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$query = "
 		SELECT LB.LB_ID
 			,OP.name
-			,DATE_FORMAT(LB.batch_date, '%a') batch_date_format
+			,DATE_FORMAT(LB.batch_date, '%d.%m') batch_date_format
 			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 			,LB.io_density
 			,LB.sn_density
@@ -324,7 +354,15 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
-			echo "<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'><h1>{$row["week"]}/{$row["pb_date_weekday"]}</h1><span class='nowrap'>{$row["week_range"]}</span><br><b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b></td>";
+			echo "
+				<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'>
+					<h1>{$row["week"]}/{$row["pb_date_weekday"]}</h1>
+					<span class='nowrap'>{$row["week_range"]}</span><br>
+					<b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>
+					<i class='fas fa-cube'></i>24: <b>{$test24}</b><br>
+					<i class='fas fa-cube'></i>72: <b>{$test72}</b><br>
+				</td>
+			";
 		}
 		?>
 		<td><?=$subrow["batch_date_format"]?> <?=$subrow["batch_time_format"]?></td>
