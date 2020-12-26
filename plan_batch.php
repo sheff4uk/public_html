@@ -127,7 +127,126 @@ foreach ($_GET as &$value) {
 	});
 </script>
 
+<!--Посуточная аналитика-->
 <table class="main_table">
+	<thead>
+		<tr>
+			<th>День</th>
+			<th>Время первого замеса</th>
+			<th>Противовес</th>
+			<th>Замесов</th>
+			<th>Заливок</th>
+			<th>Деталей</th>
+			<th>Недоливы</th>
+		</tr>
+	</thead>
+	<tbody style="text-align: center;">
+
+<?
+$batches = 0;
+$fillings = 0;
+$fakt = 0;
+$underfilling = 0;
+
+$query = "
+	SELECT COUNT(distinct(PB.CW_ID)) cnt
+		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
+		,DATE_FORMAT(LB.batch_date, '%W') weekday_format
+		,LB.batch_date
+		,COUNT(DISTINCT LB.LB_ID) batches
+		,COUNT(LF.LF_ID) fillings
+		,SUM(CW.in_cassette) fakt
+	FROM list__Batch LB
+	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	WHERE 1
+		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
+		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+	GROUP BY LB.batch_date
+	ORDER BY LB.batch_date
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+while( $row = mysqli_fetch_array($res) ) {
+	$cnt = $row["cnt"];
+	$d_batches = 0;
+	$d_underfilling = 0;
+
+	$query = "
+		SELECT DATE_FORMAT(MIN(LB.batch_time), '%H:%i') first_batch
+			,CW.item
+			,COUNT(DISTINCT LB.LB_ID) batches
+			,COUNT(LF.LF_ID) fillings
+			,SUM(CW.in_cassette) fakt
+			,ROUND(IFNULL(SUM(LB.underfilling / CW.fillings), 0)) underfilling
+		FROM list__Batch LB
+		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+		LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+		LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		WHERE 1
+			AND LB.batch_date = '{$row["batch_date"]}'
+			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		GROUP BY PB.CW_ID
+		ORDER BY MIN(LB.batch_time)
+	";
+	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $subrow = mysqli_fetch_array($subres) ) {
+		$batches += $subrow["batches"];
+		$fillings += $subrow["fillings"];
+		$fakt += $subrow["fakt"];
+		$underfilling += $subrow["underfilling"];
+		$d_underfilling += $subrow["underfilling"];
+
+		// Выводим общую ячейку с датой заливки
+		if( $cnt ) {
+			$cnt++;
+			echo "<tr style='border-top: 2px solid #333;'>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h2>{$row["weekday_format"]}</h2>{$row["batch_date_format"]}</td>";
+			$cnt = 0;
+		}
+		else {
+			echo "<tr id='{$subrow["PB_ID"]}'>";
+		}
+		?>
+			<td><?=$subrow["first_batch"]?></td>
+			<td><?=$subrow["item"]?></td>
+			<td><?=$subrow["batches"]?></td>
+			<td><?=$subrow["fillings"]?></td>
+			<td><?=($subrow["fakt"] - $subrow["underfilling"])?></td>
+			<td><?=$subrow["underfilling"]?></td>
+		</tr>
+		<?
+
+	}
+?>
+		<tr class="summary">
+			<td></td>
+			<td>Итог:</td>
+			<td><?=$row["batches"]?></td>
+			<td><?=$row["fillings"]?></td>
+			<td><?=($row["fakt"] - $d_underfilling)?></td>
+			<td><?=$d_underfilling?></td>
+		</tr>
+<?
+}
+?>
+		<tr class="total">
+			<td></td>
+			<td></td>
+			<td>Итог:</td>
+			<td><?=$batches?></td>
+			<td><?=$fillings?></td>
+			<td><?=($fakt - $underfilling)?></td>
+			<td><?=$underfilling?></td>
+		</tr>
+	</tbody>
+</table>
+
+<!--Таблица с планом-->
+<h2>План</h2>
+<table>
 	<thead>
 		<tr>
 			<th>Неделя/Цикл</th>
@@ -283,118 +402,13 @@ else {
 	</tbody>
 </table>
 
-<!--Посуточная аналитика-->
-<table>
-	<thead>
-		<tr>
-			<th>День заливки</th>
-			<th>Противовес</th>
-			<th>Заливок</th>
-			<th>Деталей</th>
-			<th>Недоливы</th>
-		</tr>
-	</thead>
-	<tbody style="text-align: center;">
-
-<?
-$fillings = 0;
-$fakt = 0;
-$underfilling = 0;
-
-$query = "
-	SELECT COUNT(distinct(PB.CW_ID)) cnt
-		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
-		,DATE_FORMAT(LB.batch_date, '%W') weekday_format
-		,LB.batch_date
-		,COUNT(LF.LF_ID) fillings
-		,SUM(CW.in_cassette) fakt
-	FROM list__Batch LB
-	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	WHERE 1
-		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
-		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	GROUP BY LB.batch_date
-	ORDER BY LB.batch_date
-";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-while( $row = mysqli_fetch_array($res) ) {
-	$cnt = $row["cnt"];
-	$d_batches = 0;
-	$d_underfilling = 0;
-
-	$query = "
-		SELECT LB.batch_date
-			,CW.item
-			,COUNT(LF.LF_ID) fillings
-			,SUM(CW.in_cassette) fakt
-			,ROUND(IFNULL(SUM(LB.underfilling / CW.fillings), 0)) underfilling
-		FROM list__Batch LB
-		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-		LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-		WHERE 1
-			AND LB.batch_date = '{$row["batch_date"]}'
-			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-		GROUP BY PB.CW_ID
-		ORDER BY MIN(LB.batch_time)
-	";
-	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-	while( $subrow = mysqli_fetch_array($subres) ) {
-		$fillings += $subrow["fillings"];
-		$fakt += $subrow["fakt"];
-		$underfilling += $subrow["underfilling"];
-		$d_underfilling += $subrow["underfilling"];
-
-		// Выводим общую ячейку с датой заливки
-		if( $cnt ) {
-			$cnt++;
-			echo "<tr style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h2>{$row["weekday_format"]}</h2>{$row["batch_date_format"]}</td>";
-			$cnt = 0;
-		}
-		else {
-			echo "<tr id='{$subrow["PB_ID"]}'>";
-		}
-		?>
-			<td><?=$subrow["item"]?></td>
-			<td><?=$subrow["fillings"]?></td>
-			<td><?=($subrow["fakt"] - $subrow["underfilling"])?></td>
-			<td><?=$subrow["underfilling"]?></td>
-		</tr>
-		<?
-
-	}
-?>
-		<tr class="summary">
-			<td>Итог:</td>
-			<td><?=$row["fillings"]?></td>
-			<td><?=($row["fakt"] - $d_underfilling)?></td>
-			<td><?=$d_underfilling?></td>
-		</tr>
-<?
-}
-?>
-		<tr class="total">
-			<td></td>
-			<td>Итог:</td>
-			<td><?=$fillings?></td>
-			<td><?=($fakt - $underfilling)?></td>
-			<td><?=$underfilling?></td>
-		</tr>
-	</tbody>
-</table>
-
 <div>
 	<h3>Журнал изменений</h3>
 	<table>
 		<thead>
 			<tr>
 				<th colspan="2">Время изменения</th>
-				<th>День</th>
+				<th>Цикл</th>
 				<th>Противовес</th>
 				<th>Замесов</th>
 				<th>Автор</th>
@@ -408,6 +422,8 @@ while( $row = mysqli_fetch_array($res) ) {
 					,Friendly_date(PBL.date_time) friendly_date
 					,DATE_FORMAT(PBL.date_time, '%H:%i') time
 					,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
+					,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
+					,WEEK(PB.pb_date, 1) week
 					,CW.item
 					,CONCAT('<n style=\"text-decoration: line-through;\">', SPBL.batches, '</n>&nbsp;<i class=\"fas fa-arrow-right\"></i>&nbsp;') prev_batches
 					,PBL.batches
@@ -428,7 +444,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<tr>
 					<td><?=$row["friendly_date"]?></td>
 					<td><?=$row["time"]?></td>
-					<td class="bg-gray"><?=$row["pb_date_format"]?></td>
+					<td class="bg-gray"><?=$row["pb_date_weekday"]?></td>
 					<td class="bg-gray"><?=$row["item"]?></td>
 					<td class="bg-gray" style="text-align: center;"><?=$row["prev_batches"]?><?=$row["batches"]?></td>
 					<td style="text-align: center;"><?=$row["usr_icon"]?></td>
