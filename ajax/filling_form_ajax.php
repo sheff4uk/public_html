@@ -7,8 +7,8 @@ $query = "
 	SELECT PB.pb_date - INTERVAL 1 DAY pb_date_min
 		,PB.pb_date + INTERVAL 2 DAY pb_date_max
 		,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
-		,WEEK(PB.pb_date, 1) week
-		,CONCAT('[', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 0-WEEKDAY(PB.pb_date) DAY), '%e %b'), ' - ', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 6-WEEKDAY(PB.pb_date) DAY), '%e %b'), '] ', YEAR(PB.pb_date), ' г') week_range
+		,RIGHT(YEARWEEK(PB.pb_date, 1), 2) week
+		,CONCAT('[', DATE_FORMAT(ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), '%e %b'), ' - ', DATE_FORMAT(ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)), '%e %b'), '] ', LEFT(YEARWEEK(PB.pb_date, 1), 4), ' г') week_range
 		,PB.pb_date
 		,PB.CW_ID
 		,PB.batches

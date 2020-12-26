@@ -6,11 +6,26 @@ include "./forms/plan_batch_form.php";
 
 // Если в фильтре не установлена неделя, показываем текущую
 if( !$_GET["week"] ) {
-	$query = "SELECT YEARWEEK(NOW(), 1) week";
+	$query = "SELECT YEARWEEK(CURDATE(), 1) week";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
 	$_GET["week"] = $row["week"];
 }
+
+// Находим очередной цикл на этой неделе, чтобы создать новый план
+$query = "
+	SELECT SUB.next
+		,CONCAT(RIGHT(YEARWEEK(SUB.next, 1), 2), '/', (WEEKDAY(SUB.next) + 1)) `week_cycle`
+	FROM (
+		SELECT IF(WEEKDAY(MAX(pb_date)) = 6, NULL, IFNULL(ADDDATE(MAX(pb_date), 1), STR_TO_DATE(CONCAT({$_GET["week"]}, '_1'), '%x%v_%w'))) `next`
+		FROM plan__Batch
+		WHERE YEARWEEK(pb_date, 1) = {$_GET["week"]}
+	) SUB
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$next = $row["next"];
+$week_cycle = $row["week_cycle"];
 ?>
 
 <!--Фильтр-->
@@ -24,9 +39,11 @@ if( !$_GET["week"] ) {
 			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
 				<?
 				$query = "
-					SELECT YEAR(NOW()) year
+					SELECT LEFT(YEARWEEK(ADDDATE(CURDATE(), 7), 1), 4) year
 					UNION
-					SELECT YEAR(pb_date) year
+					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
+					UNION
+					SELECT LEFT(YEARWEEK(pb_date, 1), 4) year
 					FROM plan__Batch
 					ORDER BY year DESC
 				";
@@ -34,17 +51,22 @@ if( !$_GET["week"] ) {
 				while( $row = mysqli_fetch_array($res) ) {
 					echo "<optgroup label='{$row["year"]}'>";
 					$query = "
-						SELECT YEARWEEK(NOW(), 1) week
-							,WEEK(NOW(), 1) week_format
-							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 0-WEEKDAY(CURDATE()) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 6-WEEKDAY(CURDATE()) DAY), '%e %b') WeekEnd
+						SELECT YEARWEEK(ADDDATE(CURDATE(), 7), 1) week
+							,RIGHT(YEARWEEK(ADDDATE(CURDATE(), 7), 1), 2) week_format
+							,DATE_FORMAT(ADDDATE(CURDATE(), 7-WEEKDAY(CURDATE())), '%e %b') WeekStart
+							,DATE_FORMAT(ADDDATE(CURDATE(), 13-WEEKDAY(CURDATE())), '%e %b') WeekEnd
+						UNION
+						SELECT YEARWEEK(CURDATE(), 1) week
+							,RIGHT(YEARWEEK(CURDATE(), 1), 2) week_format
+							,DATE_FORMAT(ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())), '%e %b') WeekStart
+							,DATE_FORMAT(ADDDATE(CURDATE(), 6-WEEKDAY(CURDATE())), '%e %b') WeekEnd
 						UNION
 						SELECT YEARWEEK(pb_date, 1) week
-							,WEEK(pb_date, 1) week_format
-							,DATE_FORMAT(adddate(pb_date, INTERVAL 0-WEEKDAY(pb_date) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(pb_date, INTERVAL 6-WEEKDAY(pb_date) DAY), '%e %b') WeekEnd
+							,RIGHT(YEARWEEK(pb_date, 1), 2) week_format
+							,DATE_FORMAT(ADDDATE(pb_date, 0-WEEKDAY(pb_date)), '%e %b') WeekStart
+							,DATE_FORMAT(ADDDATE(pb_date, 6-WEEKDAY(pb_date)), '%e %b') WeekEnd
 						FROM plan__Batch
-						WHERE YEAR(pb_date) = {$row["year"]}
+						WHERE LEFT(YEARWEEK(pb_date, 1), 4) = {$row["year"]}
 						GROUP BY week
 						ORDER BY week DESC
 					";
@@ -258,17 +280,17 @@ while( $row = mysqli_fetch_array($res) ) {
 			<th>Недоливы</th>
 			<th>Расчетное время, ч</th>
 			<th></th>
+			<th></th>
 		</tr>
 	</thead>
-	<tbody style="text-align: center;">
 
 <?
 $query = "
-	SELECT SUM(1) cnt
+	SELECT SUM(1) + 1 cnt
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
-		,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
-		,WEEK(PB.pb_date, 1) week
-		,CONCAT('[', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 0-WEEKDAY(PB.pb_date) DAY), '%e %b'), ' - ', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 6-WEEKDAY(PB.pb_date) DAY), '%e %b'), '] ', YEAR(PB.pb_date), ' г') week_range
+		,WEEKDAY(PB.pb_date) + 1 cycle
+		,RIGHT(YEARWEEK(PB.pb_date, 1), 2) week
+		,CONCAT('[', DATE_FORMAT(ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), '%e %b'), ' - ', DATE_FORMAT(ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)), '%e %b'), '] ', LEFT(YEARWEEK(PB.pb_date, 1), 4), ' г') week_range
 		,PB.pb_date
 		,SUM(PB.batches) batches
 		,SUM(PB.batches * CW.fillings) fillings
@@ -286,6 +308,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
+	echo "<tbody id='C{$row["cycle"]}' style='text-align: center; border-bottom: 2px solid #333;'>";
 	$cnt = $row["cnt"];
 	$d_batches = 0;
 	$d_underfilling = 0;
@@ -300,7 +323,6 @@ while( $row = mysqli_fetch_array($res) ) {
 			,PB.batches * CW.fillings * CW.in_cassette plan
 			,PB.fakt * CW.fillings * CW.in_cassette fakt
 			,IFNULL(SUM(LB.underfilling), 0) underfilling
-			,IF(PB.fakt = 0, 1, 0) editable
 			,IF(PB.fakt = 0 AND PB.pb_date <= (CURRENT_DATE() + INTERVAL 1 DAY), 1, 0) printable
 		FROM plan__Batch PB
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -322,11 +344,9 @@ while( $row = mysqli_fetch_array($res) ) {
 		$d_underfilling += $subrow["underfilling"];
 
 		// Выводим общую ячейку с датой заливки
-		if( $cnt ) {
-			$cnt++;
+		if( $last_cycle != $row["cycle"] ) {
 			echo "<tr id='{$subrow["PB_ID"]}' style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h1>{$row["week"]}/{$row["pb_date_weekday"]}</h1><span class='nowrap'>{$row["week_range"]}</span><br>".($row["diff"] < 0 ? "Отставание: <b style='color: red;'>{$row["diff"]}</b> мин" : ($row["diff"] > 0 ? "Опережение: <b style='color: green;'>{$row["diff"]}</b> мин" : ""))."</td>";
-			$cnt = 0;
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h1>{$row["week"]}/{$row["cycle"]}</h1><span class='nowrap'>{$row["week_range"]}</span><br>".($row["diff"] < 0 ? "Отставание: <b style='color: red;'>{$row["diff"]}</b> мин" : ($row["diff"] > 0 ? "Опережение: <b style='color: green;'>{$row["diff"]}</b> мин" : ""))."</td>";
 		}
 		else {
 			echo "<tr id='{$subrow["PB_ID"]}'>";
@@ -350,12 +370,17 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td class='bg-gray'><?=$subrow["underfilling"]?></td>
 			<td class='bg-gray'><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td>
-				<a href='#' class='add_pb clone' pb_date="<?=$_GET["pb_date"]?>" PB_ID='<?=$subrow["PB_ID"]?>' title='Клонировать план заливки'><i class='fa fa-clone fa-lg'></i></a>
-				<?=($subrow["editable"] ? "<a href='#' class='add_pb' PB_ID='{$subrow["PB_ID"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?>
 				<?=($subrow["printable"] ? "<a href='printforms/filling_blank.php?PB_ID={$subrow["PB_ID"]}' class='print' title='Бланк чеклиста оператора'><i class='fas fa-print fa-lg'></i></a>" : "")?>
 			</td>
+			<?
+			// Выводим общую ячейку с кнопками действий
+			if( $last_cycle != $row["cycle"] ) {
+				echo "<td rowspan='{$cnt}'><a href='#' class='add_pb' pb_date='{$row["pb_date"]}' cycle='{$row["week"]}/{$row["cycle"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a></td>";
+			}
+			?>
 		</tr>
 		<?
+		$last_cycle = $row["cycle"];
 
 	}
 	if($d_batches > 0) {
@@ -378,6 +403,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td></td>
 		</tr>
 <?
+	echo "</tbody>";
 }
 if($w_batches > 0) {
 	$intdiv = intdiv($w_batches, 4);
@@ -388,6 +414,7 @@ else {
 	$mod = 0;
 }
 ?>
+	<tbody style="text-align: center;">
 		<tr class="total">
 			<td></td>
 			<td>Итог:</td>
@@ -397,6 +424,7 @@ else {
 			<td><?=($fakt - $underfilling)?></td>
 			<td><?=$underfilling?></td>
 			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
+			<td></td>
 			<td></td>
 		</tr>
 	</tbody>
@@ -415,15 +443,15 @@ else {
 				<th>Ссылка</th>
 			</tr>
 		</thead>
-		<tbody>
+		<tbody style="text-align: center;">
 			<?
 			$query = "
 				SELECT PBL.PB_ID
 					,Friendly_date(PBL.date_time) friendly_date
 					,DATE_FORMAT(PBL.date_time, '%H:%i') time
 					,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
-					,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
-					,WEEK(PB.pb_date, 1) week
+					,WEEKDAY(PB.pb_date) + 1 cycle
+					,RIGHT(YEARWEEK(PB.pb_date, 1), 2) week
 					,CW.item
 					,CONCAT('<n style=\"text-decoration: line-through;\">', SPBL.batches, '</n>&nbsp;<i class=\"fas fa-arrow-right\"></i>&nbsp;') prev_batches
 					,PBL.batches
@@ -444,11 +472,11 @@ else {
 				<tr>
 					<td><?=$row["friendly_date"]?></td>
 					<td><?=$row["time"]?></td>
-					<td class="bg-gray"><?=$row["pb_date_weekday"]?></td>
+					<td class="bg-gray"><?=$row["cycle"]?></td>
 					<td class="bg-gray"><?=$row["item"]?></td>
-					<td class="bg-gray" style="text-align: center;"><?=$row["prev_batches"]?><?=$row["batches"]?></td>
-					<td style="text-align: center;"><?=$row["usr_icon"]?></td>
-					<td style="text-align: center;"><a href="#<?=$row["PB_ID"]?>"><i class="fas fa-link fa-lg"></i></a></td>
+					<td class="bg-gray"><?=$row["prev_batches"]?><?=$row["batches"]?></td>
+					<td><?=$row["usr_icon"]?></td>
+					<td><a href="#<?=$row["PB_ID"]?>"><i class="fas fa-link fa-lg"></i></a></td>
 				</tr>
 			<?
 			}
@@ -457,7 +485,7 @@ else {
 	</table>
 </div>
 
-<div id="add_btn" class="add_pb" pb_date="<?=$_GET["pb_date"]?>" title="Внести данные плана заливки"></div>
+<div id="add_btn" class="add_pb" pb_date="<?=$next?>" cycle="<?=$week_cycle?>" title="Внести данные очередного плана заливки"></div>
 
 <script>
 	$(function() {

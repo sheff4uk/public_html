@@ -17,7 +17,7 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 }
 //// Если в фильтре не установлена неделя, показываем текущую
 //if( !$_GET["week"] ) {
-//	$query = "SELECT YEARWEEK(NOW(), 1) week";
+//	$query = "SELECT YEARWEEK(CURDATE(), 1) week";
 //	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 //	$row = mysqli_fetch_array($res);
 //	$_GET["week"] = $row["week"];
@@ -157,31 +157,31 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 		</div>
 <!--
 		<div class="nowrap" style="margin-bottom: 10px;">
-			<span>Неделя:</span>
+			<span>Неделя заливки:</span>
 			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
 				<?
 				$query = "
-					SELECT YEAR(NOW()) year
+					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
 					UNION
-					SELECT YEAR(test_date) year
-					FROM list__CubeTest
+					SELECT LEFT(YEARWEEK(pb_date, 1), 4) year
+					FROM plan__Batch
 					ORDER BY year DESC
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
 					echo "<optgroup label='{$row["year"]}'>";
 					$query = "
-						SELECT YEARWEEK(NOW(), 1) week
-							,WEEK(NOW(), 1) week_format
-							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 0-WEEKDAY(CURDATE()) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 6-WEEKDAY(CURDATE()) DAY), '%e %b') WeekEnd
+						SELECT YEARWEEK(CURDATE(), 1) week
+							,RIGHT(YEARWEEK(CURDATE(), 1), 2) week_format
+							,DATE_FORMAT(ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())), '%e %b') WeekStart
+							,DATE_FORMAT(ADDDATE(CURDATE(), 6-WEEKDAY(CURDATE())), '%e %b') WeekEnd
 						UNION
-						SELECT YEARWEEK(test_date, 1) week
-							,WEEK(test_date, 1) week_format
-							,DATE_FORMAT(adddate(test_date, INTERVAL 0-WEEKDAY(test_date) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(test_date, INTERVAL 6-WEEKDAY(test_date) DAY), '%e %b') WeekEnd
-						FROM list__CubeTest
-						WHERE YEAR(test_date) = {$row["year"]}
+						SELECT YEARWEEK(pb_date, 1) week
+							,RIGHT(YEARWEEK(pb_date, 1), 2) week_format
+							,DATE_FORMAT(ADDDATE(pb_date, 0-WEEKDAY(pb_date)), '%e %b') WeekStart
+							,DATE_FORMAT(ADDDATE(pb_date, 6-WEEKDAY(pb_date)), '%e %b') WeekEnd
+						FROM plan__Batch
+						WHERE LEFT(YEARWEEK(pb_date, 1), 4) = {$row["year"]}
 						GROUP BY week
 						ORDER BY week DESC
 					";

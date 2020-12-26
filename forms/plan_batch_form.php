@@ -2,62 +2,53 @@
 include_once "../config.php";
 
 // Сохранение/редактирование плана заливки
-if( isset($_POST["batches"]) ) {
+if( isset($_POST["pb_date"]) ) {
 	session_start();
-	$batches = $_POST["batches"];
+	$pb_date = $_POST["pb_date"];
 
-	if( $_POST["PB_ID"] ) { // Редактируем
-		$query = "
-			UPDATE plan__Batch
-			SET batches = {$batches}
-				,author = {$_SESSION['id']}
-			WHERE PB_ID = {$_POST["PB_ID"]}
-		";
-		if( !mysqli_query( $mysqli, $query ) ) {
-			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+	foreach ($_POST["CW_ID"] as $key => $value) {
+		// Редактируем
+		if( $_POST["PB_ID"][$key] ) {
+			$query = "
+				UPDATE plan__Batch
+				SET pb_date = '{$pb_date}'
+					,CW_ID = {$value}
+					,batches = {$_POST["batches"][$key]}
+					,author = {$_SESSION['id']}
+				WHERE PB_ID = {$_POST["PB_ID"][$key]}
+			";
+			if( !mysqli_query( $mysqli, $query ) ) $_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 		}
-		$PB_ID = $_POST["PB_ID"];
-	}
-	else { // Добавляем
-		$pb_date = $_POST["pb_date"];
-		$CW_ID = $_POST["CW_ID"];
-		$query = "
-			INSERT INTO plan__Batch
-			SET pb_date = '{$pb_date}'
-				,CW_ID = {$CW_ID}
-				,batches = {$batches}
-				,author = {$_SESSION['id']}
-		";
-		if( !mysqli_query( $mysqli, $query ) ) {
-			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
-		}
-		else {
-			$add = 1;
-			$PB_ID = mysqli_insert_id( $mysqli );
+		elseif( $_POST["batches"][$key] > 0 ) {
+			$query = "
+				INSERT INTO plan__Batch
+				SET pb_date = '{$pb_date}'
+					,CW_ID = {$value}
+					,batches = {$_POST["batches"][$key]}
+					,author = {$_SESSION['id']}
+			";
+			if( !mysqli_query( $mysqli, $query ) ) $_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 		}
 	}
 
 	if( count($_SESSION["error"]) == 0) {
-		$_SESSION["success"][] = $add ? "Новая запись успешно добавлена." : "Запись успешно отредактирована.";
+		$_SESSION["success"][] = "Данные успешно сохранены.";
 	}
 
-	// Получаем неделю
+	// Получаем неделю и цикл
 	$query = "
 		SELECT YEARWEEK(pb_date, 1) week
+			,WEEKDAY(pb_date) + 1 cycle
 		FROM plan__Batch
-		WHERE PB_ID = {$PB_ID}
+		WHERE pb_date = '{$pb_date}'
 		";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
 	$week = $row["week"];
+	$cycle = $row["cycle"];
 
-	// Перенаправление в журнал
-	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/plan_batch.php?week='.$week.'&pb_date='.$pb_date.'&add#'.$PB_ID.'">');
-	}
-	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/plan_batch.php?week='.$week.'#'.$PB_ID.'">');
-	}
+	// Перенаправление в план
+	exit ('<meta http-equiv="refresh" content="0; url=/plan_batch.php?week='.$week.'&#C'.$cycle.'">');
 }
 ?>
 
@@ -72,40 +63,43 @@ if( isset($_POST["batches"]) ) {
 	<form method='post' action="/forms/plan_batch_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
-			<input type="hidden" name="PB_ID">
+			<input type="hidden" name="pb_date">
 
+			<h3>Неделя/цикл: <span style="font-size: 2em;" id="week_cycle"></span></h3>
+<!--			<input type="date" name="pb_date" min="<?=date('Y-m-d')?>" max="<?=date('Y-m-d', strtotime("+7 day"))?>" required>-->
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
-						<th>Дата</th>
 						<th>Противовес</th>
 						<th>Замесов</th>
 						<th>Заливок</th>
-						<th>План</th>
+						<th>Деталей</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
-					<tr>
-						<td><input type="date" name="pb_date" min="<?=date('Y-m-d')?>" max="<?=date('Y-m-d', strtotime("+7 day"))?>" required></td>
-						<td>
-							<select name="CW_ID" style="width: 150px;" required>
-								<option value=""></option>
-								<?
-								$query = "
-									SELECT CW.CW_ID, CW.item, CW.fillings, CW.in_cassette
-									FROM CounterWeight CW
-									ORDER BY CW.CW_ID
-								";
-								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-								while( $row = mysqli_fetch_array($res) ) {
-									echo "<option value='{$row["CW_ID"]}' fillings='{$row["fillings"]}' in_cassette='{$row["in_cassette"]}'>{$row["item"]}</option>";
-								}
-								?>
-							</select>
-						</td>
-						<td><input type="number" name="batches" min="0" max="30" style="width: 70px;" required></td>
-						<td><input type="number" name="fillings" style="width: 70px;" readonly></td>
-						<td><input type="number" name="amount" style="width: 70px;" readonly></td>
+					<?
+					$query = "
+						SELECT CW.CW_ID, CW.item, CW.fillings, CW.in_cassette
+						FROM CounterWeight CW
+						ORDER BY CW.CW_ID
+					";
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $row = mysqli_fetch_array($res) ) {
+						?>
+						<tr class="data_row">
+							<td><b style="font-size: 1.5em;"><?=$row["item"]?></b><input type="hidden" name="CW_ID[<?=$row["CW_ID"]?>]" value="<?=$row["CW_ID"]?>"><input type="hidden" name="PB_ID[<?=$row["CW_ID"]?>]"></td>
+							<td><input type="number" name="batches[<?=$row["CW_ID"]?>]" class="batches" min="0" max="30" fillings="<?=$row["fillings"]?>" in_cassette="<?=$row["in_cassette"]?>" tabindex="<?=(++$index)?>" style="width: 70px;"><i class="fas fa-question-circle" title="Не редактируется. Заливки уже состоялись."></i></td>
+							<td><input type="number" name="fillings" class="fillings" style="width: 70px;" readonly></td>
+							<td><input type="number" name="details" class="details" style="width: 70px;" readonly></td>
+						</tr>
+						<?
+					}
+					?>
+					<tr class="total">
+						<td>Всего:</td>
+						<td id="total_batches"><span></span></td>
+						<td id="total_fillings"><span></span></td>
+						<td id="total_details"><span></span></td>
 					</tr>
 				</tbody>
 			</table>
@@ -119,57 +113,54 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 <script>
 	$(function() {
-//		<?
-//		if( isset($_GET["add"]) ) {
-//		?>
-//		// Если было добавление, автоматичеки открывается форма для новой записи
-//		$(document).ready(function() {
-//			$('#add_btn').click();
-//		});
-//		<?
-//		}
-//		?>
-
 		// Кнопка добавления
 		$('.add_pb').click( function() {
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
-			var PB_ID = $(this).attr("PB_ID"),
-				pb_date = $(this).attr("pb_date");
+			var pb_date = $(this).attr("pb_date"),
+				week_cycle = $(this).attr("cycle");
 
-			// В случае редактирования заполняем форму
-			if( PB_ID ) {
-				// Данные аяксом
-				$.ajax({
-					url: "/ajax/plan_batch_json.php?PB_ID=" + PB_ID,
-					success: function(msg) { pb_data = msg; },
-					dataType: "json",
-					async: false
-				});
+			// Если все циклы задействованы, выводим предупреждение
+			if( !pb_date ) {
+				noty({text: '7 - максимальное количество циклов за неделю.', type: 'error'});
+				return false;
+			}
 
-				$('#plan_batch_form select[name="CW_ID"]').val(pb_data['CW_ID']);
-				$('#plan_batch_form input[name="batches"]').val(pb_data['batches']);
-				$('#plan_batch_form input[name="fillings"]').val(pb_data['fillings']);
-				$('#plan_batch_form input[name="amount"]').val(pb_data['amount']);
-				// В случае клонирования очищаем идентификатор и дату
-				if( $(this).hasClass('clone') ) {
-					$('#plan_batch_form input[name="PB_ID"]').val('');
-					$('#plan_batch_form input[name="pb_date"]').val(pb_date).attr('disabled', false);
-					$('#plan_batch_form select[name="CW_ID"]').attr('disabled', false);
+			$('#plan_batch_form input[name="pb_date"]').val(pb_date);
+			$('#week_cycle').html(week_cycle);
+
+			// Данные аяксом
+			$.ajax({
+				url: "/ajax/plan_batch_json.php?pb_date=" + pb_date,
+				success: function(msg) { pb_data = msg; },
+				dataType: "json",
+				async: false
+			});
+
+			// Очищаем форму
+			$('#plan_batch_form .data_row input[type="number"]').val('');
+			$('#plan_batch_form .total span').html('');
+
+			for (let sub_pb_data of pb_data) {
+				if( sub_pb_data['PB_ID'] ) {
+					$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').val(sub_pb_data['batches']).change();
+					$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('required', true);
+					$('#plan_batch_form input[name="PB_ID[' + sub_pb_data['CW_ID'] + ']"]').val(sub_pb_data['PB_ID']);
 				}
 				else {
-					$('#plan_batch_form input[name="PB_ID"]').val(PB_ID);
-					$('#plan_batch_form input[name="pb_date"]').val(pb_data['pb_date']).attr('disabled', true);
-					$('#plan_batch_form select[name="CW_ID"]').attr('disabled', true);
+					$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('required', false);
+					$('#plan_batch_form input[name="PB_ID[' + sub_pb_data['CW_ID'] + ']"]').val('');
 				}
-			}
-			// Иначе очищаем форму
-			else {
-				$('#plan_batch_form input[name="PB_ID"]').val('');
-				$('#plan_batch_form table input').val('').attr('disabled', false);
-				$('#plan_batch_form table select').val('').attr('disabled', false);
-				$('#plan_batch_form table input[name="pb_date"]').val(pb_date);
+
+				if( sub_pb_data['fakt'] > 0 ) {
+					$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('readonly', true);
+					$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').parent().children('i').show('fast');
+				}
+				else {
+					$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('readonly', false);
+					$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').parent().children('i').hide('fast');
+				}
 			}
 
 			$('#plan_batch_form').dialog({
@@ -182,14 +173,28 @@ this.subbut.value='Подождите, пожалуйста!';">
 			return false;
 		});
 
-		// При изменении противовеса или замесов пересчитываем заливки и детали
-		$('#plan_batch_form select[name="CW_ID"], #plan_batch_form input[name="batches"]').change(function() {
-			var fillings = $('#plan_batch_form select[name="CW_ID"] option:selected').attr('fillings'),
-				in_cassette = $('#plan_batch_form select[name="CW_ID"] option:selected').attr('in_cassette'),
-				batches = $('#plan_batch_form input[name="batches"]').val();
+		// При изменении кол-ва замесов пересчитываем заливки и детали
+		$('#plan_batch_form input.batches').change(function() {
+			var fillings = $(this).attr('fillings'),
+				in_cassette = $(this).attr('in_cassette'),
+				batches = $(this).val(),
+				total_batches = 0,
+				total_fillings = 0,
+				total_details = 0;
 
-			$('#plan_batch_form input[name="fillings"]').val(batches * fillings);
-			$('#plan_batch_form input[name="amount"]').val(batches * fillings * in_cassette);
+			$(this).parents('tr').children().children('input.fillings').val(batches * fillings);
+			$(this).parents('tr').children().children('input.details').val(batches * fillings * in_cassette);
+
+			// Вычисляем сумму
+			$('.data_row').each(function(){
+				total_batches += Number($(this).children().children('input.batches').val());
+				total_fillings += Number($(this).children().children('input.fillings').val());
+				total_details += Number($(this).children().children('input.details').val());
+			});
+
+			$('#total_batches span').html(total_batches);
+			$('#total_fillings span').html(total_fillings);
+			$('#total_details span').html(total_details);
 		});
 	});
 </script>

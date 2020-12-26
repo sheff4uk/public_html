@@ -6,7 +6,7 @@ include "./forms/plan_scheduling_form.php";
 
 // Если в фильтре не установлена неделя, показываем текущую
 if( !$_GET["week"] ) {
-	$query = "SELECT YEARWEEK(NOW(), 1) week";
+	$query = "SELECT YEARWEEK(CURDATE(), 1) week";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
 	$_GET["week"] = $row["week"];
@@ -24,9 +24,9 @@ if( !$_GET["week"] ) {
 			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
 				<?
 				$query = "
-					SELECT YEAR(NOW()) year
+					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
 					UNION
-					SELECT YEAR(ps_date) year
+					SELECT LEFT(YEARWEEK(ps_date, 1), 4) year
 					FROM plan__Scheduling
 					ORDER BY year DESC
 				";
@@ -34,17 +34,17 @@ if( !$_GET["week"] ) {
 				while( $row = mysqli_fetch_array($res) ) {
 					echo "<optgroup label='{$row["year"]}'>";
 					$query = "
-						SELECT YEARWEEK(NOW(), 1) week
-							,WEEK(NOW(), 1) week_format
-							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 0-WEEKDAY(CURDATE()) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 6-WEEKDAY(CURDATE()) DAY), '%e %b') WeekEnd
+						SELECT YEARWEEK(CURDATE(), 1) week
+							,RIGHT(YEARWEEK(CURDATE(), 1), 2) week_format
+							,DATE_FORMAT(ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())), '%e %b') WeekStart
+							,DATE_FORMAT(ADDDATE(CURDATE(), 6-WEEKDAY(CURDATE())), '%e %b') WeekEnd
 						UNION
 						SELECT YEARWEEK(ps_date, 1) week
-							,WEEK(ps_date, 1) week_format
-							,DATE_FORMAT(adddate(ps_date, INTERVAL 0-WEEKDAY(ps_date) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(ps_date, INTERVAL 6-WEEKDAY(ps_date) DAY), '%e %b') WeekEnd
+							,RIGHT(YEARWEEK(ps_date, 1), 2) week_format
+							,DATE_FORMAT(ADDDATE(ps_date, 0-WEEKDAY(ps_date)), '%e %b') WeekStart
+							,DATE_FORMAT(ADDDATE(ps_date, 6-WEEKDAY(ps_date)), '%e %b') WeekEnd
 						FROM plan__Scheduling
-						WHERE YEAR(ps_date) = {$row["year"]}
+						WHERE LEFT(YEARWEEK(ps_date, 1), 4) = {$row["year"]}
 						GROUP BY week
 						ORDER BY week DESC
 					";

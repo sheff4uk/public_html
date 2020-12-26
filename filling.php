@@ -7,7 +7,7 @@ include "./forms/filling_form.php";
 
 // Если в фильтре не установлена неделя, показываем текущую
 if( !$_GET["week"] ) {
-	$query = "SELECT YEARWEEK(NOW(), 1) week";
+	$query = "SELECT YEARWEEK(CURDATE(), 1) week";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
 	$_GET["week"] = $row["week"];
@@ -73,7 +73,7 @@ if( !$_GET["week"] ) {
 			FROM plan__Batch PB
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			WHERE PB.fakt = 0 AND PB.batches > 0
-				AND PB.pb_date <= NOW()
+				AND PB.pb_date <= CURDATE()
 			ORDER BY PB.pb_date, PB.CW_ID
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -108,9 +108,9 @@ if( !$_GET["week"] ) {
 			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
 				<?
 				$query = "
-					SELECT YEAR(NOW()) year
+					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
 					UNION
-					SELECT YEAR(pb_date) year
+					SELECT LEFT(YEARWEEK(pb_date, 1), 4) year
 					FROM plan__Batch
 					ORDER BY year DESC
 				";
@@ -118,17 +118,17 @@ if( !$_GET["week"] ) {
 				while( $row = mysqli_fetch_array($res) ) {
 					echo "<optgroup label='{$row["year"]}'>";
 					$query = "
-						SELECT YEARWEEK(NOW(), 1) week
-							,WEEK(NOW(), 1) week_format
-							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 0-WEEKDAY(CURDATE()) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(CURDATE(), INTERVAL 6-WEEKDAY(CURDATE()) DAY), '%e %b') WeekEnd
+						SELECT YEARWEEK(CURDATE(), 1) week
+							,RIGHT(YEARWEEK(CURDATE(), 1), 2) week_format
+							,DATE_FORMAT(ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())), '%e %b') WeekStart
+							,DATE_FORMAT(ADDDATE(CURDATE(), 6-WEEKDAY(CURDATE())), '%e %b') WeekEnd
 						UNION
 						SELECT YEARWEEK(pb_date, 1) week
-							,WEEK(pb_date, 1) week_format
-							,DATE_FORMAT(adddate(pb_date, INTERVAL 0-WEEKDAY(pb_date) DAY), '%e %b') WeekStart
-							,DATE_FORMAT(adddate(pb_date, INTERVAL 6-WEEKDAY(pb_date) DAY), '%e %b') WeekEnd
+							,RIGHT(YEARWEEK(pb_date, 1), 2) week_format
+							,DATE_FORMAT(ADDDATE(pb_date, 0-WEEKDAY(pb_date)), '%e %b') WeekStart
+							,DATE_FORMAT(ADDDATE(pb_date, 6-WEEKDAY(pb_date)), '%e %b') WeekEnd
 						FROM plan__Batch
-						WHERE YEAR(pb_date) = {$row["year"]}
+						WHERE LEFT(YEARWEEK(pb_date, 1), 4) = {$row["year"]}
 						GROUP BY week
 						ORDER BY week DESC
 					";
@@ -242,8 +242,8 @@ foreach ($_GET as &$value) {
 $query = "
 	SELECT PB.PB_ID
 		,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
-		,WEEK(PB.pb_date, 1) week
-		,CONCAT('[', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 0-WEEKDAY(PB.pb_date) DAY), '%e %b'), ' - ', DATE_FORMAT(adddate(PB.pb_date, INTERVAL 6-WEEKDAY(PB.pb_date) DAY), '%e %b'), '] ', YEAR(PB.pb_date), ' г') week_range
+		,RIGHT(YEARWEEK(PB.pb_date, 1), 2) week
+		,CONCAT('[', DATE_FORMAT(ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), '%e %b'), ' - ', DATE_FORMAT(ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)), '%e %b'), '] ', LEFT(YEARWEEK(PB.pb_date, 1), 4), ' г') week_range
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
 		,CW.item
 		,PB.CW_ID
@@ -355,7 +355,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
 			echo "
-				<td id='PB{$row["PB_ID"]}' rowspan='{$cnt}' class='bg-gray'>
+				<td rowspan='{$cnt}' class='bg-gray'>
 					<h1>{$row["week"]}/{$row["pb_date_weekday"]}</h1>
 					<span class='nowrap'>{$row["week_range"]}</span><br>
 					<b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>

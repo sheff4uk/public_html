@@ -5,7 +5,7 @@ include "header.php";
 
 // Если в фильтре не установлена неделя, показываем текущую
 if( !$_GET["week"] ) {
-	$query = "SELECT YEARWEEK(NOW(), 1) week";
+	$query = "SELECT YEARWEEK(CURDATE(), 1) week";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
 	$_GET["week"] = $row["week"];
@@ -31,9 +31,9 @@ $h2 = $row["h2"];
 	<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
 		<?
 		$query = "
-			SELECT YEAR(NOW()) year
+			SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
 			UNION
-			SELECT YEAR(date_time) year
+			SELECT LEFT(YEARWEEK(date_time, 1), 4) year
 			FROM Climate
 			ORDER BY year DESC
 		";
@@ -41,17 +41,17 @@ $h2 = $row["h2"];
 		while( $row = mysqli_fetch_array($res) ) {
 			echo "<optgroup label='{$row["year"]}'>";
 			$query = "
-				SELECT YEARWEEK(NOW(), 1) week
-					,WEEK(NOW(), 1) week_format
-					,DATE_FORMAT(adddate(CURDATE(), INTERVAL 0-WEEKDAY(CURDATE()) DAY), '%e %b') WeekStart
-					,DATE_FORMAT(adddate(CURDATE(), INTERVAL 6-WEEKDAY(CURDATE()) DAY), '%e %b') WeekEnd
+				SELECT YEARWEEK(CURDATE(), 1) week
+					,RIGHT(YEARWEEK(CURDATE(), 1), 2) week_format
+					,DATE_FORMAT(ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())), '%e %b') WeekStart
+					,DATE_FORMAT(ADDDATE(CURDATE(), 6-WEEKDAY(CURDATE())), '%e %b') WeekEnd
 				UNION
 				SELECT YEARWEEK(date_time, 1) week
-					,WEEK(date_time, 1) week_format
-					,DATE_FORMAT(adddate(date_time, INTERVAL 0-WEEKDAY(date_time) DAY), '%e %b') WeekStart
-					,DATE_FORMAT(adddate(date_time, INTERVAL 6-WEEKDAY(date_time) DAY), '%e %b') WeekEnd
+					,RIGHT(YEARWEEK(date_time, 1), 2) week_format
+					,DATE_FORMAT(ADDDATE(date_time, 0-WEEKDAY(date_time)), '%e %b') WeekStart
+					,DATE_FORMAT(ADDDATE(date_time, 6-WEEKDAY(date_time)), '%e %b') WeekEnd
 				FROM Climate
-				WHERE YEAR(date_time) = {$row["year"]}
+				WHERE LEFT(YEARWEEK(date_time, 1), 4) = {$row["year"]}
 				GROUP BY week
 				ORDER BY week DESC
 			";

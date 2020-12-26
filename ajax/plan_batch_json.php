@@ -1,21 +1,22 @@
 <?
 include_once "../checkrights.php";
 
-$PB_ID = $_GET["PB_ID"];
+$pb_date = $_GET["pb_date"];
 
 $query = "
-	SELECT PB.pb_date
-		,PB.CW_ID
+	SELECT CW.CW_ID
 		,PB.batches
-		,PB.batches * CW.fillings fillings
-		,PB.batches * CW.fillings * CW.in_cassette amount
-	FROM plan__Batch PB
-	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	WHERE PB.PB_ID = {$PB_ID}
+		,PB.fakt
+		,PB.PB_ID
+	FROM CounterWeight CW
+	LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID AND PB.pb_date = '{$pb_date}'
+	ORDER BY CW.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-$row = mysqli_fetch_array($res);
-$PB_data = array( "pb_date"=>$row["pb_date"], "CW_ID"=>$row["CW_ID"], "batches"=>$row["batches"], "fillings"=>$row["fillings"], "amount"=>$row["amount"] );
+$PB_data = array();
+while( $row = mysqli_fetch_array($res) ) {
+	$PB_data[] = array( "CW_ID"=>$row["CW_ID"], "batches"=>$row["batches"], "fakt"=>$row["fakt"], "PB_ID"=>$row["PB_ID"] );
+}
 
 echo json_encode($PB_data);
 ?>
