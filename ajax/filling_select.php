@@ -9,7 +9,7 @@ $filling_select = "<option value=\"\"></option>";
 if( $type == 1 ) {
 	$query = "
 		SELECT LF.LF_ID
-			,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
+			,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 			,LF.cassette
 			,CW.item
 		FROM list__Batch LB
@@ -19,14 +19,14 @@ if( $type == 1 ) {
 		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		WHERE LO.LO_ID IS NULL
 		".($LF_ID ? "OR LF.LF_ID = {$LF_ID}" : "")."
-		ORDER BY PB.pb_date, LF.cassette
+		ORDER BY PB.pb_date DESC, LF.cassette
 	";
 }
 
 if( $type == 2 ) {
 	$query = "
 		SELECT LF.LF_ID
-			,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
+			,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 			,LF.cassette
 			,CW.item
 		FROM list__Batch LB
@@ -42,7 +42,7 @@ if( $type == 2 ) {
 
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$filling_select .= "<option value=\"{$row["LF_ID"]}\">{$row["pb_date_format"]} [{$row["cassette"]}] {$row["item"]}</option>";
+	$filling_select .= "<option value=\"{$row["LF_ID"]}\">{$row["batch_date_format"]} [{$row["cassette"]}] {$row["item"]}</option>";
 }
 
 echo "$('#filling_select').html('{$filling_select}');";
