@@ -143,6 +143,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#plan_batch_form .total span').html('');
 
 			for (let sub_pb_data of pb_data) {
+				$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('placeholder', sub_pb_data['placeholder']);
+
 				if( sub_pb_data['PB_ID'] ) {
 					$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').val(sub_pb_data['batches']).change();
 					$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('required', true);
