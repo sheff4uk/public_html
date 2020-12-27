@@ -323,7 +323,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,PB.batches * CW.fillings * CW.in_cassette plan
 			,PB.fakt * CW.fillings * CW.in_cassette fakt
 			,IFNULL(SUM(LB.underfilling), 0) underfilling
-			,IF(PB.fakt = 0 AND PB.pb_date <= (CURRENT_DATE() + INTERVAL 1 DAY), 1, 0) printable
+			,IF(PB.batches > 0 AND PB.fakt = 0 AND PB.pb_date <= (CURRENT_DATE() + INTERVAL 1 DAY), 1, 0) printable
 		FROM plan__Batch PB
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
