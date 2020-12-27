@@ -48,7 +48,7 @@ if( isset($_POST["pb_date"]) ) {
 	$cycle = $row["cycle"];
 
 	// Перенаправление в план
-	exit ('<meta http-equiv="refresh" content="0; url=/plan_batch.php?week='.$week.'&#C'.$cycle.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/plan_batch.php?week='.$week.'&#C'.$week.$cycle.'">');
 }
 ?>
 

@@ -308,7 +308,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	echo "<tbody id='C{$row["cycle"]}' style='text-align: center; border-bottom: 2px solid #333;'>";
+	echo "<tbody id='C{$_GET["week"]}{$row["cycle"]}' style='text-align: center; border-bottom: 2px solid #333;'>";
 	$cnt = $row["cnt"];
 	$d_batches = 0;
 	$d_underfilling = 0;
