@@ -282,8 +282,13 @@ while( $row = mysqli_fetch_array($res) ) {
 					,CEIL((CW.shell_balance - IFNULL(ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))), 0) * CW.fillings * CW.in_cassette) / CW.shell_pallet) `pallets`
 					,SR.sr_cnt
 				FROM CounterWeight CW
-				LEFT JOIN ShellReject SR ON SR.CW_ID = CW.CW_ID
-					AND SR.sr_date = CURDATE() - INTERVAL 1 DAY
+				LEFT JOIN (
+					SELECT CW_ID
+						,SUM(sr_cnt) sr_cnt
+					FROM ShellReject
+					WHERE sr_date = CURDATE() - INTERVAL 1 DAY
+					GROUP BY CW_ID
+				) SR ON SR.CW_ID = CW.CW_ID
 				LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID
 					#AND PB.pb_date BETWEEN (CURDATE() - INTERVAL 91 DAY) AND (CURDATE() - INTERVAL 1 DAY)
 				# Число замесов с 04.12.2020
