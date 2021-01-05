@@ -10,6 +10,7 @@ if( isset($_POST["sr_cnt"]) ) {
 	$exfolation = $_POST["exfolation"] ? $_POST["exfolation"] : "NULL";
 	$crack = $_POST["crack"] ? $_POST["crack"] : "NULL";
 	$chipped = $_POST["chipped"] ? $_POST["chipped"] : "NULL";
+	$batch_number = $_POST["batch_number"] ? $_POST["batch_number"] : "NULL";
 
 	if( $_POST["SR_ID"] ) { // Редактируем
 		$query = "
@@ -20,6 +21,7 @@ if( isset($_POST["sr_cnt"]) ) {
 				,exfolation = {$exfolation}
 				,crack = {$crack}
 				,chipped = {$chipped}
+				,batch_number = {$batch_number}
 			WHERE SR_ID = {$_POST["SR_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -36,6 +38,7 @@ if( isset($_POST["sr_cnt"]) ) {
 				,exfolation = {$exfolation}
 				,crack = {$crack}
 				,chipped = {$chipped}
+				,batch_number = {$batch_number}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -65,6 +68,7 @@ if( isset($_POST["sa_cnt"]) ) {
 	$sa_date = $_POST["sa_date"];
 	$CW_ID = $_POST["CW_ID"];
 	$sa_cnt = $_POST["sa_cnt"];
+	$batch_number = $_POST["batch_number"] ? $_POST["batch_number"] : "NULL";
 
 	if( $_POST["SA_ID"] ) { // Редактируем
 		$query = "
@@ -72,6 +76,7 @@ if( isset($_POST["sa_cnt"]) ) {
 			SET sa_date = '{$sa_date}'
 				,CW_ID = {$CW_ID}
 				,sa_cnt = {$sa_cnt}
+				,batch_number = {$batch_number}
 			WHERE SA_ID = {$_POST["SA_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -85,6 +90,7 @@ if( isset($_POST["sa_cnt"]) ) {
 			SET sa_date = '{$sa_date}'
 				,CW_ID = {$CW_ID}
 				,sa_cnt = {$sa_cnt}
+				,batch_number = {$batch_number}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -137,6 +143,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Отслоения</th>
 						<th>Трещины</th>
 						<th>Сколы</th>
+						<th>№ партии</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -161,6 +168,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td><input type="number" name="exfolation" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="crack" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="chipped" min="0" style="width: 70px;"></td>
+						<td><input type="number" name="batch_number" min="1" style="width: 120px;"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -188,6 +196,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th>Противовес</th>
 						<th>Пришедших форм</th>
+						<th>№ партии</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -209,6 +218,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							</select>
 						</td>
 						<td><input type="number" name="sa_cnt" min="1" style="width: 70px;" required></td>
+						<td><input type="number" name="batch_number" min="1" style="width: 120px;"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -247,6 +257,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#shell_reject_form input[name="exfolation"]').val(SR_data['exfolation']);
 				$('#shell_reject_form input[name="crack"]').val(SR_data['crack']);
 				$('#shell_reject_form input[name="chipped"]').val(SR_data['chipped']);
+				$('#shell_reject_form input[name="batch_number"]').val(SR_data['batch_number']);
 			}
 			// Иначе очищаем форму
 			else {
@@ -288,6 +299,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#shell_arrival_form input[name="sa_date"]').val(SA_data['sa_date']);
 				$('#shell_arrival_form select[name="CW_ID"]').val(SA_data['CW_ID']);
 				$('#shell_arrival_form input[name="sa_cnt"]').val(SA_data['sa_cnt']);
+				$('#shell_arrival_form input[name="batch_number"]').val(SA_data['batch_number']);
 			}
 			// Иначе очищаем форму
 			else {

@@ -164,6 +164,7 @@ foreach ($_GET as &$value) {
 			<th>Отслоения</th>
 			<th>Трещины</th>
 			<th>Сколы</th>
+			<th>№ партии</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -180,6 +181,7 @@ $query = "
 		,NULL exfolation
 		,NULL crack
 		,NULL chipped
+		,SA.batch_number
 		,SA.sa_date date
 		,SA.CW_ID
 	FROM ShellArrival SA
@@ -201,6 +203,7 @@ $query = "
 		,SR.exfolation
 		,SR.crack
 		,SR.chipped
+		,SR.batch_number
 		,SR.sr_date date
 		,SR.CW_ID
 	FROM ShellReject SR
@@ -229,6 +232,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["exfolation"]?></td>
 		<td><?=$row["crack"]?></td>
 		<td><?=$row["chipped"]?></td>
+		<td><?=$row["batch_number"]?></td>
 		<td><a href="#" <?=($row["type"] == "A" ? "class='add_arrival' SA_ID='{$row["ID"]}'" : "class='add_reject' SR_ID='{$row["ID"]}'")?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?
@@ -242,6 +246,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$exfolation?></td>
 			<td><?=$crack?></td>
 			<td><?=$chipped?></td>
+			<td></td>
 			<td></td>
 		</tr>
 	</tbody>
