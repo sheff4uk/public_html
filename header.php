@@ -201,7 +201,8 @@ function src_url($src) {
 		$menu["Анализ"]["<i class='fas fa-history fa-lg'></i> История кассет"] = "history.php";
 		$menu["Анализ"]["<i class='fas fa-thermometer-half fa-lg'></i> Климат"] = "climate.php";
 		$menu["Анализ"]["Брак"] = "statistic.php";
-		$menu["Анализ"]["Расход сырья"] = "consumption.php";
+		$menu["Сырье"]["Приход"] = "material_arrival.php";
+		$menu["Сырье"]["Расход"] = "consumption.php";
 		$menu["Доп. данные"]["<i class='fas fa-cube fa-lg'></i> Испытания кубов"] = "cubetest.php";
 		$menu["Доп. данные"]["<i class='fas fa-trash fa-lg'></i> Суточный брак"] = "daily_reject.php";
 		$menu["Доп. данные"]["<i class='fas fa-th fa-lg'></i> Учёт форм"] = "shell_reject.php";
