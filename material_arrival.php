@@ -30,7 +30,21 @@ if( !$_GET["date_to"] ) {
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Наименование продукции:</span>
-			<input type="text" name="MN" value="<?=$_GET["MN"]?>" class="<?=$_GET["MN"] ? "filtered" : ""?>">
+			<select name="MN" class="<?=$_GET["MN"] ? "filtered" : ""?>">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT MN.MN_ID, MN.material_name
+					FROM material__Name MN
+					ORDER BY MN.MN_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["MN_ID"] == $_GET["MN"]) ? "selected" : "";
+					echo "<option value='{$row["MN_ID"]}' {$selected}>{$row["material_name"]}</option>";
+				}
+				?>
+			</select>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -106,7 +120,7 @@ foreach ($_GET as &$value) {
 		$query = "
 			SELECT MA.MA_ID
 				,DATE_FORMAT(MA.ma_date,'%d.%m.%Y') ma_date_format
-				,MA.material_name
+				,MN.material_name
 				,MA.supplier
 				,MA.invoice_number
 				,MA.car_number
@@ -114,10 +128,11 @@ foreach ($_GET as &$value) {
 				,MA.certificate_number
 				,MA.ma_cnt
 			FROM material__Arrival MA
+			JOIN material__Name MN ON MN.MN_ID = MA.MN_ID
 			WHERE 1
 				".($_GET["date_from"] ? "AND MA.ma_date >= '{$_GET["date_from"]}'" : "")."
 				".($_GET["date_to"] ? "AND MA.ma_date <= '{$_GET["date_to"]}'" : "")."
-				".($_GET["MN"] ? "AND MA.material_name LIKE '%{$_GET["MN"]}%'" : "")."
+				".($_GET["MN"] ? "AND MA.MN_ID = {$_GET["MN"]}" : "")."
 				".($_GET["S"] ? "AND MA.supplier LIKE '%{$_GET["S"]}%'" : "")."
 				".($_GET["IN"] ? "AND MA.invoice_number LIKE '%{$_GET["IN"]}%'" : "")."
 				".($_GET["CN"] ? "AND MA.car_number LIKE '%{$_GET["CN"]}%'" : "")."

@@ -6,7 +6,7 @@ include_once "../checkrights.php";
 if( isset($_POST["ma_date"]) ) {
 	session_start();
 	$ma_date = $_POST["ma_date"];
-	$material_name = trim($_POST["material_name"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["material_name"]))."'" : "NULL";
+	$MN_ID = $_POST["MN_ID"];
 	$supplier = trim($_POST["supplier"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["supplier"]))."'" : "NULL";
 	$invoice_number = trim($_POST["invoice_number"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["invoice_number"]))."'" : "NULL";
 	$car_number = trim($_POST["car_number"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["car_number"]))."'" : "NULL";
@@ -18,7 +18,7 @@ if( isset($_POST["ma_date"]) ) {
 		$query = "
 			UPDATE material__Arrival
 			SET ma_date = '{$ma_date}'
-				,material_name = {$material_name}
+				,MN_ID = {$MN_ID}
 				,supplier = {$supplier}
 				,invoice_number = {$invoice_number}
 				,car_number = {$car_number}
@@ -36,7 +36,7 @@ if( isset($_POST["ma_date"]) ) {
 		$query = "
 			INSERT INTO material__Arrival
 			SET ma_date = '{$ma_date}'
-				,material_name = {$material_name}
+				,MN_ID = {$MN_ID}
 				,supplier = {$supplier}
 				,invoice_number = {$invoice_number}
 				,car_number = {$car_number}
@@ -93,7 +93,22 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td><input type='text' name='material_name' style="width: 100%;" required></td>
+						<td>
+							<select name="MN_ID" style="width: 100%;" required>
+								<option value=""></option>
+								<?
+								$query = "
+									SELECT MN.MN_ID, MN.material_name
+									FROM material__Name MN
+									ORDER BY MN.MN_ID
+								";
+								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+								while( $row = mysqli_fetch_array($res) ) {
+									echo "<option value='{$row["MN_ID"]}'>{$row["material_name"]}</option>";
+								}
+								?>
+							</select>
+						</td>
 						<td><input type='text' name='supplier' style="width: 100%;"></td>
 						<td><input type='text' name='invoice_number' style="width: 100%;"></td>
 						<td><input type='text' name='car_number' style="width: 100%;"></td>
@@ -131,7 +146,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				});
 				$('#material_arrival_form input[name="MA_ID"]').val(MA_ID);
 				$('#material_arrival_form input[name="ma_date"]').val(ma_data['ma_date']);
-				$('#material_arrival_form input[name="material_name"]').val(ma_data['material_name']);
+				$('#material_arrival_form select[name="MN_ID"]').val(ma_data['MN_ID']);
 				$('#material_arrival_form input[name="supplier"]').val(ma_data['supplier']);
 				$('#material_arrival_form input[name="invoice_number"]').val(ma_data['invoice_number']);
 				$('#material_arrival_form input[name="car_number"]').val(ma_data['car_number']);
@@ -144,6 +159,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#material_arrival_form input[name="MA_ID"]').val('');
 				$('#material_arrival_form input[name="ma_date"]').val('');
 				$('#material_arrival_form table input').val('');
+				$('#material_arrival_form table select').val('');
 			}
 
 			$('#material_arrival_form').dialog({
