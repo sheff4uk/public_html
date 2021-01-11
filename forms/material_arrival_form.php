@@ -7,7 +7,8 @@ if( isset($_POST["ma_date"]) ) {
 	session_start();
 	$ma_date = $_POST["ma_date"];
 	$MN_ID = $_POST["MN_ID"];
-	$supplier = trim($_POST["supplier"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["supplier"]))."'" : "NULL";
+	$MS_ID = $_POST["MS_ID"];
+	$MC_ID = $_POST["MC_ID"] ? $_POST["MC_ID"] : "NULL";
 	$invoice_number = trim($_POST["invoice_number"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["invoice_number"]))."'" : "NULL";
 	$car_number = trim($_POST["car_number"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["car_number"]))."'" : "NULL";
 	$batch_number = trim($_POST["batch_number"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["batch_number"]))."'" : "NULL";
@@ -19,7 +20,8 @@ if( isset($_POST["ma_date"]) ) {
 			UPDATE material__Arrival
 			SET ma_date = '{$ma_date}'
 				,MN_ID = {$MN_ID}
-				,supplier = {$supplier}
+				,MS_ID = {$MS_ID}
+				,MC_ID = {$MC_ID}
 				,invoice_number = {$invoice_number}
 				,car_number = {$car_number}
 				,batch_number = {$batch_number}
@@ -37,7 +39,8 @@ if( isset($_POST["ma_date"]) ) {
 			INSERT INTO material__Arrival
 			SET ma_date = '{$ma_date}'
 				,MN_ID = {$MN_ID}
-				,supplier = {$supplier}
+				,MS_ID = {$MS_ID}
+				,MC_ID = {$MC_ID}
 				,invoice_number = {$invoice_number}
 				,car_number = {$car_number}
 				,batch_number = {$batch_number}
@@ -84,6 +87,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th>Наименование продукции</th>
 						<th>Поставщик</th>
+						<th>Перевозчик</th>
 						<th>№ттн, №тн</th>
 						<th>№ автомобиля</th>
 						<th>№ партии</th>
@@ -109,7 +113,38 @@ this.subbut.value='Подождите, пожалуйста!';">
 								?>
 							</select>
 						</td>
-						<td><input type='text' name='supplier' style="width: 100%;"></td>
+						<td>
+							<select name="MS_ID" style="width: 100%;" required>
+								<option value=""></option>
+								<?
+								$query = "
+									SELECT MS.MS_ID, MS.supplier
+									FROM material__Supplier MS
+									ORDER BY MS.MS_ID
+								";
+								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+								while( $row = mysqli_fetch_array($res) ) {
+									echo "<option value='{$row["MS_ID"]}'>{$row["supplier"]}</option>";
+								}
+								?>
+							</select>
+						</td>
+						<td>
+							<select name="MC_ID" style="width: 100%;">
+								<option value=""></option>
+								<?
+								$query = "
+									SELECT MC.MC_ID, MC.carrier
+									FROM material__Carrier MC
+									ORDER BY MC.MC_ID
+								";
+								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+								while( $row = mysqli_fetch_array($res) ) {
+									echo "<option value='{$row["MC_ID"]}'>{$row["carrier"]}</option>";
+								}
+								?>
+							</select>
+						</td>
 						<td><input type='text' name='invoice_number' style="width: 100%;"></td>
 						<td><input type='text' name='car_number' style="width: 100%;"></td>
 						<td><input type='text' name='batch_number' style="width: 100%;"></td>
@@ -128,7 +163,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 <script>
 	$(function() {
-		// Кнопка добавления расформовки
+		// Кнопка добавления
 		$('.add_material_arrival').click( function() {
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
@@ -147,7 +182,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#material_arrival_form input[name="MA_ID"]').val(MA_ID);
 				$('#material_arrival_form input[name="ma_date"]').val(ma_data['ma_date']);
 				$('#material_arrival_form select[name="MN_ID"]').val(ma_data['MN_ID']);
-				$('#material_arrival_form input[name="supplier"]').val(ma_data['supplier']);
+				$('#material_arrival_form select[name="MS_ID"]').val(ma_data['MS_ID']);
+				$('#material_arrival_form select[name="MC_ID"]').val(ma_data['MC_ID']);
 				$('#material_arrival_form input[name="invoice_number"]').val(ma_data['invoice_number']);
 				$('#material_arrival_form input[name="car_number"]').val(ma_data['car_number']);
 				$('#material_arrival_form input[name="batch_number"]').val(ma_data['batch_number']);
