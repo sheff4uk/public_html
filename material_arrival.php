@@ -184,7 +184,7 @@ foreach ($_GET as &$value) {
 			?>
 			<tr id="<?=$row["MA_ID"]?>">
 				<td><?=$row["ma_date_format"]?></td>
-				<td><?=$row["material_name"]?></td>
+				<td><span class="nowrap"><?=$row["material_name"]?></span></td>
 				<td><span class="nowrap"><?=$row["supplier"]?></span></td>
 				<td><span class="nowrap"><?=$row["carrier"]?></span></td>
 				<td><?=$row["invoice_number"]?></td>
