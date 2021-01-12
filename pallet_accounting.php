@@ -224,9 +224,8 @@ while( $row = mysqli_fetch_array($res) ) {
 	<table style="font-size: 1.5em;">
 		<thead>
 			<tr>
-				<th>Кол-во годных поддонов</th>
-				<th>Долг</th>
-<!--				<th>На производстве</th>-->
+				<th>Кол-во поддонов на производстве</th>
+				<th>Долг клиентов</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -263,12 +262,10 @@ while( $row = mysqli_fetch_array($res) ) {
 							";
 							$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 							while( $subrow = mysqli_fetch_array($subres) ) {
-								$outside_pallets += $subrow["pallet_balance"];
-								echo "<p>У <span style='text-decoration: underline;'>{$subrow["brand"]}</span> <b>{$subrow["pallet_balance"]}</b> шт, на сумму <b>".number_format(( $subrow["pallet_balance"] * $actual_pallet_cost ), 0, '', ' ')."</b> руб.</p>";
+								echo "<p><span style='text-decoration: underline;'>{$subrow["brand"]}</span> <b>{$subrow["pallet_balance"]}</b> шт, на сумму <b>".number_format(( $subrow["pallet_balance"] * $actual_pallet_cost ), 0, '', ' ')."</b> руб.</p>";
 							}
 							?>
 						</td>
-<!--						<td style="text-align: center;"><b><?=($row["pn_balance"] - $outside_pallets)?></b></td>-->
 					</tr>
 				<?
 			}
