@@ -28,7 +28,7 @@ a {
 	-o-transition: all 0.3s ease-in-out;
 	outline-color: #428bca;
 }
-body, td {
+body {
 	margin: 0 20px;
 	color: #333;
 	font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;

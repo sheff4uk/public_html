@@ -19,7 +19,7 @@ function src_url($src) {
 	<title><?=$title?></title>
 <!--	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css">-->
 	<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?v=2">
-	<link rel='stylesheet' type='text/css' href='css/style.css?19'>
+	<link rel='stylesheet' type='text/css' href='css/style.css?20'>
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 <!--	<link rel='stylesheet' type='text/css' href='css/font-awesome.min.css'>-->
 	<link rel='stylesheet' type='text/css' href='css/buttons.css'>
@@ -200,12 +200,13 @@ function src_url($src) {
 		$menu["Факт"]["<i class='fas fa-pallet fa-lg'></i> Упаковка"] = "packing.php";
 		$menu["Анализ"]["<i class='fas fa-history fa-lg'></i> История кассет"] = "history.php";
 		$menu["Анализ"]["<i class='fas fa-thermometer-half fa-lg'></i> Климат"] = "climate.php";
+		$menu["Анализ"]["Расход сырья"] = "consumption.php";
 		$menu["Анализ"]["Брак"] = "statistic.php";
-		$menu["Сырье"]["Приход"] = "material_arrival.php";
-		$menu["Сырье"]["Расход"] = "consumption.php";
 		$menu["Доп. данные"]["<i class='fas fa-cube fa-lg'></i> Испытания кубов"] = "cubetest.php";
 		$menu["Доп. данные"]["<i class='fas fa-trash fa-lg'></i> Суточный брак"] = "daily_reject.php";
-		$menu["Доп. данные"]["<i class='fas fa-th fa-lg'></i> Учёт форм"] = "shell_reject.php";
+		$menu["Учет"]["Поддоны противовесов"] = "pallet_accounting.php";
+		$menu["Учет"]["Сырьё/комплектующие"] = "material_arrival.php";
+		$menu["Учет"]["<i class='fas fa-th fa-lg'></i> Формы"] = "shell_reject.php";
 		$menu["<i class='fas fa-cog fa-lg'></i>"]["Рецепты"] = "mix_formula.php";
 		$menu["Выход {$USR_Icon}"] = "exit.php";
 	}
