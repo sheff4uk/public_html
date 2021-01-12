@@ -8,6 +8,7 @@ if( isset($_POST["pr_cnt"]) ) {
 	$CB_ID = $_POST["CB_ID"];
 	$pr_cnt = $_POST["pr_cnt"];
 	$pr_reject = $_POST["pr_reject"];
+	$pr_wrong_format = $_POST["pr_wrong_format"];
 
 	if( $_POST["PR_ID"] ) { // Редактируем
 		$query = "
@@ -16,6 +17,7 @@ if( isset($_POST["pr_cnt"]) ) {
 				,CB_ID = {$CB_ID}
 				,pr_cnt = {$pr_cnt}
 				,pr_reject = {$pr_reject}
+				,pr_wrong_format = {$pr_wrong_format}
 			WHERE PR_ID = {$_POST["PR_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -30,6 +32,7 @@ if( isset($_POST["pr_cnt"]) ) {
 				,CB_ID = {$CB_ID}
 				,pr_cnt = {$pr_cnt}
 				,pr_reject = {$pr_reject}
+				,pr_wrong_format = {$pr_wrong_format}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -129,6 +132,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Клиент</th>
 						<th>Возвращено поддонов</th>
 						<th>Из них бракованных</th>
+						<th>Из них другого формата</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -151,6 +155,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						</td>
 						<td><input type="number" name="pr_cnt" min="0" style="width: 70px;" required></td>
 						<td><input type="number" name="pr_reject" min="0" style="width: 70px;" required></td>
+						<td><input type="number" name="pr_wrong_format" min="0" style="width: 70px;" required></td>
 					</tr>
 				</tbody>
 			</table>
@@ -220,6 +225,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#pallet_return_form select[name="CB_ID"]').val(PR_data['CB_ID']);
 				$('#pallet_return_form input[name="pr_cnt"]').val(PR_data['pr_cnt']);
 				$('#pallet_return_form input[name="pr_reject"]').val(PR_data['pr_reject']);
+				$('#pallet_return_form input[name="pr_wrong_format"]').val(PR_data['pr_wrong_format']);
 			}
 			// Иначе очищаем форму
 			else {

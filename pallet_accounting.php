@@ -126,6 +126,7 @@ foreach ($_GET as &$value) {
 			<th>Клиент</th>
 			<th>Возвращено поддонов</th>
 			<th>Из них бракованных</th>
+			<th>Из них другого формата</th>
 			<th>Кол-во годных поддонов</th>
 			<th>Приобретено поддонов</th>
 			<th>Стоимость поддона, руб</th>
@@ -143,7 +144,8 @@ $query = "
 		,CB.brand
 		,PR.pr_cnt
 		,PR.pr_reject
-		,PR.pr_cnt - PR.pr_reject good
+		,PR.pr_wrong_format
+		,PR.pr_cnt - PR.pr_reject - PR.pr_wrong_format good
 		,NULL pa_cnt
 		,NULL pallet_cost
 		,NULL sum_cost
@@ -165,6 +167,7 @@ $query = "
 		,NULL
 		,NULL
 		,NULL
+		,NULL
 		,PA.pa_cnt
 		,PA.pallet_cost
 		,PA.pallet_cost * PA.pa_cnt sum_cost
@@ -182,6 +185,7 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	$pr_cnt += $row["pr_cnt"];
 	$pr_reject += $row["pr_reject"];
+	$pr_wrong_format += $row["pr_wrong_format"];
 	$pr_good += $row["pr_good"];
 	$pa_cnt += $row["pa_cnt"];
 	$sum_cost += $row["sum_cost"];
@@ -191,6 +195,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["brand"]?></td>
 		<td><b><?=$row["pr_cnt"]?></b></td>
 		<td><b style="color: red;"><?=$row["pr_reject"]?></b></td>
+		<td><b style="color: red;"><?=$row["pr_wrong_format"]?></b></td>
 		<td><b style="color: green;"><?=$row["good"]?></b></td>
 		<td><b><?=$row["pa_cnt"]?></b></td>
 		<td><?=(isset($row["pallet_cost"]) ? number_format($row["pallet_cost"], 0, '', ' ') : "")?></td>
@@ -205,6 +210,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Итог:</td>
 			<td><b><?=$pr_cnt?></b></td>
 			<td><b><?=$pr_reject?></b></td>
+			<td><b><?=$pr_wrong_format?></b></td>
 			<td><b><?=$pr_good?></b></td>
 			<td><b><?=$pa_cnt?></b></td>
 			<td></td>
@@ -219,8 +225,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		<thead>
 			<tr>
 				<th>Кол-во годных поддонов</th>
-				<th>Из них</th>
-				<th>На производстве</th>
+				<th>Долг</th>
+<!--				<th>На производстве</th>-->
 			</tr>
 		</thead>
 		<tbody>
@@ -262,7 +268,7 @@ while( $row = mysqli_fetch_array($res) ) {
 							}
 							?>
 						</td>
-						<td style="text-align: center;"><b><?=($row["pn_balance"] - $outside_pallets)?></b></td>
+<!--						<td style="text-align: center;"><b><?=($row["pn_balance"] - $outside_pallets)?></b></td>-->
 					</tr>
 				<?
 			}
