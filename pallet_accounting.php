@@ -85,6 +85,25 @@ if( !$_GET["date_to"] ) {
 			</select>
 		</div>
 
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>Поставщик поддонов:</span>
+			<select name="PS_ID" class="<?=$_GET["PS_ID"] ? "filtered" : ""?>" style="width: 100px;">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT PS.PS_ID, PS.pallet_supplier
+					FROM pallet__Supplier PS
+					ORDER BY PS.PS_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["PS_ID"] == $_GET["PS_ID"]) ? "selected" : "";
+					echo "<option value='{$row["PS_ID"]}' {$selected}>{$row["pallet_supplier"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+
 		<button style="float: right;">Фильтр</button>
 	</form>
 </div>
@@ -128,6 +147,7 @@ foreach ($_GET as &$value) {
 			<th>Из них бракованных</th>
 			<th>Из них другого формата</th>
 			<th>Кол-во годных поддонов</th>
+			<th>Поставщик поддонов</th>
 			<th>Приобретено поддонов</th>
 			<th>Стоимость поддона, руб</th>
 			<th>Сумма, руб</th>
@@ -146,6 +166,7 @@ $query = "
 		,PR.pr_reject
 		,PR.pr_wrong_format
 		,PR.pr_cnt - PR.pr_reject - PR.pr_wrong_format good
+		,NULL pallet_supplier
 		,NULL pa_cnt
 		,NULL pallet_cost
 		,NULL sum_cost
@@ -157,6 +178,7 @@ $query = "
 		".($_GET["date_from"] ? "AND PR.pr_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND PR.pr_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CB_ID"] ? "AND PR.CB_ID = {$_GET["CB_ID"]}" : "")."
+		".($_GET["PS_ID"] ? "AND 0" : "")."
 
 	UNION
 
@@ -168,16 +190,19 @@ $query = "
 		,NULL
 		,NULL
 		,NULL
+		,PS.pallet_supplier
 		,PA.pa_cnt
 		,PA.pallet_cost
 		,PA.pallet_cost * PA.pa_cnt sum_cost
 		,PA.pa_date date
 		,NULL
 	FROM pallet__Arrival PA
+	JOIN pallet__Supplier PS ON PS.PS_ID = PA.PS_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND PA.pa_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND PA.pa_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CB_ID"] ? "AND 0" : "")."
+		".($_GET["PS_ID"] ? "AND PS.PS_ID = {$_GET["PS_ID"]}" : "")."
 
 	ORDER BY date, CB_ID
 ";
@@ -197,6 +222,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><b style="color: red;"><?=$row["pr_reject"]?></b></td>
 		<td><b style="color: red;"><?=$row["pr_wrong_format"]?></b></td>
 		<td><b style="color: green;"><?=$row["good"]?></b></td>
+		<td><span class="nowrap"><?=$row["pallet_supplier"]?></span></td>
 		<td><b><?=$row["pa_cnt"]?></b></td>
 		<td><?=(isset($row["pallet_cost"]) ? number_format($row["pallet_cost"], 0, '', ' ') : "")?></td>
 		<td><?=(isset($row["sum_cost"]) ? number_format($row["sum_cost"], 0, '', ' ') : "")?></td>
@@ -212,6 +238,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><b><?=$pr_reject?></b></td>
 			<td><b><?=$pr_wrong_format?></b></td>
 			<td><b><?=$pr_good?></b></td>
+			<td></td>
 			<td><b><?=$pa_cnt?></b></td>
 			<td></td>
 			<td><?=(isset($sum_cost) ? number_format($sum_cost, 0, '', ' ') : "")?></td>

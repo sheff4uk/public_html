@@ -60,6 +60,7 @@ if( isset($_POST["pr_cnt"]) ) {
 if( isset($_POST["pa_cnt"]) ) {
 	session_start();
 	$pa_date = $_POST["pa_date"];
+	$PS_ID = $_POST["PS_ID"];
 	$pa_cnt = $_POST["pa_cnt"];
 	$pallet_cost = $_POST["pallet_cost"];
 
@@ -67,6 +68,7 @@ if( isset($_POST["pa_cnt"]) ) {
 		$query = "
 			UPDATE pallet__Arrival
 			SET pa_date = '{$pa_date}'
+				,PS_ID = {$PS_ID}
 				,pa_cnt = {$pa_cnt}
 				,pallet_cost = {$pallet_cost}
 			WHERE PA_ID = {$_POST["PA_ID"]}
@@ -80,6 +82,7 @@ if( isset($_POST["pa_cnt"]) ) {
 		$query = "
 			INSERT INTO pallet__Arrival
 			SET pa_date = '{$pa_date}'
+				,PS_ID = {$PS_ID}
 				,pa_cnt = {$pa_cnt}
 				,pallet_cost = {$pallet_cost}
 		";
@@ -181,12 +184,29 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
+						<th>Поставщик поддонов</th>
 						<th>Приобретено поддонов</th>
 						<th>Стоимость поддона, руб</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
+						<td>
+							<select name="PS_ID" style="width: 150px;" required>
+								<option value=""></option>
+								<?
+								$query = "
+									SELECT PS.PS_ID, PS.pallet_supplier
+									FROM pallet__Supplier PS
+									ORDER BY PS.PS_ID
+								";
+								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+								while( $row = mysqli_fetch_array($res) ) {
+									echo "<option value='{$row["PS_ID"]}'>{$row["pallet_supplier"]}</option>";
+								}
+								?>
+							</select>
+						</td>
 						<td><input type="number" name="pa_cnt" min="1" style="width: 70px;" required></td>
 						<td><input type="number" name="pallet_cost" min="0" style="width: 120px;" required></td>
 					</tr>
@@ -265,6 +285,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 				$('#pallet_arrival_form input[name="PA_ID"]').val(PA_ID);
 				$('#pallet_arrival_form input[name="pa_date"]').val(PA_data['pa_date']);
+				$('#pallet_arrival_form select[name="PS_ID"]').val(PA_data['PS_ID']);
 				$('#pallet_arrival_form input[name="pa_cnt"]').val(PA_data['pa_cnt']);
 				$('#pallet_arrival_form input[name="pallet_cost"]').val(PA_data['pallet_cost']);
 			}
@@ -273,6 +294,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#pallet_arrival_form input[name="PA_ID"]').val('');
 				$('#pallet_arrival_form input[name="pa_date"]').val(pa_date);
 				$('#pallet_arrival_form table input').val('');
+				$('#pallet_return_form table select').val('');
 			}
 
 			$('#pallet_arrival_form').dialog({

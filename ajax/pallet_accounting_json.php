@@ -24,6 +24,7 @@ elseif( isset($_GET["PA_ID"]) ) {
 
 	$query = "
 		SELECT PA.pa_date
+			,PA.PS_ID
 			,PA.pa_cnt
 			,PA.pallet_cost
 		FROM pallet__Arrival PA
@@ -31,7 +32,7 @@ elseif( isset($_GET["PA_ID"]) ) {
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$PA_data = array( "pa_date"=>$row["pa_date"], "pa_cnt"=>$row["pa_cnt"], "pallet_cost"=>$row["pallet_cost"] );
+	$PA_data = array( "pa_date"=>$row["pa_date"], "PS_ID"=>$row["PS_ID"], "pa_cnt"=>$row["pa_cnt"], "pallet_cost"=>$row["pallet_cost"] );
 
 	echo json_encode($PA_data);
 }
