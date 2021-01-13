@@ -295,6 +295,12 @@ while( $row = mysqli_fetch_array($res) ) {
 	</thead>
 
 <?
+$batches = 0;
+$fillings = 0;
+$plan = 0;
+$fakt = 0;
+$underfilling = 0;
+
 $query = "
 	SELECT SUM(1) + 1 cnt
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
