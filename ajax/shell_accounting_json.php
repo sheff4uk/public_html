@@ -12,7 +12,7 @@ if( isset($_GET["SR_ID"]) ) {
 			,SR.crack
 			,SR.chipped
 			,SR.batch_number
-		FROM ShellReject SR
+		FROM shell__Reject SR
 		WHERE SR.SR_ID = {$SR_ID}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -29,7 +29,7 @@ elseif( isset($_GET["SA_ID"]) ) {
 			,SA.CW_ID
 			,SA.sa_cnt
 			,SA.batch_number
-		FROM ShellArrival SA
+		FROM shell__Arrival SA
 		WHERE SA.SA_ID = {$SA_ID}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

@@ -2,7 +2,7 @@
 include "config.php";
 $title = 'Списание форм';
 include "header.php";
-include "./forms/shell_reject_form.php";
+include "./forms/shell_accounting_form.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["date_from"] ) {
@@ -73,7 +73,7 @@ if( !$_GET["date_to"] ) {
 <div id="filter">
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
-		<a href="/shell_reject.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+		<a href="/shell_accounting.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата списания между:</span>
@@ -184,7 +184,7 @@ $query = "
 		,SA.batch_number
 		,SA.sa_date date
 		,SA.CW_ID
-	FROM ShellArrival SA
+	FROM shell__Arrival SA
 	JOIN CounterWeight CW ON CW.CW_ID = SA.CW_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND SA.sa_date >= '{$_GET["date_from"]}'" : "")."
@@ -206,7 +206,7 @@ $query = "
 		,SR.batch_number
 		,SR.sr_date date
 		,SR.CW_ID
-	FROM ShellReject SR
+	FROM shell__Reject SR
 	JOIN CounterWeight CW ON CW.CW_ID = SR.CW_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND SR.sr_date >= '{$_GET["date_from"]}'" : "")."
@@ -285,7 +285,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				LEFT JOIN (
 					SELECT CW_ID
 						,SUM(sr_cnt) sr_cnt
-					FROM ShellReject
+					FROM shell__Reject
 					WHERE sr_date = CURDATE() - INTERVAL 1 DAY
 					GROUP BY CW_ID
 				) SR ON SR.CW_ID = CW.CW_ID
@@ -303,7 +303,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				LEFT JOIN (
 					SELECT CW_ID
 						,SUM(sr_cnt) sr_cnt
-					FROM ShellReject
+					FROM shell__Reject
 					WHERE sr_date BETWEEN '2020-12-04' AND CURDATE() - INTERVAL 1 DAY
 					GROUP BY CW_ID
 				) WR ON WR.CW_ID = CW.CW_ID
@@ -337,7 +337,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 <!--<h3>Заполненность склада с формами: <?=round(($pallets < 0 ? 0 : $pallets) / 130 * 100)?>%</h3>-->
 
-<div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_reject_report.php?CB_ID=2" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
+<!--<div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_accounting_report.php?CB_ID=2" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>-->
 
 <div id="shell_arrival_btn" class="add_arrival" sa_date="<?=$_GET["sa_date"]?>" title="Приход форм"><i class="fas fa-2x fa-plus"></i></div>
 <div id="shell_reject_btn" class="add_reject" sr_date="<?=$_GET["sr_date"]?>" title="Списание форм"><i class="fas fa-2x fa-minus"></i></div>

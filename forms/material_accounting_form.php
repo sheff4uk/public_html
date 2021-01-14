@@ -61,7 +61,7 @@ if( isset($_POST["ma_date"]) ) {
 	}
 
 	// Перенаправление в журнал
-	exit ('<meta http-equiv="refresh" content="0; url=/material_arrival.php?date_from='.$ma_date.'&date_to='.$ma_date.'#'.$MA_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/material_accounting.php?date_from='.$ma_date.'&date_to='.$ma_date.'#'.$MA_ID.'">');
 }
 ?>
 
@@ -73,7 +73,7 @@ if( isset($_POST["ma_date"]) ) {
 </style>
 
 <div id='material_arrival_form' title='Данные приемки сырья' style='display:none;'>
-	<form method='post' action="/forms/material_arrival_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
+	<form method='post' action="/forms/material_accounting_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="MA_ID">
@@ -174,7 +174,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			if( MA_ID ) {
 				// Данные аяксом
 				$.ajax({
-					url: "/ajax/material_arrival_json.php?MA_ID=" + MA_ID,
+					url: "/ajax/material_accounting_json.php?MA_ID=" + MA_ID,
 					success: function(msg) { ma_data = msg; },
 					dataType: "json",
 					async: false

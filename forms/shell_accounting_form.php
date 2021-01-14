@@ -14,7 +14,7 @@ if( isset($_POST["sr_cnt"]) ) {
 
 	if( $_POST["SR_ID"] ) { // Редактируем
 		$query = "
-			UPDATE ShellReject
+			UPDATE shell__Reject
 			SET sr_date = '{$sr_date}'
 				,CW_ID = {$CW_ID}
 				,sr_cnt = {$sr_cnt}
@@ -31,7 +31,7 @@ if( isset($_POST["sr_cnt"]) ) {
 	}
 	else { // Добавляем
 		$query = "
-			INSERT INTO ShellReject
+			INSERT INTO shell__Reject
 			SET sr_date = '{$sr_date}'
 				,CW_ID = {$CW_ID}
 				,sr_cnt = {$sr_cnt}
@@ -55,10 +55,10 @@ if( isset($_POST["sr_cnt"]) ) {
 
 	// Перенаправление в журнал
 	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/shell_reject.php?date_from='.$sr_date.'&date_to='.$sr_date.'&sr_date='.$sr_date.'&add#R'.$SR_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/shell_accounting.php?date_from='.$sr_date.'&date_to='.$sr_date.'&sr_date='.$sr_date.'&add#R'.$SR_ID.'">');
 	}
 	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/shell_reject.php?date_from='.$sr_date.'&date_to='.$sr_date.'#R'.$SR_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/shell_accounting.php?date_from='.$sr_date.'&date_to='.$sr_date.'#R'.$SR_ID.'">');
 	}
 }
 
@@ -72,7 +72,7 @@ if( isset($_POST["sa_cnt"]) ) {
 
 	if( $_POST["SA_ID"] ) { // Редактируем
 		$query = "
-			UPDATE ShellArrival
+			UPDATE shell__Arrival
 			SET sa_date = '{$sa_date}'
 				,CW_ID = {$CW_ID}
 				,sa_cnt = {$sa_cnt}
@@ -86,7 +86,7 @@ if( isset($_POST["sa_cnt"]) ) {
 	}
 	else { // Добавляем
 		$query = "
-			INSERT INTO ShellArrival
+			INSERT INTO shell__Arrival
 			SET sa_date = '{$sa_date}'
 				,CW_ID = {$CW_ID}
 				,sa_cnt = {$sa_cnt}
@@ -107,10 +107,10 @@ if( isset($_POST["sa_cnt"]) ) {
 
 	// Перенаправление в журнал
 	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/shell_reject.php?date_from='.$sa_date.'&date_to='.$sa_date.'&sa_date='.$sa_date.'&add#A'.$SA_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/shell_accounting.php?date_from='.$sa_date.'&date_to='.$sa_date.'&sa_date='.$sa_date.'&add#A'.$SA_ID.'">');
 	}
 	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/shell_reject.php?date_from='.$sa_date.'&date_to='.$sa_date.'#A'.$SA_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/shell_accounting.php?date_from='.$sa_date.'&date_to='.$sa_date.'#A'.$SA_ID.'">');
 	}
 }
 ?>
@@ -125,7 +125,7 @@ if( isset($_POST["sa_cnt"]) ) {
 </style>
 
 <div id='shell_reject_form' title='Списание форм' style='display:none;'>
-	<form method='post' action="/forms/shell_reject_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
+	<form method='post' action="/forms/shell_accounting_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="SR_ID">
@@ -181,7 +181,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 </div>
 
 <div id='shell_arrival_form' title='Приход форм' style='display:none;'>
-	<form method='post' action="/forms/shell_reject_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
+	<form method='post' action="/forms/shell_accounting_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="SA_ID">
@@ -244,7 +244,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			if( SR_ID ) {
 				// Данные аяксом
 				$.ajax({
-					url: "/ajax/shell_reject_json.php?SR_ID=" + SR_ID,
+					url: "/ajax/shell_accounting_json.php?SR_ID=" + SR_ID,
 					success: function(msg) { SR_data = msg; },
 					dataType: "json",
 					async: false
@@ -289,7 +289,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			if( SA_ID ) {
 				// Данные аяксом
 				$.ajax({
-					url: "/ajax/shell_reject_json.php?SA_ID=" + SA_ID,
+					url: "/ajax/shell_accounting_json.php?SA_ID=" + SA_ID,
 					success: function(msg) { SA_data = msg; },
 					dataType: "json",
 					async: false

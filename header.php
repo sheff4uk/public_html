@@ -205,8 +205,8 @@ function src_url($src) {
 		$menu["Доп. данные"]["<i class='fas fa-cube fa-lg'></i> Испытания кубов"] = "cubetest.php";
 		$menu["Доп. данные"]["<i class='fas fa-trash fa-lg'></i> Суточный брак"] = "daily_reject.php";
 		$menu["Учет"]["Поддоны противовесов"] = "pallet_accounting.php";
-		$menu["Учет"]["Сырьё/комплектующие"] = "material_arrival.php";
-		$menu["Учет"]["<i class='fas fa-th fa-lg'></i> Формы"] = "shell_reject.php";
+		$menu["Учет"]["Сырьё/комплектующие"] = "material_accounting.php";
+		$menu["Учет"]["<i class='fas fa-th fa-lg'></i> Формы"] = "shell_accounting.php";
 		$menu["<i class='fas fa-cog fa-lg'></i>"]["Рецепты"] = "mix_formula.php";
 		$menu["Выход {$USR_Icon}"] = "exit.php";
 	}

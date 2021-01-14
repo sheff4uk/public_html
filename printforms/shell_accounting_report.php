@@ -87,7 +87,7 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 			LEFT JOIN (
 				SELECT CW_ID
 					,SUM(sr_cnt) sr_cnt
-				FROM ShellReject
+				FROM shell__Reject
 				WHERE sr_date = CURDATE() - INTERVAL 1 DAY
 				GROUP BY CW_ID
 			) SR ON SR.CW_ID = CW.CW_ID
@@ -105,7 +105,7 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 			LEFT JOIN (
 				SELECT CW_ID
 					,SUM(sr_cnt) sr_cnt
-				FROM ShellReject
+				FROM shell__Reject
 				WHERE sr_date BETWEEN '2020-12-04' AND CURDATE() - INTERVAL 1 DAY
 				GROUP BY CW_ID
 			) WR ON WR.CW_ID = CW.CW_ID

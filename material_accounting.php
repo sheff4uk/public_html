@@ -2,7 +2,7 @@
 include "config.php";
 $title = 'Приемка сырья';
 include "header.php";
-include "./forms/material_arrival_form.php";
+include "./forms/material_accounting_form.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["date_from"] ) {
@@ -19,7 +19,7 @@ if( !$_GET["date_to"] ) {
 <div id="filter">
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
-		<a href="/material_arrival.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+		<a href="/material_accounting.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата приемки между:</span>
