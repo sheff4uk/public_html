@@ -1,7 +1,7 @@
 <?
 include_once "../config.php";
 
-// Сохранение/редактирование плана отгрузки
+// Сохранение/редактирование отгрузки
 if( isset($_POST["CW_ID"]) ) {
 	session_start();
 	$ls_date = $_POST["ls_date"];
@@ -64,7 +64,7 @@ if( isset($_POST["CW_ID"]) ) {
 	}
 </style>
 
-<div id='shipment_form' title='Данные плана отгрузки' style='display:none;'>
+<div id='shipment_form' title='Данные отгрузки' style='display:none;'>
 	<form method='post' action="/forms/shipment_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
@@ -76,7 +76,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Дата</th>
 						<th>Противовес</th>
 						<th>Паллетов</th>
-						<th>План</th>
+						<th>Деталей</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">

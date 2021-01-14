@@ -1,6 +1,6 @@
 <?
 include "config.php";
-$title = 'План отгрузки';
+$title = 'Отгрузка';
 include "header.php";
 include "./forms/shipment_form.php";
 
@@ -147,8 +147,7 @@ foreach ($_GET as &$value) {
 			<th>Дата</th>
 			<th>Противовес</th>
 			<th>Паллетов</th>
-			<th>План</th>
-			<th>По графику</th>
+			<th>Деталей</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -161,11 +160,9 @@ $query = "
 		,DATE_FORMAT(LS.ls_date, '%W') ls_date_weekday
 		,LS.ls_date
 		,SUM(LS.pallets) pallets
-		,SUM(LS.pallets * CW.in_pallet) plan
-		,SUM(PB.batches * CW.fillings * CW.in_cassette) filling_plan
+		,SUM(LS.pallets * CW.in_pallet) details
 	FROM list__Shipment LS
 	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
-	LEFT JOIN plan__Batch PB ON PB.pb_date + INTERVAL 5 DAY = LS.ls_date AND PB.CW_ID = LS.CW_ID
 	WHERE 1
 		".($_GET["week"] ? "AND YEARWEEK(LS.ls_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND LS.CW_ID={$_GET["CW_ID"]}" : "")."
@@ -183,14 +180,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			,CW.item
 			,LS.CW_ID
 			,LS.pallets
-			,LS.pallets * CW.in_pallet plan
-			,PB.PB_ID
-			,YEARWEEK(PB.pb_date, 1) week
-			,PB.batches * CW.fillings * CW.in_cassette filling_plan
-			,PB.fakt
+			,LS.pallets * CW.in_pallet details
 		FROM list__Shipment LS
 		JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
-		LEFT JOIN plan__Batch PB ON PB.pb_date + INTERVAL 5 DAY = LS.ls_date AND PB.CW_ID = LS.CW_ID
 		WHERE 1
 			AND LS.ls_date = '{$row["ls_date"]}'
 			".($_GET["CW_ID"] ? "AND LS.CW_ID={$_GET["CW_ID"]}" : "")."
@@ -200,8 +192,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
 		$pallets += $subrow["pallets"];
-		$plan += $subrow["plan"];
-		$filling_plan += $subrow["filling_plan"];
+		$details += $subrow["details"];
 
 		// Выводим общую ячейку с датой
 		if( $cnt ) {
@@ -217,10 +208,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		?>
 			<td><?=$subrow["item"]?></td>
 			<td><?=$subrow["pallets"]?></td>
-			<td><?=$subrow["plan"]?></td>
-		<td class="bg-gray"><a href="plan_batch.php?week=<?=$subrow["week"]?>#<?=$subrow["PB_ID"]?>" target="_blank" <?=($subrow["fakt"] ? "" : "style='opacity: .7;'")?>><?=$subrow["filling_plan"]?></a></td>
+			<td><?=$subrow["details"]?></td>
 			<td>
-				<a href='#' class='add_ps clone' ls_date="<?=$_GET["ls_date"]?>" LS_ID='<?=$subrow["LS_ID"]?>' title='Клонировать план отгрузки'><i class='fa fa-clone fa-lg'></i></a>
 				<a href='#' class='add_ps' LS_ID='<?=$subrow["LS_ID"]?>' title='Изменить данные плана отгрузки'><i class='fa fa-pencil-alt fa-lg'></i></a>
 			</td>
 		</tr>
@@ -231,8 +220,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<tr class="summary">
 			<td>Итог:</td>
 			<td><?=$row["pallets"]?></td>
-			<td><?=$row["plan"]?></td>
-			<td><?=$row["filling_plan"]?></td>
+			<td><?=$row["details"]?></td>
 			<td></td>
 		</tr>
 <?
@@ -242,8 +230,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td></td>
 			<td>Итог:</td>
 			<td><?=$pallets?></td>
-			<td><?=$plan?></td>
-			<td><?=$filling_plan?></td>
+			<td><?=$details?></td>
 			<td></td>
 		</tr>
 	</tbody>
