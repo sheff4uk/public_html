@@ -2,7 +2,7 @@
 include "config.php";
 $title = 'План отгрузки';
 include "header.php";
-include "./forms/plan_scheduling_form.php";
+include "./forms/shipment_form.php";
 
 // Если в фильтре не установлена неделя, показываем текущую
 if( !$_GET["week"] ) {
@@ -17,7 +17,7 @@ if( !$_GET["week"] ) {
 <div id="filter">
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
-		<a href="/plan_scheduling.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+		<a href="/shipment.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Неделя:</span>
@@ -26,8 +26,8 @@ if( !$_GET["week"] ) {
 				$query = "
 					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
 					UNION
-					SELECT LEFT(YEARWEEK(ps_date, 1), 4) year
-					FROM plan__Scheduling
+					SELECT LEFT(YEARWEEK(ls_date, 1), 4) year
+					FROM list__Shipment
 					ORDER BY year DESC
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -45,13 +45,13 @@ if( !$_GET["week"] ) {
 								,DATE_FORMAT(ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())), '%e %b') WeekStart
 								,DATE_FORMAT(ADDDATE(CURDATE(), 6-WEEKDAY(CURDATE())), '%e %b') WeekEnd
 							UNION
-							SELECT LEFT(YEARWEEK(ps_date, 1), 4) year
-								,YEARWEEK(ps_date, 1) week
-								,RIGHT(YEARWEEK(ps_date, 1), 2) week_format
-								,DATE_FORMAT(ADDDATE(ps_date, 0-WEEKDAY(ps_date)), '%e %b') WeekStart
-								,DATE_FORMAT(ADDDATE(ps_date, 6-WEEKDAY(ps_date)), '%e %b') WeekEnd
-							FROM plan__Scheduling
-							WHERE LEFT(YEARWEEK(ps_date, 1), 4) = {$row["year"]}
+							SELECT LEFT(YEARWEEK(ls_date, 1), 4) year
+								,YEARWEEK(ls_date, 1) week
+								,RIGHT(YEARWEEK(ls_date, 1), 2) week_format
+								,DATE_FORMAT(ADDDATE(ls_date, 0-WEEKDAY(ls_date)), '%e %b') WeekStart
+								,DATE_FORMAT(ADDDATE(ls_date, 6-WEEKDAY(ls_date)), '%e %b') WeekEnd
+							FROM list__Shipment
+							WHERE LEFT(YEARWEEK(ls_date, 1), 4) = {$row["year"]}
 							GROUP BY week
 						) SUB
 						WHERE SUB.year = {$row["year"]}
@@ -157,45 +157,45 @@ foreach ($_GET as &$value) {
 <?
 $query = "
 	SELECT SUM(1) cnt
-		,DATE_FORMAT(PS.ps_date, '%d.%m.%y') ps_date_format
-		,DATE_FORMAT(PS.ps_date, '%W') ps_date_weekday
-		,PS.ps_date
-		,SUM(PS.pallets) pallets
-		,SUM(PS.pallets * CW.in_pallet) plan
+		,DATE_FORMAT(LS.ls_date, '%d.%m.%y') ls_date_format
+		,DATE_FORMAT(LS.ls_date, '%W') ls_date_weekday
+		,LS.ls_date
+		,SUM(LS.pallets) pallets
+		,SUM(LS.pallets * CW.in_pallet) plan
 		,SUM(PB.batches * CW.fillings * CW.in_cassette) filling_plan
-	FROM plan__Scheduling PS
-	JOIN CounterWeight CW ON CW.CW_ID = PS.CW_ID
-	LEFT JOIN plan__Batch PB ON PB.pb_date + INTERVAL 5 DAY = PS.ps_date AND PB.CW_ID = PS.CW_ID
+	FROM list__Shipment LS
+	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
+	LEFT JOIN plan__Batch PB ON PB.pb_date + INTERVAL 5 DAY = LS.ls_date AND PB.CW_ID = LS.CW_ID
 	WHERE 1
-		".($_GET["week"] ? "AND YEARWEEK(PS.ps_date, 1) LIKE '{$_GET["week"]}'" : "")."
-		".($_GET["CW_ID"] ? "AND PS.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND PS.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	GROUP BY PS.ps_date
-	ORDER BY PS.ps_date, PS.CW_ID
+		".($_GET["week"] ? "AND YEARWEEK(LS.ls_date, 1) LIKE '{$_GET["week"]}'" : "")."
+		".($_GET["CW_ID"] ? "AND LS.CW_ID={$_GET["CW_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND LS.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+	GROUP BY LS.ls_date
+	ORDER BY LS.ls_date, LS.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$cnt = $row["cnt"];
 
 	$query = "
-		SELECT PS.PS_ID
-			,PS.ps_date
+		SELECT LS.LS_ID
+			,LS.ls_date
 			,CW.item
-			,PS.CW_ID
-			,PS.pallets
-			,PS.pallets * CW.in_pallet plan
+			,LS.CW_ID
+			,LS.pallets
+			,LS.pallets * CW.in_pallet plan
 			,PB.PB_ID
 			,YEARWEEK(PB.pb_date, 1) week
 			,PB.batches * CW.fillings * CW.in_cassette filling_plan
 			,PB.fakt
-		FROM plan__Scheduling PS
-		JOIN CounterWeight CW ON CW.CW_ID = PS.CW_ID
-		LEFT JOIN plan__Batch PB ON PB.pb_date + INTERVAL 5 DAY = PS.ps_date AND PB.CW_ID = PS.CW_ID
+		FROM list__Shipment LS
+		JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
+		LEFT JOIN plan__Batch PB ON PB.pb_date + INTERVAL 5 DAY = LS.ls_date AND PB.CW_ID = LS.CW_ID
 		WHERE 1
-			AND PS.ps_date = '{$row["ps_date"]}'
-			".($_GET["CW_ID"] ? "AND PS.CW_ID={$_GET["CW_ID"]}" : "")."
-			".($_GET["CB_ID"] ? "AND PS.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-		ORDER BY PS.ps_date DESC, PS.CW_ID
+			AND LS.ls_date = '{$row["ls_date"]}'
+			".($_GET["CW_ID"] ? "AND LS.CW_ID={$_GET["CW_ID"]}" : "")."
+			".($_GET["CB_ID"] ? "AND LS.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		ORDER BY LS.ls_date DESC, LS.CW_ID
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
@@ -206,12 +206,12 @@ while( $row = mysqli_fetch_array($res) ) {
 		// Выводим общую ячейку с датой
 		if( $cnt ) {
 			$cnt++;
-			echo "<tr id='{$subrow["PS_ID"]}' style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$row["ps_date_weekday"]}<br>{$row["ps_date_format"]}</td>";
+			echo "<tr id='{$subrow["LS_ID"]}' style='border-top: 2px solid #333;'>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'>{$row["ls_date_weekday"]}<br>{$row["ls_date_format"]}</td>";
 			$cnt = 0;
 		}
 		else {
-			echo "<tr id='{$subrow["PS_ID"]}'>";
+			echo "<tr id='{$subrow["LS_ID"]}'>";
 		}
 
 		?>
@@ -220,8 +220,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$subrow["plan"]?></td>
 		<td class="bg-gray"><a href="plan_batch.php?week=<?=$subrow["week"]?>#<?=$subrow["PB_ID"]?>" target="_blank" <?=($subrow["fakt"] ? "" : "style='opacity: .7;'")?>><?=$subrow["filling_plan"]?></a></td>
 			<td>
-				<a href='#' class='add_ps clone' ps_date="<?=$_GET["ps_date"]?>" PS_ID='<?=$subrow["PS_ID"]?>' title='Клонировать план отгрузки'><i class='fa fa-clone fa-lg'></i></a>
-				<a href='#' class='add_ps' PS_ID='<?=$subrow["PS_ID"]?>' title='Изменить данные плана отгрузки'><i class='fa fa-pencil-alt fa-lg'></i></a>
+				<a href='#' class='add_ps clone' ls_date="<?=$_GET["ls_date"]?>" LS_ID='<?=$subrow["LS_ID"]?>' title='Клонировать план отгрузки'><i class='fa fa-clone fa-lg'></i></a>
+				<a href='#' class='add_ps' LS_ID='<?=$subrow["LS_ID"]?>' title='Изменить данные плана отгрузки'><i class='fa fa-pencil-alt fa-lg'></i></a>
 			</td>
 		</tr>
 		<?
@@ -249,7 +249,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<div id="add_btn" class="add_ps" ps_date="<?=$_GET["ps_date"]?>" title="Внести данные плана отгрузки"></div>
+<div id="add_btn" class="add_ps" ls_date="<?=$_GET["ls_date"]?>" title="Внести данные плана отгрузки"></div>
 
 <script>
 	$(function() {

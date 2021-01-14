@@ -4,27 +4,27 @@ include_once "../config.php";
 // Сохранение/редактирование плана отгрузки
 if( isset($_POST["CW_ID"]) ) {
 	session_start();
-	$ps_date = $_POST["ps_date"];
+	$ls_date = $_POST["ls_date"];
 	$CW_ID = $_POST["CW_ID"];
 	$pallets = $_POST["pallets"];
 
-	if( $_POST["PS_ID"] ) { // Редактируем
+	if( $_POST["LS_ID"] ) { // Редактируем
 		$query = "
-			UPDATE plan__Scheduling
-			SET ps_date = '{$ps_date}'
+			UPDATE list__Shipment
+			SET ls_date = '{$ls_date}'
 				,CW_ID = {$CW_ID}
 				,pallets = {$pallets}
-			WHERE PS_ID = {$_POST["PS_ID"]}
+			WHERE LS_ID = {$_POST["LS_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 		}
-		$PS_ID = $_POST["PS_ID"];
+		$LS_ID = $_POST["LS_ID"];
 	}
 	else { // Добавляем
 		$query = "
-			INSERT INTO plan__Scheduling
-			SET ps_date = '{$ps_date}'
+			INSERT INTO list__Shipment
+			SET ls_date = '{$ls_date}'
 				,CW_ID = {$CW_ID}
 				,pallets = {$pallets}
 		";
@@ -33,7 +33,7 @@ if( isset($_POST["CW_ID"]) ) {
 		}
 		else {
 			$add = 1;
-			$PS_ID = mysqli_insert_id( $mysqli );
+			$LS_ID = mysqli_insert_id( $mysqli );
 		}
 	}
 
@@ -42,33 +42,33 @@ if( isset($_POST["CW_ID"]) ) {
 	}
 
 	// Получаем неделю
-	$query = "SELECT YEARWEEK('{$ps_date}', 1) week";
+	$query = "SELECT YEARWEEK('{$ls_date}', 1) week";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
 	$week = $row["week"];
 
 	// Перенаправление в журнал
 	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/plan_scheduling.php?week='.$week.'&ps_date='.$ps_date.'&add#'.$PS_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/shipment.php?week='.$week.'&ls_date='.$ls_date.'&add#'.$LS_ID.'">');
 	}
 	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/plan_scheduling.php?week='.$week.'#'.$PS_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/shipment.php?week='.$week.'#'.$LS_ID.'">');
 	}
 }
 ?>
 
 <style>
-	#plan_scheduling_form table input,
-	#plan_scheduling_form table select {
+	#shipment_form table input,
+	#shipment_form table select {
 		font-size: 1.2em;
 	}
 </style>
 
-<div id='plan_scheduling_form' title='Данные плана отгрузки' style='display:none;'>
-	<form method='post' action="/forms/plan_scheduling_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
+<div id='shipment_form' title='Данные плана отгрузки' style='display:none;'>
+	<form method='post' action="/forms/shipment_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
-			<input type="hidden" name="PS_ID">
+			<input type="hidden" name="LS_ID">
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
@@ -81,7 +81,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td><input type="date" name="ps_date" required></td>
+						<td><input type="date" name="ls_date" required></td>
 						<td>
 							<select name="CW_ID" style="width: 150px;" required>
 								<option value=""></option>
@@ -129,41 +129,41 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
-			var PS_ID = $(this).attr("PS_ID"),
-				ps_date = $(this).attr("ps_date");
+			var LS_ID = $(this).attr("LS_ID"),
+				ls_date = $(this).attr("ls_date");
 
 			// В случае редактирования заполняем форму
-			if( PS_ID ) {
+			if( LS_ID ) {
 				// Данные аяксом
 				$.ajax({
-					url: "/ajax/plan_scheduling_json.php?PS_ID=" + PS_ID,
+					url: "/ajax/shipment_json.php?LS_ID=" + LS_ID,
 					success: function(msg) { ps_data = msg; },
 					dataType: "json",
 					async: false
 				});
 
-				$('#plan_scheduling_form select[name="CW_ID"]').val(ps_data['CW_ID']);
-				$('#plan_scheduling_form input[name="pallets"]').val(ps_data['pallets']);
-				$('#plan_scheduling_form input[name="amount"]').val(ps_data['amount']);
+				$('#shipment_form select[name="CW_ID"]').val(ps_data['CW_ID']);
+				$('#shipment_form input[name="pallets"]').val(ps_data['pallets']);
+				$('#shipment_form input[name="amount"]').val(ps_data['amount']);
 				// В случае клонирования очищаем идентификатор и дату
 				if( $(this).hasClass('clone') ) {
-					$('#plan_scheduling_form input[name="PS_ID"]').val('');
-					$('#plan_scheduling_form table input[name="ps_date"]').val(ps_date);
+					$('#shipment_form input[name="LS_ID"]').val('');
+					$('#shipment_form table input[name="ls_date"]').val(ls_date);
 				}
 				else {
-					$('#plan_scheduling_form input[name="PS_ID"]').val(PS_ID);
-					$('#plan_scheduling_form input[name="ps_date"]').val(ps_data['ps_date']);
+					$('#shipment_form input[name="LS_ID"]').val(LS_ID);
+					$('#shipment_form input[name="ls_date"]').val(ps_data['ls_date']);
 				}
 			}
 			// Иначе очищаем форму
 			else {
-				$('#plan_scheduling_form input[name="PS_ID"]').val('');
-				$('#plan_scheduling_form table input').val('');
-				$('#plan_scheduling_form table select').val('');
-				$('#plan_scheduling_form table input[name="ps_date"]').val(ps_date);
+				$('#shipment_form input[name="LS_ID"]').val('');
+				$('#shipment_form table input').val('');
+				$('#shipment_form table select').val('');
+				$('#shipment_form table input[name="ls_date"]').val(ls_date);
 			}
 
-			$('#plan_scheduling_form').dialog({
+			$('#shipment_form').dialog({
 				resizable: false,
 				width: 1000,
 				modal: true,
@@ -174,11 +174,11 @@ this.subbut.value='Подождите, пожалуйста!';">
 		});
 
 		// При изменении противовеса или паллетов пересчитываем детали
-		$('#plan_scheduling_form select[name="CW_ID"], #plan_scheduling_form input[name="pallets"]').change(function() {
-			var in_pallet = $('#plan_scheduling_form select[name="CW_ID"] option:selected').attr('in_pallet'),
-				pallets = $('#plan_scheduling_form input[name="pallets"]').val();
+		$('#shipment_form select[name="CW_ID"], #shipment_form input[name="pallets"]').change(function() {
+			var in_pallet = $('#shipment_form select[name="CW_ID"] option:selected').attr('in_pallet'),
+				pallets = $('#shipment_form input[name="pallets"]').val();
 
-			$('#plan_scheduling_form input[name="amount"]').val(pallets * in_pallet);
+			$('#shipment_form input[name="amount"]').val(pallets * in_pallet);
 		});
 	});
 </script>
