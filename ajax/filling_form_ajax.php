@@ -12,7 +12,7 @@ $query = "
 		,PB.pb_date
 		,PB.CW_ID
 		,PB.batches
-		,PB.fakt
+		,PB.fact_batches
 		,CW.item
 		,CW.fillings
 		,CW.in_cassette
@@ -27,7 +27,7 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 $row = mysqli_fetch_array($res);
 
 $batches = $row["batches"];
-$fakt = $row["fakt"];
+$fact_batches = $row["fact_batches"];
 $item = $row["item"];
 $pb_weekday = $row["pb_date_weekday"];
 $week = $row["week"];
@@ -45,7 +45,7 @@ $batch_date = $row["batch_date"];
 $html = "
 	<p style='text-align: center; font-size: 1.5em;'>Фактическая дата первого замеса: <input type='date' name='batch_date' value='{$batch_date}' min='{$pb_date_min}' max='{$pb_date_max}' style='width: 250px;' required></p>
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
-	<p style='display: none; text-align: center; font-size: 2em;'>Число замесов: <input type='number' name='fakt' id='rows' min='".($fakt ? $fakt : "1")."' max='{$max_batches}' value='".($fakt ? $fakt : $batches)."'></p>
+	<p style='display: none; text-align: center; font-size: 2em;'>Число замесов: <input type='number' name='fact_batches' id='rows' min='".($fact_batches ? $fact_batches : "1")."' max='{$max_batches}' value='".($fact_batches ? $fact_batches : $batches)."'></p>
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
 	<table style='table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
 		<tr>
@@ -115,7 +115,7 @@ $html .= "
 ";
 
 // Выводим сохраненные замесы в случае редактирования
-if( $fakt ) {
+if( $fact_batches ) {
 	$query = "
 		SELECT LB.LB_ID
 			,LB.OP_ID
@@ -196,7 +196,7 @@ if( $fakt ) {
 	}
 }
 // Выводим пустые строки
-for ($i = $fakt + 1; $i <= $max_batches; $i++) {
+for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 	// Номера кассет
 	$fillings_cell = '';
 	for ($j = 1; $j <= $fillings; $j++) {

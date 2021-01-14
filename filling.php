@@ -72,7 +72,7 @@ if( !$_GET["week"] ) {
 				,PB.batches * CW.fillings * CW.in_cassette plan
 			FROM plan__Batch PB
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-			WHERE PB.fakt = 0 AND PB.batches > 0
+			WHERE PB.fact_batches = 0 AND PB.batches > 0
 				AND PB.pb_date <= CURDATE()
 			ORDER BY PB.pb_date, PB.CW_ID
 		";
@@ -257,7 +257,7 @@ $query = "
 		,CW.item
 		,PB.CW_ID
 		,PB.batches
-		,PB.fakt
+		,PB.fact_batches
 		,MIN(CAST(CONCAT(LB.batch_date, ' ', LB.batch_time) AS DATETIME)) time
 		,IF(COUNT(LCT24.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT24.LCT_ID) * 2 / 3), 0) `24tests`
 		,IF(COUNT(LCT72.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT72.LCT_ID) * 2 / 3), 0) `72tests`
@@ -301,7 +301,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$test24 = mysqli_result($subres,0,'pressure');
 	$test72 = mysqli_result($subres,1,'pressure');
 
-	$cnt = $row["fakt"];
+	$cnt = $row["fact_batches"];
 	echo "<tbody id='PB{$row["PB_ID"]}' style='text-align: center; border-bottom: 2px solid #333; ".(($weekday and $weekday != $row["pb_date_weekday"]) ? " border-top: 10px solid #333;" : "")."'>";
 	$weekday = $row["pb_date_weekday"];
 

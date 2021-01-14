@@ -177,7 +177,7 @@ foreach ($_GET as &$value) {
 <?
 $batches = 0;
 $fillings = 0;
-$fakt = 0;
+$details = 0;
 $underfilling = 0;
 
 $query = "
@@ -187,7 +187,7 @@ $query = "
 		,LB.batch_date
 		,COUNT(DISTINCT LB.LB_ID) batches
 		,COUNT(LF.LF_ID) fillings
-		,SUM(CW.in_cassette) fakt
+		,SUM(CW.in_cassette) details
 	FROM list__Batch LB
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
@@ -210,7 +210,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,CW.item
 			,COUNT(DISTINCT LB.LB_ID) batches
 			,COUNT(LF.LF_ID) fillings
-			,SUM(CW.in_cassette) fakt
+			,SUM(CW.in_cassette) details
 			,ROUND(IFNULL(SUM(LB.underfilling / CW.fillings), 0)) underfilling
 		FROM list__Batch LB
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
@@ -227,7 +227,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	while( $subrow = mysqli_fetch_array($subres) ) {
 		$batches += $subrow["batches"];
 		$fillings += $subrow["fillings"];
-		$fakt += $subrow["fakt"];
+		$details += $subrow["details"];
 		$underfilling += $subrow["underfilling"];
 		$d_underfilling += $subrow["underfilling"];
 
@@ -246,7 +246,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$subrow["item"]?></td>
 			<td><?=$subrow["batches"]?></td>
 			<td><?=$subrow["fillings"]?></td>
-			<td><?=($subrow["fakt"] - $subrow["underfilling"])?></td>
+			<td><?=($subrow["details"] - $subrow["underfilling"])?></td>
 			<td><?=$subrow["underfilling"]?></td>
 		</tr>
 		<?
@@ -258,7 +258,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Итог:</td>
 			<td><?=$row["batches"]?></td>
 			<td><?=$row["fillings"]?></td>
-			<td><?=($row["fakt"] - $d_underfilling)?></td>
+			<td><?=($row["details"] - $d_underfilling)?></td>
 			<td><?=$d_underfilling?></td>
 		</tr>
 <?
@@ -270,7 +270,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Итог:</td>
 			<td><?=$batches?></td>
 			<td><?=$fillings?></td>
-			<td><?=($fakt - $underfilling)?></td>
+			<td><?=($details - $underfilling)?></td>
 			<td><?=$underfilling?></td>
 		</tr>
 	</tbody>
@@ -298,7 +298,7 @@ while( $row = mysqli_fetch_array($res) ) {
 $batches = 0;
 $fillings = 0;
 $plan = 0;
-$fakt = 0;
+$details = 0;
 $underfilling = 0;
 
 $query = "
@@ -311,8 +311,8 @@ $query = "
 		,SUM(PB.batches) batches
 		,SUM(PB.batches * CW.fillings) fillings
 		,SUM(PB.batches * CW.fillings * CW.in_cassette) plan
-		,SUM(PB.fakt * CW.fillings * CW.in_cassette) fakt
-		,IF(SUM(PB.batches) = SUM(PB.fakt), (SELECT TIMESTAMPDIFF(MINUTE, MAX(CAST(CONCAT(batch_date, ' ', batch_time) AS DATETIME)), CAST(CONCAT(PB.pb_date, ' 23:59:59') AS DATETIME)) FROM list__Batch WHERE PB_ID IN (SELECT PB_ID FROM plan__Batch WHERE pb_date = PB.pb_date)), NULL) diff
+		,SUM(PB.fact_batches * CW.fillings * CW.in_cassette) details
+		,IF(SUM(PB.batches) = SUM(PB.fact_batches), (SELECT TIMESTAMPDIFF(MINUTE, MAX(CAST(CONCAT(batch_date, ' ', batch_time) AS DATETIME)), CAST(CONCAT(PB.pb_date, ' 23:59:59') AS DATETIME)) FROM list__Batch WHERE PB_ID IN (SELECT PB_ID FROM plan__Batch WHERE pb_date = PB.pb_date)), NULL) diff
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	WHERE 1
@@ -337,9 +337,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			,PB.batches
 			,PB.batches * CW.fillings fillings
 			,PB.batches * CW.fillings * CW.in_cassette plan
-			,PB.fakt * CW.fillings * CW.in_cassette fakt
+			,PB.fact_batches * CW.fillings * CW.in_cassette details
 			,IFNULL(SUM(LB.underfilling), 0) underfilling
-			,IF(PB.batches > 0 AND PB.fakt = 0 AND PB.pb_date <= (CURRENT_DATE() + INTERVAL 1 DAY), 1, 0) printable
+			,IF(PB.batches > 0 AND PB.fact_batches = 0 AND PB.pb_date <= (CURRENT_DATE() + INTERVAL 1 DAY), 1, 0) printable
 		FROM plan__Batch PB
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
@@ -355,7 +355,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		$batches += $subrow["batches"];
 		$fillings += $subrow["fillings"];
 		$plan += $subrow["plan"];
-		$fakt += $subrow["fakt"];
+		$details += $subrow["details"];
 		$underfilling += $subrow["underfilling"];
 		$d_underfilling += $subrow["underfilling"];
 
@@ -382,7 +382,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$subrow["batches"]?></td>
 			<td><?=$subrow["fillings"]?></td>
 			<td><?=$subrow["plan"]?></td>
-			<td class='bg-gray'><?=($subrow["fakt"] - $subrow["underfilling"])?></td>
+			<td class='bg-gray'><?=($subrow["details"] - $subrow["underfilling"])?></td>
 			<td class='bg-gray'><?=$subrow["underfilling"]?></td>
 			<td class='bg-gray'><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td>
@@ -413,7 +413,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["batches"]?></td>
 			<td><?=$row["fillings"]?></td>
 			<td><?=$row["plan"]?></td>
-			<td><?=($row["fakt"] - $d_underfilling)?></td>
+			<td><?=($row["details"] - $d_underfilling)?></td>
 			<td><?=$d_underfilling?></td>
 			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td></td>
@@ -437,7 +437,7 @@ else {
 			<td><?=$batches?></td>
 			<td><?=$fillings?></td>
 			<td><?=$plan?></td>
-			<td><?=($fakt - $underfilling)?></td>
+			<td><?=($details - $underfilling)?></td>
 			<td><?=$underfilling?></td>
 			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td></td>

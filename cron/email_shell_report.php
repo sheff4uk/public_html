@@ -38,12 +38,12 @@ $query = "
 		,CW.shell_balance
 		,ROUND((WB.batches * CW.fillings * CW.in_cassette) / WR.sr_cnt) `durability`
 		,ROUND(WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'), 1) `sr_avg`
-		,ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))) * CW.fillings * CW.in_cassette `often`
-		,MAX(PB.fakt) * CW.fillings * CW.in_cassette `max`
-		,MAX(PB.fakt) * CW.fillings * CW.in_cassette - CW.shell_balance `need`
-		,ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) `days_max`
-		,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fakt) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d/%m/%Y') `date_max`
-		,CEIL((CW.shell_balance - IFNULL(ROUND(AVG(IF(PB.fakt = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fakt))), 0) * CW.fillings * CW.in_cassette) / CW.shell_pallet) `pallets`
+		,ROUND(AVG(IF(PB.fact_batches = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fact_batches))) * CW.fillings * CW.in_cassette `often`
+		,MAX(PB.fact_batches) * CW.fillings * CW.in_cassette `max`
+		,MAX(PB.fact_batches) * CW.fillings * CW.in_cassette - CW.shell_balance `need`
+		,ROUND((CW.shell_balance - MAX(PB.fact_batches) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) `days_max`
+		,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fact_batches) * CW.fillings * CW.in_cassette) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d/%m/%Y') `date_max`
+		,CEIL((CW.shell_balance - IFNULL(ROUND(AVG(IF(PB.fact_batches = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fact_batches))), 0) * CW.fillings * CW.in_cassette) / CW.shell_pallet) `pallets`
 		,SR.sr_cnt
 	FROM CounterWeight CW
 	LEFT JOIN (
@@ -58,7 +58,7 @@ $query = "
 	# Число замесов с 04.12.2020
 	LEFT JOIN (
 		SELECT CW_ID
-			,SUM(fakt) batches
+			,SUM(fact_batches) batches
 		FROM plan__Batch
 		WHERE pb_date BETWEEN '2020-12-04' AND CURDATE() - INTERVAL 1 DAY
 		GROUP BY CW_ID

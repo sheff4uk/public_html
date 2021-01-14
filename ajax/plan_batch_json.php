@@ -6,7 +6,7 @@ $pb_date = $_GET["pb_date"];
 $query = "
 	SELECT CW.CW_ID
 		,PB.batches
-		,PB.fakt
+		,PB.fact_batches
 		,PB.PB_ID
 		,IFNULL(PB.batches, PPB.batches) `placeholder`
 	FROM CounterWeight CW
@@ -18,7 +18,7 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $PB_data = array();
 while( $row = mysqli_fetch_array($res) ) {
-	$PB_data[] = array( "CW_ID"=>$row["CW_ID"], "batches"=>$row["batches"], "fakt"=>$row["fakt"], "PB_ID"=>$row["PB_ID"], "placeholder"=>$row["placeholder"] );
+	$PB_data[] = array( "CW_ID"=>$row["CW_ID"], "batches"=>$row["batches"], "fact_batches"=>$row["fact_batches"], "PB_ID"=>$row["PB_ID"], "placeholder"=>$row["placeholder"] );
 }
 
 echo json_encode($PB_data);

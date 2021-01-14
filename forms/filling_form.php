@@ -7,17 +7,17 @@ if( isset($_POST["PB_ID"]) ) {
 
 	//Узнаем есть ли связанные с планом чеклисты и число замесов
 	$query = "
-		SELECT PB.pb_date, PB.fakt
+		SELECT PB.pb_date, PB.fact_batches
 		FROM plan__Batch PB
 		WHERE PB.PB_ID = {$_POST["PB_ID"]}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
 	//$pb_date = $row["pb_date"];
-	$fakt = $row["fakt"];
+	$fact_batches = $row["fact_batches"];
 
 	// Сохраняем данные из формы
-	if( $fakt <= $_POST["fakt"] ) { // Новое число замесов не может быть меньше уже существующего кол-ва
+	if( $fact_batches <= $_POST["fact_batches"] ) { // Новое число замесов не может быть меньше уже существующего кол-ва
 		$batch_date = $_POST["batch_date"];
 		// Построчное считывание формы
 		foreach ($_POST["batch_time"] as $key => $value) {
@@ -111,7 +111,7 @@ if( isset($_POST["PB_ID"]) ) {
 		// Обновляем фактическое число замесов
 		$query = "
 			UPDATE plan__Batch
-			SET fakt = {$_POST["fakt"]}
+			SET fact_batches = {$_POST["fact_batches"]}
 			WHERE PB_ID = {$_POST["PB_ID"]}
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

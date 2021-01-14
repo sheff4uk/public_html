@@ -132,7 +132,7 @@ $query = "
 		,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 		,SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval
 		,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
-		,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
+		,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fact
 	FROM list__Batch LB
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -166,7 +166,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 			,SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval
 			,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
-			,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
+			,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fact
 			,PB.batches * CW.fillings * CW.in_cassette plan
 		FROM list__Batch LB
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
@@ -204,10 +204,10 @@ while( $row = mysqli_fetch_array($res) ) {
 		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["o_def_form"]}</a> / <a href='packing.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["p_def_form"]}</a></td>";
 
 		$total = $subrow["o_not_spill"] + $subrow["p_not_spill"] + $subrow["o_crack"] + $subrow["p_crack"] + $subrow["o_chipped"] + $subrow["p_chipped"] + $subrow["o_def_form"] + $subrow["p_def_form"];
-		$percent_total = round($total / $subrow["fakt"] * 100, 2);
+		$percent_total = round($total / $subrow["fact"] * 100, 2);
 		echo "<td>{$total}</td>";
 		echo "<td>{$subrow["plan"]}</td>";
-		echo "<td>{$subrow["fakt"]}</td>";
+		echo "<td>{$subrow["fact"]}</td>";
 		echo "<td>{$percent_total} %</td>";
 		echo "</tr>";
 
@@ -224,10 +224,10 @@ while( $row = mysqli_fetch_array($res) ) {
 	echo "<td>{$row["chipped"]}</td>";
 	echo "<td>{$row["def_form"]}</td>";
 	$total = $row["not_spill"] + $row["crack"] + $row["chipped"] + $row["def_form"];
-	$percent_total = round($total / $row["fakt"] * 100, 2);
+	$percent_total = round($total / $row["fact"] * 100, 2);
 	echo "<td>{$total}</td>";
 	echo "<td>{$total_plan}</td>";
-	echo "<td>{$row["fakt"]}</td>";
+	echo "<td>{$row["fact"]}</td>";
 	echo "<td>{$percent_total} %</td>";
 	echo "</tr>";
 
@@ -246,7 +246,7 @@ if( $filter ) {
 			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 			,SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval
 			,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
-			,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
+			,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fact
 		FROM list__Batch LB
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -278,7 +278,7 @@ if( $filter ) {
 				,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 				,SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval
 				,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
-				,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fakt
+				,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/CW.fillings)) fact
 			FROM list__Batch LB
 			JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -300,7 +300,7 @@ if( $filter ) {
 				SELECT SUM(PB.batches * CW.fillings * CW.in_cassette) plan
 				FROM plan__Batch PB
 				JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-				WHERE PB.fakt = 1
+				WHERE PB.fact_batches = 1
 					AND PB.CW_ID = {$subrow["CW_ID"]}
 					".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
 					".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
@@ -330,10 +330,10 @@ if( $filter ) {
 			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["o_def_form"]}</a> / <a href='packing.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["p_def_form"]}</a></td>";
 
 			$total = $subrow["o_not_spill"] + $subrow["p_not_spill"] + $subrow["o_crack"] + $subrow["p_crack"] + $subrow["o_chipped"] + $subrow["p_chipped"] + $subrow["o_def_form"] + $subrow["p_def_form"];
-			$percent_total = round($total / $subrow["fakt"] * 100, 2);
+			$percent_total = round($total / $subrow["fact"] * 100, 2);
 			echo "<td>{$total}</td>";
 			echo "<td>{$subsubrow["plan"]}</td>";
-			echo "<td>{$subrow["fakt"]}</td>";
+			echo "<td>{$subrow["fact"]}</td>";
 			echo "<td>{$percent_total} %</td>";
 			echo "</tr>";
 
@@ -350,10 +350,10 @@ if( $filter ) {
 		echo "<td>{$row["chipped"]}</td>";
 		echo "<td>{$row["def_form"]}</td>";
 		$total = $row["not_spill"] + $row["crack"] + $row["chipped"] + $row["def_form"];
-		$percent_total = round($total / $row["fakt"] * 100, 2);
+		$percent_total = round($total / $row["fact"] * 100, 2);
 		echo "<td>{$total}</td>";
 		echo "<td>{$total_plan}</td>";
-		echo "<td>{$row["fakt"]}</td>";
+		echo "<td>{$row["fact"]}</td>";
 		echo "<td>{$percent_total} %</td>";
 		echo "</tr>";
 	}

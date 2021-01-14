@@ -155,7 +155,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					$('#plan_batch_form input[name="PB_ID[' + sub_pb_data['CW_ID'] + ']"]').val('');
 				}
 
-				if( sub_pb_data['fakt'] > 0 ) {
+				if( sub_pb_data['fact_batches'] > 0 ) {
 					$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('readonly', true);
 					$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').parent().children('i').show('fast');
 				}
