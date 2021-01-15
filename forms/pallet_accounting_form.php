@@ -62,6 +62,7 @@ if( isset($_POST["pa_cnt"]) ) {
 	$pa_date = $_POST["pa_date"];
 	$PS_ID = $_POST["PS_ID"];
 	$pa_cnt = $_POST["pa_cnt"];
+	$pa_reject = $_POST["pa_reject"];
 	$pallet_cost = $_POST["pallet_cost"];
 
 	if( $_POST["PA_ID"] ) { // Редактируем
@@ -70,6 +71,7 @@ if( isset($_POST["pa_cnt"]) ) {
 			SET pa_date = '{$pa_date}'
 				,PS_ID = {$PS_ID}
 				,pa_cnt = {$pa_cnt}
+				,pa_reject = {$pa_reject}
 				,pallet_cost = {$pallet_cost}
 			WHERE PA_ID = {$_POST["PA_ID"]}
 		";
@@ -84,6 +86,7 @@ if( isset($_POST["pa_cnt"]) ) {
 			SET pa_date = '{$pa_date}'
 				,PS_ID = {$PS_ID}
 				,pa_cnt = {$pa_cnt}
+				,pa_reject = {$pa_reject}
 				,pallet_cost = {$pallet_cost}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -186,6 +189,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th>Поставщик поддонов</th>
 						<th>Приобретено поддонов</th>
+						<th>Из них бракованных</th>
 						<th>Стоимость поддона, руб</th>
 					</tr>
 				</thead>
@@ -207,7 +211,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 								?>
 							</select>
 						</td>
-						<td><input type="number" name="pa_cnt" min="1" style="width: 70px;" required></td>
+						<td><input type="number" name="pa_cnt" min="0" style="width: 70px;" required></td>
+						<td><input type="number" name="pa_reject" min="0" style="width: 70px;" required></td>
 						<td><input type="number" name="pallet_cost" min="0" style="width: 120px;" required></td>
 					</tr>
 				</tbody>
@@ -222,7 +227,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 <script>
 	$(function() {
-		// Кнопка списания
+		// Кнопка возврата поддонов
 		$('.add_return').click( function() {
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
@@ -265,7 +270,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			return false;
 		});
 
-		// Кнопка прихода
+		// Кнопка приобретения
 		$('.add_arrival').click( function() {
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
@@ -287,6 +292,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#pallet_arrival_form input[name="pa_date"]').val(PA_data['pa_date']);
 				$('#pallet_arrival_form select[name="PS_ID"]').val(PA_data['PS_ID']);
 				$('#pallet_arrival_form input[name="pa_cnt"]').val(PA_data['pa_cnt']);
+				$('#pallet_arrival_form input[name="pa_reject"]').val(PA_data['pa_reject']);
 				$('#pallet_arrival_form input[name="pallet_cost"]').val(PA_data['pallet_cost']);
 			}
 			// Иначе очищаем форму

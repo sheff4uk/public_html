@@ -149,6 +149,7 @@ foreach ($_GET as &$value) {
 			<th>Кол-во годных поддонов</th>
 			<th>Поставщик поддонов</th>
 			<th>Приобретено поддонов</th>
+			<th>Из них бракованных</th>
 			<th>Стоимость поддона, руб</th>
 			<th>Сумма, руб</th>
 			<th></th>
@@ -168,6 +169,7 @@ $query = "
 		,PR.pr_cnt - PR.pr_reject - PR.pr_wrong_format good
 		,NULL pallet_supplier
 		,NULL pa_cnt
+		,NULL pa_reject
 		,NULL pallet_cost
 		,NULL sum_cost
 		,PR.pr_date date
@@ -192,6 +194,7 @@ $query = "
 		,NULL
 		,PS.pallet_supplier
 		,PA.pa_cnt
+		,PA.pa_reject
 		,PA.pallet_cost
 		,PA.pallet_cost * PA.pa_cnt sum_cost
 		,PA.pa_date date
@@ -213,6 +216,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$pr_wrong_format += $row["pr_wrong_format"];
 	$pr_good += $row["pr_good"];
 	$pa_cnt += $row["pa_cnt"];
+	$pa_reject += $row["pa_reject"];
 	$sum_cost += $row["sum_cost"];
 	?>
 	<tr id="<?=$row["type"]?><?=$row["ID"]?>">
@@ -224,6 +228,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><b style="color: green;"><?=$row["good"]?></b></td>
 		<td><span class="nowrap"><?=$row["pallet_supplier"]?></span></td>
 		<td><b><?=$row["pa_cnt"]?></b></td>
+		<td><b style="color: red;"><?=$row["pa_reject"]?></b></td>
 		<td><?=(isset($row["pallet_cost"]) ? number_format($row["pallet_cost"], 0, '', ' ') : "")?></td>
 		<td><?=(isset($row["sum_cost"]) ? number_format($row["sum_cost"], 0, '', ' ') : "")?></td>
 		<td><a href="#" <?=($row["type"] == "A" ? "class='add_arrival' PA_ID='{$row["ID"]}'" : "class='add_return' PR_ID='{$row["ID"]}'")?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
@@ -240,6 +245,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><b><?=$pr_good?></b></td>
 			<td></td>
 			<td><b><?=$pa_cnt?></b></td>
+			<td><b><?=$pa_reject?></b></td>
 			<td></td>
 			<td><?=(isset($sum_cost) ? number_format($sum_cost, 0, '', ' ') : "")?></td>
 			<td></td>
