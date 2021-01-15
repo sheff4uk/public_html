@@ -166,7 +166,7 @@ $query = "
 		,PR.pr_cnt
 		,PR.pr_reject
 		,PR.pr_wrong_format
-		,PR.pr_cnt - PR.pr_reject - PR.pr_wrong_format good
+		,PR.pr_cnt - PR.pr_reject - PR.pr_wrong_format pr_good
 		,NULL pallet_supplier
 		,NULL pa_cnt
 		,NULL pa_reject
@@ -225,7 +225,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><b><?=$row["pr_cnt"]?></b></td>
 		<td><b style="color: red;"><?=$row["pr_reject"]?></b></td>
 		<td><b style="color: red;"><?=$row["pr_wrong_format"]?></b></td>
-		<td><b style="color: green;"><?=$row["good"]?></b></td>
+		<td><b style="color: green;"><?=$row["pr_good"]?></b></td>
 		<td><span class="nowrap"><?=$row["pallet_supplier"]?></span></td>
 		<td><b><?=$row["pa_cnt"]?></b></td>
 		<td><b style="color: red;"><?=$row["pa_reject"]?></b></td>

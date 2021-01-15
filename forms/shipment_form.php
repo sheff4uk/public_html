@@ -75,7 +75,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th>Дата</th>
 						<th>Противовес</th>
-						<th>Паллетов</th>
+						<th>Поддонов</th>
 						<th>Деталей</th>
 					</tr>
 				</thead>
@@ -173,7 +173,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			return false;
 		});
 
-		// При изменении противовеса или паллетов пересчитываем детали
+		// При изменении противовеса или поддонов пересчитываем детали
 		$('#shipment_form select[name="CW_ID"], #shipment_form input[name="pallets"]').change(function() {
 			var in_pallet = $('#shipment_form select[name="CW_ID"] option:selected').attr('in_pallet'),
 				pallets = $('#shipment_form input[name="pallets"]').val();

@@ -146,7 +146,7 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th>Дата</th>
 			<th>Противовес</th>
-			<th>Паллетов</th>
+			<th>Поддонов</th>
 			<th>Деталей</th>
 			<th></th>
 		</tr>
