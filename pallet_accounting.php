@@ -142,14 +142,12 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th>Дата</th>
-			<th>Клиент</th>
-			<th>Возвращено поддонов</th>
+			<th>Поставщик поддонов / Клиент</th>
+			<th>Отгружено поддонов</th>
+			<th>Приобретено / возвращено поддонов</th>
 			<th>Из них бракованных</th>
 			<th>Из них другого формата</th>
 			<th>Кол-во годных поддонов</th>
-			<th>Поставщик поддонов</th>
-			<th>Приобретено поддонов</th>
-			<th>Из них бракованных</th>
 			<th>Стоимость поддона, руб</th>
 			<th>Сумма, руб</th>
 			<th></th>
@@ -163,17 +161,16 @@ $query = "
 		,PR.PR_ID ID
 		,DATE_FORMAT(PR.pr_date, '%d.%m.%Y') date_format
 		,CB.brand
+		,NULL pallets_shipment
 		,PR.pr_cnt
 		,PR.pr_reject
 		,PR.pr_wrong_format
 		,PR.pr_cnt - PR.pr_reject - PR.pr_wrong_format pr_good
-		,NULL pallet_supplier
-		,NULL pa_cnt
-		,NULL pa_reject
 		,NULL pallet_cost
 		,NULL sum_cost
 		,PR.pr_date date
 		,PR.CB_ID
+		,NULL week
 	FROM pallet__Return PR
 	JOIN ClientBrand CB ON CB.CB_ID = PR.CB_ID
 	WHERE 1
@@ -184,20 +181,19 @@ $query = "
 
 	UNION
 
-	SELECT 'A' type
-		,PA.PA_ID ID
-		,DATE_FORMAT(PA.pa_date, '%d.%m.%Y') date_format
-		,NULL
-		,NULL
-		,NULL
-		,NULL
-		,NULL
+	SELECT 'A'
+		,PA.PA_ID
+		,DATE_FORMAT(PA.pa_date, '%d.%m.%Y')
 		,PS.pallet_supplier
+		,NULL pallets_shipment
 		,PA.pa_cnt
 		,PA.pa_reject
+		,NULL
+		,PA.pa_cnt - PA.pa_reject
 		,PA.pallet_cost
-		,PA.pallet_cost * PA.pa_cnt sum_cost
-		,PA.pa_date date
+		,PA.pallet_cost * PA.pa_cnt
+		,PA.pa_date
+		,NULL
 		,NULL
 	FROM pallet__Arrival PA
 	JOIN pallet__Supplier PS ON PS.PS_ID = PA.PS_ID
@@ -207,10 +203,37 @@ $query = "
 		".($_GET["CB_ID"] ? "AND 0" : "")."
 		".($_GET["PS_ID"] ? "AND PS.PS_ID = {$_GET["PS_ID"]}" : "")."
 
+	UNION
+
+	SELECT NULL
+		,NULL
+		,DATE_FORMAT(LS.ls_date, '%d.%m.%Y')
+		,CB.brand
+		,SUM(pallets)
+		,NULL
+		,NULL
+		,NULL
+		,NULL
+		,NULL
+		,NULL
+		,LS.ls_date
+		,CW.CB_ID
+		,YEARWEEK(LS.ls_date, 1)
+	FROM list__Shipment LS
+	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
+	JOIN ClientBrand CB ON CB.CB_ID = CW.CB_ID
+	WHERE 1
+		".($_GET["date_from"] ? "AND LS.ls_date >= '{$_GET["date_from"]}'" : "")."
+		".($_GET["date_to"] ? "AND LS.ls_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["CB_ID"] ? "AND CW.CB_ID = {$_GET["CB_ID"]}" : "")."
+		".($_GET["PS_ID"] ? "AND 0" : "")."
+	GROUP BY CW.CB_ID, LS.ls_date
+
 	ORDER BY date, CB_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
+	$pallets_shipment += $row["pallets_shipment"];
 	$pr_cnt += $row["pr_cnt"];
 	$pr_reject += $row["pr_reject"];
 	$pr_wrong_format += $row["pr_wrong_format"];
@@ -221,17 +244,15 @@ while( $row = mysqli_fetch_array($res) ) {
 	?>
 	<tr id="<?=$row["type"]?><?=$row["ID"]?>">
 		<td><?=$row["date_format"]?></td>
-		<td><?=$row["brand"]?></td>
+		<td><span class="nowrap"><?=$row["brand"]?></span></td>
+		<td><b><a href="shipment.php?week=<?=$row["week"]?>&CB_ID=<?=$row["CB_ID"]?>" target="_blank"><?=$row["pallets_shipment"]?></a></b></td>
 		<td><b><?=$row["pr_cnt"]?></b></td>
 		<td><b style="color: red;"><?=$row["pr_reject"]?></b></td>
 		<td><b style="color: red;"><?=$row["pr_wrong_format"]?></b></td>
 		<td><b style="color: green;"><?=$row["pr_good"]?></b></td>
-		<td><span class="nowrap"><?=$row["pallet_supplier"]?></span></td>
-		<td><b><?=$row["pa_cnt"]?></b></td>
-		<td><b style="color: red;"><?=$row["pa_reject"]?></b></td>
 		<td><?=(isset($row["pallet_cost"]) ? number_format($row["pallet_cost"], 0, '', ' ') : "")?></td>
 		<td><?=(isset($row["sum_cost"]) ? number_format($row["sum_cost"], 0, '', ' ') : "")?></td>
-		<td><a href="#" <?=($row["type"] == "A" ? "class='add_arrival' PA_ID='{$row["ID"]}'" : "class='add_return' PR_ID='{$row["ID"]}'")?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
+		<td><?=($row["type"] ? "<a href='#' ".($row["type"] == "A" ? "class='add_arrival' PA_ID='{$row["ID"]}'" : "class='add_return' PR_ID='{$row["ID"]}'")." title='Редактировать'><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?></td>
 	</tr>
 	<?
 }
@@ -239,13 +260,11 @@ while( $row = mysqli_fetch_array($res) ) {
 		<tr class="total">
 			<td></td>
 			<td>Итог:</td>
+			<td><b><?=$pallets_shipment?></b></td>
 			<td><b><?=$pr_cnt?></b></td>
 			<td><b><?=$pr_reject?></b></td>
 			<td><b><?=$pr_wrong_format?></b></td>
 			<td><b><?=$pr_good?></b></td>
-			<td></td>
-			<td><b><?=$pa_cnt?></b></td>
-			<td><b><?=$pa_reject?></b></td>
 			<td></td>
 			<td><?=(isset($sum_cost) ? number_format($sum_cost, 0, '', ' ') : "")?></td>
 			<td></td>
