@@ -171,6 +171,7 @@ $query = "
 		,PR.pr_date date
 		,PR.CB_ID
 		,NULL week
+		,NULL LS_ID
 	FROM pallet__Return PR
 	JOIN ClientBrand CB ON CB.CB_ID = PR.CB_ID
 	WHERE 1
@@ -193,6 +194,7 @@ $query = "
 		,PA.pallet_cost
 		,PA.pallet_cost * PA.pa_cnt
 		,PA.pa_date
+		,NULL
 		,NULL
 		,NULL
 	FROM pallet__Arrival PA
@@ -219,6 +221,7 @@ $query = "
 		,LS.ls_date
 		,CW.CB_ID
 		,YEARWEEK(LS.ls_date, 1)
+		,LS.LS_ID
 	FROM list__Shipment LS
 	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
 	JOIN ClientBrand CB ON CB.CB_ID = CW.CB_ID
@@ -245,7 +248,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	<tr id="<?=$row["type"]?><?=$row["ID"]?>">
 		<td><?=$row["date_format"]?></td>
 		<td><span class="nowrap"><?=$row["brand"]?></span></td>
-		<td><b><a href="shipment.php?week=<?=$row["week"]?>&CB_ID=<?=$row["CB_ID"]?>" target="_blank"><?=$row["pallets_shipment"]?></a></b></td>
+		<td><b><a href="shipment.php?week=<?=$row["week"]?>&CB_ID=<?=$row["CB_ID"]?>#<?=$row["LS_ID"]?>" target="_blank"><?=$row["pallets_shipment"]?></a></b></td>
 		<td><b><?=$row["pr_cnt"]?></b></td>
 		<td><b style="color: red;"><?=$row["pr_reject"]?></b></td>
 		<td><b style="color: red;"><?=$row["pr_wrong_format"]?></b></td>
