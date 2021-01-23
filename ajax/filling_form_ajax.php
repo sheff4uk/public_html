@@ -82,6 +82,7 @@ $html .= "
 				<th rowspan='3'>Время замеса</th>
 				<th rowspan='2' width='30' style='word-wrap: break-word;'>Рецепт</th>
 				<th colspan='".(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0) + ($row["cs"] ? 1 : 0))."'>Масса куба, кг</th>
+				<th rowspan='3' width='40'>t, ℃ 25±5</th>
 				".($row["iron_oxide"] ? "<th rowspan='2'>Окалина, кг</th>" : "")."
 				".($row["sand"] ? "<th rowspan='2'>КМП, кг</th>" : "")."
 				".($row["crushed_stone"] ? "<th rowspan='2'>Отсев, кг</th>" : "")."
@@ -123,6 +124,7 @@ if( $fact_batches ) {
 			,LB.io_density
 			,LB.sn_density
 			,LB.mix_density
+			,LB.temp
 			,IFNULL(LB.iron_oxide, 0) iron_oxide
 			,IFNULL(LB.sand, 0) sand
 			,IFNULL(LB.crushed_stone, 0) crushed_stone
@@ -182,6 +184,7 @@ if( $fact_batches ) {
 				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$subrow["LB_ID"]}]' value='".($subrow["io_density"]/1000)."' style='width: 70px;' required></td>" : "")."
 				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$subrow["LB_ID"]}]' value='".($subrow["sn_density"]/1000)."' style='width: 70px;' required></td>" : "")."
 				<td><input type='number' min='2' max='4' step='0.01' name='mix_density[{$subrow["LB_ID"]}]' value='".($subrow["mix_density"]/1000)."' style='width: 70px;' required></td>
+				<td><input type='number' min='5' max='45' name='temp[{$subrow["LB_ID"]}]' value='{$subrow["temp"]}' style='width: 40px;'></td>
 				".($row["iron_oxide"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[{$subrow["LB_ID"]}]' value='{$subrow["iron_oxide"]}' style='width: 70px;' required></td>" : "")."
 				".($row["sand"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[{$subrow["LB_ID"]}]' value='{$subrow["sand"]}' style='width: 70px;' required></td>" : "")."
 				".($row["crushed_stone"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone"]}' style='width: 70px;' required></td>" : "")."
@@ -228,6 +231,7 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 			".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[n_{$i}]' style='width: 70px;' required></td>" : "")."
 			".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[n_{$i}]' style='width: 70px;' required></td>" : "")."
 			<td><input type='number' min='2' max='4' step='0.01' name='mix_density[n_{$i}]' style='width: 70px;' required></td>
+			<td><input type='number' min='5' max='45' name='temp[n_{$i}]' style='width: 40px;'></td>
 			".($row["iron_oxide"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[n_{$i}]' style='width: 70px;' required></td>" : "")."
 			".($row["sand"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[n_{$i}]' style='width: 70px;' required></td>" : "")."
 			".($row["crushed_stone"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[n_{$i}]' style='width: 70px;' required></td>" : "")."

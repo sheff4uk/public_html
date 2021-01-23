@@ -142,7 +142,7 @@ a:hover .cassette {
 form input[required],
 form select[required],
 form textarea[required] {
-	background-image: url('/img/star.png');
+	background-image: url('/img/star.png?v=2');
 	background-repeat: no-repeat;
 /*	background-position-x: right;*/
 	background-position: right;

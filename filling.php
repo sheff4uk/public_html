@@ -234,6 +234,7 @@ foreach ($_GET as &$value) {
 			<th>Дата время замеса</th>
 			<th>Рецепт</th>
 			<th>Куб раствора, кг</th>
+			<th>t, ℃ 25±5</th>
 			<th>Окалина,<br>кг ±5</th>
 			<th>КМП,<br>кг ±5</th>
 			<th>Отсев,<br>кг ±5</th>
@@ -313,6 +314,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.io_density
 			,LB.sn_density
 			,LB.mix_density
+			,LB.temp
+			,IF(ABS(25 - LB.temp) <= 5, NULL, IF(LB.temp - 25 > 5, LB.temp - 30, LB.temp - 20)) temp_diff
 			,LB.iron_oxide
 			,LB.sand
 			,LB.crushed_stone
@@ -377,6 +380,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$subrow["batch_date_format"]?> <?=$subrow["batch_time_format"]?></td>
 		<td><span class="nowrap"><?=$subrow["MF_ID"] ? "<a href='mix_formula.php#{$subrow["MF_ID"]}' target='_blank'><b>{$subrow["letter"]}</b></a> " : "<i class='fas fa-exclamation-triangle' style='color: red;' title='Подходящий рецепт не обнаружен'></i> "?><?=($subrow["io_density"] ? "<i title='Плотность окалины' style='text-decoration: underline; background: #a52a2a80;'>".($subrow["io_density"]/1000)."</i> " : "")?><?=($subrow["sn_density"] ? "<i title='Плотность КМП' style='text-decoration: underline; background: #f4a46082;'>".($subrow["sn_density"]/1000)."</i> " : "")?></span></td>
 				<td><?=$subrow["mix_density"]/1000?> <?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
+				<td><?=$subrow["temp"]?>℃<?=($subrow["temp_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["temp_diff"] > 0 ? " +" : " ").($subrow["temp_diff"])."</font>" : "")?></td>
 				<td style="background: #a52a2a80; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
 				<td style="background: #f4a46082; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["sand"]?><?=($subrow["sn_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sn_diff"] > 0 ? " +" : " ").($subrow["sn_diff"])."</font>" : "")?></td>
 				<td style="background: #8b45137a; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>

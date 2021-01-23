@@ -125,7 +125,8 @@ $row = mysqli_fetch_array($res);
 			<th rowspan="3" width="30">№<br>п/п</th>
 			<th rowspan="3">Время замеса</th>
 			<th rowspan="2" width="40" style="word-wrap: break-word;">Рецепт</th>
-			<th colspan="<?=(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0))?>" style="border-right: 4px solid;">Масса куба, кг</th>
+			<th colspan="<?=(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0))?>">Масса куба, кг</th>
+			<th rowspan="3" width="30" style="border-right: 4px solid;">t, ℃ 25±5</th>
 			<?=($row["io_cnt"] ? "<th rowspan='2'>Окалина, кг</th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th rowspan='2'>КМП, кг</th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th rowspan='2'>Отсев, кг</th>" : "")?>
@@ -139,13 +140,13 @@ $row = mysqli_fetch_array($res);
 		<tr>
 			<?=(($row["io"] ? "<th>Окалины</th>" : ""))?>
 			<?=(($row["sn"] ? "<th>КМП</th>" : ""))?>
-			<th style="border-right: 4px solid;">Раствора</th>
+			<th>Раствора</th>
 		</tr>
 		<tr>
 			<th><?=$row["ltr"]?></th>
 			<?=(($row["io"] ? "<th class='nowrap'>{$row["io"]}</th>" : ""))?>
 			<?=(($row["sn"] ? "<th class='nowrap'>{$row["sn"]}</th>" : ""))?>
-			<th class="nowrap" style="border-right: 4px solid;"><?=$spec?></th>
+			<th class="nowrap"><?=$spec?></th>
 			<?=($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")?>
@@ -168,6 +169,7 @@ for ($i = 1; $i <= $batches; $i++) {
 			<td></td>
 			".($row["io"] ? "<td></td>" : "")."
 			".($row["sn"] ? "<td></td>" : "")."
+			<td></td>
 			<td style='border-right: 4px solid;'></td>
 			".($row["io_cnt"] ? "<td></td>" : "")."
 			".($row["sn_cnt"] ? "<td></td>" : "")."

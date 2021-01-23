@@ -25,6 +25,7 @@ if( isset($_POST["PB_ID"]) ) {
 			$io_density = $_POST["io_density"][$key] ? $_POST["io_density"][$key]*1000 : "NULL";
 			$sn_density = $_POST["sn_density"][$key] ? $_POST["sn_density"][$key]*1000 : "NULL";
 			$mix_density = $_POST["mix_density"][$key]*1000;
+			$temp = $_POST["temp"][$key] ? $_POST["temp"][$key] : "NULL";
 			$iron_oxide = $_POST["iron_oxide"][$key] ? $_POST["iron_oxide"][$key] : "NULL";
 			$sand = $_POST["sand"][$key] ? $_POST["sand"][$key] : "NULL";
 			$crushed_stone = $_POST["crushed_stone"][$key] ? $_POST["crushed_stone"][$key] : "NULL";
@@ -52,6 +53,7 @@ if( isset($_POST["PB_ID"]) ) {
 						,io_density = {$io_density}
 						,sn_density = {$sn_density}
 						,mix_density = {$mix_density}
+						,temp = {$temp}
 						,iron_oxide = {$iron_oxide}
 						,sand = {$sand}
 						,crushed_stone = {$crushed_stone}
@@ -84,6 +86,7 @@ if( isset($_POST["PB_ID"]) ) {
 						,io_density = {$io_density}
 						,sn_density = {$sn_density}
 						,mix_density = {$mix_density}
+						,temp = {$temp}
 						,iron_oxide = {$iron_oxide}
 						,sand = {$sand}
 						,crushed_stone = {$crushed_stone}
