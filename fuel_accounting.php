@@ -89,14 +89,16 @@ echo "<h3>Баланс дизтоплива: <span style='font-size: 2em; color:
 					<option value=""></option>
 					<?
 					$query = "
-						SELECT FD.FD_ID, FD.fuel_device
+						SELECT FD.FD_ID
+							,FD.fuel_device
+							,CONCAT(' (', FD.last_hour_meter_value, ' м/ч)') last_hour_meter_value
 						FROM fuel__Device FD
 						ORDER BY FD.FD_ID
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) ) {
 						$selected = ($row["FD_ID"] == $_GET["FD_ID"]) ? "selected" : "";
-						echo "<option value='{$row["FD_ID"]}' {$selected}>{$row["fuel_device"]}</option>";
+						echo "<option value='{$row["FD_ID"]}' {$selected}>{$row["fuel_device"]}{$row["last_hour_meter_value"]}</option>";
 					}
 					?>
 				</select>
