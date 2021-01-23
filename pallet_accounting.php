@@ -329,8 +329,8 @@ while( $row = mysqli_fetch_array($res) ) {
 	</table>
 </div>
 
-<div id="pallet_arrival_btn" class="add_arrival" pa_date="<?=$_GET["pa_date"]?>" title="Приобретение поддонов"><i class="fas fa-2x fa-plus"></i></div>
-<div id="pallet_return_btn" class="add_return" pr_date="<?=$_GET["pr_date"]?>" title="Возврат поддонов"><i class="fas fa-2x fa-undo-alt"></i></div>
+<div id="pallet_arrival_btn" class="add_arrival" title="Приобретение поддонов"><i class="fas fa-2x fa-plus"></i></div>
+<div id="pallet_return_btn" class="add_return" title="Возврат поддонов"><i class="fas fa-2x fa-undo-alt"></i></div>
 
 <?
 include "footer.php";

@@ -48,12 +48,7 @@ if( isset($_POST["pr_cnt"]) ) {
 	}
 
 	// Перенаправление в журнал
-	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$pr_date.'&date_to='.$pr_date.'&pr_date='.$pr_date.'&add#R'.$PR_ID.'">');
-	}
-	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$pr_date.'&date_to='.$pr_date.'#R'.$PR_ID.'">');
-	}
+	exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$pr_date.'&date_to='.$pr_date.'#R'.$PR_ID.'">');
 }
 
 // Сохранение/редактирование приобретения поддонов
@@ -103,12 +98,7 @@ if( isset($_POST["pa_cnt"]) ) {
 	}
 
 	// Перенаправление в журнал
-	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$pa_date.'&date_to='.$pa_date.'&pa_date='.$pa_date.'&add#A'.$PA_ID.'">');
-	}
-	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$pa_date.'&date_to='.$pa_date.'#A'.$PA_ID.'">');
-	}
+	exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$pa_date.'&date_to='.$pa_date.'#A'.$PA_ID.'">');
 }
 ?>
 
@@ -232,8 +222,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
-			var PR_ID = $(this).attr("PR_ID"),
-				pr_date = $(this).attr("pr_date");
+			var PR_ID = $(this).attr("PR_ID");
 
 			// В случае редактирования заполняем форму
 			if( PR_ID ) {
@@ -255,7 +244,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Иначе очищаем форму
 			else {
 				$('#pallet_return_form input[name="PR_ID"]').val('');
-				$('#pallet_return_form input[name="pr_date"]').val(pr_date);
+				$('#pallet_return_form input[name="pr_date"]').val('');
 				$('#pallet_return_form table input').val('');
 				$('#pallet_return_form table select').val('');
 			}
@@ -275,8 +264,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
-			var PA_ID = $(this).attr("PA_ID"),
-				pa_date = $(this).attr("pa_date");
+			var PA_ID = $(this).attr("PA_ID");
 
 			// В случае редактирования заполняем форму
 			if( PA_ID ) {
@@ -298,7 +286,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Иначе очищаем форму
 			else {
 				$('#pallet_arrival_form input[name="PA_ID"]').val('');
-				$('#pallet_arrival_form input[name="pa_date"]').val(pa_date);
+				$('#pallet_arrival_form input[name="pa_date"]').val('');
 				$('#pallet_arrival_form table input').val('');
 				$('#pallet_return_form table select').val('');
 			}

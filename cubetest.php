@@ -300,6 +300,7 @@ foreach ($_GET as &$value) {
 			<th>Масса испытуемого куба, кг</th>
 			<th>Давление, МПа</th>
 			<th>Выдержка в часах</th>
+			<th>Автор</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -323,7 +324,7 @@ $query = "
 		,LCT.pressure
 		,IF(LCT.delay = 24, IF(LCT.pressure < 20, 1, 0), IF(LCT.pressure < 30, 1, 0)) press_error
 		,IF(LCT.USR_ID, USR_Icon(LCT.USR_ID), '') USR_Icon
-		,DATE_FORMAT(LCT.last_edit, '%d.%m.%y в %H:%i:%s') last_edit
+		,DATE_FORMAT(LCT.last_edit, '%d.%m.%Y в %H:%i:%s') last_edit
 	FROM list__CubeTest LCT
 	JOIN list__Batch LB ON LB.LB_ID = LCT.LB_ID
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
@@ -352,7 +353,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["cube_weight"]/1000?></td>
 		<td class="<?=($row["press_error"] ? "error" : "")?>"><?=$row["pressure"]?></td>
 		<td class="<?=($row["delay_fact"] != $row["delay"] ? "error" : "")?>"><?=$row["delay_fact"]?></td>
-		<td><a href="#" class="add_cubetest" LCT_ID="<?=$row["LCT_ID"]?>" title="Изменить данные испытания куба"><i class="fa fa-pencil-alt fa-lg"></i></a><?=$row["USR_Icon"]?><?=($row["last_edit"] ? "<i class='fas fa-clock' title='Сохранено ".$row["last_edit"]."'.></i>" : "")?></td>
+		<td><?=$row["USR_Icon"]?><?=($row["last_edit"] ? "<i class='fas fa-clock' title='Сохранено ".$row["last_edit"]."'.></i>" : "")?></td>
+		<td><a href="#" class="add_cubetest" LCT_ID="<?=$row["LCT_ID"]?>" title="Изменить данные испытания куба"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?
 }

@@ -207,6 +207,7 @@ function src_url($src) {
 		$menu["Учет"]["Поддоны противовесов"] = "pallet_accounting.php";
 		$menu["Учет"]["Сырьё/комплектующие"] = "material_accounting.php";
 		$menu["Учет"]["<i class='fas fa-th fa-lg'></i> Формы"] = "shell_accounting.php";
+		$menu["Учет"]["<i class='fas fa-gas-pump fa-lg'></i> Дизтопливо"] = "fuel_accounting.php";
 		$menu["<i class='fas fa-cog fa-lg'></i>"]["Рецепты"] = "mix_formula.php";
 		$menu["Выход {$USR_Icon}"] = "exit.php";
 	}
