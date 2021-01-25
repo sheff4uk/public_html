@@ -28,13 +28,14 @@ elseif( isset($_GET["SA_ID"]) ) {
 		SELECT SA.sa_date
 			,SA.CW_ID
 			,SA.sa_cnt
+			,SA.actual_volume
 			,SA.batch_number
 		FROM shell__Arrival SA
 		WHERE SA.SA_ID = {$SA_ID}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$SA_data = array( "sa_date"=>$row["sa_date"], "CW_ID"=>$row["CW_ID"], "sa_cnt"=>$row["sa_cnt"], "batch_number"=>$row["batch_number"] );
+	$SA_data = array( "sa_date"=>$row["sa_date"], "CW_ID"=>$row["CW_ID"], "sa_cnt"=>$row["sa_cnt"], "actual_volume"=>$row["actual_volume"]/1000, "batch_number"=>$row["batch_number"] );
 
 	echo json_encode($SA_data);
 }

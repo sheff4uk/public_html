@@ -68,6 +68,7 @@ if( isset($_POST["sa_cnt"]) ) {
 	$sa_date = $_POST["sa_date"];
 	$CW_ID = $_POST["CW_ID"];
 	$sa_cnt = $_POST["sa_cnt"];
+	$actual_volume = $_POST["actual_volume"] ? $_POST["actual_volume"] * 1000 : "NULL";
 	$batch_number = $_POST["batch_number"] ? $_POST["batch_number"] : "NULL";
 
 	if( $_POST["SA_ID"] ) { // Редактируем
@@ -76,6 +77,7 @@ if( isset($_POST["sa_cnt"]) ) {
 			SET sa_date = '{$sa_date}'
 				,CW_ID = {$CW_ID}
 				,sa_cnt = {$sa_cnt}
+				,actual_volume = {$actual_volume}
 				,batch_number = {$batch_number}
 			WHERE SA_ID = {$_POST["SA_ID"]}
 		";
@@ -90,6 +92,7 @@ if( isset($_POST["sa_cnt"]) ) {
 			SET sa_date = '{$sa_date}'
 				,CW_ID = {$CW_ID}
 				,sa_cnt = {$sa_cnt}
+				,actual_volume = {$actual_volume}
 				,batch_number = {$batch_number}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -196,6 +199,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th>Противовес</th>
 						<th>Пришедших форм</th>
+						<th>Объем, л</th>
 						<th>№ партии</th>
 					</tr>
 				</thead>
@@ -218,6 +222,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							</select>
 						</td>
 						<td><input type="number" name="sa_cnt" min="1" style="width: 70px;" required></td>
+						<td><input type="number" name="actual_volume" min="2" max="6" step="0.01" style="width: 70px;"></td>
 						<td><input type="number" name="batch_number" min="1" style="width: 120px;"></td>
 					</tr>
 				</tbody>
@@ -299,6 +304,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#shell_arrival_form input[name="sa_date"]').val(SA_data['sa_date']);
 				$('#shell_arrival_form select[name="CW_ID"]').val(SA_data['CW_ID']);
 				$('#shell_arrival_form input[name="sa_cnt"]').val(SA_data['sa_cnt']);
+				$('#shell_arrival_form input[name="actual_volume"]').val(SA_data['actual_volume']);
 				$('#shell_arrival_form input[name="batch_number"]').val(SA_data['batch_number']);
 			}
 			// Иначе очищаем форму

@@ -160,6 +160,8 @@ foreach ($_GET as &$value) {
 			<th>Дата</th>
 			<th>Противовес</th>
 			<th>Пришедших форм</th>
+			<th>Объем (факт), л</th>
+			<th>Объем (по чертежу), л</th>
 			<th>Списанных форм</th>
 			<th>Отслоения</th>
 			<th>Трещины</th>
@@ -177,6 +179,8 @@ $query = "
 		,DATE_FORMAT(SA.sa_date, '%d.%m.%Y') date_format
 		,CW.item
 		,SA.sa_cnt
+		,SA.actual_volume
+		,CW.drawing_volume
 		,NULL sr_cnt
 		,NULL exfolation
 		,NULL crack
@@ -198,7 +202,9 @@ $query = "
 		,SR.SR_ID ID
 		,DATE_FORMAT(SR.sr_date, '%d.%m.%Y') date_format
 		,CW.item
-		,NULL sa_cnt
+		,NULL
+		,NULL
+		,NULL
 		,SR.sr_cnt
 		,SR.exfolation
 		,SR.crack
@@ -228,6 +234,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["date_format"]?></td>
 		<td><?=$row["item"]?></td>
 		<td><b style="color: green;"><?=$row["sa_cnt"]?></b></td>
+		<td><?=($row["actual_volume"] ? $row["actual_volume"]/1000 : "")?></td>
+		<td><?=($row["drawing_volume"] ? $row["drawing_volume"]/1000 : "")?></td>
 		<td><b style="color: red;"><?=$row["sr_cnt"]?></b></td>
 		<td><?=$row["exfolation"]?></td>
 		<td><?=$row["crack"]?></td>
@@ -242,6 +250,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td></td>
 			<td>Итог:</td>
 			<td><b><?=$sa_cnt?></b></td>
+			<td></td>
+			<td></td>
 			<td><b><?=$sr_cnt?></b></td>
 			<td><?=$exfolation?></td>
 			<td><?=$crack?></td>
