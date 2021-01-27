@@ -63,13 +63,6 @@ echo "<h3>Баланс дизтоплива: <span style='font-size: 2em; color:
 	#fuel_arrival_btn:hover, #fuel_filling_btn:hover {
 		opacity: 1;
 	}
-
-	.meter_value, .meter_value:hover {
-		background: #333 !important;
-		color: #fff;
-		padding: 2px !important;
-		border-radius: 5px;
-	}
 </style>
 
 <!--Фильтр-->
@@ -219,11 +212,11 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["date_format"]?></td>
 		<td><?=$row["time_format"]?></td>
 		<td><b><?=$row["fa_cnt"]?></b></td>
-		<td><span class="meter_value"><?=$row["fuel_meter_before"]?></span></td>
-		<td><span class="meter_value"><?=$row["fuel_meter_value"]?></span></td>
+		<td><span><?=$row["fuel_meter_before"]?></span></td>
+		<td><span><?=$row["fuel_meter_value"]?></span></td>
 		<td><b><?=$row["ff_cnt"]?></b></td>
 		<td><span class="nowrap"><?=$row["fuel_device"]?></span></td>
-		<td><span class="meter_value"><?=$row["hour_meter_value"]?></span></td>
+		<td><span><?=$row["hour_meter_value"]?></span></td>
 		<td><?=$row["hours_cnt"]?></td>
 		<td><?=$row["USR_Icon"]?><?=($row["last_edit"] ? "<i class='fas fa-clock' title='Сохранено ".$row["last_edit"]."'.></i>" : "")?></td>
 		<td><a href="#" <?=($row["type"] == "A" ? "class='add_arrival' FA_ID='{$row["ID"]}'" : ($row["last"] ? "class='add_filling' FF_ID='{$row["ID"]}'" : "style='display: none;'"))?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
