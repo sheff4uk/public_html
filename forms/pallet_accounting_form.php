@@ -48,7 +48,14 @@ if( isset($_POST["pr_cnt"]) ) {
 	}
 
 	// Перенаправление в журнал
-	exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$pr_date.'&date_to='.$pr_date.'#R'.$PR_ID.'">');
+	$date_edit = date_create($pr_date);
+	$date_from = date_create($_POST["date_from"]);
+	$date_to = date_create($_POST["date_to"]);
+	$date_from = min($date_from, $date_edit);
+	$date_to = max($date_to, $date_edit);
+	$date_from = date_format($date_from, 'Y-m-d');
+	$date_to = date_format($date_to, 'Y-m-d');
+	exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#R'.$PR_ID.'">');
 }
 
 // Сохранение/редактирование приобретения поддонов
@@ -98,7 +105,14 @@ if( isset($_POST["pa_cnt"]) ) {
 	}
 
 	// Перенаправление в журнал
-	exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$pa_date.'&date_to='.$pa_date.'#A'.$PA_ID.'">');
+	$date_edit = date_create($pa_date);
+	$date_from = date_create($_POST["date_from"]);
+	$date_to = date_create($_POST["date_to"]);
+	$date_from = min($date_from, $date_edit);
+	$date_to = max($date_to, $date_edit);
+	$date_from = date_format($date_from, 'Y-m-d');
+	$date_to = date_format($date_to, 'Y-m-d');
+	exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#A'.$PA_ID.'">');
 }
 ?>
 
@@ -116,6 +130,8 @@ if( isset($_POST["pa_cnt"]) ) {
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="PR_ID">
+			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
+			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
 
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 				<span>Дата возврата:</span>
@@ -168,6 +184,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="PA_ID">
+			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
+			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
 
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 				<span>Дата приобретения:</span>

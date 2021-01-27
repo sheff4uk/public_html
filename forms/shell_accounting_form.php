@@ -53,11 +53,12 @@ if( isset($_POST["sr_cnt"]) ) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 
-	// Перенаправление в журнал +-7 дней диапазон дат
-	$date_from = new DateTime($sr_date);
-	$date_to = new DateTime($sr_date);
-	date_modify($date_from, '-7 day');
-	date_modify($date_to, '+7 day');
+	// Перенаправление в журнал
+	$date_edit = date_create($sr_date);
+	$date_from = date_create($_POST["date_from"]);
+	$date_to = date_create($_POST["date_to"]);
+	$date_from = min($date_from, $date_edit);
+	$date_to = max($date_to, $date_edit);
 	$date_from = date_format($date_from, 'Y-m-d');
 	$date_to = date_format($date_to, 'Y-m-d');
 	exit ('<meta http-equiv="refresh" content="0; url=/shell_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#R'.$SR_ID.'">');
@@ -109,11 +110,12 @@ if( isset($_POST["sa_cnt"]) ) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 
-	// Перенаправление в журнал +-7 дней диапазон дат
-	$date_from = new DateTime($sa_date);
-	$date_to = new DateTime($sa_date);
-	date_modify($date_from, '-7 day');
-	date_modify($date_to, '+7 day');
+	// Перенаправление в журнал
+	$date_edit = date_create($sa_date);
+	$date_from = date_create($_POST["date_from"]);
+	$date_to = date_create($_POST["date_to"]);
+	$date_from = min($date_from, $date_edit);
+	$date_to = max($date_to, $date_edit);
 	$date_from = date_format($date_from, 'Y-m-d');
 	$date_to = date_format($date_to, 'Y-m-d');
 	exit ('<meta http-equiv="refresh" content="0; url=/shell_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#A'.$SA_ID.'">');
@@ -134,6 +136,8 @@ if( isset($_POST["sa_cnt"]) ) {
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="SR_ID">
+			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
+			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
 
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 				<span>Дата списания:</span>
@@ -190,6 +194,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="SA_ID">
+			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
+			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
 
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 				<span>Дата прихода:</span>

@@ -7,11 +7,11 @@ include "./forms/packing_form.php";
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 	if( !$_GET["p_date_from"] ) {
-		$date = new DateTime('-6 days');
+		$date = date_create('-6 days');
 		$_GET["p_date_from"] = date_format($date, 'Y-m-d');
 	}
 	if( !$_GET["p_date_to"] ) {
-		$date = new DateTime('-0 days');
+		$date = date_create('-0 days');
 		$_GET["p_date_to"] = date_format($date, 'Y-m-d');
 	}
 }

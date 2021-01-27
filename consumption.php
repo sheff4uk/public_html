@@ -5,11 +5,11 @@ include "header.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["date_from"] ) {
-	$date = new DateTime('-6 days');
+	$date = date_create('-6 days');
 	$_GET["date_from"] = date_format($date, 'Y-m-d');
 }
 if( !$_GET["date_to"] ) {
-	$date = new DateTime('-0 days');
+	$date = date_create('-0 days');
 	$_GET["date_to"] = date_format($date, 'Y-m-d');
 }
 ?>

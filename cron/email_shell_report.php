@@ -8,7 +8,7 @@ include $path."/config.php";
 // Проверка доступа
 if( $key != $script_key ) die('Access denied!');
 
-$date = new DateTime();
+$date = date_create();
 $sr_date_format = date_format($date, 'd/m/Y');
 $subject = "[KONSTANTA] Shell report on {$sr_date_format}";
 

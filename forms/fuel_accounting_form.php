@@ -50,11 +50,12 @@ if( isset($_POST["fuel_meter_value"]) ) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 
-	// Перенаправление в журнал +-7 дней диапазон дат
-	$date_from = new DateTime($ff_date);
-	$date_to = new DateTime($ff_date);
-	date_modify($date_from, '-7 day');
-	date_modify($date_to, '+7 day');
+	// Перенаправление в журнал
+	$date_edit = date_create($ff_date);
+	$date_from = date_create($_POST["date_from"]);
+	$date_to = date_create($_POST["date_to"]);
+	$date_from = min($date_from, $date_edit);
+	$date_to = max($date_to, $date_edit);
 	$date_from = date_format($date_from, 'Y-m-d');
 	$date_to = date_format($date_to, 'Y-m-d');
 	exit ('<meta http-equiv="refresh" content="0; url=/fuel_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#F'.$FF_ID.'">');
@@ -103,11 +104,12 @@ if( isset($_POST["fa_cnt"]) ) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 
-	// Перенаправление в журнал +-7 дней диапазон дат
-	$date_from = new DateTime($fa_date);
-	$date_to = new DateTime($fa_date);
-	date_modify($date_from, '-7 day');
-	date_modify($date_to, '+7 day');
+	// Перенаправление в журнал
+	$date_edit = date_create($fa_date);
+	$date_from = date_create($_POST["date_from"]);
+	$date_to = date_create($_POST["date_to"]);
+	$date_from = min($date_from, $date_edit);
+	$date_to = max($date_to, $date_edit);
 	$date_from = date_format($date_from, 'Y-m-d');
 	$date_to = date_format($date_to, 'Y-m-d');
 	exit ('<meta http-equiv="refresh" content="0; url=/fuel_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#A'.$FA_ID.'">');
@@ -154,6 +156,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="FF_ID">
 			<input type="hidden" name="FT_ID" value="<?=$FT_ID?>">
+			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
+			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
@@ -213,6 +217,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="FA_ID">
 			<input type="hidden" name="FT_ID" value="<?=$FT_ID?>">
+			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
+			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>

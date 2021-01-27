@@ -8,7 +8,7 @@ include "../config.php";
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <?
-$date = new DateTime();
+$date = date_create();
 $sr_date_format = date_format($date, 'd/m/Y');
 
 echo "<title>Shells report on {$sr_date_format}</title>";

@@ -7,11 +7,11 @@ include "./forms/cubetest_form.php";
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 	if( !$_GET["date_from"] ) {
-		$date = new DateTime('-6 days');
+		$date = date_create('-6 days');
 		$_GET["date_from"] = date_format($date, 'Y-m-d');
 	}
 	if( !$_GET["date_to"] ) {
-		$date = new DateTime('-0 days');
+		$date = date_create('-0 days');
 		$_GET["date_to"] = date_format($date, 'Y-m-d');
 	}
 }
@@ -114,10 +114,10 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 				AND LCT.LCT_ID IS NULL
 			ORDER BY test_date_time
 		";
-		$now = new DateTime("now");
+		$now = date_create("now");
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
-			$test_date_time = new DateTime($row["test_date_time"]);
+			$test_date_time = date_create($row["test_date_time"]);
 			$error = $test_date_time < $now ? "error" : "";
 			?>
 			<tr>
