@@ -3,7 +3,6 @@ include "config.php";
 $title = 'Учет дизтоплива';
 include "header.php";
 $FT_ID = 1; // Номер топливной цистерны
-include "./forms/fuel_accounting_form.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["date_from"] ) {
@@ -14,6 +13,8 @@ if( !$_GET["date_to"] ) {
 	$date = date_create('-0 days');
 	$_GET["date_to"] = date_format($date, 'Y-m-d');
 }
+
+include "./forms/fuel_accounting_form.php";
 
 // Узнаем баланс топлива
 $query = "

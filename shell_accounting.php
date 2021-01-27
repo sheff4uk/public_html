@@ -2,7 +2,6 @@
 include "config.php";
 $title = 'Списание форм';
 include "header.php";
-include "./forms/shell_accounting_form.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["date_from"] ) {
@@ -13,6 +12,8 @@ if( !$_GET["date_to"] ) {
 	$date = date_create('-0 days');
 	$_GET["date_to"] = date_format($date, 'Y-m-d');
 }
+
+include "./forms/shell_accounting_form.php";
 ?>
 
 <style>
