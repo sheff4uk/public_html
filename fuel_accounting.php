@@ -91,7 +91,7 @@ echo "<h3>Баланс дизтоплива: <span style='font-size: 2em; color:
 					$query = "
 						SELECT FD.FD_ID
 							,FD.fuel_device
-							,CONCAT(' (', FD.last_hour_meter_value, ' м/ч)') last_hour_meter_value
+							,CONCAT(' (пробег: ', FD.last_hour_meter_value, ')') last_hour_meter_value
 						FROM fuel__Device FD
 						ORDER BY FD.FD_ID
 					";
@@ -144,7 +144,7 @@ foreach ($_GET as &$value) {
 			<th>Показания счетчика после заправки</th>
 			<th>Кол-во заправленного топлива</th>
 			<th>Техника</th>
-			<th>Показания счетчика м/ч на момент заправки</th>
+			<th>Показания счетчика пробега на момент заправки</th>
 			<th>Пробег с последней заправки</th>
 			<th>Автор</th>
 			<th></th>

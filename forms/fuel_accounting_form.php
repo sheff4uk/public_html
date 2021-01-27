@@ -163,7 +163,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Показания счетчика после заправки</th>
 						<th>Кол-во заправленного топлива</th>
 						<th>Техника</th>
-						<th>Показания счетчика м/ч на момент заправки</th>
+						<th>Показания счетчика пробега на момент заправки</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -183,7 +183,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 								$query = "
 									SELECT FD.FD_ID
 										,FD.fuel_device
-										,CONCAT(' (', FD.last_hour_meter_value, ' м/ч)') last_hour_meter_value
+										,CONCAT(' (пробег: ', FD.last_hour_meter_value, ')') last_hour_meter_value
 									FROM fuel__Device FD
 									ORDER BY FD.FD_ID
 								";
