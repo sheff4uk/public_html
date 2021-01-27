@@ -53,13 +53,14 @@ if( isset($_POST["sr_cnt"]) ) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 
-	// Перенаправление в журнал
-	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/shell_accounting.php?date_from='.$sr_date.'&date_to='.$sr_date.'&sr_date='.$sr_date.'&add#R'.$SR_ID.'">');
-	}
-	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/shell_accounting.php?date_from='.$sr_date.'&date_to='.$sr_date.'#R'.$SR_ID.'">');
-	}
+	// Перенаправление в журнал +-7 дней диапазон дат
+	$date_from = new DateTime($sr_date);
+	$date_to = new DateTime($sr_date);
+	date_modify($date_from, '-7 day');
+	date_modify($date_to, '+7 day');
+	$date_from = date_format($date_from, 'Y-m-d');
+	$date_to = date_format($date_to, 'Y-m-d');
+	exit ('<meta http-equiv="refresh" content="0; url=/shell_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#R'.$SR_ID.'">');
 }
 
 // Сохранение/редактирование прихода
@@ -108,13 +109,14 @@ if( isset($_POST["sa_cnt"]) ) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 
-	// Перенаправление в журнал
-	if( $add ) {
-		exit ('<meta http-equiv="refresh" content="0; url=/shell_accounting.php?date_from='.$sa_date.'&date_to='.$sa_date.'&sa_date='.$sa_date.'&add#A'.$SA_ID.'">');
-	}
-	else {
-		exit ('<meta http-equiv="refresh" content="0; url=/shell_accounting.php?date_from='.$sa_date.'&date_to='.$sa_date.'#A'.$SA_ID.'">');
-	}
+	// Перенаправление в журнал +-7 дней диапазон дат
+	$date_from = new DateTime($sa_date);
+	$date_to = new DateTime($sa_date);
+	date_modify($date_from, '-7 day');
+	date_modify($date_to, '+7 day');
+	$date_from = date_format($date_from, 'Y-m-d');
+	$date_to = date_format($date_to, 'Y-m-d');
+	exit ('<meta http-equiv="refresh" content="0; url=/shell_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#A'.$SA_ID.'">');
 }
 ?>
 
@@ -267,7 +269,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Иначе очищаем форму
 			else {
 				$('#shell_reject_form input[name="SR_ID"]').val('');
-				$('#shell_reject_form input[name="sr_date"]').val(sr_date);
+				$('#shell_reject_form input[name="sr_date"]').val('');
 				$('#shell_reject_form table input').val('');
 				$('#shell_reject_form table select').val('');
 			}
@@ -310,7 +312,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Иначе очищаем форму
 			else {
 				$('#shell_arrival_form input[name="SA_ID"]').val('');
-				$('#shell_arrival_form input[name="sa_date"]').val(sa_date);
+				$('#shell_arrival_form input[name="sa_date"]').val('');
 				$('#shell_arrival_form table input').val('');
 				$('#shell_arrival_form table select').val('');
 			}

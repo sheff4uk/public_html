@@ -51,8 +51,8 @@ if( isset($_POST["fuel_meter_value"]) ) {
 	}
 
 	// Перенаправление в журнал +-7 дней диапазон дат
-	$date_from = date_create(date($ff_date, 'Y-m-d'));
-	$date_to = date_create(date($ff_date, 'Y-m-d'));
+	$date_from = new DateTime($ff_date);
+	$date_to = new DateTime($ff_date);
 	date_modify($date_from, '-7 day');
 	date_modify($date_to, '+7 day');
 	$date_from = date_format($date_from, 'Y-m-d');
@@ -104,8 +104,8 @@ if( isset($_POST["fa_cnt"]) ) {
 	}
 
 	// Перенаправление в журнал +-7 дней диапазон дат
-	$date_from = date_create(date($fa_date, 'Y-m-d'));
-	$date_to = date_create(date($fa_date, 'Y-m-d'));
+	$date_from = new DateTime($fa_date);
+	$date_to = new DateTime($fa_date);
 	date_modify($date_from, '-7 day');
 	date_modify($date_to, '+7 day');
 	$date_from = date_format($date_from, 'Y-m-d');

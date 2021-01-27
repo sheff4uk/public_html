@@ -349,8 +349,8 @@ while( $row = mysqli_fetch_array($res) ) {
 
 <!--<div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_accounting_report.php?CB_ID=2" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>-->
 
-<div id="shell_arrival_btn" class="add_arrival" sa_date="<?=$_GET["sa_date"]?>" title="Приход форм"><i class="fas fa-2x fa-plus"></i></div>
-<div id="shell_reject_btn" class="add_reject" sr_date="<?=$_GET["sr_date"]?>" title="Списание форм"><i class="fas fa-2x fa-minus"></i></div>
+<div id="shell_arrival_btn" class="add_arrival" title="Приход форм"><i class="fas fa-2x fa-plus"></i></div>
+<div id="shell_reject_btn" class="add_reject" title="Списание форм"><i class="fas fa-2x fa-minus"></i></div>
 
 <script>
 	$(function() {
