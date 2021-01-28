@@ -42,6 +42,150 @@ while( $row = mysqli_fetch_array($res) ) {
 	<div></div>
 </fieldset>
 
+<!--Фильтр-->
+<div id="filter">
+	<h3>Фильтр</h3>
+	<form method="get" style="position: relative;">
+		<a href="/opening.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Неделя:</span>
+			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
+					UNION
+					SELECT LEFT(YEARWEEK(o_date, 1), 4) year
+					FROM list__Opening
+					ORDER BY year DESC
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					echo "<optgroup label='{$row["year"]}'>";
+					$query = "
+						SELECT SUB.week
+							,SUB.week_format
+							,SUB.WeekStart
+							,SUB.WeekEnd
+						FROM (
+							SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
+								,YEARWEEK(CURDATE(), 1) week
+								,RIGHT(YEARWEEK(CURDATE(), 1), 2) week_format
+								,DATE_FORMAT(ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())), '%e %b') WeekStart
+								,DATE_FORMAT(ADDDATE(CURDATE(), 6-WEEKDAY(CURDATE())), '%e %b') WeekEnd
+							UNION
+							SELECT LEFT(YEARWEEK(o_date, 1), 4) year
+								,YEARWEEK(o_date, 1) week
+								,RIGHT(YEARWEEK(o_date, 1), 2) week_format
+								,DATE_FORMAT(ADDDATE(o_date, 0-WEEKDAY(o_date)), '%e %b') WeekStart
+								,DATE_FORMAT(ADDDATE(o_date, 6-WEEKDAY(o_date)), '%e %b') WeekEnd
+							FROM list__Opening
+							WHERE LEFT(YEARWEEK(o_date, 1), 4) = {$row["year"]}
+							GROUP BY week
+						) SUB
+						WHERE SUB.year = {$row["year"]}
+						ORDER BY SUB.week DESC
+					";
+					$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $subrow = mysqli_fetch_array($subres) ) {
+						$selected = ($subrow["week"] == $_GET["week"]) ? "selected" : "";
+						echo "<option value='{$subrow["week"]}' {$selected}>{$subrow["week_format"]} [{$subrow["WeekStart"]} - {$subrow["WeekEnd"]}]</option>";
+					}
+					echo "</optgroup>";
+				}
+				?>
+			</select>
+			<i class="fas fa-question-circle" title="По умолчанию устанавливается текущая неделя."></i>
+		</div>
+
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>Бренд:</span>
+			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT CB.CB_ID, CB.brand
+					FROM ClientBrand CB
+					ORDER BY CB.CB_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
+					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>№№ Кассет:</span>
+			<select name="CAS[]" class="<?=$_GET["CAS"] ? "filtered" : ""?>" style="width: 350px;" multiple>
+				<?
+				for ($i = 1; $i <= $cassetts; $i++) {
+					$selected = in_array($i, $_GET["CAS"]) ? "selected" : "";
+					echo "<option value='{$i}' {$selected}>{$i}</option>";
+				}
+				?>
+			</select>
+		</div>
+
+		<div style="margin-bottom: 10px;">
+			<fieldset>
+				<legend>Нарушение тех. процесса:</legend>
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["int24"] ? "filtered" : ""?>">
+						Менее 24 часов с момента заливки:
+						<input type="checkbox" name="int24" value="1" <?=$_GET["int24"] ? "checked" : ""?>>
+					</label>
+				</div>
+
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["not_spec"] ? "filtered" : ""?>">
+						Несоответствие по весу:
+						<input type="checkbox" name="not_spec" value="1" <?=$_GET["not_spec"] ? "checked" : ""?>>
+					</label>
+				</div>
+			</fieldset>
+		</div>
+
+		<div style="margin-bottom: 10px;">
+			<fieldset>
+				<legend>Брак:</legend>
+
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["not_spill"] ? "filtered" : ""?>">
+						Непролив:
+						<input type="checkbox" name="not_spill" value="1" <?=$_GET["not_spill"] ? "checked" : ""?>>
+					</label>
+				</div>
+
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["crack"] ? "filtered" : ""?>">
+						Трещина:
+						<input type="checkbox" name="crack" value="1" <?=$_GET["crack"] ? "checked" : ""?>>
+					</label>
+				</div>
+
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["chipped"] ? "filtered" : ""?>">
+						Скол:
+						<input type="checkbox" name="chipped" value="1" <?=$_GET["chipped"] ? "checked" : ""?>>
+					</label>
+				</div>
+
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["def_form"] ? "filtered" : ""?>">
+						Дефект форм:
+						<input type="checkbox" name="def_form" value="1" <?=$_GET["def_form"] ? "checked" : ""?>>
+					</label>
+				</div>
+
+			</fieldset>
+		</div>
+
+		<button style="float: right;">Фильтр</button>
+	</form>
+</div>
 
 <?
 // Узнаем есть ли фильтр
