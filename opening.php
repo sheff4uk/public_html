@@ -2,7 +2,7 @@
 include "config.php";
 $title = 'Расформовка';
 include "header.php";
-//include "./forms/opening_form.php";
+include "./forms/opening_form.php";
 
 // Если в фильтре не установлена неделя, показываем текущую
 if( !$_GET["week"] ) {
@@ -33,7 +33,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	//$errors .= "<p>Кассета <b class='cassette'>{$row["cassette"]}</b> залита <a href='filling.php?week={$row["week"]}#{$row["LB_ID"]}' target='_blank'>{$row["lf_date_format"]} {$row["lf_time_format"]}</a>. Нет данных по расформовке.</p>";
+	$errors .= "<p>Кассета <b class='cassette'>{$row["cassette"]}</b> залита <a href='filling.php?week={$row["week"]}#{$row["LB_ID"]}' target='_blank'>{$row["lf_date_format"]} {$row["lf_time_format"]}</a>. Нет данных по расформовке.</p>";
 }
 ?>
 
@@ -103,16 +103,16 @@ while( $row = mysqli_fetch_array($res) ) {
 			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
 				<?
-				$query = "
-					SELECT CW.CW_ID, CW.item
-					FROM CounterWeight CW
-					ORDER BY CW.CW_ID
-				";
-				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-				while( $row = mysqli_fetch_array($res) ) {
-					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
-					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
-				}
+//				$query = "
+//					SELECT CW.CW_ID, CW.item
+//					FROM CounterWeight CW
+//					ORDER BY CW.CW_ID
+//				";
+//				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//				while( $row = mysqli_fetch_array($res) ) {
+//					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
+//					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
+//				}
 				?>
 			</select>
 		</div>
@@ -122,16 +122,16 @@ while( $row = mysqli_fetch_array($res) ) {
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
 				<?
-				$query = "
-					SELECT CB.CB_ID, CB.brand
-					FROM ClientBrand CB
-					ORDER BY CB.CB_ID
-				";
-				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-				while( $row = mysqli_fetch_array($res) ) {
-					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
-					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
-				}
+//				$query = "
+//					SELECT CB.CB_ID, CB.brand
+//					FROM ClientBrand CB
+//					ORDER BY CB.CB_ID
+//				";
+//				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//				while( $row = mysqli_fetch_array($res) ) {
+//					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
+//					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
+//				}
 				?>
 			</select>
 		</div>
@@ -320,7 +320,7 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	// Собираем ошибки номеров кассет
 	if($row["dbl"] > 1) {
-		//$errors .= "<p>Кассета <a href='#{$row["LO_ID"]}'><b class='cassette'>{$row["cassette"]}</b></a> расформована повторно.</p>";
+		$errors .= "<p>Кассета <a href='#{$row["LO_ID"]}'><b class='cassette'>{$row["cassette"]}</b></a> расформована повторно.</p>";
 	}
 
 	if( $row["LP_ID"] ) {
