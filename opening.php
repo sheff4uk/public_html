@@ -43,6 +43,7 @@ while( $row = mysqli_fetch_array($res) ) {
 </fieldset>
 
 <!--Фильтр-->
+<!--
 <div id="filter">
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
@@ -103,16 +104,16 @@ while( $row = mysqli_fetch_array($res) ) {
 			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
 				<?
-//				$query = "
-//					SELECT CW.CW_ID, CW.item
-//					FROM CounterWeight CW
-//					ORDER BY CW.CW_ID
-//				";
-//				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//				while( $row = mysqli_fetch_array($res) ) {
-//					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
-//					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
-//				}
+				$query = "
+					SELECT CW.CW_ID, CW.item
+					FROM CounterWeight CW
+					ORDER BY CW.CW_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
+					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
+				}
 				?>
 			</select>
 		</div>
@@ -122,16 +123,16 @@ while( $row = mysqli_fetch_array($res) ) {
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
 				<?
-//				$query = "
-//					SELECT CB.CB_ID, CB.brand
-//					FROM ClientBrand CB
-//					ORDER BY CB.CB_ID
-//				";
-//				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//				while( $row = mysqli_fetch_array($res) ) {
-//					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
-//					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
-//				}
+				$query = "
+					SELECT CB.CB_ID, CB.brand
+					FROM ClientBrand CB
+					ORDER BY CB.CB_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
+					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
+				}
 				?>
 			</select>
 		</div>
@@ -140,10 +141,10 @@ while( $row = mysqli_fetch_array($res) ) {
 			<span>№№ Кассет:</span>
 			<select name="CAS[]" class="<?=$_GET["CAS"] ? "filtered" : ""?>" style="width: 350px;" multiple>
 				<?
-//				for ($i = 1; $i <= $cassetts; $i++) {
-//					$selected = in_array($i, $_GET["CAS"]) ? "selected" : "";
-//					echo "<option value='{$i}' {$selected}>{$i}</option>";
-//				}
+				for ($i = 1; $i <= $cassetts; $i++) {
+					$selected = in_array($i, $_GET["CAS"]) ? "selected" : "";
+					echo "<option value='{$i}' {$selected}>{$i}</option>";
+				}
 				?>
 			</select>
 		</div>
@@ -205,7 +206,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<button style="float: right;">Фильтр</button>
 	</form>
 </div>
-
+-->
 <?
 // Узнаем есть ли фильтр
 $filter = 0;
