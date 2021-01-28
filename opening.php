@@ -99,19 +99,19 @@ while( $row = mysqli_fetch_array($res) ) {
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Бренд:</span>
-			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
+			<span>Код противовеса:</span>
+			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
 				<?
 				$query = "
-					SELECT CB.CB_ID, CB.brand
-					FROM ClientBrand CB
-					ORDER BY CB.CB_ID
+					SELECT CW.CW_ID, CW.item
+					FROM CounterWeight CW
+					ORDER BY CW.CW_ID
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
-					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
-					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
+					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
+					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
 				}
 				?>
 			</select>
