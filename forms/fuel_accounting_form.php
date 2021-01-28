@@ -123,31 +123,6 @@ if( isset($_POST["fa_cnt"]) ) {
 	#fuel_arrival_form table select {
 		font-size: 1.2em;
 	}
-
-	.input-container input,
-	.input-container select {
-		border: none;
-		box-sizing: border-box;
-		outline: 0;
-		padding: .5rem;
-		position: relative;
-		box-shadow: 5px 5px 8px #666;
-		border-radius: .3rem;
-	}
-
-	input[type="date"]::-webkit-calendar-picker-indicator,
-	input[type="time"]::-webkit-calendar-picker-indicator {
-		background: transparent;
-		bottom: 0;
-		color: transparent;
-		cursor: pointer;
-		height: auto;
-		left: 0;
-		position: absolute;
-		right: 0;
-		top: 0;
-		width: auto;
-	}
 </style>
 
 <div id='fuel_filling_form' title='Заправка техники' style='display:none;'>
@@ -162,7 +137,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
-						<th colspan="2">Дата/время заправки</th>
+						<th>Дата заправки</th>
+						<th>Время заправки</th>
 						<th>Показания счетчика до заправки</th>
 						<th>Показания счетчика после заправки</th>
 						<th>Кол-во заправленного топлива</th>
@@ -172,15 +148,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td colspan="2">
-							<span class="input-container"><input type="date" name="ff_date" max="<?=date('Y-m-d')?>" onkeydown="return false" required></span>
-							<span class="input-container"><input type="time" name="ff_time" onkeydown="return false" required></span>
-						</td>
-						<td><span class="input-container"><input type="number" id="fuel_meter_before"  style="width: 100px;" readonly></span></td>
-						<td><span class="input-container"><input type="number" name="fuel_meter_value" style="width: 100px;" required></span></td>
-						<td><span class="input-container"><input type="number" id="ff_cnt" style="width: 70px;" readonly></span></td>
+						<td><input type="date" name="ff_date" max="<?=date('Y-m-d')?>" required></td>
+						<td><input type="time" name="ff_time" required></td>
+						<td><input type="number" id="fuel_meter_before"  style="width: 100px;" readonly></td>
+						<td><input type="number" name="fuel_meter_value" style="width: 100px;" required></td>
+						<td><input type="number" id="ff_cnt" style="width: 70px;" readonly></td>
 						<td>
-							<span class="input-container">
 							<select name="FD_ID" style="width: 100%;" required>
 								<option value="" hm="0"></option>
 								<?
@@ -197,9 +170,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 								}
 								?>
 							</select>
-							</span>
 						</td>
-						<td><span class="input-container"><input type="number" name="hour_meter_value" min="0" style="width: 100px;" required></span></td>
+						<td><input type="number" name="hour_meter_value" min="0" style="width: 100px;" required></td>
 					</tr>
 				</tbody>
 			</table>
@@ -230,9 +202,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td><span class="input-container"><input type="date" name="fa_date" max="<?=date('Y-m-d')?>" onkeydown="return false" required></span></td>
-						<td><span class="input-container"><input type="time" name="fa_time" onkeydown="return false" required></span></td>
-						<td><span class="input-container"><input type="number" name="fa_cnt" min="0" max="1000" style="width: 100px;" required></span></td>
+						<td><input type="date" name="fa_date" max="<?=date('Y-m-d')?>" required></td>
+						<td><input type="time" name="fa_time" required></td>
+						<td><input type="number" name="fa_cnt" min="0" max="1000" style="width: 100px;" required></td>
 					</tr>
 				</tbody>
 			</table>

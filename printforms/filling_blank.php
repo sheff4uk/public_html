@@ -50,11 +50,15 @@ elseif( $cubetests == 3 ) {
 
 echo "<title>Чеклист оператора для {$item} от {$pb_date}</title>";
 ?>
-	<style type="text/css" media="print">
-		@page { size: landscape; }
-	</style>
-
 	<style>
+		@media print {
+			@page {
+				size: landscape;
+/*				padding: 0;*/
+/*				margin: 0;*/
+			}
+		}
+
 		body, td {
 			font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
 			font-size: 10pt;

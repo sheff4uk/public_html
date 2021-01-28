@@ -139,14 +139,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
 			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
 
-			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-				<span>Дата списания:</span>
-				<input type="date" name="sr_date" required>
-			</div>
-
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
+						<th>Дата списания</th>
 						<th>Противовес</th>
 						<th>Списанных форм</th>
 						<th>Отслоения</th>
@@ -157,8 +153,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
+						<td><input type="date" name="sr_date" required></td>
 						<td>
-							<select name="CW_ID" style="width: 150px;" required>
+							<select name="CW_ID" style="width: 100%;" required>
 								<option value=""></option>
 								<?
 								$query = "
@@ -197,14 +194,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
 			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
 
-			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-				<span>Дата прихода:</span>
-				<input type="date" name="sa_date" required>
-			</div>
-
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
+						<th>Дата прихода</th>
 						<th>Противовес</th>
 						<th>Пришедших форм</th>
 						<th>Объем, л</th>
@@ -213,8 +206,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
+						<td><input type="date" name="sa_date" required></td>
 						<td>
-							<select name="CW_ID" style="width: 150px;" required>
+							<select name="CW_ID" style="width: 100%;" required>
 								<option value=""></option>
 								<?
 								$query = "
@@ -275,7 +269,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Иначе очищаем форму
 			else {
 				$('#shell_reject_form input[name="SR_ID"]').val('');
-				$('#shell_reject_form input[name="sr_date"]').val('');
 				$('#shell_reject_form table input').val('');
 				$('#shell_reject_form table select').val('');
 			}
@@ -318,7 +311,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Иначе очищаем форму
 			else {
 				$('#shell_arrival_form input[name="SA_ID"]').val('');
-				$('#shell_arrival_form input[name="sa_date"]').val('');
 				$('#shell_arrival_form table input').val('');
 				$('#shell_arrival_form table select').val('');
 			}

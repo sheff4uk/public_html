@@ -85,7 +85,7 @@ include "./forms/shell_accounting_form.php";
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Код противовеса:</span>
-			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
+			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
 				<?
 				$query = "
@@ -104,7 +104,7 @@ include "./forms/shell_accounting_form.php";
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Бренд:</span>
-			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
+			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
 				<?
 				$query = "

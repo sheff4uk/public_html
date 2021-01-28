@@ -53,4 +53,9 @@ $(function(){
 			$(".main_table thead").css({'display':'contents'});
 		}
 	});
+
+	// Запрет на ввод даты и времени вручную
+	$('input[type="date"], input[type="time"]').on('keydown', function() {
+		return false;
+	});
 });

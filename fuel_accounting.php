@@ -74,36 +74,30 @@ echo "<h3>Баланс дизтоплива: <span style='font-size: 2em; color:
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата между:</span>
-			<span class="input-container">
-				<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
-			</span>
-			<span class="input-container">
-				<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
-			</span>
+			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
+			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
 			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Техника:</span>
-			<span class="input-container">
-				<select name="FD_ID" class="<?=$_GET["FD_ID"] ? "filtered" : ""?>">
-					<option value=""></option>
-					<?
-					$query = "
-						SELECT FD.FD_ID
-							,FD.fuel_device
-							,CONCAT(' (пробег: ', FD.last_hour_meter_value, ')') last_hour_meter_value
-						FROM fuel__Device FD
-						ORDER BY FD.FD_ID
-					";
-					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					while( $row = mysqli_fetch_array($res) ) {
-						$selected = ($row["FD_ID"] == $_GET["FD_ID"]) ? "selected" : "";
-						echo "<option value='{$row["FD_ID"]}' {$selected}>{$row["fuel_device"]}{$row["last_hour_meter_value"]}</option>";
-					}
-					?>
-				</select>
-			</span>
+			<select name="FD_ID" class="<?=$_GET["FD_ID"] ? "filtered" : ""?>">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT FD.FD_ID
+						,FD.fuel_device
+						,CONCAT(' (пробег: ', FD.last_hour_meter_value, ')') last_hour_meter_value
+					FROM fuel__Device FD
+					ORDER BY FD.FD_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["FD_ID"] == $_GET["FD_ID"]) ? "selected" : "";
+					echo "<option value='{$row["FD_ID"]}' {$selected}>{$row["fuel_device"]}{$row["last_hour_meter_value"]}</option>";
+				}
+				?>
+			</select>
 		</div>
 
 		<button style="float: right;">Фильтр</button>

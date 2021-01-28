@@ -43,7 +43,7 @@ $spec = $row["spec"];
 $batch_date = $row["batch_date"];
 
 $html = "
-	<p style='text-align: center; font-size: 1.5em;'>Фактическая дата первого замеса: <input type='date' name='batch_date' value='{$batch_date}' min='{$pb_date_min}' max='{$pb_date_max}' style='width: 250px;' required></p>
+	<p style='text-align: center; font-size: 1.5em;'>Фактическая дата первого замеса: <input type='date' name='batch_date' value='{$batch_date}' min='{$pb_date_min}' max='{$pb_date_max}' required></p>
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
 	<p style='display: none; text-align: center; font-size: 2em;'>Число замесов: <input type='number' name='fact_batches' id='rows' min='".($fact_batches ? $fact_batches : "1")."' max='{$max_batches}' value='".($fact_batches ? $fact_batches : $batches)."'></p>
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
@@ -155,12 +155,12 @@ if( $fact_batches ) {
 		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$fillings_cell = "";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
-			$fillings_cell .= "<td><input type='number' min='1' max='{$cassetts}' name='cassette[{$subrow["LB_ID"]}][{$subsubrow["LF_ID"]}]' value='{$subsubrow["cassette"]}' style='width: 60px;' required ".($subsubrow["is_link"] ? "readonly" : "")."></td>";
+			$fillings_cell .= "<td><input type='number' min='1' max='{$cassetts}' name='cassette[{$subrow["LB_ID"]}][{$subsubrow["LF_ID"]}]' value='{$subsubrow["cassette"]}' style='width: 60px; background-color: coral;' required ".($subsubrow["is_link"] ? "readonly" : "")."></td>";
 		}
 
 		// Дропдаун операторов
 		$operators = "
-			<select name='OP_ID[{$subrow["LB_ID"]}]' style='width: 70px;' required>
+			<select name='OP_ID[{$subrow["LB_ID"]}]' style='width: 100%;' required>
 				<option value=''></option>
 		";
 		$query = "
@@ -179,17 +179,17 @@ if( $fact_batches ) {
 		$html .= "
 			<tr class='batch_row' num='{$i}'>
 				<td style='text-align: center; font-size: 1.2em;'>{$i}</td>
-				<td><input type='time' name='batch_time[{$subrow["LB_ID"]}]' value='{$subrow["batch_time_format"]}' style='width: 70px;' required></td>
+				<td><input type='time' name='batch_time[{$subrow["LB_ID"]}]' value='{$subrow["batch_time_format"]}' required></td>
 				<td><att></att></td>
-				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$subrow["LB_ID"]}]' value='".($subrow["io_density"]/1000)."' style='width: 70px;' required></td>" : "")."
-				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$subrow["LB_ID"]}]' value='".($subrow["sn_density"]/1000)."' style='width: 70px;' required></td>" : "")."
-				<td><input type='number' min='2' max='4' step='0.01' name='mix_density[{$subrow["LB_ID"]}]' value='".($subrow["mix_density"]/1000)."' style='width: 70px;' required></td>
+				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$subrow["LB_ID"]}]' value='".($subrow["io_density"]/1000)."' style='width: 60px;' required></td>" : "")."
+				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$subrow["LB_ID"]}]' value='".($subrow["sn_density"]/1000)."' style='width: 60px;' required></td>" : "")."
+				<td><input type='number' min='2' max='4' step='0.01' name='mix_density[{$subrow["LB_ID"]}]' value='".($subrow["mix_density"]/1000)."' style='width: 60px;' required></td>
 				<td><input type='number' min='5' max='45' name='temp[{$subrow["LB_ID"]}]' value='{$subrow["temp"]}' style='width: 40px;' required></td>
-				".($row["iron_oxide"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[{$subrow["LB_ID"]}]' value='{$subrow["iron_oxide"]}' style='width: 70px;' required></td>" : "")."
-				".($row["sand"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[{$subrow["LB_ID"]}]' value='{$subrow["sand"]}' style='width: 70px;' required></td>" : "")."
-				".($row["crushed_stone"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone"]}' style='width: 70px;' required></td>" : "")."
-				".($row["cement"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[{$subrow["LB_ID"]}]' value='{$subrow["cement"]}' style='width: 70px;' required></td>" : "")."
-				".($row["water"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[{$subrow["LB_ID"]}]' value='{$subrow["water"]}' style='width: 70px;' required></td>" : "")."
+				".($row["iron_oxide"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[{$subrow["LB_ID"]}]' value='{$subrow["iron_oxide"]}' style='width: 60px;' required></td>" : "")."
+				".($row["sand"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[{$subrow["LB_ID"]}]' value='{$subrow["sand"]}' style='width: 60px;' required></td>" : "")."
+				".($row["crushed_stone"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone"]}' style='width: 60px;' required></td>" : "")."
+				".($row["cement"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[{$subrow["LB_ID"]}]' value='{$subrow["cement"]}' style='width: 60px;' required></td>" : "")."
+				".($row["water"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[{$subrow["LB_ID"]}]' value='{$subrow["water"]}' style='width: 60px;' required></td>" : "")."
 				{$fillings_cell}
 				<td><input type='number' min='0' max='{$in_cassette}' name='underfilling[{$subrow["LB_ID"]}]' value='{$subrow["underfilling"]}' style='width: 60px;' required></td>
 				<td class='nowrap'><input type='checkbox' name='test[{$subrow["LB_ID"]}]' ".($subrow["test"] ? "checked" : "")." ".($subrow["is_test"] ? "onclick='return false;'" : "")." value='1'>".($subrow["is_test"] ? "<i id='test_notice' class='fas fa-question-circle' title='Не редактируется так как есть связанные испытания куба.'></i>" : "")."</td>
@@ -203,12 +203,12 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 	// Номера кассет
 	$fillings_cell = '';
 	for ($j = 1; $j <= $fillings; $j++) {
-		$fillings_cell .= "<td><input type='number' min='1' max='{$cassetts}' name='cassette[n_{$i}][{$j}]' style='width: 60px;' required></td>";
+		$fillings_cell .= "<td><input type='number' min='1' max='{$cassetts}' name='cassette[n_{$i}][{$j}]' style='width: 60px; background-color: coral;' required></td>";
 	}
 
 	// Дропдаун операторов
 	$operators = "
-		<select name='OP_ID[n_{$i}]' style='width: 70px;' required>
+		<select name='OP_ID[n_{$i}]' style='width: 100%;' required>
 			<option value=''></option>
 	";
 	$query = "
@@ -226,17 +226,17 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 	$html .= "
 		<tr class='batch_row' num='{$i}'>
 			<td style='text-align: center; font-size: 1.2em;'>{$i}</td>
-			<td><input type='time' name='batch_time[n_{$i}]' style='width: 70px;' required></td>
+			<td><input type='time' name='batch_time[n_{$i}]' required></td>
 			<td><att></att></td>
-			".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[n_{$i}]' style='width: 70px;' required></td>" : "")."
-			".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[n_{$i}]' style='width: 70px;' required></td>" : "")."
-			<td><input type='number' min='2' max='4' step='0.01' name='mix_density[n_{$i}]' style='width: 70px;' required></td>
+			".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[n_{$i}]' style='width: 60px;' required></td>" : "")."
+			".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[n_{$i}]' style='width: 60px;' required></td>" : "")."
+			<td><input type='number' min='2' max='4' step='0.01' name='mix_density[n_{$i}]' style='width: 60px;' required></td>
 			<td><input type='number' min='5' max='45' name='temp[n_{$i}]' style='width: 40px;' required></td>
-			".($row["iron_oxide"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[n_{$i}]' style='width: 70px;' required></td>" : "")."
-			".($row["sand"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[n_{$i}]' style='width: 70px;' required></td>" : "")."
-			".($row["crushed_stone"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[n_{$i}]' style='width: 70px;' required></td>" : "")."
-			".($row["cement"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[n_{$i}]' style='width: 70px;' required></td>" : "")."
-			".($row["water"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[n_{$i}]' style='width: 70px;' required></td>" : "")."
+			".($row["iron_oxide"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[n_{$i}]' style='width: 60px;' required></td>" : "")."
+			".($row["sand"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[n_{$i}]' style='width: 60px;' required></td>" : "")."
+			".($row["crushed_stone"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[n_{$i}]' style='width: 60px;' required></td>" : "")."
+			".($row["cement"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[n_{$i}]' style='width: 60px;' required></td>" : "")."
+			".($row["water"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[n_{$i}]' style='width: 60px;' required></td>" : "")."
 			{$fillings_cell}
 			<td><input type='number' min='0' max='{$in_cassette}' name='underfilling[n_{$i}]' style='width: 60px;' required></td>
 			<td><input type='checkbox' name='test[n_{$i}]' value='1'></td>
