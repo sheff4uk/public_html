@@ -118,12 +118,19 @@ while( $row = mysqli_fetch_array($res) ) {
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>№№ Кассет:</span>
-			<select name="CAS[]" class="<?=$_GET["CAS"] ? "filtered" : ""?>" style="width: 350px;" multiple>
+			<span>Бренд:</span>
+			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
+				<option value=""></option>
 				<?
-				for ($i = 1; $i <= $cassetts; $i++) {
-					$selected = in_array($i, $_GET["CAS"]) ? "selected" : "";
-					echo "<option value='{$i}' {$selected}>{$i}</option>";
+				$query = "
+					SELECT CB.CB_ID, CB.brand
+					FROM ClientBrand CB
+					ORDER BY CB.CB_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
+					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
 				}
 				?>
 			</select>
