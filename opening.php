@@ -2,7 +2,7 @@
 include "config.php";
 $title = 'Расформовка';
 include "header.php";
-include "./forms/opening_form.php";
+//include "./forms/opening_form.php";
 
 // Если в фильтре не установлена неделя, показываем текущую
 if( !$_GET["week"] ) {
@@ -33,7 +33,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$errors .= "<p>Кассета <b class='cassette'>{$row["cassette"]}</b> залита <a href='filling.php?week={$row["week"]}#{$row["LB_ID"]}' target='_blank'>{$row["lf_date_format"]} {$row["lf_time_format"]}</a>. Нет данных по расформовке.</p>";
+	//$errors .= "<p>Кассета <b class='cassette'>{$row["cassette"]}</b> залита <a href='filling.php?week={$row["week"]}#{$row["LB_ID"]}' target='_blank'>{$row["lf_date_format"]} {$row["lf_time_format"]}</a>. Нет данных по расформовке.</p>";
 }
 ?>
 
@@ -320,7 +320,7 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	// Собираем ошибки номеров кассет
 	if($row["dbl"] > 1) {
-		$errors .= "<p>Кассета <a href='#{$row["LO_ID"]}'><b class='cassette'>{$row["cassette"]}</b></a> расформована повторно.</p>";
+		//$errors .= "<p>Кассета <a href='#{$row["LO_ID"]}'><b class='cassette'>{$row["cassette"]}</b></a> расформована повторно.</p>";
 	}
 
 	if( $row["LP_ID"] ) {
