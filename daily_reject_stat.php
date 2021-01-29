@@ -199,7 +199,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<tr class="total">
 			<td></td>
 			<td>Итог:</td>
-			<td><?=($p_details > 0 ? $p_reject : "")?></td>
+			<td><?=($o_details > 0 ? $o_reject : "")?></td>
 			<td><?=($o_details > 0 ? round($o_reject / $o_details * 100, 1) : "")?></td>
 			<td><?=($p_details > 0 ? $p_reject : "")?></td>
 			<td><?=($p_details > 0 ? round($p_reject / $p_details * 100, 1) : "")?></td>
