@@ -171,9 +171,9 @@ while( $row = mysqli_fetch_array($res) ) {
 	<tr>
 		<td><?=$row["reject_date_format"]?></td>
 		<td><?=$row["item"]?></td>
-		<td><?=$row["o_reject"]?></td>
+		<td><?=($row["o_details"] > 0 ? $row["o_reject"] : "")?></td>
 		<td><?=($row["o_details"] > 0 ? round($row["o_reject"] / $row["o_details"] * 100, 1) : "")?></td>
-		<td><?=$row["p_reject"]?></td>
+		<td><?=($row["p_details"] > 0 ? $row["p_reject"] : "")?></td>
 		<td><?=($row["p_details"] > 0 ? round($row["p_reject"] / $row["p_details"] * 100, 1) : "")?></td>
 		<td><?=($row["o_reject"] + $row["p_reject"])?></td>
 	</tr>
@@ -183,9 +183,9 @@ while( $row = mysqli_fetch_array($res) ) {
 		<tr class="total">
 			<td></td>
 			<td>Итог:</td>
-			<td><?=$o_reject?></td>
+			<td><?=($p_details > 0 ? $p_reject : "")?></td>
 			<td><?=($o_details > 0 ? round($o_reject / $o_details * 100, 1) : "")?></td>
-			<td><?=$p_reject?></td>
+			<td><?=($p_details > 0 ? $p_reject : "")?></td>
 			<td><?=($p_details > 0 ? round($p_reject / $p_details * 100, 1) : "")?></td>
 			<td><?=($o_reject + $p_reject)?></td>
 		</tr>
