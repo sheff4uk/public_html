@@ -471,12 +471,10 @@ textarea {
 	border-radius: .3rem;
 }
 
-input[type="date"],
-input[type="time"] {
+input[type="date"] {
 	position: relative;
 }
-input[type="date"]::-webkit-calendar-picker-indicator,
-input[type="time"]::-webkit-calendar-picker-indicator {
+input[type="date"]::-webkit-calendar-picker-indicator {
 	background: transparent;
 	color: transparent;
 	cursor: pointer;

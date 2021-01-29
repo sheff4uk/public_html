@@ -54,8 +54,8 @@ $(function(){
 		}
 	});
 
-	// Запрет на ввод даты и времени вручную
-	$('input[type="date"], input[type="time"]').on('keydown', function() {
+	// Запрет на ввод даты
+	$('input[type="date"]').on('keydown', function() {
 		return false;
 	});
 });
