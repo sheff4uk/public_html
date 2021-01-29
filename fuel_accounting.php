@@ -203,15 +203,15 @@ while( $row = mysqli_fetch_array($res) ) {
 	$ff_cnt += $row["ff_cnt"];
 	$hours_cnt += $row["hours_cnt"];
 	?>
-	<tr id="<?=$row["type"]?><?=$row["ID"]?>">
+	<tr id="<?=$row["type"]?><?=$row["ID"]?>" class="<?=($row["fa_cnt"] ? "row_arrival" : "")?>">
 		<td><?=$row["date_format"]?></td>
 		<td><?=$row["time_format"]?></td>
 		<td><b><?=$row["fa_cnt"]?></b></td>
-		<td><span><?=$row["fuel_meter_before"]?></span></td>
-		<td><span><?=$row["fuel_meter_value"]?></span></td>
+		<td><?=$row["fuel_meter_before"]?></td>
+		<td><?=$row["fuel_meter_value"]?></td>
 		<td><b><?=$row["ff_cnt"]?></b></td>
 		<td><span class="nowrap"><?=$row["fuel_device"]?></span></td>
-		<td><span><?=$row["hour_meter_value"]?></span></td>
+		<td><?=$row["hour_meter_value"]?></td>
 		<td><?=$row["hours_cnt"]?></td>
 		<td><?=$row["USR_Icon"]?><?=($row["last_edit"] ? "<i class='fas fa-clock' title='Сохранено ".$row["last_edit"]."'.></i>" : "")?></td>
 		<td><a href="#" <?=($row["type"] == "A" ? "class='add_arrival' FA_ID='{$row["ID"]}'" : ($row["last"] ? "class='add_filling' FF_ID='{$row["ID"]}'" : "style='display: none;'"))?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>

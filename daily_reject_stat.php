@@ -1,6 +1,6 @@
 <?
 include "config.php";
-$title = 'Суточный брак';
+$title = 'Статистика брака';
 include "header.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
@@ -12,6 +12,9 @@ if( !$_GET["date_to"] ) {
 	$date = date_create('-0 days');
 	$_GET["date_to"] = date_format($date, 'Y-m-d');
 }
+if( !$_GET["detailing"] ) {
+	$_GET["detailing"] = "day";
+}
 ?>
 
 <!--Фильтр-->
@@ -21,10 +24,20 @@ if( !$_GET["date_to"] ) {
 		<a href="/daily_reject.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
-			<span style="display: inline-block; width: 200px;">Дата между:</span>
+			<span>Дата между:</span>
 			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
 			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
-			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
+			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней." style="margin-right: 30px;"></i>
+
+			<span>Детализация:</span>
+			<div class='btnset' id='detailing' style="display: inline-block;">
+				<input type='radio' id='day' name='detailing' value='day' <?= ($_GET["detailing"] == "day" ? "checked" : "") ?>>
+					<label for='day'>по дням</label>
+				<input type='radio' id='week' name='detailing' value='week' <?= ($_GET["detailing"] == "week" ? "checked" : "") ?>>
+					<label for='week'>по неделям</label>
+				<input type='radio' id='month' name='detailing' value='month' <?= ($_GET["detailing"] == "month" ? "checked" : "") ?>>
+					<label for='month'>по месяцам</label>
+			</div>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -97,7 +110,7 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th>Дата</th>
+			<th>Период</th>
 			<th>Противовес</th>
 			<th>Кол-во брака при расформовке</th>
 			<th>% брака при расформовке</th>
@@ -110,7 +123,10 @@ foreach ($_GET as &$value) {
 
 <?
 $query = "
-	SELECT DATE_FORMAT(OPR.reject_date, '%d.%m.%y') reject_date_format
+	SELECT
+		".($_GET["detailing"] == "day" ? "DATE_FORMAT(OPR.reject_date, '%d.%m.%y') reject_date_format" : "")."
+		".($_GET["detailing"] == "week" ? "DATE_FORMAT(OPR.reject_date, '%x w%v') reject_date_format" : "")."
+		".($_GET["detailing"] == "month" ? "DATE_FORMAT(OPR.reject_date, '%Y %b') reject_date_format" : "")."
 		,OPR.item
 		,IFNULL(SUM(o_reject), 0) `o_reject`
 		,IFNULL(SUM(o_details), 0) `o_details`
@@ -158,7 +174,7 @@ $query = "
 			".($_GET["CB_ID"] ? "AND CW.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		GROUP BY PB.CW_ID, LP.p_date
 	) OPR
-	GROUP BY OPR.reject_date, OPR.CW_ID
+	GROUP BY reject_date_format, OPR.CW_ID
 	ORDER BY OPR.reject_date, OPR.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

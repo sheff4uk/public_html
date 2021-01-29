@@ -19,7 +19,7 @@ function src_url($src) {
 	<title><?=$title?></title>
 <!--	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css">-->
 	<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?v=2">
-	<link rel='stylesheet' type='text/css' href='css/style.css?22'>
+	<link rel='stylesheet' type='text/css' href='css/style.css?23'>
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 <!--	<link rel='stylesheet' type='text/css' href='css/font-awesome.min.css'>-->
 	<link rel='stylesheet' type='text/css' href='css/buttons.css'>
@@ -202,7 +202,7 @@ function src_url($src) {
 		$menu["Анализ"]["<i class='fas fa-thermometer-half fa-lg'></i> Климат"] = "climate.php";
 		$menu["Анализ"]["Расход сырья"] = "consumption.php";
 		$menu["Анализ"]["Брак"] = "statistic.php";
-		$menu["Анализ"]["<i class='fas fa-trash fa-lg'></i> Суточный брак"] = "daily_reject_stat.php";
+		$menu["Анализ"]["<i class='fas fa-trash fa-lg'></i> Статистика брака"] = "daily_reject_stat.php";
 		$menu["Доп. данные"]["<i class='fas fa-cube fa-lg'></i> Испытания кубов"] = "cubetest.php";
 		$menu["Доп. данные"]["<i class='fas fa-trash fa-lg'></i> Суточный брак"] = "daily_reject.php";
 		$menu["Учет"]["Поддоны противовесов"] = "pallet_accounting.php";
