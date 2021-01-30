@@ -124,9 +124,12 @@ foreach ($_GET as &$value) {
 <?
 $query = "
 	SELECT
-		".($_GET["detailing"] == "day" ? "DATE_FORMAT(OPR.reject_date, '%d.%m.%y') reject_date_format" : "")."
+		".($_GET["detailing"] == "day" ? "DATE_FORMAT(OPR.reject_date, '%d.%m.%Y') reject_date_format" : "")."
 		".($_GET["detailing"] == "week" ? "DATE_FORMAT(OPR.reject_date, '%x w%v') reject_date_format" : "")."
 		".($_GET["detailing"] == "month" ? "DATE_FORMAT(OPR.reject_date, '%Y %b') reject_date_format" : "")."
+		".($_GET["detailing"] == "day" ? ",OPR.reject_date reject_date_sort" : "")."
+		".($_GET["detailing"] == "week" ? ",DATE_FORMAT(OPR.reject_date, '%x%v') reject_date_sort" : "")."
+		".($_GET["detailing"] == "month" ? ",DATE_FORMAT(OPR.reject_date, '%Y%m') reject_date_sort" : "")."
 		,OPR.item
 		,IFNULL(SUM(o_reject), 0) `o_reject`
 		,IFNULL(SUM(o_details), 0) `o_details`
@@ -175,7 +178,7 @@ $query = "
 		GROUP BY PB.CW_ID, LP.p_date
 	) OPR
 	GROUP BY reject_date_format, OPR.CW_ID
-	ORDER BY OPR.reject_date, OPR.CW_ID
+	ORDER BY reject_date_sort, OPR.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
