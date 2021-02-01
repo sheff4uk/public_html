@@ -2,6 +2,7 @@
 include "config.php";
 $title = 'Приемка сырья';
 include "header.php";
+$location = $_SERVER['REQUEST_URI'];
 include "./forms/material_accounting_form.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
@@ -29,7 +30,7 @@ if( !$_GET["date_to"] ) {
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Наименование продукции:</span>
+			<span><a href="#" id="add_material_list">Наименование продукции:</a></span>
 			<select name="MN" class="<?=$_GET["MN"] ? "filtered" : ""?>">
 				<option value=""></option>
 				<?
@@ -48,7 +49,7 @@ if( !$_GET["date_to"] ) {
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Поставщик:</span>
+			<span><a href="#" id="add_supplier_list">Поставщик:</a></span>
 			<select name="MS" class="<?=$_GET["MS"] ? "filtered" : ""?>">
 				<option value=""></option>
 				<?
@@ -67,7 +68,7 @@ if( !$_GET["date_to"] ) {
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Перевозчик:</span>
+			<span><a href="#" id="add_carrier_list">Перевозчик:</a></span>
 			<select name="MC" class="<?=$_GET["MC"] ? "filtered" : ""?>">
 				<option value=""></option>
 				<?
@@ -145,7 +146,7 @@ foreach ($_GET as &$value) {
 			<th>№ автомобиля</th>
 			<th>№ партии</th>
 			<th>№ сертификата качества</th>
-			<th>Кол-во, т</th>
+			<th>Кол-во</th>
 			<th></th>
 		</tr>
 	</thead>

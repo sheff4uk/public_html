@@ -2,7 +2,7 @@
 include_once "../config.php";
 include_once "../checkrights.php";
 
-// Сохранение/редактирование
+// Сохранение/редактирование прихода
 if( isset($_POST["ma_date"]) ) {
 	session_start();
 	$ma_date = $_POST["ma_date"];
@@ -63,14 +63,85 @@ if( isset($_POST["ma_date"]) ) {
 	// Перенаправление в журнал
 	exit ('<meta http-equiv="refresh" content="0; url=/material_accounting.php?date_from='.$ma_date.'&date_to='.$ma_date.'#'.$MA_ID.'">');
 }
-?>
 
-<style>
-	#material_arrival_form table input,
-	#material_arrival_form table select {
-		font-size: 1.2em;
+// Сохранение/редактирование списка продукции
+if( isset($_POST["material_name_add"]) ) {
+	session_start();
+
+	foreach ($_POST["MN_ID"] as $key => $value) {
+		$material_name = mysqli_real_escape_string($mysqli, convert_str($_POST["material_name"][$key]));
+		$query = "
+			UPDATE material__Name
+			SET material_name = '{$material_name}'
+			WHERE MN_ID = {$value}
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	}
-</style>
+
+	if( trim($_POST["material_name_add"]) ) {
+		$material_name_add = mysqli_real_escape_string($mysqli, convert_str($_POST["material_name_add"]));
+		$query = "
+			INSERT INTO material__Name
+			SET material_name = '{$material_name_add}'
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	}
+	// Перенаправление в журнал
+	exit ('<meta http-equiv="refresh" content="0; url='.$location.'">');
+}
+
+// Сохранение/редактирование поставщика
+if( isset($_POST["supplier_add"]) ) {
+	session_start();
+
+	foreach ($_POST["MS_ID"] as $key => $value) {
+		$supplier = mysqli_real_escape_string($mysqli, convert_str($_POST["supplier"][$key]));
+		$query = "
+			UPDATE material__Supplier
+			SET supplier = '{$supplier}'
+			WHERE MS_ID = {$value}
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	}
+
+	if( trim($_POST["supplier_add"]) ) {
+		$supplier_add = mysqli_real_escape_string($mysqli, convert_str($_POST["supplier_add"]));
+		$query = "
+			INSERT INTO material__Supplier
+			SET supplier = '{$supplier_add}'
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	}
+	// Перенаправление в журнал
+	exit ('<meta http-equiv="refresh" content="0; url='.$location.'">');
+}
+
+// Сохранение/редактирование перевозчика
+if( isset($_POST["carrier_add"]) ) {
+	session_start();
+
+	foreach ($_POST["MC_ID"] as $key => $value) {
+		$carrier = mysqli_real_escape_string($mysqli, convert_str($_POST["carrier"][$key]));
+		$query = "
+			UPDATE material__Carrier
+			SET carrier = '{$carrier}'
+			WHERE MC_ID = {$value}
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	}
+
+	if( trim($_POST["carrier_add"]) ) {
+		$carrier_add = mysqli_real_escape_string($mysqli, convert_str($_POST["carrier_add"]));
+		$query = "
+			INSERT INTO material__Carrier
+			SET carrier = '{$carrier_add}'
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	}
+	// Перенаправление в журнал
+	exit ('<meta http-equiv="refresh" content="0; url='.$location.'">');
+}
+?>
 
 <div id='material_arrival_form' title='Данные приемки сырья' style='display:none;'>
 	<form method='post' action="/forms/material_accounting_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
@@ -92,7 +163,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>№ автомобиля</th>
 						<th>№ партии</th>
 						<th>№ сертификата качества</th>
-						<th>Кол-во, т</th>
+						<th>Кол-во</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -161,6 +232,123 @@ this.subbut.value='Подождите, пожалуйста!';">
 	</form>
 </div>
 
+<!-- Форма добавления/редактирования приобретаемой продукции -->
+<div id='material_list_form' style='display:none;' title="Редактирование списка продукции">
+	<form method='post' onsubmit="JavaScript:this.subbut.disabled=true;
+this.subbut.value='Подождите, пожалуйста!';">
+		<fieldset>
+			<table style="width: 100%; table-layout: fixed;">
+				<thead>
+					<tr>
+						<th>Наименование продукции</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?
+					$query = "SELECT MN_ID, material_name FROM material__Name ORDER BY MN_ID";
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $row = mysqli_fetch_array($res) )
+					{
+						echo "<tr>";
+						echo "<td>";
+							echo "<input type='hidden' name='MN_ID[]' value='{$row["MN_ID"]}'>";
+							echo "<input type='text' name='material_name[]' value='{$row["material_name"]}' autocomplete='off' style='width: 100%;'>";
+						echo "</td>";
+						echo "</tr>";
+					}
+
+					echo "<tr style='background: #6f6;'>";
+					echo "<td><input type='text' name='material_name_add' autocomplete='off' style='width: 100%;' placeholder='Новая продукция'></td>";
+					echo "</tr>";
+					?>
+				</tbody>
+			</table>
+		</fieldset>
+		<div>
+			<hr>
+			<input type='submit' name="subbut" value='Сохранить' style='float: right;'>
+		</div>
+	</form>
+</div>
+
+<!-- Форма добавления/редактирования поставщика -->
+<div id='supplier_list_form' style='display:none;' title="Редактирование списка поставщиков">
+	<form method='post' onsubmit="JavaScript:this.subbut.disabled=true;
+this.subbut.value='Подождите, пожалуйста!';">
+		<fieldset>
+			<table style="width: 100%; table-layout: fixed;">
+				<thead>
+					<tr>
+						<th>Поставщик</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?
+					$query = "SELECT MS_ID, supplier FROM material__Supplier ORDER BY MS_ID";
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $row = mysqli_fetch_array($res) )
+					{
+						echo "<tr>";
+						echo "<td>";
+							echo "<input type='hidden' name='MS_ID[]' value='{$row["MS_ID"]}'>";
+							echo "<input type='text' name='supplier[]' value='{$row["supplier"]}' autocomplete='off' style='width: 100%;'>";
+						echo "</td>";
+						echo "</tr>";
+					}
+
+					echo "<tr style='background: #6f6;'>";
+					echo "<td><input type='text' name='supplier_add' autocomplete='off' style='width: 100%;' placeholder='Новый поставщик'></td>";
+					echo "</tr>";
+					?>
+				</tbody>
+			</table>
+		</fieldset>
+		<div>
+			<hr>
+			<input type='submit' name="subbut" value='Сохранить' style='float: right;'>
+		</div>
+	</form>
+</div>
+
+<!-- Форма добавления/редактирования перевозчика -->
+<div id='carrier_list_form' style='display:none;' title="Редактирование списка перевозчиков">
+	<form method='post' onsubmit="JavaScript:this.subbut.disabled=true;
+this.subbut.value='Подождите, пожалуйста!';">
+		<fieldset>
+			<table style="width: 100%; table-layout: fixed;">
+				<thead>
+					<tr>
+						<th>Перевозчик</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?
+					$query = "SELECT MC_ID, carrier FROM material__Carrier ORDER BY MC_ID";
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $row = mysqli_fetch_array($res) )
+					{
+						echo "<tr>";
+						echo "<td>";
+							echo "<input type='hidden' name='MC_ID[]' value='{$row["MC_ID"]}'>";
+							echo "<input type='text' name='carrier[]' value='{$row["carrier"]}' autocomplete='off' style='width: 100%;'>";
+						echo "</td>";
+						echo "</tr>";
+					}
+
+					echo "<tr style='background: #6f6;'>";
+					echo "<td><input type='text' name='carrier_add' autocomplete='off' style='width: 100%;' placeholder='Новый перевозчик'></td>";
+					echo "</tr>";
+					?>
+				</tbody>
+			</table>
+		</fieldset>
+		<div>
+			<hr>
+			<input type='submit' name="subbut" value='Сохранить' style='float: right;'>
+		</div>
+	</form>
+</div>
+
 <script>
 	$(function() {
 		// Кнопка добавления
@@ -199,6 +387,51 @@ this.subbut.value='Подождите, пожалуйста!';">
 			}
 
 			$('#material_arrival_form').dialog({
+				resizable: false,
+				width: 1000,
+				modal: true,
+				closeText: 'Закрыть'
+			});
+
+			return false;
+		});
+
+		// Кнопка редактирования списка продукции
+		$('#add_material_list').click( function() {
+			// Проверяем сессию
+			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
+
+			$('#material_list_form').dialog({
+				resizable: false,
+				width: 1000,
+				modal: true,
+				closeText: 'Закрыть'
+			});
+
+			return false;
+		});
+
+		// Кнопка редактирования списка поставщиков
+		$('#add_supplier_list').click( function() {
+			// Проверяем сессию
+			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
+
+			$('#supplier_list_form').dialog({
+				resizable: false,
+				width: 1000,
+				modal: true,
+				closeText: 'Закрыть'
+			});
+
+			return false;
+		});
+
+		// Кнопка редактирования списка перевозчиков
+		$('#add_carrier_list').click( function() {
+			// Проверяем сессию
+			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
+
+			$('#carrier_list_form').dialog({
 				resizable: false,
 				width: 1000,
 				modal: true,
