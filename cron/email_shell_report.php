@@ -175,7 +175,7 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 $row = mysqli_fetch_array($res);
 $message .= "
 	<td>{$row["pallet_balance"]}</td>
-	<td>&#8381;".number_format(( $subrow["pallet_balance"] * $actual_pallet_cost ), 0, '', ' ')."</td>
+	<td>&#8381;".number_format(( $row["pallet_balance"] * $actual_pallet_cost ), 0, '', ' ')."</td>
 ";
 
 $message .= "
@@ -192,5 +192,4 @@ $headers  = "Content-type: text/html; charset=utf-8 \r\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
 
 mail($to, $subject, $message, $headers);
-echo $message;
 ?>
