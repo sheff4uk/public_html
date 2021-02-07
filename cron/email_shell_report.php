@@ -10,12 +10,13 @@ if( $key != $script_key ) die('Access denied!');
 
 $date = date_create();
 $sr_date_format = date_format($date, 'd/m/Y');
-$subject = "[KONSTANTA] Shell report on {$sr_date_format}";
+$subject = "[KONSTANTA] Shell/Pallets report on {$sr_date_format}";
 
 $message = "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 		<tr>
 			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
+			<th><n style='font-size: 2em;'>Shell report</n></th>
 			<th>Report date: <n style='font-size: 2em;'>{$sr_date_format}</n></th>
 		</tr>
 	</table>
@@ -91,6 +92,99 @@ while( $row = mysqli_fetch_array($res) ) {
 $message .= "
 		</tbody>
 	</table>
+	<br>
+	<br>
+";
+
+$message .= "
+	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
+		<tr>
+			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
+			<th><n style='font-size: 2em;'>Pallets report</n></th>
+			<th>Report date: <n style='font-size: 2em;'>{$sr_date_format}</n></th>
+		</tr>
+	</table>
+
+	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
+		<thead style='word-wrap: break-word;'>
+			<tr>
+				<th>Pallets shipped</th>
+				<th>Pallets returned</th>
+				<th>Broken pallets</th>
+				<th>Wrong format pallet</th>
+				<th>Usable pallets returned</th>
+				<th>Pallet debt</th>
+				<th>Debt in rubles</th>
+			</tr>
+		</thead>
+		<tbody style='text-align: center;'>
+			<tr>
+";
+
+$query = "
+	SELECT SUM(pallets) shipped
+	FROM list__Shipment LS
+	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
+	WHERE LS.ls_date = CURDATE() - INTERVAL 1 DAY
+		AND CW.CB_ID = {$CB_ID}
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$message .= "
+	<td>{$row["shipped"]}</td>
+";
+
+$query = "
+	SELECT SUM(PR.pr_cnt) pr_cnt
+		,SUM(PR.pr_reject) pr_reject
+		,SUM(PR.pr_wrong_format) pr_wrong_format
+		,SUM(PR.pr_cnt - PR.pr_reject - PR.pr_wrong_format) pr_good
+	FROM pallet__Return PR
+	JOIN ClientBrand CB ON CB.CB_ID = PR.CB_ID
+	WHERE PR.pr_date = CURDATE() - INTERVAL 1 DAY
+		AND PR.CB_ID = {$CB_ID}
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$message .= "
+	<td>{$row["pr_cnt"]}</td>
+	<td>{$row["pr_reject"]}</td>
+	<td>{$row["pr_wrong_format"]}</td>
+	<td>{$row["pr_good"]}</td>
+";
+
+// Узнаем актуальную стоимость поддона
+$query = "
+	SELECT PA.pallet_cost
+	FROM pallet__Arrival PA
+	WHERE PA.pallet_cost > 0
+	ORDER BY PA.pa_date DESC, PA.PA_ID DESC
+	LIMIT 1
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$actual_pallet_cost = $row["pallet_cost"];
+
+// Узнаем долг в поддонах
+$query = "
+	SELECT CB.pallet_balance
+	FROM ClientBrand CB
+	WHERE CB.CB_ID = {$CB_ID}
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$message .= "
+	<td>{$row["pallet_balance"]}</td>
+	<td>&#8381;".number_format(( $subrow["pallet_balance"] * $actual_pallet_cost ), 0, '', ' ')."</td>
+";
+
+$message .= "
+			</tr>
+		</tbody>
+	</table>
+";
+
+$message .= "
 	<p>This letter is generated automatically. Please do not answer it. If you have any questions, you can contact us by e-mail info@konstanta.ltd.</p>
 ";
 
@@ -98,4 +192,5 @@ $headers  = "Content-type: text/html; charset=utf-8 \r\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
 
 mail($to, $subject, $message, $headers);
+echo $message;
 ?>
