@@ -108,11 +108,11 @@ $message .= "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 		<thead style='word-wrap: break-word;'>
 			<tr>
-				<th>Pallets shipped</th>
-				<th>Pallets returned</th>
+				<th>Pallets shipped on the past day</th>
+				<th>Pallets returned on the past day</th>
 				<th>Broken pallets</th>
 				<th>Wrong format pallet</th>
-				<th>Usable pallets returned</th>
+				<th>Usable pallets returned on the past day</th>
 				<th>Pallet debt</th>
 				<th>Debt in rubles</th>
 			</tr>
