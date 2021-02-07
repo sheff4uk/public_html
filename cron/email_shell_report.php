@@ -113,7 +113,7 @@ $message .= "
 				<th>Broken pallets</th>
 				<th>Wrong format pallet</th>
 				<th>Usable pallets returned on the past day</th>
-				<th>Pallet debt</th>
+				<th>Pallet debt (Vesta)</th>
 				<th>Debt in rubles</th>
 			</tr>
 		</thead>
@@ -174,8 +174,8 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
 $message .= "
-	<td>{$row["pallet_balance"]}</td>
-	<td>&#8381;".number_format(( $row["pallet_balance"] * $actual_pallet_cost ), 0, '', ' ')."</td>
+	<td style='color: red;'>{$row["pallet_balance"]}</td>
+	<td style='color: red;'><b>&#8381;".number_format(( $row["pallet_balance"] * $actual_pallet_cost ), 0, '', ' ')."</b></td>
 ";
 
 $message .= "
