@@ -97,32 +97,43 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th>Дата заливки</th>
-			<th>Окалина, кг</th>
-			<th>КМП, кг</th>
-			<th>Отсев, кг</th>
-			<th>Цемент, кг</th>
-			<th>Вода, кг</th>
+			<th rowspan="2">Противовес</th>
+			<th rowspan="2">Кол-во залитых деталей</th>
+			<th colspan="2">Окалина</th>
+			<th colspan="2">КМП</th>
+			<th colspan="2">Отсев</th>
+			<th colspan="2">Цемент</th>
+		</tr>
+		<tr>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
 		<?
 		$query = "
-			SELECT DATE_FORMAT(PB.pb_date,'%d.%m.%Y') pb_date_format
+			SELECT CW.item
+				,ROUND(SUM(CW.fillings * CW.in_cassette - LB.underfilling / CW.fillings)) details
 				,SUM(LB.iron_oxide) iron_oxide
 				,SUM(LB.sand) sand
 				,SUM(LB.crushed_stone) crushed_stone
 				,SUM(LB.cement) cement
-				,SUM(LB.water) water
 			FROM plan__Batch PB
+			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 			WHERE 1
 				".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
 				".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
 				".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 				".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-			GROUP BY PB.pb_date
-			ORDER BY PB.pb_date
+			GROUP BY PB.CW_ID
+			ORDER BY PB.pb_date, PB.CW_ID
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
@@ -130,15 +141,19 @@ foreach ($_GET as &$value) {
 			$sand += $row["sand"];
 			$crushed_stone += $row["crushed_stone"];
 			$cement += $row["cement"];
-			$water += $row["water"];
+			$details += $row["details"];
 			?>
 			<tr>
-				<td><?=$row["pb_date_format"]?></td>
-				<td><?=$row["iron_oxide"]?></td>
-				<td><?=$row["sand"]?></td>
-				<td><?=$row["crushed_stone"]?></td>
-				<td><?=$row["cement"]?></td>
-				<td><?=$row["water"]?></td>
+				<td><?=$row["item"]?></td>
+				<td><?=$row["details"]?></td>
+				<td style="background: #a52a2a80;"><?=$row["iron_oxide"]?></td>
+				<td style="background: #a52a2a80;"><?=round($row["iron_oxide"]/$row["details"], 2)?></td>
+				<td style="background: #f4a46082;"><?=$row["sand"]?></td>
+				<td style="background: #f4a46082;"><?=round($row["sand"]/$row["details"], 2)?></td>
+				<td style="background: #8b45137a;"><?=$row["crushed_stone"]?></td>
+				<td style="background: #8b45137a;"><?=round($row["crushed_stone"]/$row["details"], 2)?></td>
+				<td style="background: #7080906b;"><?=$row["cement"]?></td>
+				<td style="background: #7080906b;"><?=round($row["cement"]/$row["details"], 2)?></td>
 			</tr>
 			<?
 		}
@@ -146,11 +161,15 @@ foreach ($_GET as &$value) {
 
 		<tr class="total">
 			<td>Итог:</td>
+			<td><?=$details?></td>
 			<td><?=$iron_oxide?></td>
+				<td></td>
 			<td><?=$sand?></td>
+				<td></td>
 			<td><?=$crushed_stone?></td>
+				<td></td>
 			<td><?=$cement?></td>
-			<td><?=$water?></td>
+				<td></td>
 		</tr>
 	</tbody>
 </table>
