@@ -105,14 +105,14 @@ foreach ($_GET as &$value) {
 			<th colspan="2">Цемент</th>
 		</tr>
 		<tr>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
+			<th>Расход, т</th>
+			<th>На деталь, кг</th>
+			<th>Расход, т</th>
+			<th>На деталь, кг</th>
+			<th>Расход, т</th>
+			<th>На деталь, кг</th>
+			<th>Расход, т</th>
+			<th>На деталь, кг</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
@@ -146,13 +146,13 @@ foreach ($_GET as &$value) {
 			<tr>
 				<td><?=$row["item"]?></td>
 				<td><?=$row["details"]?></td>
-				<td style="background: #a52a2a80;"><?=$row["iron_oxide"]?></td>
+				<td style="background: #a52a2a80;"><?=round($row["iron_oxide"]/1000)?></td>
 				<td style="background: #a52a2a80;"><?=round($row["iron_oxide"]/$row["details"], 2)?></td>
-				<td style="background: #f4a46082;"><?=$row["sand"]?></td>
+				<td style="background: #f4a46082;"><?=round($row["sand"]/1000)?></td>
 				<td style="background: #f4a46082;"><?=round($row["sand"]/$row["details"], 2)?></td>
-				<td style="background: #8b45137a;"><?=$row["crushed_stone"]?></td>
+				<td style="background: #8b45137a;"><?=round($row["crushed_stone"]/1000)?></td>
 				<td style="background: #8b45137a;"><?=round($row["crushed_stone"]/$row["details"], 2)?></td>
-				<td style="background: #7080906b;"><?=$row["cement"]?></td>
+				<td style="background: #7080906b;"><?=round($row["cement"]/1000)?></td>
 				<td style="background: #7080906b;"><?=round($row["cement"]/$row["details"], 2)?></td>
 			</tr>
 			<?
