@@ -108,11 +108,11 @@ $message .= "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 		<thead style='word-wrap: break-word;'>
 			<tr>
-				<th>Pallets shipped on the past day</th>
-				<th>Pallets returned on the past day</th>
-				<th>Broken pallets</th>
-				<th>Wrong format pallet</th>
-				<th>Usable pallets returned on the past day</th>
+				<th>Pallets shipped</th>
+				<th>Pallets returned</th>
+				<th>Broken pallets returned</th>
+				<th>Wrong format pallet returned</th>
+				<th>Usable pallets returned</th>
 				<th>Pallet debt (Vesta)</th>
 				<th>Debt in rubles</th>
 			</tr>
@@ -141,7 +141,7 @@ $query = "
 		,SUM(PR.pr_cnt - PR.pr_reject - PR.pr_wrong_format) pr_good
 	FROM pallet__Return PR
 	JOIN ClientBrand CB ON CB.CB_ID = PR.CB_ID
-	WHERE PR.pr_date = CURDATE() - INTERVAL 1 DAY
+	WHERE PR.pr_date = CURDATE()
 		AND PR.CB_ID = {$CB_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
