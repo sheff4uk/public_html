@@ -146,13 +146,13 @@ foreach ($_GET as &$value) {
 			<tr>
 				<td><?=$row["item"]?></td>
 				<td><?=$row["details"]?></td>
-				<td style="background: #a52a2a80;"><?=round($row["iron_oxide"]/1000)?></td>
+				<td style="background: #a52a2a80;"><?=round($row["iron_oxide"]/1000, 2)?></td>
 				<td style="background: #a52a2a80;"><?=round($row["iron_oxide"]/$row["details"], 2)?></td>
-				<td style="background: #f4a46082;"><?=round($row["sand"]/1000)?></td>
+				<td style="background: #f4a46082;"><?=round($row["sand"]/1000, 2)?></td>
 				<td style="background: #f4a46082;"><?=round($row["sand"]/$row["details"], 2)?></td>
-				<td style="background: #8b45137a;"><?=round($row["crushed_stone"]/1000)?></td>
+				<td style="background: #8b45137a;"><?=round($row["crushed_stone"]/1000, 2)?></td>
 				<td style="background: #8b45137a;"><?=round($row["crushed_stone"]/$row["details"], 2)?></td>
-				<td style="background: #7080906b;"><?=round($row["cement"]/1000)?></td>
+				<td style="background: #7080906b;"><?=round($row["cement"]/1000, 2)?></td>
 				<td style="background: #7080906b;"><?=round($row["cement"]/$row["details"], 2)?></td>
 			</tr>
 			<?
@@ -162,13 +162,13 @@ foreach ($_GET as &$value) {
 		<tr class="total">
 			<td>Итог:</td>
 			<td><?=$details?></td>
-			<td><?=$iron_oxide?></td>
+			<td><?=round($iron_oxide/1000, 2)?></td>
 				<td></td>
-			<td><?=$sand?></td>
+			<td><?=round($sand/1000, 2)?></td>
 				<td></td>
-			<td><?=$crushed_stone?></td>
+			<td><?=round($crushed_stone/1000, 2)?></td>
 				<td></td>
-			<td><?=$cement?></td>
+			<td><?=round($cement/1000, 2)?></td>
 				<td></td>
 		</tr>
 	</tbody>
