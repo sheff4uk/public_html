@@ -125,7 +125,7 @@ $query = "
 	SELECT SUM(pallets) shipped
 	FROM list__Shipment LS
 	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
-	WHERE LS.ls_date = CURDATE() - INTERVAL 1 DAY
+	WHERE LS.ls_date = CURDATE()
 		AND CW.CB_ID = {$CB_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
