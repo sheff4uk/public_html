@@ -188,7 +188,7 @@ $query = "
 		,NULL
 		,IF(FA.USR_ID, USR_Icon(FA.USR_ID), '')
 		,DATE_FORMAT(FA.last_edit, '%d.%m.%Y в %H:%i:%s')
-		,NULL
+		,IF((SELECT FA_ID FROM fuel__Arrival ORDER BY FA_ID DESC LIMIT 1) = FA.FA_ID, 1, 0) last
 	FROM fuel__Arrival FA
 	WHERE 1
 		".($_GET["date_from"] ? "AND FA.fa_date >= '{$_GET["date_from"]}'" : "")."
@@ -214,7 +214,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["hour_meter_value"]?></td>
 		<td><?=$row["hours_cnt"]?></td>
 		<td><?=$row["USR_Icon"]?><?=($row["last_edit"] ? "<i class='fas fa-clock' title='Сохранено ".$row["last_edit"]."'.></i>" : "")?></td>
-		<td><a href="#" <?=($row["type"] == "A" ? "class='add_arrival' FA_ID='{$row["ID"]}'" : ($row["last"] ? "class='add_filling' FF_ID='{$row["ID"]}'" : "style='display: none;'"))?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
+		<td><a href="#" <?=($row["last"] ? ($row["type"] == "A" ? "class='add_arrival' FA_ID='{$row["ID"]}'" : "class='add_filling' FF_ID='{$row["ID"]}'") : "style='display: none;'")?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?
 }
