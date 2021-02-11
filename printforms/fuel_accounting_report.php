@@ -173,7 +173,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
-$fa_cnt_after = $row["ff_cnt"];
+$fa_cnt_after = $row["fa_cnt"];
 
 echo "<h3 style='float: right;'>Баланс топлива на конец месяца: <span style='font-size: 2em;'>".($ft_balance - $fa_cnt_after + $ff_cnt_after)."</span> л</h3>";
 echo "<h3>Баланс топлива на начало месяца: <span style='font-size: 2em;'>".($ft_balance - $fa_cnt + $ff_cnt - $fa_cnt_after + $ff_cnt_after)."</span> л</h3>";
