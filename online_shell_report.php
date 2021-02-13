@@ -49,7 +49,7 @@ if( !$_GET["date_to"] ) {
 					<span style="display: inline-block;">Please select a date range:</span>
 					<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
 					<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
-<!--					<i class="fas fa-question-circle" title="By default last 7 days."></i>-->
+					<i class="fas fa-question-circle" title="By default last 7 days."></i>
 					&nbsp;&nbsp;&nbsp;&nbsp;
 					<span>Part-number:</span>
 					<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>">
