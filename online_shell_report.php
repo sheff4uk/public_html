@@ -40,6 +40,8 @@ if( !$_GET["date_to"] ) {
 			</div>
 		</nav>
 
+		<h1>Shell report</h1>
+
 		<fieldset>
 			<legend>Filter:</legend>
 			<form method="get" style="position: relative;">

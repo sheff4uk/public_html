@@ -18,7 +18,7 @@ if( !$_GET["date_to"] ) {
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Pallet report</title>
+		<title>Pallets report</title>
 		<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?v=2">
 		<link rel='stylesheet' type='text/css' href='css/style.css?23'>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
@@ -39,6 +39,8 @@ if( !$_GET["date_to"] ) {
 			</div>
 			</div>
 		</nav>
+
+		<h1>Pallets report</h1>
 
 		<fieldset>
 			<legend>Filter:</legend>
@@ -143,7 +145,7 @@ while( $row = mysqli_fetch_array($res) ) {
 }
 ?>
 		<tr class="total">
-			<td>Итог:</td>
+			<td>Total:</td>
 			<td><b><?=$pallets_shipment?></b></td>
 			<td><b><?=$pr_cnt?></b></td>
 			<td><b><?=$pr_reject?></b></td>
