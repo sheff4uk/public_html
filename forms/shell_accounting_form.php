@@ -224,7 +224,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							</select>
 						</td>
 						<td><input type="number" name="sa_cnt" min="1" style="width: 70px;" required></td>
-						<td><input type="number" name="actual_volume" min="2" max="6" step="0.01" style="width: 70px;"></td>
+						<td><input type="number" name="actual_volume" min="0" max="6" step="0.01" style="width: 70px;"></td>
 						<td><input type="number" name="batch_number" min="1" style="width: 120px;"></td>
 					</tr>
 				</tbody>
