@@ -22,13 +22,35 @@ if( !$_GET["date_to"] ) {
 		<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?v=2">
 		<link rel='stylesheet' type='text/css' href='css/style.css?v=23'>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+		<link rel='stylesheet' type='text/css' href='plugins/jReject-master/css/jquery.reject.css'>
 		<script src="js/jquery-1.11.3.min.js"></script>
 		<script src="js/ui/jquery-ui.js"></script>
 		<script src="js/script.js?v=1"></script>
 		<script src="/js/jquery.ui.totop.js"></script>
+		<script src="plugins/jReject-master/js/jquery.reject.js" type="text/javascript"></script>
 		<script>
 			$(function() {
+				$('#body_wraper').fadeIn('slow');
 				$( 'input[type=submit], input[type=button], .button, button' ).button();
+
+				//Check the browser
+				$.reject({
+					reject: {
+						safari: true, // Apple Safari
+						//chrome: true, // Google Chrome
+						firefox: true, // Mozilla Firefox
+						msie: true, // Microsoft Internet Explorer
+						//opera: true, // Opera
+						konqueror: true, // Konqueror (Linux)
+						unknown: true // Everything else
+					},
+					close: false,
+					display: ['chrome','opera'],
+					header: 'Your browser is out of date',
+					paragraph1: 'You are using an outdated browser that does not support modern web standards and poses a security risk to your data.',
+					paragraph2: 'Please install a modern browser:',
+					closeMessage: ''
+				});
 			});
 		</script>
 	</head>
@@ -92,10 +114,10 @@ if( !$_GET["date_to"] ) {
 		<tr>
 			<th>Date</th>
 			<th>Part-number</th>
-			<th>Shell received</th>
+			<th>Number of shell received</th>
 			<th>Actual volume, dm<sup>3</sup></th>
 			<th>Volume as per drawing, dm<sup>3</sup></th>
-			<th>Broken shells</th>
+			<th>Number of broken shells</th>
 			<th>Exfolation</th>
 			<th>Crack</th>
 			<th>Chipped</th>
@@ -115,7 +137,6 @@ $query = "
 		,NULL exfolation
 		,NULL crack
 		,NULL chipped
-		,SA.batch_number
 		,SA.sa_date date
 		,SA.CW_ID
 	FROM shell__Arrival SA
@@ -133,11 +154,10 @@ $query = "
 		,NULL
 		,NULL
 		,NULL
-		,SR.sr_cnt
-		,SR.exfolation
-		,SR.crack
-		,SR.chipped
-		,SR.batch_number
+		,SUM(SR.sr_cnt) sr_cnt
+		,SUM(SR.exfolation) exfolation
+		,SUM(SR.crack) crack
+		,SUM(SR.chipped) chipped
 		,SR.sr_date date
 		,SR.CW_ID
 	FROM shell__Reject SR
@@ -146,6 +166,7 @@ $query = "
 		".($_GET["date_from"] ? "AND SR.sr_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND SR.sr_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND SR.CW_ID={$_GET["CW_ID"]}" : "")."
+	GROUP BY date, CW_ID
 
 	ORDER BY date, type, CW_ID
 ";

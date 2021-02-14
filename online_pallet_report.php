@@ -22,13 +22,35 @@ if( !$_GET["date_to"] ) {
 		<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?v=2">
 		<link rel='stylesheet' type='text/css' href='css/style.css?v=23'>
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+		<link rel='stylesheet' type='text/css' href='plugins/jReject-master/css/jquery.reject.css'>
 		<script src="js/jquery-1.11.3.min.js"></script>
 		<script src="js/ui/jquery-ui.js"></script>
 		<script src="js/script.js?v=1"></script>
 		<script src="/js/jquery.ui.totop.js"></script>
+		<script src="plugins/jReject-master/js/jquery.reject.js" type="text/javascript"></script>
 		<script>
 			$(function() {
+				$('#body_wraper').fadeIn('slow');
 				$( 'input[type=submit], input[type=button], .button, button' ).button();
+
+				//Check the browser
+				$.reject({
+					reject: {
+						safari: true, // Apple Safari
+						//chrome: true, // Google Chrome
+						firefox: true, // Mozilla Firefox
+						msie: true, // Microsoft Internet Explorer
+						//opera: true, // Opera
+						konqueror: true, // Konqueror (Linux)
+						unknown: true // Everything else
+					},
+					close: false,
+					display: ['chrome','opera'],
+					header: 'Your browser is out of date',
+					paragraph1: 'You are using an outdated browser that does not support modern web standards and poses a security risk to your data.',
+					paragraph2: 'Please install a modern browser:',
+					closeMessage: ''
+				});
 			});
 		</script>
 	</head>
@@ -41,6 +63,36 @@ if( !$_GET["date_to"] ) {
 			</div>
 		</nav>
 
+		<div id="body_wraper" style="display: none;" class="page">
+
+<?
+// Узнаем актуальную стоимость поддона
+$query = "
+	SELECT PA.pallet_cost
+	FROM pallet__Arrival PA
+	WHERE PA.pallet_cost > 0
+	ORDER BY PA.pa_date DESC, PA.PA_ID DESC
+	LIMIT 1
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$actual_pallet_cost = $row["pallet_cost"];
+
+// Узнаем долг в поддонах
+$query = "
+	SELECT CB.pallet_balance
+	FROM ClientBrand CB
+	WHERE CB.CB_ID = 2
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$pallet_balance = $row["pallet_balance"];
+?>
+		<div style="float: right;">
+			<b>Debt in pallets (Vesta): <span style="font-size: 2em; color: red;"><?=$pallet_balance?></span>;</b>&nbsp;&nbsp;&nbsp;&nbsp;
+			<b>Debt in rubles: <span style="font-size: 2em; color: red;">&#8381;<?=number_format(( $pallet_balance * $actual_pallet_cost ), 0, '', ' ')?></span>;</b>
+		</div>
+
 		<h1>Pallets report</h1>
 
 		<fieldset>
@@ -50,7 +102,7 @@ if( !$_GET["date_to"] ) {
 
 				<div class="nowrap">
 					<span style="display: inline-block;">Please select a date range:</span>
-					<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
+					<input name="date_from" type="date" min="2020-11-01" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
 					<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
 					<i class="fas fa-question-circle" title="By default last 7 days."></i>
 					&nbsp;&nbsp;&nbsp;&nbsp;
@@ -73,12 +125,12 @@ if( !$_GET["date_to"] ) {
 	<thead>
 		<tr>
 			<th>Date</th>
-			<th>Pallets shipped</th>
-			<th>Pallets returned</th>
-			<th>Broken pallets returned</th>
-			<th>Wrong format pallet returned</th>
-			<th>Usable pallets returned today</th>
-			<th>Missing pallets</th>
+			<th>Number of pallets shipped</th>
+			<th>Number of pallets returned</th>
+			<th>Broken pallets</th>
+			<th>Pallets of the wrong size</th>
+			<th>Usable pallets returned</th>
+			<th>Number of missing pallets (shipped pallets - usable pallets returned)</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
