@@ -63,8 +63,6 @@ if( !$_GET["date_to"] ) {
 			</div>
 		</nav>
 
-		<h1>Shell report</h1>
-
 		<fieldset>
 			<legend>Filter:</legend>
 			<form method="get" style="position: relative;">
@@ -111,6 +109,11 @@ if( !$_GET["date_to"] ) {
 <br>
 <table class="main_table">
 	<thead>
+		<tr>
+			<th colspan="3"><h1>Shell report</h1></th>
+			<th colspan="3"></th>
+			<th colspan="3"></th>
+		</tr>
 		<tr>
 			<th>Date</th>
 			<th>Part-number</th>

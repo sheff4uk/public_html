@@ -88,12 +88,6 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 $row = mysqli_fetch_array($res);
 $pallet_balance = $row["pallet_balance"];
 ?>
-		<div style="float: right;">
-			<b>Debt in pallets (Vesta): <span style="font-size: 2em; color: red;"><?=$pallet_balance?></span>;</b>&nbsp;&nbsp;&nbsp;&nbsp;
-			<b>Debt in rubles: <span style="font-size: 2em; color: red;">&#8381;<?=number_format(( $pallet_balance * $actual_pallet_cost ), 0, '', ' ')?></span>;</b>
-		</div>
-
-		<h1>Pallets report</h1>
 
 		<fieldset>
 			<legend>Filter:</legend>
@@ -124,11 +118,16 @@ $pallet_balance = $row["pallet_balance"];
 <table class="main_table">
 	<thead>
 		<tr>
+			<th colspan="3"><h1>Pallets report</h1></th>
+			<th colspan="2"><b>Debt in pallets (Vesta): <span style="font-size: 2em; color: red;"><?=$pallet_balance?></span></b></th>
+			<th colspan="2"><b>Debt in rubles: <span style="font-size: 2em; color: red;">&#8381;<?=number_format(( $pallet_balance * $actual_pallet_cost ), 0, '', ' ')?></span></b></th>
+		</tr>
+		<tr>
 			<th>Date</th>
 			<th>Number of pallets shipped</th>
 			<th>Number of pallets returned</th>
-			<th>Broken pallets</th>
-			<th>Pallets of the wrong size</th>
+			<th>Number of broken pallets returned</th>
+			<th>Number of returned pallets of the wrong size</th>
 			<th>Usable pallets returned</th>
 			<th>Number of missing pallets (shipped pallets - usable pallets returned)</th>
 		</tr>
