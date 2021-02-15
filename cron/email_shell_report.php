@@ -16,7 +16,7 @@ $message = "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 		<tr>
 			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
-			<th><n style='font-size: 2em;'>Shell report</n></th>
+			<th><n style='font-size: 2em;'>Shell report</n><br><a href='https://kis.konstanta.ltd/online_shell_report.php'>Click here to open the online report</a></th>
 			<th>Report date: <n style='font-size: 2em;'>{$sr_date_format}</n></th>
 		</tr>
 	</table>
@@ -100,7 +100,7 @@ $message .= "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 		<tr>
 			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
-			<th><n style='font-size: 2em;'>Pallets report</n></th>
+			<th><n style='font-size: 2em;'>Pallets report</n><br><a href='https://kis.konstanta.ltd/online_pallet_report.php'>Click here to open the online report</a></th>
 			<th>Report date: <n style='font-size: 2em;'>{$sr_date_format}</n></th>
 		</tr>
 	</table>
