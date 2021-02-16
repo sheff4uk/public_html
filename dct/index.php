@@ -16,7 +16,7 @@
 					{
 						//console.log(barcode);
 						alert(barcode.length);
-						alert('['.barcode.']');
+						alert('[' + barcode + ']');
 						if( barcode.length == 8 ) {
 							//filling_form(Number(barcode));
 							barcode="";
