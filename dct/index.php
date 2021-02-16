@@ -30,8 +30,10 @@
 					}
 					else
 					{
-						barcode = barcode + String.fromCharCode(code);
-						codes = codes + code + ',';
+						if (code >= 48 && code <= 57) {
+							barcode = barcode + String.fromCharCode(code);
+							codes = codes + code + ',';
+						}
 					}
 				});
 			});
