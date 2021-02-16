@@ -196,7 +196,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 			{
 				console.log(barcode);
 				if( barcode.length == 8 ) {
-					alert(barcode);
 					filling_form(Number(barcode));
 					barcode="";
 					return false;
