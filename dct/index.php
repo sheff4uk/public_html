@@ -13,6 +13,7 @@
 				$(document).keydown(function(e)
 				{
 					var code = (e.keyCode ? e.keyCode : e.which);
+					if (code==0) alert('!!!');
 					if( code==13 || code==9 )// Enter key hit. Tab key hit.
 					{
 						//console.log(barcode);
