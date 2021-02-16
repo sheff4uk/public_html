@@ -193,8 +193,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			var code = (e.keyCode ? e.keyCode : e.which);
 			if( code==13 || code==9 )// Enter key hit. Tab key hit.
 			{
-				//console.log(barcode);
-				alert(barcode.length);
+				console.log(barcode);
 				if( barcode.length == 8 ) {
 					alert(barcode);
 					filling_form(Number(barcode));
