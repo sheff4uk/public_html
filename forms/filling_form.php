@@ -191,6 +191,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 		$(document).keydown(function(e)
 		{
 			var code = (e.keyCode ? e.keyCode : e.which);
+			if (code==0) barcode="";
 			if( code==13 || code==9 )// Enter key hit. Tab key hit.
 			{
 				console.log(barcode);
@@ -204,7 +205,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 			}
 			else
 			{
-				barcode=barcode+String.fromCharCode(code);
+				if (code >= 48 && code <= 57) {
+					barcode=barcode+String.fromCharCode(code);
+				}
 			}
 		});
 
