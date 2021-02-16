@@ -14,7 +14,8 @@
 					var code = (e.keyCode ? e.keyCode : e.which);
 					if( code==13 || code==9 )// Enter key hit. Tab key hit.
 					{
-						console.log(barcode);
+						//console.log(barcode);
+						alert(barcode.length);
 						alert(barcode);
 						if( barcode.length == 8 ) {
 							//filling_form(Number(barcode));
