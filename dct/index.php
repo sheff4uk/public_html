@@ -9,25 +9,29 @@
 			$(function() {
 				// Считывание штрихкода
 				var barcode="";
+				var codes="";
 				$(document).keydown(function(e)
 				{
 					var code = (e.keyCode ? e.keyCode : e.which);
-					alert('[' + code + ']');
 					if( code==13 || code==9 )// Enter key hit. Tab key hit.
 					{
 						//console.log(barcode);
 						alert(barcode.length);
-						alert('[' + barcode + ']');
+						alert(barcode);
+						alert(codes);
 						if( barcode.length == 8 ) {
 							//filling_form(Number(barcode));
 							barcode="";
+							codes="";
 							return false;
 						}
 						barcode="";
+						codes="";
 					}
 					else
 					{
-						barcode=barcode+String.fromCharCode(code);
+						barcode = barcode + String.fromCharCode(code);
+						codes = codes + code + ',';
 					}
 				});
 			});
