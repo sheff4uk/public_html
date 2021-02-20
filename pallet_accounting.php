@@ -17,6 +17,22 @@ include "./forms/pallet_accounting_form.php";
 ?>
 
 <style>
+	#pallet_disposal_btn {
+		text-align: center;
+		line-height: 68px;
+		color: #fff;
+		bottom: 250px;
+		cursor: pointer;
+		width: 56px;
+		height: 56px;
+		opacity: .4;
+		position: fixed;
+		right: 20px;
+		z-index: 9;
+		border-radius: 50%;
+		background-color: #db4437;
+		box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+	}
 	#pallet_arrival_btn {
 		text-align: center;
 		line-height: 68px;
@@ -46,10 +62,10 @@ include "./forms/pallet_accounting_form.php";
 		right: 20px;
 		z-index: 9;
 		border-radius: 50%;
-		background-color: #db4437;
+		background-color: #16A085;
 		box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
 	}
-	#pallet_arrival_btn:hover, #pallet_return_btn:hover {
+	#pallet_disposal_btn:hover, #pallet_arrival_btn:hover, #pallet_return_btn:hover {
 		opacity: 1;
 	}
 </style>
@@ -145,6 +161,7 @@ foreach ($_GET as &$value) {
 			<th>Дата</th>
 			<th>Поставщик поддонов / Клиент</th>
 			<th>Отгружено поддонов</th>
+			<th>Утилизировано поддонов</th>
 			<th>Приобретено / возвращено поддонов</th>
 			<th>Из них бракованных</th>
 			<th>Из них другого формата</th>
@@ -163,6 +180,7 @@ $query = "
 		,DATE_FORMAT(PR.pr_date, '%d.%m.%Y') date_format
 		,CB.brand
 		,NULL pallets_shipment
+		,NULL pd_cnt
 		,PR.pr_cnt
 		,PR.pr_reject
 		,PR.pr_wrong_format
@@ -188,6 +206,7 @@ $query = "
 		,DATE_FORMAT(PA.pa_date, '%d.%m.%Y')
 		,PS.pallet_supplier
 		,NULL pallets_shipment
+		,NULL
 		,PA.pa_cnt
 		,PA.pa_reject
 		,NULL
@@ -206,6 +225,32 @@ $query = "
 		".($_GET["CB_ID"] ? "AND 0" : "")."
 		".($_GET["PS_ID"] ? "AND PS.PS_ID = {$_GET["PS_ID"]}" : "")."
 
+
+	UNION
+
+	SELECT 'D'
+		,PD.PD_ID
+		,DATE_FORMAT(PD.pd_date, '%d.%m.%Y')
+		,NULL
+		,NULL pallets_shipment
+		,PD.pd_cnt
+		,NULL
+		,NULL
+		,NULL
+		,NULL
+		,NULL
+		,NULL
+		,PD.pd_date
+		,NULL
+		,NULL
+		,NULL
+	FROM pallet__Disposal PD
+	WHERE 1
+		".($_GET["date_from"] ? "AND PD.pd_date >= '{$_GET["date_from"]}'" : "")."
+		".($_GET["date_to"] ? "AND PD.pd_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["CB_ID"] ? "AND 0" : "")."
+		".($_GET["PS_ID"] ? "AND 0" : "")."
+
 	UNION
 
 	SELECT NULL
@@ -213,6 +258,7 @@ $query = "
 		,DATE_FORMAT(LS.ls_date, '%d.%m.%Y')
 		,CB.brand
 		,SUM(pallets)
+		,NULL
 		,NULL
 		,NULL
 		,NULL
@@ -233,11 +279,12 @@ $query = "
 		".($_GET["PS_ID"] ? "AND 0" : "")."
 	GROUP BY CW.CB_ID, LS.ls_date
 
-	ORDER BY date, CB_ID
+	ORDER BY date, type, CB_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$pallets_shipment += $row["pallets_shipment"];
+	$pd_cnt += $row["pd_cnt"];
 	$pr_cnt += $row["pr_cnt"];
 	$pr_reject += $row["pr_reject"];
 	$pr_wrong_format += $row["pr_wrong_format"];
@@ -250,13 +297,14 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["date_format"]?></td>
 		<td><span class="nowrap"><?=$row["brand"]?></span></td>
 		<td><b><a href="shipment.php?week=<?=$row["week"]?>&CB_ID=<?=$row["CB_ID"]?>#<?=$row["LS_ID"]?>" target="_blank"><?=$row["pallets_shipment"]?></a></b></td>
+		<td><b><?=$row["pd_cnt"]?></b></td>
 		<td><b><?=$row["pr_cnt"]?></b></td>
 		<td><b style="color: red;"><?=$row["pr_reject"]?></b></td>
 		<td><b style="color: red;"><?=$row["pr_wrong_format"]?></b></td>
 		<td><b style="color: green;"><?=$row["pr_good"]?></b></td>
 		<td><?=(isset($row["pallet_cost"]) ? number_format($row["pallet_cost"], 0, '', ' ') : "")?></td>
 		<td><?=(isset($row["sum_cost"]) ? number_format($row["sum_cost"], 0, '', ' ') : "")?></td>
-		<td><?=($row["type"] ? "<a href='#' ".($row["type"] == "A" ? "class='add_arrival' PA_ID='{$row["ID"]}'" : "class='add_return' PR_ID='{$row["ID"]}'")." title='Редактировать'><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?></td>
+		<td><?=($row["type"] ? "<a href='#' ".($row["type"] == "A" ? "class='add_arrival' PA_ID='{$row["ID"]}'" : ($row["type"] == "R" ? "class='add_return' PR_ID='{$row["ID"]}'" : "class='add_disposal' PD_ID='{$row["ID"]}'"))." title='Редактировать'><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?></td>
 	</tr>
 	<?
 }
@@ -265,6 +313,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td></td>
 			<td>Итог:</td>
 			<td><b><?=$pallets_shipment?></b></td>
+			<td><b><?=$pd_cnt?></b></td>
 			<td><b><?=$pr_cnt?></b></td>
 			<td><b><?=$pr_reject?></b></td>
 			<td><b><?=$pr_wrong_format?></b></td>
@@ -330,6 +379,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	</table>
 </div>
 
+<div id="pallet_disposal_btn" class="add_disposal" title="Утилизация поддонов"><i class="fas fa-2x fa-trash-alt"></i></div>
 <div id="pallet_arrival_btn" class="add_arrival" title="Приобретение поддонов"><i class="fas fa-2x fa-plus"></i></div>
 <div id="pallet_return_btn" class="add_return" title="Возврат поддонов"><i class="fas fa-2x fa-undo-alt"></i></div>
 

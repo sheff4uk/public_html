@@ -37,5 +37,20 @@ elseif( isset($_GET["PA_ID"]) ) {
 
 	echo json_encode($PA_data);
 }
+elseif( isset($_GET["PD_ID"]) ) {
+	$PD_ID = $_GET["PD_ID"];
+
+	$query = "
+		SELECT PD.pd_date
+			,PD.pd_cnt
+		FROM pallet__Disposal PD
+		WHERE PD.PD_ID = {$PD_ID}
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$PD_data = array( "pd_date"=>$row["pd_date"], "pd_cnt"=>$row["pd_cnt"] );
+
+	echo json_encode($PD_data);
+}
 
 ?>

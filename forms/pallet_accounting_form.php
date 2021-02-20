@@ -114,6 +114,54 @@ if( isset($_POST["pa_cnt"]) ) {
 	$date_to = date_format($date_to, 'Y-m-d');
 	exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#A'.$PA_ID.'">');
 }
+
+// Сохранение/редактирование утилизации поддонов
+if( isset($_POST["pd_cnt"]) ) {
+	session_start();
+	$pd_date = $_POST["pd_date"];
+	$pd_cnt = $_POST["pd_cnt"];
+
+	if( $_POST["PD_ID"] ) { // Редактируем
+		$query = "
+			UPDATE pallet__Disposal
+			SET pd_date = '{$pd_date}'
+				,pd_cnt = {$pd_cnt}
+			WHERE PD_ID = {$_POST["PD_ID"]}
+		";
+		if( !mysqli_query( $mysqli, $query ) ) {
+			$_SESSION["error"][] = "Invalid query1: ".mysqli_error( $mysqli );
+		}
+		$PD_ID = $_POST["PD_ID"];
+	}
+	else { // Добавляем
+		$query = "
+			INSERT INTO pallet__Disposal
+			SET pd_date = '{$pd_date}'
+				,pd_cnt = {$pd_cnt}
+		";
+		if( !mysqli_query( $mysqli, $query ) ) {
+			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+		}
+		else {
+			$add = 1;
+			$PD_ID = mysqli_insert_id( $mysqli );
+		}
+	}
+
+	if( count($_SESSION["error"]) == 0) {
+		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
+	}
+
+	// Перенаправление в журнал
+	$date_edit = date_create($pd_date);
+	$date_from = date_create($_POST["date_from"]);
+	$date_to = date_create($_POST["date_to"]);
+	$date_from = min($date_from, $date_edit);
+	$date_to = max($date_to, $date_edit);
+	$date_from = date_format($date_from, 'Y-m-d');
+	$date_to = date_format($date_to, 'Y-m-d');
+	exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#D'.$PD_ID.'">');
+}
 ?>
 
 <style>
@@ -133,14 +181,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
 			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
 
-			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-				<span>Дата возврата:</span>
-				<input type="date" name="pr_date" required>
-			</div>
-
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
+						<th>Дата возврата</th>
 						<th>Клиент</th>
 						<th>Возвращено поддонов</th>
 						<th>Из них бракованных</th>
@@ -149,6 +193,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
+						<td><input type="date" name="pr_date" required></td>
 						<td>
 							<select name="CB_ID" style="width: 150px;" required>
 								<option value=""></option>
@@ -187,14 +232,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
 			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
 
-			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-				<span>Дата приобретения:</span>
-				<input type="date" name="pa_date" required>
-			</div>
-
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
+						<th>Дата приобретения</th>
 						<th>Поставщик поддонов</th>
 						<th>Приобретено поддонов</th>
 						<th>Из них бракованных</th>
@@ -203,6 +244,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
+						<td><input type="date" name="pa_date" required></td>
 						<td>
 							<select name="PS_ID" style="width: 150px;" required>
 								<option value=""></option>
@@ -222,6 +264,36 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td><input type="number" name="pa_cnt" min="0" style="width: 70px;" required></td>
 						<td><input type="number" name="pa_reject" min="0" style="width: 70px;" required></td>
 						<td><input type="number" name="pallet_cost" min="0" style="width: 120px;" required></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<div>
+			<hr>
+			<input type='submit' name="subbut" value='Записать' style='float: right;'>
+		</div>
+	</form>
+</div>
+
+<div id='pallet_disposal_form' title='Утилизация поддонов' style='display:none;'>
+	<form method='post' action="/forms/pallet_accounting_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
+this.subbut.value='Подождите, пожалуйста!';">
+		<fieldset>
+			<input type="hidden" name="PD_ID">
+			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
+			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
+
+			<table style="width: 100%; table-layout: fixed;">
+				<thead>
+					<tr>
+						<th>Дата утилизации</th>
+						<th>Утилизировано поддонов</th>
+					</tr>
+				</thead>
+				<tbody style="text-align: center;">
+					<tr>
+						<td><input type="date" name="pd_date" required></td>
+						<td><input type="number" name="pd_cnt" min="0" style="width: 70px;" required></td>
 					</tr>
 				</tbody>
 			</table>
@@ -262,7 +334,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Иначе очищаем форму
 			else {
 				$('#pallet_return_form input[name="PR_ID"]').val('');
-				$('#pallet_return_form input[name="pr_date"]').val('');
 				$('#pallet_return_form table input').val('');
 				$('#pallet_return_form table select').val('');
 			}
@@ -304,12 +375,48 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Иначе очищаем форму
 			else {
 				$('#pallet_arrival_form input[name="PA_ID"]').val('');
-				$('#pallet_arrival_form input[name="pa_date"]').val('');
 				$('#pallet_arrival_form table input').val('');
-				$('#pallet_return_form table select').val('');
+				$('#pallet_arrival_form table select').val('');
 			}
 
 			$('#pallet_arrival_form').dialog({
+				resizable: false,
+				width: 1000,
+				modal: true,
+				closeText: 'Закрыть'
+			});
+
+			return false;
+		});
+
+		// Кнопка утилизация
+		$('.add_disposal').click( function() {
+			// Проверяем сессию
+			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
+
+			var PD_ID = $(this).attr("PD_ID");
+
+			// В случае редактирования заполняем форму
+			if( PD_ID ) {
+				// Данные аяксом
+				$.ajax({
+					url: "/ajax/pallet_accounting_json.php?PD_ID=" + PD_ID,
+					success: function(msg) { PD_data = msg; },
+					dataType: "json",
+					async: false
+				});
+
+				$('#pallet_disposal_form input[name="PD_ID"]').val(PD_ID);
+				$('#pallet_disposal_form input[name="pd_date"]').val(PD_data['pd_date']);
+				$('#pallet_disposal_form input[name="pd_cnt"]').val(PD_data['pd_cnt']);
+			}
+			// Иначе очищаем форму
+			else {
+				$('#pallet_disposal_form input[name="PD_ID"]').val('');
+				$('#pallet_arrival_form table input').val('');
+			}
+
+			$('#pallet_disposal_form').dialog({
 				resizable: false,
 				width: 1000,
 				modal: true,
