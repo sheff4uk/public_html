@@ -21,7 +21,7 @@ if( !$_GET["detailing"] ) {
 <div id="filter">
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
-		<a href="/daily_reject.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+		<a href="/daily_reject_stat.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Дата между:</span>
