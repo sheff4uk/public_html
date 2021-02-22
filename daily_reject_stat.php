@@ -112,11 +112,9 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th>Период</th>
 			<th>Противовес</th>
-			<th>Кол-во брака при расформовке</th>
-			<th>% брака при расформовке</th>
-			<th>Кол-во брака при упаковке</th>
-			<th>% брака при упаковке</th>
-			<th>Всего брака</th>
+			<th>Кол-во выявленного брака, шт</th>
+			<th>% брака</th>
+			<th>Стоимость брака</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
@@ -124,77 +122,42 @@ foreach ($_GET as &$value) {
 <?
 $query = "
 	SELECT
-		".($_GET["detailing"] == "day" ? "DATE_FORMAT(OPR.reject_date, '%d.%m.%Y') reject_date_format" : "")."
-		".($_GET["detailing"] == "week" ? "DATE_FORMAT(OPR.reject_date, '%x w%v') reject_date_format" : "")."
-		".($_GET["detailing"] == "month" ? "DATE_FORMAT(OPR.reject_date, '%Y %b') reject_date_format" : "")."
-		".($_GET["detailing"] == "day" ? ",OPR.reject_date reject_date_sort" : "")."
-		".($_GET["detailing"] == "week" ? ",DATE_FORMAT(OPR.reject_date, '%x%v') reject_date_sort" : "")."
-		".($_GET["detailing"] == "month" ? ",DATE_FORMAT(OPR.reject_date, '%Y%m') reject_date_sort" : "")."
-		,OPR.item
-		,IFNULL(SUM(o_reject), 0) `o_reject`
-		,IFNULL(SUM(o_details), 0) `o_details`
-		,IFNULL(SUM(p_reject), 0) `p_reject`
-		,IFNULL(SUM(p_details), 0) `p_details`
-	FROM (
-		SELECT LO.o_date `reject_date`
-			,CW.item
-			,CW.CW_ID
-			,SUM(IFNULL(o_not_spill, 0) + IFNULL(o_crack, 0) + IFNULL(o_chipped, 0) + IFNULL(o_def_form, 0)) `o_reject`
-			,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling) / CW.fillings) `o_details`
-			,NULL `p_reject`
-			,NULL `p_details`
-		FROM list__Opening LO
-		JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
-		JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
-		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-		WHERE 1
-			".($_GET["date_from"] ? "AND LO.o_date >= '{$_GET["date_from"]}'" : "")."
-			".($_GET["date_to"] ? "AND LO.o_date <= '{$_GET["date_to"]}'" : "")."
-			".($_GET["CW_ID"] ? "AND CW.CW_ID={$_GET["CW_ID"]}" : "")."
-			".($_GET["CB_ID"] ? "AND CW.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-		GROUP BY PB.CW_ID, LO.o_date
-
-		UNION
-
-		SELECT LP.p_date
-			,CW.item
-			,CW.CW_ID
-			,NULL
-			,NULL
-			,SUM(IFNULL(p_not_spill, 0) + IFNULL(p_crack, 0) + IFNULL(p_chipped, 0) + IFNULL(p_def_form, 0)) `p_reject`
-			,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling) / CW.fillings) - SUM(IFNULL(o_not_spill, 0) + IFNULL(o_crack, 0) + IFNULL(o_chipped, 0) + IFNULL(o_def_form, 0)) `p_details`
-		FROM list__Packing LP
-		JOIN list__Filling LF ON LF.LF_ID = LP.LF_ID
-		JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
-		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
-		WHERE 1
-			".($_GET["date_from"] ? "AND LP.p_date >= '{$_GET["date_from"]}'" : "")."
-			".($_GET["date_to"] ? "AND LP.p_date <= '{$_GET["date_to"]}'" : "")."
-			".($_GET["CW_ID"] ? "AND CW.CW_ID={$_GET["CW_ID"]}" : "")."
-			".($_GET["CB_ID"] ? "AND CW.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-		GROUP BY PB.CW_ID, LP.p_date
-	) OPR
-	GROUP BY reject_date_format, OPR.CW_ID
-	ORDER BY reject_date_sort, OPR.CW_ID
+		".($_GET["detailing"] == "day" ? "DATE_FORMAT(LO.o_date, '%d.%m.%Y') reject_date_format" : "")."
+		".($_GET["detailing"] == "week" ? "DATE_FORMAT(LO.o_date, '%x w%v') reject_date_format" : "")."
+		".($_GET["detailing"] == "month" ? "DATE_FORMAT(LO.o_date, '%Y %b') reject_date_format" : "")."
+		".($_GET["detailing"] == "day" ? ",LO.o_date reject_date_sort" : "")."
+		".($_GET["detailing"] == "week" ? ",DATE_FORMAT(LO.o_date, '%x%v') reject_date_sort" : "")."
+		".($_GET["detailing"] == "month" ? ",DATE_FORMAT(LO.o_date, '%Y%m') reject_date_sort" : "")."
+		,CW.item
+		,SUM(IFNULL(o_not_spill, 0) + IFNULL(o_crack, 0) + IFNULL(o_chipped, 0) + IFNULL(o_def_form, 0) + IFNULL(p_not_spill, 0) + IFNULL(p_crack, 0) + IFNULL(p_chipped, 0) + IFNULL(p_def_form, 0)) `o_reject`
+		,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling) / CW.fillings) `o_details`
+		,CW.CBD
+	FROM list__Opening LO
+	JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
+	WHERE 1
+		".($_GET["date_from"] ? "AND LO.o_date >= '{$_GET["date_from"]}'" : "")."
+		".($_GET["date_to"] ? "AND LO.o_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["CW_ID"] ? "AND CW.CW_ID={$_GET["CW_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND CW.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+	GROUP BY reject_date_format, PB.CW_ID
+	ORDER BY reject_date_sort, PB.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$o_reject += $row["o_reject"];
-	$p_reject += $row["p_reject"];
 	$o_details += $row["o_details"];
-	$p_details += $row["p_details"];
+	$CBD += $row["o_reject"] * $row["CBD"];
 	?>
 	<tr>
 		<td><?=$row["reject_date_format"]?></td>
 		<td><?=$row["item"]?></td>
 		<td><?=($row["o_details"] > 0 ? $row["o_reject"] : "")?></td>
 		<td><?=($row["o_details"] > 0 ? round($row["o_reject"] / $row["o_details"] * 100, 1) : "")?></td>
-		<td><?=($row["p_details"] > 0 ? $row["p_reject"] : "")?></td>
-		<td><?=($row["p_details"] > 0 ? round($row["p_reject"] / $row["p_details"] * 100, 1) : "")?></td>
-		<td><?=($row["o_reject"] + $row["p_reject"])?></td>
+		<td><?=($row["o_reject"] * $row["CBD"])?></td>
 	</tr>
 	<?
 }
@@ -204,9 +167,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Итог:</td>
 			<td><?=($o_details > 0 ? $o_reject : "")?></td>
 			<td><?=($o_details > 0 ? round($o_reject / $o_details * 100, 1) : "")?></td>
-			<td><?=($p_details > 0 ? $p_reject : "")?></td>
-			<td><?=($p_details > 0 ? round($p_reject / $p_details * 100, 1) : "")?></td>
-			<td><?=($o_reject + $p_reject)?></td>
+			<td><?=$CBD?></td>
 		</tr>
 	</tbody>
 </table>
