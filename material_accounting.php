@@ -147,6 +147,7 @@ foreach ($_GET as &$value) {
 			<th>№ партии</th>
 			<th>№ сертификата качества</th>
 			<th>Кол-во</th>
+			<th>Стоимость</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -163,6 +164,7 @@ foreach ($_GET as &$value) {
 				,MA.batch_number
 				,MA.certificate_number
 				,MA.ma_cnt
+				,MA.ma_cost
 			FROM material__Arrival MA
 			JOIN material__Name MN ON MN.MN_ID = MA.MN_ID
 			JOIN material__Supplier MS ON MS.MS_ID = MA.MS_ID
@@ -182,6 +184,7 @@ foreach ($_GET as &$value) {
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
 			$ma_cnt += $row["ma_cnt"];
+			$ma_cost += $row["ma_cost"];
 			?>
 			<tr id="<?=$row["MA_ID"]?>">
 				<td><?=$row["ma_date_format"]?></td>
@@ -193,6 +196,7 @@ foreach ($_GET as &$value) {
 				<td><?=$row["batch_number"]?></td>
 				<td><?=$row["certificate_number"]?></td>
 				<td><?=$row["ma_cnt"]?></td>
+				<td><?=$row["ma_cost"]?></td>
 				<td><a href="#" class="add_material_arrival" MA_ID="<?=$row["MA_ID"]?>" title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 			</tr>
 			<?
@@ -209,6 +213,7 @@ foreach ($_GET as &$value) {
 			<td></td>
 			<td>Итог:</td>
 			<td><?=$ma_cnt?></td>
+			<td><?=$ma_cost?></td>
 			<td></td>
 		</tr>
 	</tbody>

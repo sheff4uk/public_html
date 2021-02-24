@@ -14,6 +14,7 @@ if( isset($_POST["ma_date"]) ) {
 	$batch_number = trim($_POST["batch_number"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["batch_number"]))."'" : "NULL";
 	$certificate_number = trim($_POST["certificate_number"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["certificate_number"]))."'" : "NULL";
 	$ma_cnt = $_POST["ma_cnt"];
+	$ma_cost = $_POST["ma_cost"] ? $_POST["ma_cost"] : "NULL";
 
 	if( $_POST["MA_ID"] ) { // Редактируем
 		$query = "
@@ -27,6 +28,7 @@ if( isset($_POST["ma_date"]) ) {
 				,batch_number = {$batch_number}
 				,certificate_number = {$certificate_number}
 				,ma_cnt = {$ma_cnt}
+				,ma_cost = {$ma_cost}
 			WHERE MA_ID = {$_POST["MA_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -46,6 +48,7 @@ if( isset($_POST["ma_date"]) ) {
 				,batch_number = {$batch_number}
 				,certificate_number = {$certificate_number}
 				,ma_cnt = {$ma_cnt}
+				,ma_cost = {$ma_cost}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -164,6 +167,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>№ партии</th>
 						<th>№ сертификата качества</th>
 						<th>Кол-во</th>
+						<th>Стоимость</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -221,6 +225,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td><input type='text' name='batch_number' style="width: 100%;"></td>
 						<td><input type='text' name='certificate_number' style="width: 100%;"></td>
 						<td><input type='number' min='0' step='0.01' name='ma_cnt' style="width: 100%;" required></td>
+						<td><input type='number' min='0' name='ma_cost' style="width: 100%;"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -377,6 +382,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#material_arrival_form input[name="batch_number"]').val(ma_data['batch_number']);
 				$('#material_arrival_form input[name="certificate_number"]').val(ma_data['certificate_number']);
 				$('#material_arrival_form input[name="ma_cnt"]').val(ma_data['ma_cnt']);
+				$('#material_arrival_form input[name="ma_cost"]').val(ma_data['ma_cost']);
 			}
 			// Иначе очищаем форму
 			else {
