@@ -1136,12 +1136,14 @@ class BarcodeDatamatrix {
         return $datamatrix;
     }
 }
-$im     = imagecreatetruecolor(200, 60);
+$w = $_GET["w"];
+$h = $_GET["h"];
+$im     = imagecreatetruecolor($w, $h);
 $black  = ImageColorAllocate($im,0x00,0x00,0x00);
 $white  = ImageColorAllocate($im,0xff,0xff,0xff);
-imagefilledrectangle($im, 0, 0, 300, 300, $white);
+imagefilledrectangle($im, 0, 0, $w, $h, $white);
 $code = str_pad($_GET["code"], 8, "0", STR_PAD_LEFT);
-$data = Barcode::gd($im, $black, 100, 30, 0, "code128", $code, 2, 50);
+$data = Barcode::gd($im, $black, $w/2, $h/2, 0, "code128", $code, 2, $h-10);
 header('Content-type: image/gif');
 imagegif($im);
 imagedestroy($im);

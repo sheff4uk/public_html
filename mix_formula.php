@@ -11,7 +11,7 @@ include "./forms/mix_formula_form.php";
 			<th rowspan="2">Противовес</th>
 			<th rowspan="2">Литера</th>
 			<th colspan="2">Условия применения</th>
-			<th colspan="5">Рецепт</th>
+			<th colspan="6">Рецепт</th>
 			<th rowspan="2"></th>
 		</tr>
 		<tr>
@@ -21,6 +21,7 @@ include "./forms/mix_formula_form.php";
 			<th>КМП, кг</th>
 			<th>Отсев, кг</th>
 			<th>Цемент, кг</th>
+			<th>Пластификатор, кг</th>
 			<th>Вода, кг</th>
 		</tr>
 	</thead>
@@ -41,6 +42,7 @@ $query = "
 		,MF.sand
 		,MF.crushed_stone
 		,MF.cement
+		,MF.plasticizer
 		,MF.water
 	FROM MixFormula MF
 	JOIN CounterWeight CW ON CW.CW_ID = MF.CW_ID
@@ -71,6 +73,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td style="background: #f4a46082;"><?=$row["sand"]?></td>
 		<td style="background: #8b45137a;"><?=$row["crushed_stone"]?></td>
 		<td style="background: #7080906b;"><?=$row["cement"]?></td>
+		<td style="background: #80800080;"><?=$row["plasticizer"]?></td>
 		<td style="background: #1e90ff85;"><?=$row["water"]?></td>
 		<td><a href="#" class="add_formula" MF_ID="<?=$row["MF_ID"]?>" title="Изменить рецепт"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>

@@ -14,6 +14,7 @@ if( isset($_POST["CW_ID"]) ) {
 	$sand = ($_POST["sand"] != '') ? $_POST["sand"] : "NULL";
 	$crushed_stone = ($_POST["crushed_stone"] != '') ? $_POST["crushed_stone"] : "NULL";
 	$cement = ($_POST["cement"] != '') ? $_POST["cement"] : "NULL";
+	$plasticizer = ($_POST["plasticizer"] != '') ? $_POST["plasticizer"] : "NULL";
 	$water = ($_POST["water"] != '') ? $_POST["water"] : "NULL";
 
 	if( $_POST["MF_ID"] ) { // Редактируем
@@ -29,6 +30,7 @@ if( isset($_POST["CW_ID"]) ) {
 				,sand = {$sand}
 				,crushed_stone = {$crushed_stone}
 				,cement = {$cement}
+				,plasticizer = {$plasticizer}
 				,water = {$water}
 			WHERE MF_ID = {$_POST["MF_ID"]}
 		";
@@ -50,6 +52,7 @@ if( isset($_POST["CW_ID"]) ) {
 				,sand = {$sand}
 				,crushed_stone = {$crushed_stone}
 				,cement = {$cement}
+				,plasticizer = {$plasticizer}
 				,water = {$water}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -89,7 +92,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th rowspan="2">Противовес</th>
 						<th rowspan="2">Литера</th>
 						<th colspan="2">Условия применения</th>
-						<th colspan="5">Рецепт</th>
+						<th colspan="6">Рецепт</th>
 					</tr>
 					<tr>
 						<th>Окалина между</th>
@@ -98,6 +101,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>КМП, кг</th>
 						<th>Отсев, кг</th>
 						<th>Цемент, кг</th>
+						<th>Пластификатор, кг</th>
 						<th>Вода, кг</th>
 					</tr>
 				</thead>
@@ -147,6 +151,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td style="background: #f4a46082;"><input type="number" name="sand" min="0" style="width: 80px;"></td>
 						<td style="background: #8b45137a;"><input type="number" name="crushed_stone" min="0" style="width: 80px;"></td>
 						<td style="background: #7080906b;"><input type="number" name="cement" min="0" style="width: 80px;" required></td>
+						<td style="background: #80800080;"><input type="number" name="plasticizer" min="0" step="0.05" style="width: 80px;"></td>
 						<td style="background: #1e90ff85;"><input type="number" name="water" min="0" style="width: 80px;" required></td>
 					</tr>
 				</tbody>
@@ -191,6 +196,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#formula_form input[name="sand"]').val(mf_data['sand']);
 				$('#formula_form input[name="crushed_stone"]').val(mf_data['crushed_stone']);
 				$('#formula_form input[name="cement"]').val(mf_data['cement']);
+				$('#formula_form input[name="plasticizer"]').val(mf_data['plasticizer']);
 				$('#formula_form input[name="water"]').val(mf_data['water']);
 			}
 			// Иначе очищаем форму

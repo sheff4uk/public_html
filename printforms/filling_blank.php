@@ -95,7 +95,7 @@ echo "<title>Чеклист оператора для {$item} от {$pb_date}</t
 			<th style="font-size: 2em;"><?=$item?></th>
 			<th><n style="font-size: 3em;"><?=$week?></n> неделя<br><?=$week_range?></th>
 			<th width="40"><n style="font-size: 3em;"><?=$pb_weekday?></n><br>цикл</th>
-			<th><img src="../barcode.php?code=<?=$PB_ID?>" alt="barcode"></th>
+			<th><img src="../barcode.php?code=<?=$PB_ID?>&w=200&h=60" alt="barcode"></th>
 		</tr>
 	</thead>
 </table>
@@ -110,11 +110,13 @@ $query = "
 		,GROUP_CONCAT(IFNULL(CONCAT(MF.sand, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') sand
 		,GROUP_CONCAT(IFNULL(CONCAT(MF.crushed_stone, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') crushed_stone
 		,GROUP_CONCAT(IFNULL(CONCAT(MF.cement, ' ±2'), 0) ORDER BY MF.letter SEPARATOR '<br>') cement
+		,GROUP_CONCAT(IFNULL(CONCAT(MF.plasticizer, ' ±0.05'), 0) ORDER BY MF.letter SEPARATOR '<br>') plasticizer
 		,GROUP_CONCAT(IFNULL(CONCAT('min ', MF.water), 0) ORDER BY MF.letter SEPARATOR '<br>') water
 		,COUNT(MF.iron_oxide) io_cnt
 		,COUNT(MF.sand) sn_cnt
 		,COUNT(MF.crushed_stone) cs_cnt
 		,COUNT(MF.cement) cm_cnt
+		,COUNT(MF.plasticizer) pl_cnt
 		,COUNT(MF.water) wt_cnt
 	FROM MixFormula MF
 	WHERE MF.CW_ID = {$CW_ID}
@@ -135,6 +137,7 @@ $row = mysqli_fetch_array($res);
 			<?=($row["sn_cnt"] ? "<th rowspan='2'>КМП, кг</th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th rowspan='2'>Отсев, кг</th>" : "")?>
 			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент, кг</th>" : "")?>
+			<?=($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор, кг</th>" : "")?>
 			<?=($row["wt_cnt"] ? "<th rowspan='2'>Вода, кг</th>" : "")?>
 			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 60)?>" style="border-left: 4px solid;">№ кассеты</th>
 			<th rowspan="3" width="40">Недолив</th>
@@ -155,6 +158,7 @@ $row = mysqli_fetch_array($res);
 			<?=($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")?>
 			<?=($row["cm_cnt"] ? "<th class='nowrap'>{$row["cement"]}</th>" : "")?>
+			<?=($row["pl_cnt"] ? "<th class='nowrap'>{$row["plasticizer"]}</th>" : "")?>
 			<?=($row["wt_cnt"] ? "<th class='nowrap'>{$row["water"]}</th>" : "")?>
 		</tr>
 	</thead>
@@ -179,6 +183,7 @@ for ($i = 1; $i <= $batches; $i++) {
 			".($row["sn_cnt"] ? "<td></td>" : "")."
 			".($row["cs_cnt"] ? "<td></td>" : "")."
 			".($row["cm_cnt"] ? "<td></td>" : "")."
+			".($row["pl_cnt"] ? "<td></td>" : "")."
 			".($row["wt_cnt"] ? "<td></td>" : "")."
 			{$fillings_cell}
 			<td></td>
