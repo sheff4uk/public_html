@@ -151,7 +151,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td style="background: #f4a46082;"><input type="number" name="sand" min="0" style="width: 80px;"></td>
 						<td style="background: #8b45137a;"><input type="number" name="crushed_stone" min="0" style="width: 80px;"></td>
 						<td style="background: #7080906b;"><input type="number" name="cement" min="0" style="width: 80px;" required></td>
-						<td style="background: #80800080;"><input type="number" name="plasticizer" min="0" step="0.05" style="width: 80px;"></td>
+						<td style="background: #80800080;"><input type="number" name="plasticizer" min="0" step="0.01" style="width: 80px;"></td>
 						<td style="background: #1e90ff85;"><input type="number" name="water" min="0" style="width: 80px;" required></td>
 					</tr>
 				</tbody>
