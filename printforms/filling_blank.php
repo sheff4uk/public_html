@@ -110,7 +110,7 @@ $query = "
 		,GROUP_CONCAT(IFNULL(CONCAT(MF.sand, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') sand
 		,GROUP_CONCAT(IFNULL(CONCAT(MF.crushed_stone, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') crushed_stone
 		,GROUP_CONCAT(IFNULL(CONCAT(MF.cement, ' ±2'), 0) ORDER BY MF.letter SEPARATOR '<br>') cement
-		,GROUP_CONCAT(IFNULL(CONCAT(MF.plasticizer, ' ±0.05'), 0) ORDER BY MF.letter SEPARATOR '<br>') plasticizer
+		,GROUP_CONCAT(IFNULL(CONCAT(MF.plasticizer, ' ±0.1'), 0) ORDER BY MF.letter SEPARATOR '<br>') plasticizer
 		,GROUP_CONCAT(IFNULL(CONCAT('min ', MF.water), 0) ORDER BY MF.letter SEPARATOR '<br>') water
 		,COUNT(MF.iron_oxide) io_cnt
 		,COUNT(MF.sand) sn_cnt
