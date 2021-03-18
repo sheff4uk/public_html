@@ -63,11 +63,12 @@ $query = "
 		,GROUP_CONCAT(CONCAT(ROUND(MF.io_min/1000, 2), '&ndash;', ROUND(MF.io_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') io
 		,GROUP_CONCAT(CONCAT(ROUND(MF.sn_min/1000, 2), '&ndash;', ROUND(MF.sn_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') sn
 		,GROUP_CONCAT(CONCAT(ROUND(MF.cs_min/1000, 2), '&ndash;', ROUND(MF.cs_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') cs
-		,GROUP_CONCAT(CONCAT(MF.iron_oxide, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') iron_oxide
-		,GROUP_CONCAT(CONCAT(MF.sand, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') sand
-		,GROUP_CONCAT(CONCAT(MF.crushed_stone, ' ±5') ORDER BY MF.letter SEPARATOR '<br>') crushed_stone
-		,GROUP_CONCAT(CONCAT(MF.cement, ' ±2') ORDER BY MF.letter SEPARATOR '<br>') cement
-		,GROUP_CONCAT(CONCAT('min ', MF.water) ORDER BY MF.letter SEPARATOR '<br>') water
+		,GROUP_CONCAT(IFNULL(CONCAT(MF.iron_oxide, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') iron_oxide
+		,GROUP_CONCAT(IFNULL(CONCAT(MF.sand, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') sand
+		,GROUP_CONCAT(IFNULL(CONCAT(MF.crushed_stone, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') crushed_stone
+		,GROUP_CONCAT(IFNULL(CONCAT(MF.cement, ' ±2'), 0) ORDER BY MF.letter SEPARATOR '<br>') cement
+		,GROUP_CONCAT(IFNULL(CONCAT(MF.plasticizer, ' ±0.05'), 0) ORDER BY MF.letter SEPARATOR '<br>') plasticizer
+		,GROUP_CONCAT(IFNULL(CONCAT('min ', MF.water), 0) ORDER BY MF.letter SEPARATOR '<br>') water
 	FROM MixFormula MF
 	WHERE MF.CW_ID = {$CW_ID}
 ";
@@ -76,7 +77,7 @@ $row = mysqli_fetch_array($res);
 
 $html .= "
 	<table style='table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
-		<thead>
+		<thead style='word-wrap: break-word; font-size: .9em;'>
 			<tr>
 				<th rowspan='3' width='30'>№<br>п/п</th>
 				<th rowspan='3'>Время замеса</th>
@@ -87,6 +88,7 @@ $html .= "
 				".($row["sand"] ? "<th rowspan='2'>КМП, кг</th>" : "")."
 				".($row["crushed_stone"] ? "<th rowspan='2'>Отсев, кг</th>" : "")."
 				".($row["cement"] ? "<th rowspan='2'>Цемент, кг</th>" : "")."
+				".($row["plasticizer"] ? "<th rowspan='2'>Пластификатор, кг</th>" : "")."
 				".($row["water"] ? "<th rowspan='2'>Вода, кг</th>" : "")."
 				<th rowspan='3' colspan='{$fillings}' width='".($fillings * 60)."'>№ кассеты</th>
 				<th rowspan='3'>Недолив</th>
@@ -109,6 +111,7 @@ $html .= "
 				".($row["sand"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")."
 				".($row["crushed_stone"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")."
 				".($row["cement"] ? "<th class='nowrap'>{$row["cement"]}</th>" : "")."
+				".($row["plasticizer"] ? "<th class='nowrap'>{$row["plasticizer"]}</th>" : "")."
 				".($row["water"] ? "<th class='nowrap'>{$row["water"]}</th>" : "")."
 			</tr>
 		</thead>
@@ -129,6 +132,7 @@ if( $fact_batches ) {
 			,IFNULL(LB.sand, 0) sand
 			,IFNULL(LB.crushed_stone, 0) crushed_stone
 			,IFNULL(LB.cement, 0) cement
+			,IFNULL(LB.plasticizer, 0) plasticizer
 			,IFNULL(LB.water, 0) water
 			,LB.underfilling
 			,LB.test
@@ -189,6 +193,7 @@ if( $fact_batches ) {
 				".($row["sand"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[{$subrow["LB_ID"]}]' value='{$subrow["sand"]}' style='width: 60px;' required></td>" : "")."
 				".($row["crushed_stone"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone"]}' style='width: 60px;' required></td>" : "")."
 				".($row["cement"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[{$subrow["LB_ID"]}]' value='{$subrow["cement"]}' style='width: 60px;' required></td>" : "")."
+				".($row["plasticizer"] ? "<td style='background: #80800080;'><input type='number' min='0' step='0.01' name='plasticizer[{$subrow["LB_ID"]}]' value='{$subrow["plasticizer"]}' style='width: 60px;' required></td>" : "")."
 				".($row["water"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[{$subrow["LB_ID"]}]' value='{$subrow["water"]}' style='width: 60px;' required></td>" : "")."
 				{$fillings_cell}
 				<td><input type='number' min='0' max='{$in_cassette}' name='underfilling[{$subrow["LB_ID"]}]' value='{$subrow["underfilling"]}' style='width: 60px;' required></td>
@@ -236,6 +241,7 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 			".($row["sand"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[n_{$i}]' style='width: 60px;' required></td>" : "")."
 			".($row["crushed_stone"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[n_{$i}]' style='width: 60px;' required></td>" : "")."
 			".($row["cement"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[n_{$i}]' style='width: 60px;' required></td>" : "")."
+			".($row["plasticizer"] ? "<td style='background: #80800080;'><input type='number' min='0' step='0.01' name='plasticizer[n_{$i}]' style='width: 60px;' required></td>" : "")."
 			".($row["water"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[n_{$i}]' style='width: 60px;' required></td>" : "")."
 			{$fillings_cell}
 			<td><input type='number' min='0' max='{$in_cassette}' name='underfilling[n_{$i}]' style='width: 60px;' required></td>

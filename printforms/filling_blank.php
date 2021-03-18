@@ -130,7 +130,7 @@ $row = mysqli_fetch_array($res);
 		<tr>
 			<th rowspan="3" width="30">№<br>п/п</th>
 			<th rowspan="3">Время замеса</th>
-			<th rowspan="2" width="40" style="word-wrap: break-word;">Рецепт</th>
+			<th rowspan="2" width="40">Рецепт</th>
 			<th colspan="<?=(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0))?>">Масса куба, кг</th>
 			<th rowspan="3" width="30" style="border-right: 4px solid;">t, ℃ 23±5</th>
 			<?=($row["io_cnt"] ? "<th rowspan='2'>Окалина, кг</th>" : "")?>

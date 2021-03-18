@@ -239,6 +239,7 @@ foreach ($_GET as &$value) {
 			<th>КМП,<br>кг ±5</th>
 			<th>Отсев,<br>кг ±5</th>
 			<th>Цемент,<br>кг ±2</th>
+			<th>Пластификатор,<br>кг ±0.05</th>
 			<th>Вода, л</th>
 			<th colspan="2">№ кассеты</th>
 			<th>Недолив</th>
@@ -320,6 +321,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.sand
 			,LB.crushed_stone
 			,LB.cement
+			,LB.plasticizer
 			,LB.water
 			,LB.underfilling
 			,LB.test
@@ -330,6 +332,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,mix_sn_diff(mix_id(LB.LB_ID), LB.sand) sn_diff
 			,mix_cs_diff(mix_id(LB.LB_ID), LB.crushed_stone) cs_diff
 			,mix_cm_diff(mix_id(LB.LB_ID), LB.cement) cm_diff
+			,mix_pl_diff(mix_id(LB.LB_ID), LB.plasticizer) pl_diff
 			,mix_wt_diff(mix_id(LB.LB_ID), LB.water) wt_diff
 		FROM list__Batch LB
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
@@ -385,6 +388,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td style="background: #f4a46082; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["sand"]?><?=($subrow["sn_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sn_diff"] > 0 ? " +" : " ").($subrow["sn_diff"])."</font>" : "")?></td>
 				<td style="background: #8b45137a; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
 				<td style="background: #7080906b; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["cement"]?><?=($subrow["cm_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cm_diff"] > 0 ? " +" : " ").($subrow["cm_diff"])."</font>" : "")?></td>
+				<td style="background: #80800080; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["plasticizer"]?><?=($subrow["pl_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["pl_diff"] > 0 ? " +" : " ").($subrow["pl_diff"])."</font>" : "")?></td>
 				<td style="background: #1e90ff85; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["water"]?><?=($subrow["wt_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["wt_diff"])."</font>" : "")?></td>
 				<td colspan="2" class="nowrap"><?=$cassette?></td>
 				<td><?=$subrow["underfilling"]?></td>

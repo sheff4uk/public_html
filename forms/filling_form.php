@@ -30,6 +30,7 @@ if( isset($_POST["PB_ID"]) ) {
 			$sand = $_POST["sand"][$key] ? $_POST["sand"][$key] : "NULL";
 			$crushed_stone = $_POST["crushed_stone"][$key] ? $_POST["crushed_stone"][$key] : "NULL";
 			$cement = $_POST["cement"][$key];
+			$plasticizer = $_POST["plasticizer"][$key] ? $_POST["plasticizer"][$key] : "NULL";
 			$water = $_POST["water"][$key];
 			$underfilling = $_POST["underfilling"][$key] ? $_POST["underfilling"][$key] : 0;
 			$test = $_POST["test"][$key] ? 1 : 0;
@@ -58,6 +59,7 @@ if( isset($_POST["PB_ID"]) ) {
 						,sand = {$sand}
 						,crushed_stone = {$crushed_stone}
 						,cement = {$cement}
+						,plasticizer = {$plasticizer}
 						,water = {$water}
 						,underfilling = {$underfilling}
 						,test = {$test}
@@ -91,6 +93,7 @@ if( isset($_POST["PB_ID"]) ) {
 						,sand = {$sand}
 						,crushed_stone = {$crushed_stone}
 						,cement = {$cement}
+						,plasticizer = {$plasticizer}
 						,water = {$water}
 						,underfilling = {$underfilling}
 						,test = {$test}
