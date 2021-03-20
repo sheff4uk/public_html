@@ -169,8 +169,8 @@ foreach ($_GET as &$value) {
 				<td style="background: #8b451388;"><?=round($row["crushed_stone"]/$row["details"], 2)?></td>
 				<td style="background: #70809088;"><?=round($row["cement"]/1000, 2)?></td>
 				<td style="background: #70809088;"><?=round($row["cement"]/$row["details"], 2)?></td>
-				<td style="background: #80800080;"><?=round($row["plasticizer"]/1000, 2)?></td>
-				<td style="background: #80800080;"><?=round($row["plasticizer"]/$row["details"], 2)?></td>
+				<td style="background: #80800080;"><?=round($row["plasticizer"], 2)?></td>
+				<td style="background: #80800080;"><?=round($row["plasticizer"]/$row["details"] * 1000, 2)?></td>
 				<td style="background: #c0c0c088;"><?=round($row["calcium"] * $row["details"] / 1000, 2)?></td>
 				<td style="background: #c0c0c088;"><?=round($row["calcium"], 2)?></td>
 				<td style="background: #ffff6688;"><?=round($row["reinforcement"] * $row["details"] / 1000, 2)?></td>
