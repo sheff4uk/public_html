@@ -134,19 +134,18 @@ foreach ($_GET as &$value) {
 				,SUM(LB.crushed_stone) crushed_stone
 				,SUM(LB.cement) cement
 				,SUM(LB.plasticizer) plasticizer
-				#,CW.drawing_volume * CW.plasticizer / 1000 plasticizer
 				,CW.drawing_volume * CW.calcium / 1000 calcium
 				,CW.reinforcement
 			FROM plan__Batch PB
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 			WHERE 1
-				".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
-				".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
+				".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
+				".($_GET["date_to"] ? "AND LB.batch_date <= '{$_GET["date_to"]}'" : "")."
 				".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 				".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 			GROUP BY PB.CW_ID
-			ORDER BY PB.pb_date, PB.CW_ID
+			ORDER BY PB.CW_ID
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
