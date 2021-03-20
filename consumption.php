@@ -133,7 +133,8 @@ foreach ($_GET as &$value) {
 				,SUM(LB.sand) sand
 				,SUM(LB.crushed_stone) crushed_stone
 				,SUM(LB.cement) cement
-				,CW.drawing_volume * CW.plasticizer / 1000 plasticizer
+				,SUM(LB.plasticizer) plasticizer
+				#,CW.drawing_volume * CW.plasticizer / 1000 plasticizer
 				,CW.drawing_volume * CW.calcium / 1000 calcium
 				,CW.reinforcement
 			FROM plan__Batch PB
