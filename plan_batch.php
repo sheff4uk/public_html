@@ -211,7 +211,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,COUNT(DISTINCT LB.LB_ID) batches
 			,COUNT(LF.LF_ID) fillings
 			,SUM(CW.in_cassette) details
-			,ROUND(IFNULL(SUM(LB.underfilling / CW.fillings), 0)) underfilling
+			,ROUND(IFNULL(SUM(LB.underfilling / PB.fillings_per_batch), 0)) underfilling
 		FROM list__Batch LB
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
@@ -309,9 +309,9 @@ $query = "
 		,CONCAT('[', DATE_FORMAT(ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), '%e %b'), ' - ', DATE_FORMAT(ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)), '%e %b'), '] ', LEFT(YEARWEEK(PB.pb_date, 1), 4), ' г') week_range
 		,PB.pb_date
 		,SUM(PB.batches) batches
-		,SUM(PB.batches * CW.fillings) fillings
-		,SUM(PB.batches * CW.fillings * CW.in_cassette) plan
-		,SUM(PB.fact_batches * CW.fillings * CW.in_cassette) details
+		,SUM(PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings)) fillings
+		,SUM(PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * CW.in_cassette) plan
+		,SUM(PB.fact_batches * PB.fillings_per_batch * CW.in_cassette) details
 		,IF(SUM(PB.batches) = SUM(PB.fact_batches), (SELECT TIMESTAMPDIFF(MINUTE, MAX(CAST(CONCAT(batch_date, ' ', batch_time) AS DATETIME)), CAST(CONCAT(PB.pb_date, ' 23:59:59') AS DATETIME)) FROM list__Batch WHERE PB_ID IN (SELECT PB_ID FROM plan__Batch WHERE pb_date = PB.pb_date)), NULL) diff
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -335,9 +335,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			,CW.item
 			,PB.CW_ID
 			,PB.batches
-			,PB.batches * CW.fillings fillings
-			,PB.batches * CW.fillings * CW.in_cassette plan
-			,PB.fact_batches * CW.fillings * CW.in_cassette details
+			,PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) fillings
+			,PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * CW.in_cassette plan
+			,PB.fact_batches * PB.fillings_per_batch * CW.in_cassette details
 			,IFNULL(SUM(LB.underfilling), 0) underfilling
 			,IF(PB.batches > 0 AND PB.fact_batches = 0 AND PB.pb_date <= (CURRENT_DATE() + INTERVAL 1 DAY), 1, 0) printable
 		FROM plan__Batch PB

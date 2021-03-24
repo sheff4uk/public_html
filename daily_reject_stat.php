@@ -130,7 +130,7 @@ $query = "
 		".($_GET["detailing"] == "month" ? ",DATE_FORMAT(LO.o_date, '%Y%m') reject_date_sort" : "")."
 		,CW.item
 		,SUM(IFNULL(o_not_spill, 0) + IFNULL(o_crack, 0) + IFNULL(o_chipped, 0) + IFNULL(o_def_form, 0) + IFNULL(p_not_spill, 0) + IFNULL(p_crack, 0) + IFNULL(p_chipped, 0) + IFNULL(p_def_form, 0)) `o_reject`
-		,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling) / CW.fillings) `o_details`
+		,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling) / PB.fillings_per_batch) `o_details`
 		,CW.CBD
 	FROM list__Opening LO
 	JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
