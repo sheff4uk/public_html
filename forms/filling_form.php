@@ -114,10 +114,10 @@ if( isset($_POST["PB_ID"]) ) {
 				}
 			}
 		}
-		// Обновляем фактическое число замесов
+		// Обновляем фактическое число замесов и число заливок на замес
 		$query = "
 			UPDATE plan__Batch
-			SET fact_batches = {$_POST["fact_batches"]}
+			SET fact_batches = {$_POST["fact_batches"]}, fillings_per_batch = {$_POST["fillings_per_batch"]}
 			WHERE PB_ID = {$_POST["PB_ID"]}
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

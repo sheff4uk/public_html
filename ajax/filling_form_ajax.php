@@ -14,7 +14,7 @@ $query = "
 		,PB.batches
 		,PB.fact_batches
 		,CW.item
-		,CW.fillings
+		,IFNULL(PB.fillings_per_batch, CW.fillings) fillings
 		,CW.in_cassette
 		,CONCAT(ROUND(CW.min_density/1000, 2), '&ndash;', ROUND(CW.max_density/1000, 2)) spec
 		,MIN(LB.batch_date) batch_date
@@ -47,6 +47,7 @@ $html = "
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
 	<p style='display: none; text-align: center; font-size: 2em;'>Число замесов: <input type='number' name='fact_batches' id='rows' min='".($fact_batches ? $fact_batches : "1")."' max='{$max_batches}' value='".($fact_batches ? $fact_batches : $batches)."'></p>
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
+	<input type='hidden' name='fillings_per_batch' value='{$fillings}'>
 	<table style='table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
 		<tr>
 			<td style='border: 1px solid black; line-height: 1em;'><img src='/img/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></td>

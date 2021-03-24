@@ -114,8 +114,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 								$query = "
 									SELECT CW.CW_ID
 										,CW.item
-										,CW.fillings
-										#,CW.type
 										,SUM(MF.io_min) io
 										,SUM(MF.sn_min) sn
 										,SUM(MF.cs_min) cs
@@ -126,7 +124,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 								";
 								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 								while( $row = mysqli_fetch_array($res) ) {
-									echo "<option value='{$row["CW_ID"]}' fillings='{$row["fillings"]}' type='{$row["type"]}' io='{$row["io"]}' sn='{$row["sn"]}' cs='{$row["cs"]}'>{$row["item"]}</option>";
+									echo "<option value='{$row["CW_ID"]}' type='{$row["type"]}' io='{$row["io"]}' sn='{$row["sn"]}' cs='{$row["cs"]}'>{$row["item"]}</option>";
 								}
 								?>
 							</select>
