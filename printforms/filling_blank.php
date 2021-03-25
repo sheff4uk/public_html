@@ -15,7 +15,7 @@ $query = "
 	SELECT DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
 		,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
 		,RIGHT(YEARWEEK(PB.pb_date, 1), 2) week
-		,CONCAT('[', DATE_FORMAT(ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), '%e %b'), ' - ', DATE_FORMAT(ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)), '%e %b'), '] ', LEFT(YEARWEEK(PB.pb_date, 1), 4), ' г') week_range
+		,CONCAT('[00:00 ', DATE_FORMAT(ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), '%e %b'), ' - 23:59 ', DATE_FORMAT(ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)), '%e %b'), '] ', LEFT(YEARWEEK(PB.pb_date, 1), 4), 'г') week_range
 		,PB.CW_ID
 		,PB.batches
 		,CW.item
@@ -85,7 +85,7 @@ echo "<title>Чеклист оператора для {$item} от {$pb_date}</t
 </head>
 <body>
 
-<b style="float: right; width: 50%;">ВАЖНО! Время замеса в чек-листе не должен выходить за границы своей недели. Новая неделя всегда должна начинаться с 1-го цикла.</b>
+	<b style="float: right; width: 50%;"><span style="font-size: 1.5em;">ВНИМАНИЕ!</span> Время замеса не должно выходить за границы недели <?=$week_range?>.</b>
 <h3>Фактическая дата первого замеса: ________________</h3>
 
 <table>
