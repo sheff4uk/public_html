@@ -340,6 +340,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,PB.fact_batches * PB.fillings_per_batch * CW.in_cassette details
 			,IFNULL(SUM(LB.underfilling), 0) underfilling
 			,IF(PB.batches > 0 AND PB.fact_batches = 0 AND PB.pb_date <= (CURRENT_DATE() + INTERVAL 1 DAY), 1, 0) printable
+			,(SELECT PB_ID FROM plan__Batch WHERE CW_ID = PB.CW_ID AND fact_batches = 0 AND batches > 0 ORDER BY pb_date LIMIT 1) current_PB_ID
 		FROM plan__Batch PB
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
@@ -386,7 +387,16 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td class='bg-gray'><?=$subrow["underfilling"]?></td>
 			<td class='bg-gray'><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td>
-				<?=($subrow["printable"] ? "<a href='printforms/filling_blank.php?PB_ID={$subrow["PB_ID"]}' class='print' title='Бланк чеклиста оператора'><i class='fas fa-print fa-lg'></i></a>" : "")?>
+				<?
+				if($subrow["printable"]) {
+					if( $subrow["PB_ID"] == $subrow["current_PB_ID"] ) {
+						echo "<a href='printforms/filling_blank.php?PB_ID={$subrow["PB_ID"]}' class='print' title='Бланк чеклиста оператора'><i class='fas fa-print fa-lg'></i></a>";
+					}
+					else {
+						echo "<i class='fas fa-print fa-lg' style='color: red;' title='Чтобы распечатать очередной чек лист, должны быть внесены данные предыдущего.'></i>";
+					}
+				}
+				?>
 			</td>
 			<?
 			// Выводим общую ячейку с кнопками действий
