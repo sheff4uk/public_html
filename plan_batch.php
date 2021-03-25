@@ -363,7 +363,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		// Выводим общую ячейку с датой заливки
 		if( $last_cycle != $row["cycle"] ) {
 			echo "<tr id='{$subrow["PB_ID"]}' style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h1>{$row["week"]}/{$row["cycle"]}</h1><span class='nowrap'>{$row["week_range"]}</span><br>".($row["diff"] < 0 ? "Отставание: <b style='color: red;'>{$row["diff"]}</b> мин" : ($row["diff"] > 0 ? "Опережение: <b style='color: green;'>{$row["diff"]}</b> мин" : ""))."</td>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h3>{$row["week"]}/<span style='font-size: 1.5em;'>{$row["cycle"]}</span></h3><span class='nowrap'>{$row["week_range"]}</span><br>".($row["diff"] < 0 ? "Отставание: <b style='color: red;'>{$row["diff"]}</b> мин" : ($row["diff"] > 0 ? "Опережение: <b style='color: green;'>{$row["diff"]}</b> мин" : ""))."</td>";
 		}
 		else {
 			echo "<tr id='{$subrow["PB_ID"]}'>";
