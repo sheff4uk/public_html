@@ -246,7 +246,7 @@ if( $filter ) {
 			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 			,SUM(IF(p_interval(LP.LP_ID) < 120, 1, NULL)) p_interval
 			,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
-			,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/BP.fillings_per_batch)) fact
+			,SUM(CW.in_cassette) - ROUND(SUM(LB.underfilling/PB.fillings_per_batch)) fact
 		FROM list__Batch LB
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
