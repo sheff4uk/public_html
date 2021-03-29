@@ -239,7 +239,7 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 	$html .= "
 		<tr class='batch_row' num='{$i}'>
 			<td style='text-align: center; font-size: 1.2em;'>{$i}</td>
-			<td><input type='datetime-local' name='batch_time[{$i}]' style='width: 110%;' min='{$pb_date_min}T00:00' max='{$pb_date_max}T23:59' required></td>
+			<td><input type='datetime-local' name='batch_time[n_{$i}]' style='width: 110%;' min='{$pb_date_min}T00:00' max='{$pb_date_max}T23:59' required></td>
 			<td><att></att></td>
 			".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[n_{$i}]' style='width: 110%;' required></td>" : "")."
 			".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[n_{$i}]' style='width: 110%;' required></td>" : "")."
