@@ -18,8 +18,8 @@ function src_url($src) {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?=$title?></title>
 <!--	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css">-->
-	<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?v=2">
-	<link rel='stylesheet' type='text/css' href='css/style.css?24'>
+	<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?3">
+	<link rel='stylesheet' type='text/css' href='css/style.css?25'>
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 <!--	<link rel='stylesheet' type='text/css' href='css/font-awesome.min.css'>-->
 	<link rel='stylesheet' type='text/css' href='css/buttons.css'>
