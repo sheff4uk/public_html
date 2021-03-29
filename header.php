@@ -58,6 +58,8 @@ function src_url($src) {
 
 	<script>
 		$(document).ready(function(){
+			var is_chrome = /chrome/i.test( navigator.userAgent );
+
 			$('#body_wraper').fadeIn('slow');
 			$('#loading').hide();
 

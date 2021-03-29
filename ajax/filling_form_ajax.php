@@ -4,12 +4,14 @@ include_once "../checkrights.php";
 $max_batches = 30; // Максимально возможное число замесов
 $PB_ID = $_GET["PB_ID"];
 $query = "
-	SELECT PB.pb_date - INTERVAL 1 DAY pb_date_min
-		,PB.pb_date + INTERVAL 2 DAY pb_date_max
+	SELECT PB.pb_date
+		#,PB.pb_date - INTERVAL 1 DAY pb_date_min
+		#,PB.pb_date + INTERVAL 2 DAY pb_date_max
+		,IF(PB.pb_date - INTERVAL 1 DAY < ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), PB.pb_date - INTERVAL 1 DAY) pb_date_min
+		,ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)) pb_date_max
 		,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
 		,RIGHT(YEARWEEK(PB.pb_date, 1), 2) week
 		,CONCAT('[', DATE_FORMAT(ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), '%e %b'), ' - ', DATE_FORMAT(ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)), '%e %b'), '] ', LEFT(YEARWEEK(PB.pb_date, 1), 4), ' г') week_range
-		,PB.pb_date
 		,PB.CW_ID
 		,PB.batches
 		,PB.fact_batches
@@ -34,7 +36,6 @@ $week = $row["week"];
 $week_range = $row["week_range"];
 $pb_date_min = $row["pb_date_min"];
 $pb_date_max = $row["pb_date_max"];
-$pb_weekday = $row["pb_date_weekday"];
 $pb_date = $row["pb_date"];
 $fillings = $row["fillings"];
 $in_cassette = $row["in_cassette"];
@@ -43,7 +44,6 @@ $spec = $row["spec"];
 $batch_date = $row["batch_date"];
 
 $html = "
-	<p style='text-align: center; font-size: 1.5em;'>Фактическая дата первого замеса: <input type='date' name='batch_date' value='{$batch_date}' min='{$pb_date_min}' max='{$pb_date_max}' required></p>
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
 	<p style='display: none; text-align: center; font-size: 2em;'>Число замесов: <input type='number' name='fact_batches' id='rows' min='".($fact_batches ? $fact_batches : "1")."' max='{$max_batches}' value='".($fact_batches ? $fact_batches : $batches)."'></p>
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
@@ -83,11 +83,11 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 $row = mysqli_fetch_array($res);
 
 $html .= "
-	<table style='table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
-		<thead style='word-wrap: break-word; font-size: .9em;'>
+	<table style='font-size: .85em; table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
+		<thead style='word-wrap: break-word;'>
 			<tr>
 				<th rowspan='3' width='30'>№<br>п/п</th>
-				<th rowspan='3'>Время замеса</th>
+				<th rowspan='3' width='160'>Дата и время замеса</th>
 				<th rowspan='2' width='30' style='word-wrap: break-word;'>Рецепт</th>
 				<th colspan='".(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0) + ($row["cs"] ? 1 : 0))."'>Масса куба, кг</th>
 				<th rowspan='3' width='40'>t, ℃ 23±5</th>
@@ -97,7 +97,7 @@ $html .= "
 				".($row["cm_cnt"] ? "<th rowspan='2'>Цемент, кг</th>" : "")."
 				".($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор, кг</th>" : "")."
 				".($row["wt_cnt"] ? "<th rowspan='2'>Вода, кг</th>" : "")."
-				<th rowspan='3' colspan='{$fillings}' width='".($fillings * 60)."'>№ кассеты</th>
+				<th rowspan='3' colspan='{$fillings}' width='".($fillings * 50)."'>№ кассеты</th>
 				<th rowspan='3'>Недолив</th>
 				<th rowspan='3' width='30'><i class='fas fa-cube' title='Испытание куба'></i></th>
 				<th rowspan='3'>Оператор</th>
@@ -130,6 +130,7 @@ if( $fact_batches ) {
 	$query = "
 		SELECT LB.LB_ID
 			,LB.OP_ID
+			,LB.batch_date
 			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 			,LB.io_density
 			,LB.sn_density
@@ -166,7 +167,7 @@ if( $fact_batches ) {
 		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$fillings_cell = "";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
-			$fillings_cell .= "<td><input type='number' min='1' max='{$cassetts}' name='cassette[{$subrow["LB_ID"]}][{$subsubrow["LF_ID"]}]' value='{$subsubrow["cassette"]}' style='width: 60px; background-color: coral;' required ".($subsubrow["is_link"] ? "readonly" : "")."></td>";
+			$fillings_cell .= "<td><input type='number' min='1' max='{$cassetts}' name='cassette[{$subrow["LB_ID"]}][{$subsubrow["LF_ID"]}]' value='{$subsubrow["cassette"]}' style='width: 110%; background-color: coral;' required ".($subsubrow["is_link"] ? "readonly" : "")."></td>";
 		}
 
 		// Дропдаун операторов
@@ -190,20 +191,20 @@ if( $fact_batches ) {
 		$html .= "
 			<tr class='batch_row' num='{$i}'>
 				<td style='text-align: center; font-size: 1.2em;'>{$i}</td>
-				<td><input type='time' name='batch_time[{$subrow["LB_ID"]}]' value='{$subrow["batch_time_format"]}' required></td>
+				<td><input type='datetime-local' name='batch_time[{$subrow["LB_ID"]}]' style='width: 110%;' value='{$subrow["batch_date"]}T{$subrow["batch_time_format"]}' min='{$pb_date_min}T00:00' max='{$pb_date_max}T23:59' required></td>
 				<td><att></att></td>
-				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$subrow["LB_ID"]}]' value='".($subrow["io_density"]/1000)."' style='width: 60px;' required></td>" : "")."
-				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$subrow["LB_ID"]}]' value='".($subrow["sn_density"]/1000)."' style='width: 60px;' required></td>" : "")."
-				<td><input type='number' min='2' max='4' step='0.01' name='mix_density[{$subrow["LB_ID"]}]' value='".($subrow["mix_density"]/1000)."' style='width: 60px;' required></td>
-				<td><input type='number' min='5' max='45' name='temp[{$subrow["LB_ID"]}]' value='{$subrow["temp"]}' style='width: 40px;' required></td>
-				".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[{$subrow["LB_ID"]}]' value='{$subrow["iron_oxide"]}' style='width: 60px;' required></td>" : "")."
-				".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[{$subrow["LB_ID"]}]' value='{$subrow["sand"]}' style='width: 60px;' required></td>" : "")."
-				".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone"]}' style='width: 60px;' required></td>" : "")."
-				".($row["cm_cnt"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[{$subrow["LB_ID"]}]' value='{$subrow["cement"]}' style='width: 60px;' required></td>" : "")."
-				".($row["pl_cnt"] ? "<td style='background: #80800080;'><input type='number' min='0' step='0.01' name='plasticizer[{$subrow["LB_ID"]}]' value='{$subrow["plasticizer"]}' style='width: 60px;' required></td>" : "")."
-				".($row["wt_cnt"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[{$subrow["LB_ID"]}]' value='{$subrow["water"]}' style='width: 60px;' required></td>" : "")."
+				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$subrow["LB_ID"]}]' value='".($subrow["io_density"]/1000)."' style='width: 110%;' required></td>" : "")."
+				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$subrow["LB_ID"]}]' value='".($subrow["sn_density"]/1000)."' style='width: 110%;' required></td>" : "")."
+				<td><input type='number' min='2' max='4' step='0.01' name='mix_density[{$subrow["LB_ID"]}]' value='".($subrow["mix_density"]/1000)."' style='width: 110%;' required></td>
+				<td><input type='number' min='5' max='45' name='temp[{$subrow["LB_ID"]}]' value='{$subrow["temp"]}' style='width: 110%;' required></td>
+				".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[{$subrow["LB_ID"]}]' value='{$subrow["iron_oxide"]}' style='width: 110%;' required></td>" : "")."
+				".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[{$subrow["LB_ID"]}]' value='{$subrow["sand"]}' style='width: 110%;' required></td>" : "")."
+				".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone"]}' style='width: 110%;' required></td>" : "")."
+				".($row["cm_cnt"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[{$subrow["LB_ID"]}]' value='{$subrow["cement"]}' style='width: 110%;' required></td>" : "")."
+				".($row["pl_cnt"] ? "<td style='background: #80800080;'><input type='number' min='0' step='0.01' name='plasticizer[{$subrow["LB_ID"]}]' value='{$subrow["plasticizer"]}' style='width: 110%;' required></td>" : "")."
+				".($row["wt_cnt"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[{$subrow["LB_ID"]}]' value='{$subrow["water"]}' style='width: 110%;' required></td>" : "")."
 				{$fillings_cell}
-				<td><input type='number' min='0' max='{$in_cassette}' name='underfilling[{$subrow["LB_ID"]}]' value='{$subrow["underfilling"]}' style='width: 60px;' required></td>
+				<td><input type='number' min='0' max='{$in_cassette}' name='underfilling[{$subrow["LB_ID"]}]' value='{$subrow["underfilling"]}' style='width: 110%;' required></td>
 				<td class='nowrap'><input type='checkbox' name='test[{$subrow["LB_ID"]}]' ".($subrow["test"] ? "checked" : "")." ".($subrow["is_test"] ? "onclick='return false;'" : "")." value='1'>".($subrow["is_test"] ? "<i id='test_notice' class='fas fa-question-circle' title='Не редактируется так как есть связанные испытания куба.'></i>" : "")."</td>
 				<td>{$operators}</td>
 			</tr>
@@ -215,7 +216,7 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 	// Номера кассет
 	$fillings_cell = '';
 	for ($j = 1; $j <= $fillings; $j++) {
-		$fillings_cell .= "<td><input type='number' min='1' max='{$cassetts}' name='cassette[n_{$i}][{$j}]' style='width: 60px; background-color: coral;' required></td>";
+		$fillings_cell .= "<td><input type='number' min='1' max='{$cassetts}' name='cassette[n_{$i}][{$j}]' style='width: 110%; background-color: coral;' required></td>";
 	}
 
 	// Дропдаун операторов
@@ -238,20 +239,20 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 	$html .= "
 		<tr class='batch_row' num='{$i}'>
 			<td style='text-align: center; font-size: 1.2em;'>{$i}</td>
-			<td><input type='time' name='batch_time[n_{$i}]' required></td>
+			<td><input type='datetime-local' name='batch_time[{$i}]' style='width: 110%;' min='{$pb_date_min}T00:00' max='{$pb_date_max}T23:59' required></td>
 			<td><att></att></td>
-			".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[n_{$i}]' style='width: 60px;' required></td>" : "")."
-			".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[n_{$i}]' style='width: 60px;' required></td>" : "")."
-			<td><input type='number' min='2' max='4' step='0.01' name='mix_density[n_{$i}]' style='width: 60px;' required></td>
-			<td><input type='number' min='5' max='45' name='temp[n_{$i}]' style='width: 40px;' required></td>
-			".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[n_{$i}]' style='width: 60px;' required></td>" : "")."
-			".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[n_{$i}]' style='width: 60px;' required></td>" : "")."
-			".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[n_{$i}]' style='width: 60px;' required></td>" : "")."
-			".($row["cm_cnt"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[n_{$i}]' style='width: 60px;' required></td>" : "")."
-			".($row["pl_cnt"] ? "<td style='background: #80800080;'><input type='number' min='0' step='0.01' name='plasticizer[n_{$i}]' style='width: 60px;' required></td>" : "")."
-			".($row["wt_cnt"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[n_{$i}]' style='width: 60px;' required></td>" : "")."
+			".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[n_{$i}]' style='width: 110%;' required></td>" : "")."
+			".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[n_{$i}]' style='width: 110%;' required></td>" : "")."
+			<td><input type='number' min='2' max='4' step='0.01' name='mix_density[n_{$i}]' style='width: 110%;' required></td>
+			<td><input type='number' min='5' max='45' name='temp[n_{$i}]' style='width: 110%;' required></td>
+			".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[n_{$i}]' style='width: 110%;' required></td>" : "")."
+			".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[n_{$i}]' style='width: 110%;' required></td>" : "")."
+			".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[n_{$i}]' style='width: 110%;' required></td>" : "")."
+			".($row["cm_cnt"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[n_{$i}]' style='width: 110%;' required></td>" : "")."
+			".($row["pl_cnt"] ? "<td style='background: #80800080;'><input type='number' min='0' step='0.01' name='plasticizer[n_{$i}]' style='width: 110%;' required></td>" : "")."
+			".($row["wt_cnt"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[n_{$i}]' style='width: 110%;' required></td>" : "")."
 			{$fillings_cell}
-			<td><input type='number' min='0' max='{$in_cassette}' name='underfilling[n_{$i}]' style='width: 60px;' required></td>
+			<td><input type='number' min='0' max='{$in_cassette}' name='underfilling[n_{$i}]' style='width: 110%;' required></td>
 			<td><input type='checkbox' name='test[n_{$i}]' value='1'></td>
 			<td>{$operators}</td>
 		</tr>
