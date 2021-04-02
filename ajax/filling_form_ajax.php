@@ -90,7 +90,7 @@ $html .= "
 				<th rowspan='3' width='160'>Дата и время замеса</th>
 				<th rowspan='2' width='30' style='word-wrap: break-word;'>Рецепт</th>
 				<th colspan='".(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0) + ($row["cs"] ? 1 : 0))."'>Масса куба, кг</th>
-				<th rowspan='3' width='40'>t, ℃ 23±5</th>
+				<th rowspan='3' width='40'>t, ℃ 19±4</th>
 				".($row["io_cnt"] ? "<th rowspan='2'>Окалина, кг</th>" : "")."
 				".($row["sn_cnt"] ? "<th rowspan='2'>КМП, кг</th>" : "")."
 				".($row["cs_cnt"] ? "<th rowspan='2'>Отсев, кг</th>" : "")."
