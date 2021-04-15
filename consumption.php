@@ -191,7 +191,7 @@ foreach ($_GET as &$value) {
 			<td></td>
 			<td><?=round($cement/1000, 2)?></td>
 			<td></td>
-			<td><?=round($plasticizer/1000, 2)?></td>
+			<td><?=round($plasticizer, 2)?></td>
 			<td></td>
 			<td><?=round($calcium/1000, 2)?></td>
 			<td></td>
