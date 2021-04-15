@@ -537,6 +537,7 @@ input.amount {
 }
 .total td {
 	color: #fff;
+	font-weight: bold;
 }
 
 .log-blank, .log-pay {

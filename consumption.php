@@ -108,14 +108,14 @@ foreach ($_GET as &$value) {
 			<th colspan="2">Арматура</th>
 		</tr>
 		<tr>
-			<th>Расход, т</th>
-			<th>На деталь, кг</th>
-			<th>Расход, т</th>
-			<th>На деталь, кг</th>
-			<th>Расход, т</th>
-			<th>На деталь, кг</th>
-			<th>Расход, т</th>
-			<th>На деталь, кг</th>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
 			<th>Расход, кг</th>
 			<th>На деталь, г</th>
 			<th>Расход, кг</th>
@@ -159,22 +159,22 @@ foreach ($_GET as &$value) {
 			$reinforcement += $row["reinforcement"] * $row["details"];
 			?>
 			<tr>
-				<td><?=$row["item"]?></td>
-				<td><?=$row["details"]?></td>
-				<td style="background: #a52a2a88;"><?=round($row["iron_oxide"]/1000, 2)?></td>
-				<td style="background: #a52a2a88;"><?=round($row["iron_oxide"]/$row["details"], 2)?></td>
-				<td style="background: #f4a46088;"><?=round($row["sand"]/1000, 2)?></td>
-				<td style="background: #f4a46088;"><?=round($row["sand"]/$row["details"], 2)?></td>
-				<td style="background: #8b451388;"><?=round($row["crushed_stone"]/1000, 2)?></td>
-				<td style="background: #8b451388;"><?=round($row["crushed_stone"]/$row["details"], 2)?></td>
-				<td style="background: #70809088;"><?=round($row["cement"]/1000, 2)?></td>
-				<td style="background: #70809088;"><?=round($row["cement"]/$row["details"], 2)?></td>
-				<td style="background: #80800080;"><?=round($row["plasticizer"], 2)?></td>
-				<td style="background: #80800080;"><?=round($row["plasticizer"] * 1000/$row["details"], 2)?></td>
-				<td style="background: #c0c0c088;"><?=round($row["calcium"] * $row["details"] / 1000, 2)?></td>
-				<td style="background: #c0c0c088;"><?=round($row["calcium"], 2)?></td>
-				<td style="background: #ffff6688;"><?=round($row["reinforcement"] * $row["details"] / 1000, 2)?></td>
-				<td style="background: #ffff6688;"><?=round($row["reinforcement"], 2)?></td>
+				<td><span style="font-size: 1.5em; font-weight: bold;"><?=substr($row["item"], -3)?></span></td>
+				<td><?=number_format($row["details"], 0, '', ' ')?></td>
+				<td style="background: #a52a2a88;"><?=number_format($row["iron_oxide"], 2, ',', ' ')?></td>
+				<td style="background: #a52a2a88;"><?=number_format($row["iron_oxide"] * 1000/$row["details"], 2, ',', ' ')?></td>
+				<td style="background: #f4a46088;"><?=number_format($row["sand"], 2, ',', ' ')?></td>
+				<td style="background: #f4a46088;"><?=number_format($row["sand"] * 1000/$row["details"], 2, ',', ' ')?></td>
+				<td style="background: #8b451388;"><?=number_format($row["crushed_stone"], 2, ',', ' ')?></td>
+				<td style="background: #8b451388;"><?=number_format($row["crushed_stone"] * 1000/$row["details"], 2, ',', ' ')?></td>
+				<td style="background: #70809088;"><?=number_format($row["cement"], 2, ',', ' ')?></td>
+				<td style="background: #70809088;"><?=number_format($row["cement"] * 1000/$row["details"], 2, ',', ' ')?></td>
+				<td style="background: #80800080;"><?=number_format($row["plasticizer"], 2, ',', ' ')?></td>
+				<td style="background: #80800080;"><?=number_format($row["plasticizer"] * 1000/$row["details"], 2, ',', ' ')?></td>
+				<td style="background: #c0c0c088;"><?=number_format($row["calcium"] * $row["details"] / 1000, 2, ',', ' ')?></td>
+				<td style="background: #c0c0c088;"><?=number_format($row["calcium"], 2, ',', ' ')?></td>
+				<td style="background: #ffff6688;"><?=number_format($row["reinforcement"] * $row["details"] / 1000, 2, ',', ' ')?></td>
+				<td style="background: #ffff6688;"><?=number_format($row["reinforcement"], 2, ',', ' ')?></td>
 			</tr>
 			<?
 		}
@@ -182,20 +182,20 @@ foreach ($_GET as &$value) {
 
 		<tr class="total">
 			<td>Итог:</td>
-			<td><?=$details?></td>
-			<td><?=round($iron_oxide/1000, 2)?></td>
+			<td><?=number_format($details, 0, '', ' ')?></td>
+			<td><?=number_format($iron_oxide, 2, ',', ' ')?></td>
 			<td></td>
-			<td><?=round($sand/1000, 2)?></td>
+			<td><?=number_format($sand, 2, ',', ' ')?></td>
 			<td></td>
-			<td><?=round($crushed_stone/1000, 2)?></td>
+			<td><?=number_format($crushed_stone, 2, ',', ' ')?></td>
 			<td></td>
-			<td><?=round($cement/1000, 2)?></td>
+			<td><?=number_format($cement, 2, ',', ' ')?></td>
 			<td></td>
-			<td><?=round($plasticizer, 2)?></td>
+			<td><?=number_format($plasticizer, 2, ',', ' ')?></td>
 			<td></td>
-			<td><?=round($calcium/1000, 2)?></td>
+			<td><?=number_format($calcium/1000, 2, ',', ' ')?></td>
 			<td></td>
-			<td><?=round($reinforcement/1000, 2)?></td>
+			<td><?=number_format($reinforcement/1000, 2, ',', ' ')?></td>
 			<td></td>
 		</tr>
 	</tbody>
