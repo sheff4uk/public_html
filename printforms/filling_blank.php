@@ -95,7 +95,10 @@ echo "<title>Чеклист оператора для {$item} от {$pb_date}</t
 			<th style="font-size: 2em;"><?=$item?></th>
 			<th><n style="font-size: 3em;"><?=$week?></n> неделя<br><?=$week_range?></th>
 			<th width="40"><n style="font-size: 3em;"><?=$pb_weekday?></n><br>цикл</th>
-			<th><img src="../barcode.php?code=<?=$PB_ID?>&w=200&h=60" alt="barcode"></th>
+			<th style="position: relative;">
+				<img src="../barcode.php?code=<?=$PB_ID?>&w=200&h=60" alt="barcode">
+				<span style="position: absolute; background: white; left: calc(50% - 40px); top: 48px; width: 80px;"><?=str_pad($PB_ID, 8, "0", STR_PAD_LEFT)?></span>
+			</th>
 		</tr>
 	</thead>
 </table>
