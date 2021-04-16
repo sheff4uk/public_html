@@ -242,7 +242,14 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["crack"]?></td>
 		<td><?=$row["chipped"]?></td>
 		<td><?=$row["batch_number"]?></td>
-		<td><a href="#" <?=($row["type"] == "A" ? "class='add_arrival' SA_ID='{$row["ID"]}'" : "class='add_reject' SR_ID='{$row["ID"]}'")?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
+		<td>
+			<a href="#" <?=($row["type"] == "A" ? "class='add_arrival' SA_ID='{$row["ID"]}'" : "class='add_reject' SR_ID='{$row["ID"]}'")?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a>
+			<?
+			if( $row["type"] == 'A' ) {
+				echo "<a href='printforms/shell_label.php?SA_ID={$row["ID"]}' class='print' title='Штрихкоды на формы'><i class='fas fa-print fa-lg'></i></a>";
+			}
+			?>
+		</td>
 	</tr>
 	<?
 }

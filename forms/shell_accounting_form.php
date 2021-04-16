@@ -103,6 +103,11 @@ if( isset($_POST["sa_cnt"]) ) {
 		else {
 			$add = 1;
 			$SA_ID = mysqli_insert_id( $mysqli );
+			// Добавляем идентификаторы форм для штрихкодов
+			for($i=1; $i <= $sa_cnt; $i++) {
+				$query = "INSERT INTO shell__Item SET SA_ID = {$SA_ID}";
+				mysqli_query( $mysqli, $query );
+			}
 		}
 	}
 
@@ -201,7 +206,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Противовес</th>
 						<th>Пришедших форм</th>
 						<th>Объем, л</th>
-						<th>№ партии</th>
+<!--						<th>№ партии</th>-->
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -225,11 +230,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 						</td>
 						<td><input type="number" name="sa_cnt" min="1" style="width: 70px;" required></td>
 						<td><input type="number" name="actual_volume" min="0" max="6" step="0.01" style="width: 70px;"></td>
-						<td><input type="number" name="batch_number" min="1" style="width: 120px;"></td>
+<!--						<td><input type="number" name="batch_number" min="1" style="width: 120px;"></td>-->
 					</tr>
 				</tbody>
 			</table>
 		</fieldset>
+		<h3 style="color: red;">ВНИМАНИЕ! Для указанного количества форм будут сгенерированы уникальные штрих коды. После сохранения это число не изменить! Пожалуйста, будте внимательны.</h3>
 		<div>
 			<hr>
 			<input type='submit' name="subbut" value='Записать' style='float: right;'>
@@ -304,7 +310,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#shell_arrival_form input[name="SA_ID"]').val(SA_ID);
 				$('#shell_arrival_form input[name="sa_date"]').val(SA_data['sa_date']);
 				$('#shell_arrival_form select[name="CW_ID"]').val(SA_data['CW_ID']);
-				$('#shell_arrival_form input[name="sa_cnt"]').val(SA_data['sa_cnt']);
+				$('#shell_arrival_form input[name="sa_cnt"]').val(SA_data['sa_cnt']).attr('readonly', true);
 				$('#shell_arrival_form input[name="actual_volume"]').val(SA_data['actual_volume']);
 				$('#shell_arrival_form input[name="batch_number"]').val(SA_data['batch_number']);
 			}
@@ -313,6 +319,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#shell_arrival_form input[name="SA_ID"]').val('');
 				$('#shell_arrival_form table input').val('');
 				$('#shell_arrival_form table select').val('');
+				$('#shell_arrival_form input[name="sa_cnt"]').attr('readonly', false);
 			}
 
 			$('#shell_arrival_form').dialog({
