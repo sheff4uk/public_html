@@ -49,7 +49,7 @@ include "../config.php";
 
 		.label {
 			width: 48.5mm;
-			height: 25.5mm;
+			height: 25.4mm;
 /*			border: 1px dotted #999;*/
 			padding: 5px;
 			box-sizing: border-box;
