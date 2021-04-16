@@ -189,6 +189,7 @@ $query = "
 		,SA.batch_number
 		,SA.sa_date date
 		,SA.CW_ID
+		,(SELECT SUM(1) FROM shell__Item WHERE SA_ID = SA.SA_ID) barcode
 	FROM shell__Arrival SA
 	JOIN CounterWeight CW ON CW.CW_ID = SA.CW_ID
 	WHERE 1
@@ -213,6 +214,7 @@ $query = "
 		,SR.batch_number
 		,SR.sr_date date
 		,SR.CW_ID
+		,NULL
 	FROM shell__Reject SR
 	JOIN CounterWeight CW ON CW.CW_ID = SR.CW_ID
 	WHERE 1
@@ -245,7 +247,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td>
 			<a href="#" <?=($row["type"] == "A" ? "class='add_arrival' SA_ID='{$row["ID"]}'" : "class='add_reject' SR_ID='{$row["ID"]}'")?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a>
 			<?
-			if( $row["type"] == 'A' ) {
+			if( $row["type"] == 'A' && $row["barcode"] ) {
 				echo "<a href='printforms/shell_label.php?SA_ID={$row["ID"]}' class='print' title='Штрихкоды на формы'><i class='fas fa-print fa-lg'></i></a>";
 			}
 			?>
