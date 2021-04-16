@@ -128,7 +128,7 @@ foreach ($_GET as &$value) {
 		<?
 		$query = "
 			SELECT CW.item
-				,ROUND(SUM(PB.fillings_per_batch * CW.in_cassette - LB.underfilling / PB.fillings_per_batch)) details
+				,ROUND(SUM(CW.in_cassette * (SELECT SUM(1) FROM list__Filling WHERE LB_ID = LB.LB_ID) - LB.underfilling)) details
 				,SUM(LB.iron_oxide) iron_oxide
 				,SUM(LB.sand) sand
 				,SUM(LB.crushed_stone) crushed_stone
