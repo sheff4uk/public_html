@@ -25,7 +25,8 @@ include "header.php";
 	}
 </style>
 
-<div class="files_wrap">
+<fieldset class="files_wrap">
+	<legend>Бланки</legend>
 	<section class="cell">
 		<a href="/files/%D0%B1%D0%B8%D1%80%D0%BA%D0%B0%20%D0%BD%D0%B0%20%D0%B1%D1%80%D0%B0%D0%BA%201.pdf" class='print'>
 			<p><i class="fas fa-file-pdf fa-5x"></i></p>
@@ -74,7 +75,71 @@ include "header.php";
 			<p>Расстановка персонала на конвейере</p>
 		</a>
 	</section>
-</div>
+</fieldset>
+
+<fieldset class="files_wrap">
+	<legend>Этикетки</legend>
+	<section class="cell">
+		<a href="/files/41008883.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>41008883</p>
+		</a>
+	</section>
+	<section class="cell">
+		<a href="/files/41028645.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>41028645</p>
+		</a>
+	</section>
+	<section class="cell">
+		<a href="/files/43000493.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>43000493</p>
+		</a>
+	</section>
+	<section class="cell">
+		<a href="/files/43000505.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>43000505</p>
+		</a>
+	</section>
+	<section class="cell">
+		<a href="/files/43018816.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>43018816</p>
+		</a>
+	</section>
+	<section class="cell">
+		<a href="/files/45318430.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>45318430</p>
+		</a>
+	</section>
+	<section class="cell">
+		<a href="/files/45319434.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>45319434</p>
+		</a>
+	</section>
+	<section class="cell">
+		<a href="/files/20301451.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>20301451</p>
+		</a>
+	</section>
+	<section class="cell">
+		<a href="/files/20301452.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>20301452</p>
+		</a>
+	</section>
+	<section class="cell">
+		<a href="/files/20301558.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>20301558</p>
+		</a>
+	</section>
+</fieldset>
 
 <script>
 	$(function() {
