@@ -50,8 +50,8 @@ include "../config.php";
 		.label {
 			width: 48.5mm;
 			height: 25.4mm;
-/*			border: 1px dotted #999;*/
-			padding: 5px;
+			border: 1px dotted #999;
+			padding: 4px;
 			box-sizing: border-box;
 			font-size: 16px;
 			display: inline-block;
@@ -63,18 +63,23 @@ include "../config.php";
 <?
 	$count = 0;
 	$query = "
-		SELECT LPAD(SI_ID, 7, '0') SI_ID
-		FROM shell__Item
-		WHERE SA_ID = {$_GET['SA_ID']}
+		SELECT SI.SI_ID
+			,DATE_FORMAT(SA.sa_date, '%d.%m.%y') sa_date_format
+			,CW.Item
+		FROM shell__Item SI
+		JOIN shell__Arrival SA ON SA.SA_ID = SI.SA_ID
+		JOIN CounterWeight CW ON CW.CW_ID = SA.CW_ID
+		WHERE SI.SA_ID = {$_GET['SA_ID']}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
 		$count++;
-		$code = '2'.$row["SI_ID"];
 		?>
-		<span class="label" style="position: relative;">
-			<img src="../barcode.php?code=<?=$code?>&w=170&h=90" alt="barcode">
-			<div style="position: absolute; top: 80px; width: 100%; text-align: center;"><span style="background-color: white;"><?=$code?></span></div>
+		<span class="label" style="position: relative; font-size: 12px;">
+			<img src="../barcode.php?code=<?=$code?>&w=170&h=80" alt="barcode" style="position: absolute; top: 12px;">
+			<span style="position: absolute; left: 30px; width: 97px; text-align: center; letter-spacing: 5px; font-weight:bold;"><?=$row["SI_ID"]?></span>
+			<span style="position: absolute; left: 10px; text-align: center;"><?=substr($row["Item"], -3)?></span>
+			<span style="position: absolute; right: 10px; text-align: center;"><?=$row["sa_date_format"]?></span>
 		</span>
 		<?
 		if( $count == 40 ) {
