@@ -64,6 +64,7 @@ include "../config.php";
 	$count = 0;
 	$query = "
 		SELECT SI.SI_ID
+			,LPAD(SI.SI_ID, 7, '0') lpadSI_ID
 			,DATE_FORMAT(SA.sa_date, '%d.%m.%y') sa_date_format
 			,CW.Item
 		FROM shell__Item SI
@@ -74,6 +75,7 @@ include "../config.php";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
 		$count++;
+		$code = '2'.$row["lpadSI_ID"];
 		?>
 		<span class="label" style="position: relative; font-size: 12px;">
 			<img src="../barcode.php?code=<?=$code?>&w=170&h=80" alt="barcode" style="position: absolute; top: 12px;">
