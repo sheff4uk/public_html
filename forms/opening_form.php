@@ -5,7 +5,6 @@ include_once "../config.php";
 if( isset($_POST["cassette"]) ) {
 	session_start();
 	$cassette = $_POST["cassette"];
-	$o_post = $_POST["o_post"];
 	$o_date = $_POST["o_date"];
 	$o_time = $_POST["o_time"];
 	$o_not_spill = $_POST["o_not_spill"] ? $_POST["o_not_spill"] : "NULL";
@@ -20,7 +19,6 @@ if( isset($_POST["cassette"]) ) {
 		$query = "
 			UPDATE list__Opening
 			SET cassette = {$cassette}
-				,o_post = {$o_post}
 				,o_date = '{$o_date}'
 				,o_time = '{$o_time}'
 				,o_not_spill = {$o_not_spill}
@@ -41,7 +39,6 @@ if( isset($_POST["cassette"]) ) {
 		$query = "
 			INSERT INTO list__Opening
 			SET cassette = {$cassette}
-				,o_post = {$o_post}
 				,o_date = '{$o_date}'
 				,o_time = '{$o_time}'
 				,o_not_spill = {$o_not_spill}
@@ -78,7 +75,7 @@ if( isset($_POST["cassette"]) ) {
 
 		// Перенаправление в журнал маршрутных листов
 		if( $add ) {
-			exit ('<meta http-equiv="refresh" content="0; url=/opening.php?week='.$week.'&o_date='.$o_date.'&o_post='.$o_post.'&add#'.$LO_ID.'">');
+			exit ('<meta http-equiv="refresh" content="0; url=/opening.php?week='.$week.'&o_date='.$o_date.'&add#'.$LO_ID.'">');
 		}
 		else {
 			exit ('<meta http-equiv="refresh" content="0; url=/opening.php?week='.$week.'#'.$LO_ID.'">');
@@ -105,10 +102,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 				<span>Дата расформовки:</span>
 				<input type="date" name="o_date" required>
-			</div>
-			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-				<span>№ поста:</span>
-				<input type="number" min="1" max="10" name="o_post" required>
 			</div>
 
 			<table style="width: 100%; table-layout: fixed;">
@@ -159,8 +152,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
 			var LO_ID = $(this).attr("LO_ID"),
-				o_date = $(this).attr("o_date"),
-				o_post = $(this).attr("o_post");
+				o_date = $(this).attr("o_date");
 
 			// В случае редактирования заполняем форму
 			if( LO_ID ) {
@@ -173,8 +165,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 				});
 				// Идентификатор расформовки
 				$('#opening_form input[name="LO_ID"]').val(LO_ID);
-				// № поста
-				$('#opening_form input[name="o_post"]').val(opening_data['o_post']);
 				// № кассеты
 				$('#opening_form input[name="cassette"]').val(opening_data['cassette']);
 				// Дата/время расформовки
@@ -197,7 +187,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$.ajax({ url: "/ajax/filling_select.php?type=1", dataType: "script", async: true });
 
 				$('#opening_form input[name="o_date"]').val(o_date);
-				$('#opening_form input[name="o_post"]').val(o_post);
 				$('#opening_form table input').val('');
 				$('#opening_form table select').val('');
 			}

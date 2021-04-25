@@ -245,7 +245,6 @@ foreach ($_GET as &$value) {
 			<th colspan="2">Расформовка</th>
 			<th rowspan="2">№ кассеты</th>
 			<th rowspan="2"><i class="far fa-lg fa-hourglass" title="Интервал в часах с моента заливки."></i></th>
-			<th rowspan="2">№ поста</th>
 			<th colspan="4">Кол-во брака, шт</th>
 			<th colspan="3">Взвешивания, кг</th>
 			<th rowspan="2">Куб раствора, кг</th>
@@ -270,7 +269,6 @@ foreach ($_GET as &$value) {
 <?
 $query = "
 	SELECT LO.LO_ID
-		,LO.o_post
 		,DATE_FORMAT(LO.o_date, '%d.%m.%y') o_date
 		,DATE_FORMAT(LO.o_time, '%H:%i') o_time
 		,o_interval(LO.LO_ID) o_interval
@@ -314,7 +312,7 @@ $query = "
 		".($_GET["def_form"] ? "AND LO.o_def_form" : "")."
 		".($CASs ? "AND LO.cassette IN({$CASs})" : "")."
 	GROUP BY LO.LO_ID
-	ORDER BY LO.o_date, LO.o_time, LO.o_post
+	ORDER BY LO.o_date, LO.o_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -335,7 +333,6 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["o_time"]?></td>
 		<td><?=$cassette?></td>
 		<td style="background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
-		<td><?=$row["o_post"]?></td>
 		<td style="color: red;"><?=$row["o_not_spill"]?></td>
 		<td style="color: red;"><?=$row["o_crack"]?></td>
 		<td style="color: red;"><?=$row["o_chipped"]?></td>
@@ -369,7 +366,7 @@ if( $errors ) {
 	</tbody>
 </table>
 
-<div id="add_btn" class="add_opening" o_date="<?=$_GET["o_date"]?>" o_post="<?=$_GET["o_post"]?>" title="Внести данные расформовки"></div>
+<div id="add_btn" class="add_opening" o_date="<?=$_GET["o_date"]?>" title="Внести данные расформовки"></div>
 
 <?
 include "footer.php";
