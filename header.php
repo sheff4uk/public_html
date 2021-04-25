@@ -198,7 +198,6 @@ function src_url($src) {
 		$menu["План"]["<i class='fas fa-fill fa-lg'></i> Заливка"] = "plan_batch.php";
 		$menu["Факт"]["<i class='fas fa-fill-drip fa-lg'></i> Заливка"] = "filling.php";
 		$menu["Факт"]["<i class='fas fa-expand fa-lg'></i> Расформовка"] = "opening.php";
-		$menu["Факт"]["<i class='fas fa-pallet fa-lg'></i> Упаковка"] = "packing.php";
 		$menu["Факт"]["<i class='fas fa-truck fa-lg'></i> Отгрузка"] = "shipment.php";
 		$menu["Анализ"]["<i class='fas fa-history fa-lg'></i> История кассет"] = "history.php";
 		$menu["Анализ"]["<i class='fas fa-thermometer-half fa-lg'></i> Климат"] = "climate.php";

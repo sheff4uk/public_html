@@ -288,8 +288,6 @@ $query = "
 		,YEARWEEK(PB.pb_date, 1) pb_week
 		,PB.CW_ID
 		,LB.LB_ID
-		,LP.LP_ID
-		,LP.p_date
 		,LB.mix_density
 		,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
 		,SUM(1) dbl
@@ -299,7 +297,6 @@ $query = "
 	LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
 	WHERE 1
 		".($_GET["week"] ? "AND YEARWEEK(LO.o_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
@@ -321,12 +318,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		$errors .= "<p>Кассета <a href='#{$row["LO_ID"]}'><b class='cassette'>{$row["cassette"]}</b></a> расформована повторно.</p>";
 	}
 
-	if( $row["LP_ID"] ) {
-		$cassette = "<a href='packing.php?p_date_from={$row["p_date"]}&p_date_to={$row["p_date"]}#{$row["LP_ID"]}' title='Упаковка' target='_blank'><b class='cassette' style='".($row["dbl"] > 1 ? "color: red;" : "")."'>{$row["cassette"]}</b></a>";
-	}
-	else {
-		$cassette = "<b class='cassette' style='".($row["dbl"] > 1 ? "color: red;" : "")."'>{$row["cassette"]}</b>";
-	}
+	$cassette = "<b class='cassette' style='".($row["dbl"] > 1 ? "color: red;" : "")."'>{$row["cassette"]}</b>";
 	?>
 	<tr id="<?=$row["LO_ID"]?>" style="<?=(($o_date and $o_date != $row["o_date"]) ? "border-top: 10px solid #333;" : "")?>">
 		<td><?=$row["o_date"]?></td>

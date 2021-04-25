@@ -137,7 +137,6 @@ $query = "
 	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	LEFT JOIN list__Packing LP ON LP.LF_ID = LF.LF_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND LO.o_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND LO.o_date <= '{$_GET["date_to"]}'" : "")."
