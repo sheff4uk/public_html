@@ -193,7 +193,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["o_chipped"]}</a></td>";
 		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["o_def_form"]}</a></td>";
 
-		$total = $subrow["o_not_spill"] + $subrow["p_not_spill"] + $subrow["o_crack"] + $subrow["p_crack"] + $subrow["o_chipped"] + $subrow["p_chipped"] + $subrow["o_def_form"] + $subrow["p_def_form"];
+		$total = $subrow["o_not_spill"] + $subrow["o_crack"] + $subrow["o_chipped"] + $subrow["o_def_form"];
 		$percent_total = round($total / $subrow["fact"] * 100, 2);
 		echo "<td>{$total}</td>";
 		echo "<td>{$subrow["plan"]}</td>";
@@ -309,7 +309,7 @@ if( $filter ) {
 			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["o_chipped"]}</a></td>";
 			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["o_def_form"]}</a></td>";
 
-			$total = $subrow["o_not_spill"] + $subrow["p_not_spill"] + $subrow["o_crack"] + $subrow["p_crack"] + $subrow["o_chipped"] + $subrow["p_chipped"] + $subrow["o_def_form"] + $subrow["p_def_form"];
+			$total = $subrow["o_not_spill"] + $subrow["o_crack"] + $subrow["o_chipped"] + $subrow["o_def_form"];
 			$percent_total = round($total / $subrow["fact"] * 100, 2);
 			echo "<td>{$total}</td>";
 			echo "<td>{$subsubrow["plan"]}</td>";
