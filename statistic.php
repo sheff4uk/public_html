@@ -281,7 +281,7 @@ if( $filter ) {
 				SELECT SUM(PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * CW.in_cassette) plan
 				FROM plan__Batch PB
 				JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-				WHERE PB.fact_batches = 1
+				WHERE PB.fact_batches
 					AND PB.CW_ID = {$subrow["CW_ID"]}
 					".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
 					".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
