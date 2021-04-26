@@ -13,7 +13,7 @@ if( isset($_POST["SI_ID"]) ) {
 			WHERE SI_ID = {$_POST["SI_ID"]}
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		exit ('<meta http-equiv="refresh" content="0; url=/dct/index.php?SI_ID='.$_POST["SI_ID"].'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/dct/formreject.php?SI_ID='.$_POST["SI_ID"].'">');
 	}
 	else {
 		echo "<h1 style='color: red;'>Укажите хотябы один дефект!</h1>";
@@ -41,7 +41,7 @@ if( isset($_POST["SI_ID"]) ) {
 						// Если это форма
 						if( barcode.length == 8 && barcode[0] == "2" ) {
 							var SI_ID = Number(barcode.substr(1, 7));
-							$(location).attr('href','/dct/index.php?SI_ID='+SI_ID);
+							$(location).attr('href','/dct/formreject.php?SI_ID='+SI_ID);
 							barcode="";
 							return false;
 						}
