@@ -21,23 +21,32 @@ if( $ip == "91.144.175.13" ) {
 						WHERE cassette = {$cassette} AND event_time BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					// Если была кассета, то обновляем время
-					if( mysqli_num_rows($res) ) {
-						$row = mysqli_fetch_array($res);
-						$query = "
-							UPDATE cassette__Opening
-							SET event_time = NOW()
-							WHERE event_time = {$row["event_time"]} AND cassette = {$cassette}
-						";
-						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					}
-					// Иначе добавляем кассету
-					else {
+					// Если кассеты не было, записываем её в базу
+					if( mysqli_num_rows($res) == 0 ) {
 						$query = "
 							INSERT INTO cassette__Opening
 							SET cassette = {$cassette}
 						";
 						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+						//Узнаем время заливки и код
+						$query = "
+							SELECT DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
+								,DATE_FORMAT(LF.lf_time, '%h:%i') lf_time_format
+								,CW.item
+							FROM list__Filling LF
+							JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+							JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+							JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+							WHERE LF.cassette = {$cassette}
+							ORDER BY LF.lf_date DESC, LF.lf_time DESC
+							LIMIT 1
+						";
+						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						$row = mysqli_fetch_array($res);
+						//Телеграм бот отправляет уведомление
+						$message = "Расформована кассета <b>{$cassette}</b>\nКод: <b>{$row["item"]}<\b>\nЗалита: <b>{$row["lf_date_format"]} {$row["lf_time_format"]}<\b>\n";
+						message_to_telegram($message);
 					}
 					break;
 				/////////////////////////////////////
