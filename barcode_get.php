@@ -45,7 +45,7 @@ if( $ip == "91.144.175.13" ) {
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						$row = mysqli_fetch_array($res);
 						//Телеграм бот отправляет уведомление
-						$message = "Расформована кассета <b>{$cassette}</b>\nКод: <b>{$row["item"]}<\b>\nЗалита: <b>{$row["lf_date_format"]} {$row["lf_time_format"]}<\b>\n";
+						$message = "<b>{$cassette}</b> кассета расформована\n Код: <b>{$row["item"]}</b>\n Залита: <b>{$row["lf_date_format"]} {$row["lf_time_format"]}</b>\n";
 						message_to_telegram($message);
 					}
 					break;
