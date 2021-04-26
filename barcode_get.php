@@ -34,6 +34,7 @@ if( $ip == "91.144.175.13" ) {
 							SELECT DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
 								,DATE_FORMAT(LF.lf_time, '%h:%i') lf_time_format
 								,CW.item
+								,TIMESTAMPDIFF(HOUR, CAST(CONCAT(LF.lf_date, ' ', LF.lf_time) AS DATETIME), NOW()) maturation
 							FROM list__Filling LF
 							JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 							JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
@@ -45,7 +46,7 @@ if( $ip == "91.144.175.13" ) {
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						$row = mysqli_fetch_array($res);
 						//Телеграм бот отправляет уведомление
-						$message = "<b>{$cassette}</b> кассета расформована\n Код: <b>{$row["item"]}</b>\n Залита: <b>{$row["lf_date_format"]} {$row["lf_time_format"]}</b>\n";
+						$message = "<b>{$cassette}</b> кассета расформована\nКод: <b>{$row["item"]}</b>\nЗалита: <b>{$row["lf_date_format"]} {$row["lf_time_format"]}</b>\nСозревание: <b>{$row["maturation"]}</b>часов\n";
 						message_to_telegram($message);
 					}
 					break;
