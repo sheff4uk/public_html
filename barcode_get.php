@@ -32,7 +32,7 @@ if( $ip == "91.144.175.13" ) {
 						//Узнаем время заливки и код
 						$query = "
 							SELECT DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
-								,DATE_FORMAT(LF.lf_time, '%h:%i') lf_time_format
+								,DATE_FORMAT(LF.lf_time, '%H:%i') lf_time_format
 								,CW.item
 								,TIMESTAMPDIFF(HOUR, CAST(CONCAT(LF.lf_date, ' ', LF.lf_time) AS DATETIME), NOW()) maturation
 							FROM list__Filling LF
