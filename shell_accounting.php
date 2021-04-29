@@ -167,7 +167,7 @@ foreach ($_GET as &$value) {
 			<th>Отслоения</th>
 			<th>Трещины</th>
 			<th>Сколы</th>
-			<th>№ партии</th>
+			<th>Партия</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -186,10 +186,11 @@ $query = "
 		,NULL exfolation
 		,NULL crack
 		,NULL chipped
-		,SA.batch_number
+		,SA.batch_number batch
 		,SA.sa_date date
 		,SA.CW_ID
 		,(SELECT SUM(1) FROM shell__Item WHERE SA_ID = SA.SA_ID) barcode
+		,1 edit
 	FROM shell__Arrival SA
 	JOIN CounterWeight CW ON CW.CW_ID = SA.CW_ID
 	WHERE 1
@@ -211,17 +212,19 @@ $query = "
 		,SR.exfolation
 		,SR.crack
 		,SR.chipped
-		,SR.batch_number
+		,IFNULL(DATE_FORMAT(SA.sa_date, '%d.%m.%Y'), SR.batch_number)
 		,SR.sr_date date
-		,SR.CW_ID
+		,IFNULL(SR.CW_ID, SA.CW_ID)
 		,NULL
+		,IF(SR.SA_ID, 0, 1) edit
 	FROM shell__Reject SR
-	JOIN CounterWeight CW ON CW.CW_ID = SR.CW_ID
+	LEFT JOIN shell__Arrival SA ON SA.SA_ID = SR.SA_ID
+	JOIN CounterWeight CW ON CW.CW_ID = IFNULL(SR.CW_ID, SA.CW_ID)
 	WHERE 1
 		".($_GET["date_from"] ? "AND SR.sr_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND SR.sr_date <= '{$_GET["date_to"]}'" : "")."
-		".($_GET["CW_ID"] ? "AND SR.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND SR.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		".($_GET["CW_ID"] ? "AND IFNULL(SR.CW_ID, SA.CW_ID) = {$_GET["CW_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND IFNULL(SR.CW_ID, SA.CW_ID) IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 
 	ORDER BY date, type, CW_ID
 ";
@@ -243,10 +246,12 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["exfolation"]?></td>
 		<td><?=$row["crack"]?></td>
 		<td><?=$row["chipped"]?></td>
-		<td><?=$row["batch_number"]?></td>
+		<td><?=$row["batch"]?></td>
 		<td>
-			<a href="#" <?=($row["type"] == "A" ? "class='add_arrival' SA_ID='{$row["ID"]}'" : "class='add_reject' SR_ID='{$row["ID"]}'")?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a>
 			<?
+			if( $row["edit"] ) {
+				echo "<a href='#' ".($row["type"] == "A" ? "class='add_arrival' SA_ID='{$row["ID"]}'" : "class='add_reject' SR_ID='{$row["ID"]}'")." title='Редактировать'><i class='fa fa-pencil-alt fa-lg'></i></a>";
+			}
 			if( $row["type"] == 'A' && $row["barcode"] ) {
 				echo "<a href='printforms/shell_label.php?SA_ID={$row["ID"]}' class='print' title='Штрихкоды на формы'><i class='fas fa-print fa-lg'></i></a>";
 			}
