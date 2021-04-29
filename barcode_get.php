@@ -4,7 +4,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
 
 // Проверка доступа
-if( $ip == "91.144.175.13" ) {
+//if( $ip == "91.144.175.13" ) {
 	// Узнаем префикс штрихкода
 	$prefix1 = substr($bc, 0, 1);
 	$prefix2 = substr($bc, 0, 2);
@@ -73,13 +73,13 @@ if( $ip == "91.144.175.13" ) {
 			}
 			break;
 		/////////////////////////////////////
-		case "9": // TEST
-			$test = (int)substr($bc, 2);
+		default: // TEST
+			$test = (int)$bc;
 			//Телеграм бот отправляет уведомление
 			$message = "Test label <b>{$test}</b>";
 			message_to_telegram($message);
 			break;
 		/////////////////////////////////////
 	}
-}
+//}
 ?>
