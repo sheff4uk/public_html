@@ -45,7 +45,7 @@ if( $cubetests == 1 ) {
 	$tests = array(round($batches/2));
 }
 elseif( $cubetests == 3 ) {
-	$tests = array(1, round($batches/2), $batches);
+	$tests = array(2, round($batches/2), $batches);
 }
 
 echo "<title>Чеклист оператора для {$item} от {$pb_date}</title>";
