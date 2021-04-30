@@ -59,6 +59,7 @@ if( isset($_POST["SI_ID"]) ) {
 	</head>
 	<body>
 		<h3>Отсканируйте штрихкод</h3>
+		<h3>Или введите номер <form method="get"><input type="number" name="SI_ID"><input type="submit" value="->>"></form></h3>
 		<?
 		if( isset($_GET["SI_ID"]) ) {
 			$query = "
