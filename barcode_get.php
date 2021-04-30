@@ -46,7 +46,7 @@ include "config.php";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						$row = mysqli_fetch_array($res);
 						//Телеграм бот отправляет уведомление
-						$message = "<b>[{$cassette}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b> ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>";
+						$message = "<b>[{$cassette}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>";
 						message_to_telegram($message);
 					}
 					break;
