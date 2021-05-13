@@ -1,10 +1,11 @@
 <?
 $bc = $_GET["bc"];
+$bc = str_pad($bc, 8, "0", STR_PAD_LEFT);
 $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
 
 // Проверка доступа
-//if( $ip == "91.144.175.13" ) {
+if( $ip == "91.144.175.13" ) {
 	// Узнаем префикс штрихкода
 	$prefix1 = substr($bc, 0, 1);
 	$prefix2 = substr($bc, 0, 2);
@@ -76,10 +77,10 @@ include "config.php";
 		default: // TEST
 			$test = (int)$bc;
 			//Телеграм бот отправляет уведомление
-			$message = "Test label <b>{$test}</b>";
+			$message = "Test label <b>{$bc}</b>";
 			message_to_telegram($message);
 			break;
 		/////////////////////////////////////
 	}
-//}
+}
 ?>
