@@ -7,7 +7,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
 
 // Проверка доступа
-if( $ip == "91.144.175.13" ) {
+if( $ip == $from_ip ) {
 	// Записываем в базу переданные показания
 	$query = "
 		INSERT INTO Climate

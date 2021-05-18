@@ -5,7 +5,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
 
 // Проверка доступа
-if( $ip == "91.144.175.13" ) {
+if( $ip == $from_ip ) {
 	// Узнаем префикс штрихкода
 	$prefix1 = substr($bc, 0, 1);
 	$prefix2 = substr($bc, 0, 2);
