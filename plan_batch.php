@@ -211,7 +211,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,COUNT(DISTINCT LB.LB_ID) batches
 			,COUNT(LF.LF_ID) fillings
 			,SUM(CW.in_cassette) details
-			,ROUND(IFNULL(SUM(LB.underfilling / PB.fillings_per_batch), 0)) underfilling
+			,SUM(LF.underfilling) underfilling
 		FROM list__Batch LB
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
@@ -338,12 +338,13 @@ while( $row = mysqli_fetch_array($res) ) {
 			,PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) fillings
 			,PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * CW.in_cassette plan
 			,PB.fact_batches * PB.fillings_per_batch * CW.in_cassette details
-			,IFNULL(SUM(LB.underfilling), 0) underfilling
+			,SUM(LF.underfilling) underfilling
 			,IF(PB.batches > 0 AND PB.fact_batches = 0 AND PB.pb_date <= (CURRENT_DATE() + INTERVAL 1 DAY), 1, 0) printable
 			,(SELECT PB_ID FROM plan__Batch WHERE CW_ID = PB.CW_ID AND fact_batches = 0 AND batches > 0 ORDER BY pb_date LIMIT 1) current_PB_ID
 		FROM plan__Batch PB
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
+		LEFT JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		WHERE 1
 			AND PB.pb_date = '{$row["pb_date"]}'
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
