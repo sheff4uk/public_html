@@ -68,7 +68,16 @@ if( isset($_POST["PB_ID"]) ) {
 							,LB_ID = {$LB_ID}
 					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					// ID последней залитой кассеты
+					$LF_ID = mysqli_insert_id( $mysqli );
 				}
+				// Записываем недоливы в последнюю кассету
+				$query = "
+					UPDATE list__Filling
+					SET underfilling = {$underfilling}
+					WHERE LF_ID = {$LF_ID}
+				";
+				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			}
 			else { // Редактируем замес
 				$query = "
@@ -99,10 +108,20 @@ if( isset($_POST["PB_ID"]) ) {
 						UPDATE list__Filling
 						SET
 							cassette = {$v}
+							,underfilling = 0
 						WHERE LF_ID = {$k}
 					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					// ID последней залитой кассеты
+					$LF_ID = $k;
 				}
+				// Записываем недоливы в последнюю кассету
+				$query = "
+					UPDATE list__Filling
+					SET underfilling = {$underfilling}
+					WHERE LF_ID = {$LF_ID}
+				";
+				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			}
 		}
 		// Обновляем фактическое число замесов и число заливок на замес

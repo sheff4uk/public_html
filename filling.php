@@ -323,7 +323,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.cement
 			,LB.plasticizer
 			,LB.water
-			,LB.underfilling
+			,SUM(LF.underfilling) underfilling
 			,LB.test
 			,mix_letter(LB.LB_ID) letter
 			,mix_id(LB.LB_ID) MF_ID
@@ -335,6 +335,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,mix_pl_diff(mix_id(LB.LB_ID), LB.plasticizer) pl_diff
 			,mix_wt_diff(mix_id(LB.LB_ID), LB.water) wt_diff
 		FROM list__Batch LB
+		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
 		WHERE LB.PB_ID = {$row["PB_ID"]}
 		ORDER BY LB.batch_date, LB.batch_time

@@ -142,10 +142,11 @@ if( $fact_batches ) {
 			,IFNULL(LB.cement, 0) cement
 			,IFNULL(LB.plasticizer, 0) plasticizer
 			,IFNULL(LB.water, 0) water
-			,LB.underfilling
+			,SUM(LF.underfilling) underfilling
 			,LB.test
 			,IF(LCT.LCT_ID, 1, 0) is_test
 		FROM list__Batch LB
+		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
 		LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID
 		WHERE LB.PB_ID = {$PB_ID}
