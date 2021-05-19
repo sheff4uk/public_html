@@ -339,6 +339,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
 		WHERE LB.PB_ID = {$row["PB_ID"]}
 		ORDER BY LB.batch_date, LB.batch_time
+		GROUP BY LB.LB_ID
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
