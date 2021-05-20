@@ -272,10 +272,10 @@ $query = "
 		,DATE_FORMAT(LO.o_date, '%d.%m.%y') o_date
 		,DATE_FORMAT(LO.o_time, '%H:%i') o_time
 		,o_interval(LO.LO_ID) o_interval
-		,LO.o_not_spill
-		,LO.o_crack
-		,LO.o_chipped
-		,LO.o_def_form
+		,LO.not_spill
+		,LO.crack
+		,LO.chipped
+		,LO.def_form
 		,LO.weight1
 		,LO.weight2
 		,LO.weight3
@@ -303,10 +303,10 @@ $query = "
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		".($_GET["int24"] ? "AND o_interval(LO.LO_ID) < 24" : "")."
 		".($_GET["not_spec"] ? "AND (NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3))" : "")."
-		".($_GET["not_spill"] ? "AND LO.o_not_spill" : "")."
-		".($_GET["crack"] ? "AND LO.o_crack" : "")."
-		".($_GET["chipped"] ? "AND LO.o_chipped" : "")."
-		".($_GET["def_form"] ? "AND LO.o_def_form" : "")."
+		".($_GET["not_spill"] ? "AND LO.not_spill" : "")."
+		".($_GET["crack"] ? "AND LO.crack" : "")."
+		".($_GET["chipped"] ? "AND LO.chipped" : "")."
+		".($_GET["def_form"] ? "AND LO.def_form" : "")."
 		".($CASs ? "AND LO.cassette IN({$CASs})" : "")."
 	GROUP BY LO.LO_ID
 	ORDER BY LO.o_date, LO.o_time
@@ -325,10 +325,10 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["o_time"]?></td>
 		<td><?=$cassette?></td>
 		<td style="background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
-		<td style="color: red;"><?=$row["o_not_spill"]?></td>
-		<td style="color: red;"><?=$row["o_crack"]?></td>
-		<td style="color: red;"><?=$row["o_chipped"]?></td>
-		<td style="color: red;"><?=$row["o_def_form"]?></td>
+		<td style="color: red;"><?=$row["not_spill"]?></td>
+		<td style="color: red;"><?=$row["crack"]?></td>
+		<td style="color: red;"><?=$row["chipped"]?></td>
+		<td style="color: red;"><?=$row["def_form"]?></td>
 		<td><?=$row["weight1"]/1000?><?=($row["w1_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w1_diff"] > 0 ? " +" : " ").($row["w1_diff"]/1000)."</font>" : "")?></td>
 		<td><?=$row["weight2"]/1000?><?=($row["w2_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w2_diff"] > 0 ? " +" : " ").($row["w2_diff"]/1000)."</font>" : "")?></td>
 		<td><?=$row["weight3"]/1000?><?=($row["w3_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w3_diff"] > 0 ? " +" : " ").($row["w3_diff"]/1000)."</font>" : "")?></td>

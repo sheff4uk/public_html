@@ -52,7 +52,6 @@ if( isset($_POST["PB_ID"]) ) {
 						,cement = {$cement}
 						,plasticizer = {$plasticizer}
 						,water = {$water}
-						,underfilling = {$underfilling}
 						,test = {$test}
 						,OP_ID = {$OP_ID}
 				";
@@ -95,7 +94,6 @@ if( isset($_POST["PB_ID"]) ) {
 						,cement = {$cement}
 						,plasticizer = {$plasticizer}
 						,water = {$water}
-						,underfilling = {$underfilling}
 						,test = {$test}
 						,OP_ID = {$OP_ID}
 					WHERE LB_ID = {$key}

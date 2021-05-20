@@ -7,10 +7,10 @@ if( isset($_POST["cassette"]) ) {
 	$cassette = $_POST["cassette"];
 	$o_date = $_POST["o_date"];
 	$o_time = $_POST["o_time"];
-	$o_not_spill = $_POST["o_not_spill"] ? $_POST["o_not_spill"] : "NULL";
-	$o_crack = $_POST["o_crack"] ? $_POST["o_crack"] : "NULL";
-	$o_chipped = $_POST["o_chipped"] ? $_POST["o_chipped"] : "NULL";
-	$o_def_form = $_POST["o_def_form"] ? $_POST["o_def_form"] : "NULL";
+	$not_spill = $_POST["not_spill"] ? $_POST["not_spill"] : "NULL";
+	$crack = $_POST["crack"] ? $_POST["crack"] : "NULL";
+	$chipped = $_POST["chipped"] ? $_POST["chipped"] : "NULL";
+	$def_form = $_POST["def_form"] ? $_POST["def_form"] : "NULL";
 	$weight1 = $_POST["weight1"]*1000;
 	$weight2 = $_POST["weight2"]*1000;
 	$weight3 = $_POST["weight3"]*1000;
@@ -21,10 +21,10 @@ if( isset($_POST["cassette"]) ) {
 			SET cassette = {$cassette}
 				,o_date = '{$o_date}'
 				,o_time = '{$o_time}'
-				,o_not_spill = {$o_not_spill}
-				,o_crack = {$o_crack}
-				,o_chipped = {$o_chipped}
-				,o_def_form = {$o_def_form}
+				,not_spill = {$not_spill}
+				,crack = {$crack}
+				,chipped = {$chipped}
+				,def_form = {$def_form}
 				,weight1 = {$weight1}
 				,weight2 = {$weight2}
 				,weight3 = {$weight3}
@@ -41,10 +41,10 @@ if( isset($_POST["cassette"]) ) {
 			SET cassette = {$cassette}
 				,o_date = '{$o_date}'
 				,o_time = '{$o_time}'
-				,o_not_spill = {$o_not_spill}
-				,o_crack = {$o_crack}
-				,o_chipped = {$o_chipped}
-				,o_def_form = {$o_def_form}
+				,not_spill = {$not_spill}
+				,crack = {$crack}
+				,chipped = {$chipped}
+				,def_form = {$def_form}
 				,weight1 = {$weight1}
 				,weight2 = {$weight2}
 				,weight3 = {$weight3}
@@ -126,10 +126,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<td><input type='number' min='1' max='<?=$cassetts?>' name='cassette' style='width: 60px;' required></td>
 						<td><input type='time' name='o_time' required></td>
-						<td><input type="number" name="o_not_spill" min="0" style="width: 70px;"></td>
-						<td><input type="number" name="o_crack" min="0" style="width: 70px;"></td>
-						<td><input type="number" name="o_chipped" min="0" style="width: 70px;"></td>
-						<td><input type="number" name="o_def_form" min="0" style="width: 70px;"></td>
+						<td><input type="number" name="not_spill" min="0" style="width: 70px;"></td>
+						<td><input type="number" name="crack" min="0" style="width: 70px;"></td>
+						<td><input type="number" name="chipped" min="0" style="width: 70px;"></td>
+						<td><input type="number" name="def_form" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="weight1" min="5" max="20" step="0.01" required></td>
 						<td><input type="number" name="weight2" min="5" max="20" step="0.01" required></td>
 						<td><input type="number" name="weight3" min="5" max="20" step="0.01" required></td>
@@ -171,10 +171,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#opening_form input[name="o_date"]').val(opening_data['o_date']);
 				$('#opening_form input[name="o_time"]').val(opening_data['o_time']);
 				// Дефекты расформовки
-				$('#opening_form input[name="o_not_spill"]').val(opening_data['o_not_spill']);
-				$('#opening_form input[name="o_crack"]').val(opening_data['o_crack']);
-				$('#opening_form input[name="o_chipped"]').val(opening_data['o_chipped']);
-				$('#opening_form input[name="o_def_form"]').val(opening_data['o_def_form']);
+				$('#opening_form input[name="not_spill"]').val(opening_data['not_spill']);
+				$('#opening_form input[name="crack"]').val(opening_data['crack']);
+				$('#opening_form input[name="chipped"]').val(opening_data['chipped']);
+				$('#opening_form input[name="def_form"]').val(opening_data['def_form']);
 				// Контрольные взвешивания
 				$('#opening_form input[name="weight1"]').val(opening_data['weight1']);
 				$('#opening_form input[name="weight2"]').val(opening_data['weight2']);

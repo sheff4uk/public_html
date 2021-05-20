@@ -123,10 +123,10 @@ $query = "
 	SELECT PB.pb_date
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') date
 		,COUNT(distinct(PB.CW_ID)) item_cnt
-		,SUM(IFNULL(LO.o_not_spill,0)) not_spill
-		,SUM(IFNULL(LO.o_crack,0)) crack
-		,SUM(IFNULL(LO.o_chipped,0)) chipped
-		,SUM(IFNULL(LO.o_def_form,0)) def_form
+		,SUM(IFNULL(LO.not_spill,0)) not_spill
+		,SUM(IFNULL(LO.crack,0)) crack
+		,SUM(IFNULL(LO.chipped,0)) chipped
+		,SUM(IFNULL(LO.def_form,0)) def_form
 		,SUM(1) cnt
 		,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 		,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -151,10 +151,10 @@ while( $row = mysqli_fetch_array($res) ) {
 	$query = "
 		SELECT CW.item
 			,PB.CW_ID
-			,IFNULL(SUM(LO.o_not_spill), '-') o_not_spill
-			,IFNULL(SUM(LO.o_crack), '-') o_crack
-			,IFNULL(SUM(LO.o_chipped), '-') o_chipped
-			,IFNULL(SUM(LO.o_def_form), '-') o_def_form
+			,IFNULL(SUM(LO.not_spill), '-') not_spill
+			,IFNULL(SUM(LO.crack), '-') crack
+			,IFNULL(SUM(LO.chipped), '-') chipped
+			,IFNULL(SUM(LO.def_form), '-') def_form
 			,SUM(1) cnt
 			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 			,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -188,12 +188,12 @@ while( $row = mysqli_fetch_array($res) ) {
 		echo "<td>{$subrow["cnt"]}</td>";
 		echo "<td style='color:red;'><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;int24=1' target='_blank'>{$subrow["o_interval"]}</a></td>";
 		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spec=1' target='_blank'>{$subrow["not_spec"]}</a></td>";
-		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spill=1' target='_blank'>{$subrow["o_not_spill"]}</a></td>";
-		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;crack=1' target='_blank'>{$subrow["o_crack"]}</a></td>";
-		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["o_chipped"]}</a></td>";
-		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["o_def_form"]}</a></td>";
+		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spill=1' target='_blank'>{$subrow["not_spill"]}</a></td>";
+		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;crack=1' target='_blank'>{$subrow["crack"]}</a></td>";
+		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["chipped"]}</a></td>";
+		echo "<td><a href='opening.php?pb_date_from={$row["pb_date"]}&amp;pb_date_to={$row["pb_date"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["def_form"]}</a></td>";
 
-		$total = $subrow["o_not_spill"] + $subrow["o_crack"] + $subrow["o_chipped"] + $subrow["o_def_form"];
+		$total = $subrow["not_spill"] + $subrow["crack"] + $subrow["chipped"] + $subrow["def_form"];
 		$percent_total = round($total / $subrow["fact"] * 100, 2);
 		echo "<td>{$total}</td>";
 		echo "<td>{$subrow["plan"]}</td>";
@@ -227,10 +227,10 @@ while( $row = mysqli_fetch_array($res) ) {
 if( $filter ) {
 	$query = "
 		SELECT COUNT(distinct(PB.CW_ID)) item_cnt
-			,SUM(IFNULL(LO.o_not_spill,0)) not_spill
-			,SUM(IFNULL(LO.o_crack,0)) crack
-			,SUM(IFNULL(LO.o_chipped,0)) chipped
-			,SUM(IFNULL(LO.o_def_form,0)) def_form
+			,SUM(IFNULL(LO.not_spill,0)) not_spill
+			,SUM(IFNULL(LO.crack,0)) crack
+			,SUM(IFNULL(LO.chipped,0)) chipped
+			,SUM(IFNULL(LO.def_form,0)) def_form
 			,SUM(1) cnt
 			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 			,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -253,10 +253,10 @@ if( $filter ) {
 		$query = "
 			SELECT CW.item
 				,PB.CW_ID
-				,IFNULL(SUM(LO.o_not_spill), '-') o_not_spill
-				,IFNULL(SUM(LO.o_crack), '-') o_crack
-				,IFNULL(SUM(LO.o_chipped), '-') o_chipped
-				,IFNULL(SUM(LO.o_def_form), '-') o_def_form
+				,IFNULL(SUM(LO.not_spill), '-') not_spill
+				,IFNULL(SUM(LO.crack), '-') crack
+				,IFNULL(SUM(LO.chipped), '-') chipped
+				,IFNULL(SUM(LO.def_form), '-') def_form
 				,SUM(1) cnt
 				,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 				,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -304,12 +304,12 @@ if( $filter ) {
 			echo "<td>{$subrow["cnt"]}</td>";
 			echo "<td style='color:red;'><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;int24=1' target='_blank'>{$subrow["o_interval"]}</a></td>";
 			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spec=1' target='_blank'>{$subrow["not_spec"]}</a></td>";
-			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spill=1' target='_blank'>{$subrow["o_not_spill"]}</a></td>";
-			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;crack=1' target='_blank'>{$subrow["o_crack"]}</a></td>";
-			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["o_chipped"]}</a></td>";
-			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["o_def_form"]}</a></td>";
+			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;not_spill=1' target='_blank'>{$subrow["not_spill"]}</a></td>";
+			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;crack=1' target='_blank'>{$subrow["crack"]}</a></td>";
+			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;chipped=1' target='_blank'>{$subrow["chipped"]}</a></td>";
+			echo "<td><a href='opening.php?pb_date_from={$_GET["date_from"]}&amp;pb_date_to={$_GET["date_to"]}&amp;CW_ID={$subrow["CW_ID"]}&amp;def_form=1' target='_blank'>{$subrow["def_form"]}</a></td>";
 
-			$total = $subrow["o_not_spill"] + $subrow["o_crack"] + $subrow["o_chipped"] + $subrow["o_def_form"];
+			$total = $subrow["not_spill"] + $subrow["crack"] + $subrow["chipped"] + $subrow["def_form"];
 			$percent_total = round($total / $subrow["fact"] * 100, 2);
 			echo "<td>{$total}</td>";
 			echo "<td>{$subsubrow["plan"]}</td>";
