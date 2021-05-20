@@ -346,7 +346,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		// Получаем список кассет
 		$query = "
 			SELECT LF.cassette
-				,YEARWEEK(LO.o_date, 1) o_week
+				,YEARWEEK(LO.o_event_time, 1) o_week
 				,LO.LO_ID
 				,SUM(1) dbl
 			FROM list__Filling LF

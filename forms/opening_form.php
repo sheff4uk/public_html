@@ -2,11 +2,8 @@
 include_once "../config.php";
 
 // Сохранение/редактирование расформовки
-if( isset($_POST["cassette"]) ) {
+if( isset($_POST["LO_ID"]) ) {
 	session_start();
-	$cassette = $_POST["cassette"];
-	$o_date = $_POST["o_date"];
-	$o_time = $_POST["o_time"];
 	$not_spill = $_POST["not_spill"] ? $_POST["not_spill"] : "NULL";
 	$crack = $_POST["crack"] ? $_POST["crack"] : "NULL";
 	$chipped = $_POST["chipped"] ? $_POST["chipped"] : "NULL";
@@ -18,10 +15,7 @@ if( isset($_POST["cassette"]) ) {
 	if( $_POST["LO_ID"] ) { // Редактируем
 		$query = "
 			UPDATE list__Opening
-			SET cassette = {$cassette}
-				,o_date = '{$o_date}'
-				,o_time = '{$o_time}'
-				,not_spill = {$not_spill}
+			SET not_spill = {$not_spill}
 				,crack = {$crack}
 				,chipped = {$chipped}
 				,def_form = {$def_form}
@@ -35,37 +29,15 @@ if( isset($_POST["cassette"]) ) {
 		}
 		$LO_ID = $_POST["LO_ID"];
 	}
-	else { // Добавляем
-		$query = "
-			INSERT INTO list__Opening
-			SET cassette = {$cassette}
-				,o_date = '{$o_date}'
-				,o_time = '{$o_time}'
-				,not_spill = {$not_spill}
-				,crack = {$crack}
-				,chipped = {$chipped}
-				,def_form = {$def_form}
-				,weight1 = {$weight1}
-				,weight2 = {$weight2}
-				,weight3 = {$weight3}
-		";
-		if( !mysqli_query( $mysqli, $query ) ) {
-			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
-		}
-		else {
-			$add = 1;
-			$LO_ID = mysqli_insert_id( $mysqli );
-		}
-	}
 
 	if( count($_SESSION["error"]) == 0) {
-		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
+		$_SESSION["success"][] = "Запись успешно отредактирована.";
 	}
 
 	if( $LO_ID ) {
 		// Получаем неделю
 		$query = "
-			SELECT YEARWEEK(o_date, 1) week
+			SELECT YEARWEEK(o_event_time, 1) week
 			FROM list__Opening
 			WHERE LO_ID = {$LO_ID}
 		";
@@ -74,12 +46,7 @@ if( isset($_POST["cassette"]) ) {
 		$week = $row["week"];
 
 		// Перенаправление в журнал маршрутных листов
-		if( $add ) {
-			exit ('<meta http-equiv="refresh" content="0; url=/opening.php?week='.$week.'&o_date='.$o_date.'&add#'.$LO_ID.'">');
-		}
-		else {
-			exit ('<meta http-equiv="refresh" content="0; url=/opening.php?week='.$week.'#'.$LO_ID.'">');
-		}
+		exit ('<meta http-equiv="refresh" content="0; url=/opening.php?week='.$week.'#'.$LO_ID.'">');
 	}
 	else {
 		exit ('<meta http-equiv="refresh" content="0; url=/opening.php">');
@@ -101,7 +68,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="LO_ID">
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 				<span>Дата расформовки:</span>
-				<input type="date" name="o_date" required>
+				<span id="o_date" style="font-size: 1.5em;"></span>
 			</div>
 
 			<table style="width: 100%; table-layout: fixed;">
@@ -124,8 +91,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td><input type='number' min='1' max='<?=$cassetts?>' name='cassette' style='width: 60px;' required></td>
-						<td><input type='time' name='o_time' required></td>
+						<td><b class="cassette" id="cassette"></b></td>
+						<td><span id="o_time"></span></td>
 						<td><input type="number" name="not_spill" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="crack" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="chipped" min="0" style="width: 70px;"></td>
@@ -151,8 +118,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
-			var LO_ID = $(this).attr("LO_ID"),
-				o_date = $(this).attr("o_date");
+			var LO_ID = $(this).attr("LO_ID");
 
 			// В случае редактирования заполняем форму
 			if( LO_ID ) {
@@ -166,10 +132,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 				// Идентификатор расформовки
 				$('#opening_form input[name="LO_ID"]').val(LO_ID);
 				// № кассеты
-				$('#opening_form input[name="cassette"]').val(opening_data['cassette']);
+				$('#opening_form #cassette').text(opening_data['cassette']);
 				// Дата/время расформовки
-				$('#opening_form input[name="o_date"]').val(opening_data['o_date']);
-				$('#opening_form input[name="o_time"]').val(opening_data['o_time']);
+				$('#opening_form #o_date').text(opening_data['o_date']);
+				$('#opening_form #o_time').text(opening_data['o_time']);
 				// Дефекты расформовки
 				$('#opening_form input[name="not_spill"]').val(opening_data['not_spill']);
 				$('#opening_form input[name="crack"]').val(opening_data['crack']);
@@ -179,16 +145,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#opening_form input[name="weight1"]').val(opening_data['weight1']);
 				$('#opening_form input[name="weight2"]').val(opening_data['weight2']);
 				$('#opening_form input[name="weight3"]').val(opening_data['weight3']);
-			}
-			// Иначе очищаем форму
-			else {
-				$('#opening_form input[name="LO_ID"]').val('');
-				// Генерируем список свободных заливок
-				$.ajax({ url: "/ajax/filling_select.php?type=1", dataType: "script", async: true });
-
-				$('#opening_form input[name="o_date"]').val(o_date);
-				$('#opening_form table input').val('');
-				$('#opening_form table select').val('');
 			}
 
 			$('#opening_form').dialog({

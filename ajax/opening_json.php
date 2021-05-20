@@ -5,8 +5,8 @@ $LO_ID = $_GET["LO_ID"];
 
 $query = "
 	SELECT LO.cassette
-		,LO.o_date
-		,LO.o_time
+		,DATE_FORMAT(LO.o_event_time, '%d.%m.%Y') o_date
+		,DATE_FORMAT(LO.o_event_time, '%H:%i') o_time
 		,LO.not_spill
 		,LO.crack
 		,LO.chipped
