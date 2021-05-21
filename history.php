@@ -62,7 +62,7 @@ $query = "
 
 		SELECT LO.cassette
 			,NULL
-			,ADDTIME(CONVERT(LO.o_date, DATETIME), LO.o_time) date_time
+			,LO.opening_time date_time
 			,LO.LF_ID
 			,CW.item
 			,o_interval(LO.LO_ID)
@@ -148,7 +148,7 @@ $query = "
 
 		SELECT LO.cassette
 			,NULL
-			,ADDTIME(CONVERT(LO.o_date, DATETIME), LO.o_time) date_time
+			,LO.opening_time date_time
 			,LO.LF_ID
 			,CW.item
 			,o_interval(LO.LO_ID)

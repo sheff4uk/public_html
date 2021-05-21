@@ -55,7 +55,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				$query = "
 					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
 					UNION
-					SELECT LEFT(YEARWEEK(o_event_time, 1), 4) year
+					SELECT LEFT(YEARWEEK(opening_time, 1), 4) year
 					FROM list__Opening
 					ORDER BY year DESC
 				";
@@ -74,13 +74,13 @@ while( $row = mysqli_fetch_array($res) ) {
 								,DATE_FORMAT(ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())), '%e %b') WeekStart
 								,DATE_FORMAT(ADDDATE(CURDATE(), 6-WEEKDAY(CURDATE())), '%e %b') WeekEnd
 							UNION
-							SELECT LEFT(YEARWEEK(o_event_time, 1), 4) year
-								,YEARWEEK(o_event_time, 1) week
-								,RIGHT(YEARWEEK(o_event_time, 1), 2) week_format
-								,DATE_FORMAT(ADDDATE(o_event_time, 0-WEEKDAY(o_event_time)), '%e %b') WeekStart
-								,DATE_FORMAT(ADDDATE(o_event_time, 6-WEEKDAY(o_event_time)), '%e %b') WeekEnd
+							SELECT LEFT(YEARWEEK(opening_time, 1), 4) year
+								,YEARWEEK(opening_time, 1) week
+								,RIGHT(YEARWEEK(opening_time, 1), 2) week_format
+								,DATE_FORMAT(ADDDATE(opening_time, 0-WEEKDAY(opening_time)), '%e %b') WeekStart
+								,DATE_FORMAT(ADDDATE(opening_time, 6-WEEKDAY(opening_time)), '%e %b') WeekEnd
 							FROM list__Opening
-							WHERE LEFT(YEARWEEK(o_event_time, 1), 4) = {$row["year"]}
+							WHERE LEFT(YEARWEEK(opening_time, 1), 4) = {$row["year"]}
 							GROUP BY week
 						) SUB
 						WHERE SUB.year = {$row["year"]}
@@ -269,8 +269,8 @@ foreach ($_GET as &$value) {
 <?
 $query = "
 	SELECT LO.LO_ID
-		,DATE_FORMAT(LO.o_event_time, '%d.%m.%y') o_date
-		,DATE_FORMAT(LO.o_event_time, '%H:%i') o_time
+		,DATE_FORMAT(LO.opening_time, '%d.%m.%y') o_date
+		,DATE_FORMAT(LO.opening_time, '%H:%i') o_time
 		,o_interval(LO.LO_ID) o_interval
 		,LO.not_spill
 		,LO.crack
@@ -298,7 +298,7 @@ $query = "
 	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	WHERE 1
-		".($_GET["week"] ? "AND YEARWEEK(LO.o_event_time, 1) LIKE '{$_GET["week"]}'" : "")."
+		".($_GET["week"] ? "AND YEARWEEK(LO.opening_time, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		".($_GET["int24"] ? "AND o_interval(LO.LO_ID) < 24" : "")."
@@ -309,7 +309,7 @@ $query = "
 		".($_GET["def_form"] ? "AND LO.def_form" : "")."
 		".($CASs ? "AND LO.cassette IN({$CASs})" : "")."
 	GROUP BY LO.LO_ID
-	ORDER BY LO.o_event_time
+	ORDER BY LO.opening_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {

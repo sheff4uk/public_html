@@ -122,12 +122,12 @@ foreach ($_GET as &$value) {
 <?
 $query = "
 	SELECT
-		".($_GET["detailing"] == "day" ? "DATE_FORMAT(LO.o_event_time, '%d.%m.%Y') reject_date_format" : "")."
-		".($_GET["detailing"] == "week" ? "DATE_FORMAT(LO.o_event_time, '%x w%v') reject_date_format" : "")."
-		".($_GET["detailing"] == "month" ? "DATE_FORMAT(LO.o_event_time, '%Y %b') reject_date_format" : "")."
-		".($_GET["detailing"] == "day" ? ",LO.o_event_time reject_date_sort" : "")."
-		".($_GET["detailing"] == "week" ? ",DATE_FORMAT(LO.o_event_time, '%x%v') reject_date_sort" : "")."
-		".($_GET["detailing"] == "month" ? ",DATE_FORMAT(LO.o_event_time, '%Y%m') reject_date_sort" : "")."
+		".($_GET["detailing"] == "day" ? "DATE_FORMAT(LO.opening_time, '%d.%m.%Y') reject_date_format" : "")."
+		".($_GET["detailing"] == "week" ? "DATE_FORMAT(LO.opening_time, '%x w%v') reject_date_format" : "")."
+		".($_GET["detailing"] == "month" ? "DATE_FORMAT(LO.opening_time, '%Y %b') reject_date_format" : "")."
+		".($_GET["detailing"] == "day" ? ",LO.opening_time reject_date_sort" : "")."
+		".($_GET["detailing"] == "week" ? ",DATE_FORMAT(LO.opening_time, '%x%v') reject_date_sort" : "")."
+		".($_GET["detailing"] == "month" ? ",DATE_FORMAT(LO.opening_time, '%Y%m') reject_date_sort" : "")."
 		,CW.item
 		,SUM(IFNULL(not_spill, 0) + IFNULL(crack, 0) + IFNULL(chipped, 0) + IFNULL(def_form, 0)) `o_reject`
 		,SUM(CW.in_cassette - LF.underfilling) `o_details`
@@ -138,8 +138,8 @@ $query = "
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	WHERE 1
-		".($_GET["date_from"] ? "AND DATE(LO.o_event_time) >= '{$_GET["date_from"]}'" : "")."
-		".($_GET["date_to"] ? "AND DATELO.o_event_time) <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["date_from"] ? "AND DATE(LO.opening_time) >= '{$_GET["date_from"]}'" : "")."
+		".($_GET["date_to"] ? "AND DATELO.opening_time) <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND CW.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND CW.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	GROUP BY reject_date_format, PB.CW_ID

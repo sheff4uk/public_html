@@ -37,7 +37,7 @@ if( isset($_POST["LO_ID"]) ) {
 	if( $LO_ID ) {
 		// Получаем неделю
 		$query = "
-			SELECT YEARWEEK(o_event_time, 1) week
+			SELECT YEARWEEK(opening_time, 1) week
 			FROM list__Opening
 			WHERE LO_ID = {$LO_ID}
 		";
