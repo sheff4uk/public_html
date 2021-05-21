@@ -17,15 +17,15 @@ if( $ip == $from_ip ) {
 					$cassette = (int)substr($bc, 2);
 					//Проверяем была ли эта кассета уже просканирован в течении часа
 					$query = "
-						SELECT event_time
-						FROM cassette__Opening
-						WHERE cassette = {$cassette} AND event_time BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()
+						SELECT opening_time
+						FROM list__Opening
+						WHERE cassette = {$cassette} AND opening_time BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					// Если кассеты не было, записываем её в базу
 					if( mysqli_num_rows($res) == 0 ) {
 						$query = "
-							INSERT INTO cassette__Opening
+							INSERT INTO list__Opening
 							SET cassette = {$cassette}
 						";
 						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
