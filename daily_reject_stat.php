@@ -139,7 +139,7 @@ $query = "
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND DATE(LO.opening_time) >= '{$_GET["date_from"]}'" : "")."
-		".($_GET["date_to"] ? "AND DATELO.opening_time) <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND CW.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND CW.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	GROUP BY reject_date_format, PB.CW_ID
