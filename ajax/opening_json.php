@@ -19,7 +19,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
-$LO_data = array( "cassette"=>$row["cassette"], "o_date"=>$row["o_date"], "o_time"=>$row["o_time"], "not_spill"=>$row["not_spill"], "crack"=>$row["crack"], "chipped"=>$row["chipped"], "def_form"=>$row["def_form"], "weight1"=>$row["weight1"]/1000, "weight2"=>$row["weight2"]/1000, "weight3"=>$row["weight3"]/1000 );
+$LO_data = array( "cassette"=>$row["cassette"], "o_date"=>$row["o_date"], "o_time"=>$row["o_time"], "not_spill"=>$row["not_spill"], "crack"=>$row["crack"], "chipped"=>$row["chipped"], "def_form"=>$row["def_form"], "weight1"=>($row["weight1"] ? $row["weight1"]/1000 : ""), "weight2"=>($row["weight2"] ? $row["weight2"]/1000 : ""), "weight3"=>($row["weight3"] ? $row["weight3"]/1000 : "") );
 
 echo json_encode($LO_data);
 ?>
