@@ -1,4 +1,5 @@
 <?php
+//include "config.php";
 // Двоичная строка в массив отдельных байт
 function byteStr2byteArray($s) {
 	return array_slice(unpack("C*", "\0".$s), 1);
@@ -175,8 +176,8 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 	}
 }
 ///////////////////////////////////////////////////////////
-//if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5002)) ) {
-//	read_transaction(10000, 1, $socket, 0);
+//if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5001)) ) {
+//	read_transaction(36666, 1, $socket, 0, $mysqli);
 //	socket_close($socket);
 //}
 
