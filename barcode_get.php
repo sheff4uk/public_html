@@ -37,9 +37,9 @@ if( $ip == $from_ip ) {
 						$query = "
 							SELECT WT.port
 								,WT.last_transaction
-								#,LW.LO_ID
+								,LW.LO_ID
 							FROM WeighingTerminal WT
-							#JOIN list__Weight LW ON LW.WT_ID = WT.WT_ID AND LW.nextID = WT.last_transaction
+							JOIN list__Weight LW ON LW.WT_ID = WT.WT_ID AND LW.nextID = WT.last_transaction
 							WHERE WT.type = 1
 						";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

@@ -105,25 +105,25 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 //					echo $ReceiptNumber."\r\n";
 
 					// Записываем в базу регистрацию
-//					$query = "
-//						INSERT INTO list__Weight
-//						SET LO_ID = {$lastLO_ID}
-//							,weight = {$netWeight}
-//							,nextID = {$nextID}
-//							,WT_ID = {$deviceID}
-//							,weighing_time = '{$transactionDate}'
-//							,goodsID = {$goodsID}
-//							,RN = {$ReceiptNumber}
-//					";
 					$query = "
 						INSERT INTO list__Weight
-						SET weight = {$netWeight}
+						SET LO_ID = {$lastLO_ID}
+							,weight = {$netWeight}
 							,nextID = {$nextID}
 							,WT_ID = {$deviceID}
 							,weighing_time = '{$transactionDate}'
 							,goodsID = {$goodsID}
 							,RN = {$ReceiptNumber}
 					";
+//					$query = "
+//						INSERT INTO list__Weight
+//						SET weight = {$netWeight}
+//							,nextID = {$nextID}
+//							,WT_ID = {$deviceID}
+//							,weighing_time = '{$transactionDate}'
+//							,goodsID = {$goodsID}
+//							,RN = {$ReceiptNumber}
+//					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
 					// Запоминаем ID последней регистрации
@@ -149,19 +149,19 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 //					echo $transactionDate." ";
 //					echo "Закрытие партии\r\n";
 
-//					// Узнаем очередной LO_ID
-//					$query = "
-//						SELECT LO_ID
-//						FROM list__Opening
-//						WHERE opening_time > (SELECT opening_time FROM list__Opening WHERE LO_ID = {$lastLO_ID})
-//						ORDER BY opening_time
-//						LIMIT 1
-//					";
-//					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//					$row = mysqli_fetch_array($res);
-//					if( $row["LO_ID"] ) {
-//						$lastLO_ID = $row["LO_ID"];
-//					}
+					// Узнаем очередной LO_ID
+					$query = "
+						SELECT LO_ID
+						FROM list__Opening
+						WHERE opening_time > (SELECT opening_time FROM list__Opening WHERE LO_ID = {$lastLO_ID})
+						ORDER BY opening_time
+						LIMIT 1
+					";
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					$row = mysqli_fetch_array($res);
+					if( $row["LO_ID"] ) {
+						$lastLO_ID = $row["LO_ID"];
+					}
 				}
 			}
 
