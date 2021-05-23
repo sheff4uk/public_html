@@ -104,14 +104,24 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 //					echo $ReceiptNumber."\r\n";
 
 					// Записываем в базу регистрацию
+//					$query = "
+//						INSERT INTO list__Weight
+//						SET LO_ID = {$lastLO_ID}
+//							,weight = {$netWeight}
+//							,nextID = {$nextID}
+//							,WT_ID = {$deviceID}
+//							,weighing_time = '{$transactionDate}'
+//							,goodsID = {$goodsID}
+//							,RN = {$ReceiptNumber}
+//					";
 					$query = "
 						INSERT INTO list__Weight
-						SET LO_ID = {$lastLO_ID}
-							,weight = {$netWeight}
+						SET weight = {$netWeight}
 							,nextID = {$nextID}
 							,WT_ID = {$deviceID}
 							,weighing_time = '{$transactionDate}'
 							,goodsID = {$goodsID}
+							,RN = {$ReceiptNumber}
 					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
