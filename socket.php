@@ -148,19 +148,19 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 //					echo $transactionDate." ";
 //					echo "Закрытие партии\r\n";
 
-					// Узнаем очередной LO_ID
-					$query = "
-						SELECT LO_ID
-						FROM list__Opening
-						WHERE opening_time > (SELECT opening_time FROM list__Opening WHERE LO_ID = {$lastLO_ID})
-						ORDER BY opening_time
-						LIMIT 1
-					";
-					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					$row = mysqli_fetch_array($res);
-					if( $row["LO_ID"] ) {
-						$lastLO_ID = $row["LO_ID"];
-					}
+//					// Узнаем очередной LO_ID
+//					$query = "
+//						SELECT LO_ID
+//						FROM list__Opening
+//						WHERE opening_time > (SELECT opening_time FROM list__Opening WHERE LO_ID = {$lastLO_ID})
+//						ORDER BY opening_time
+//						LIMIT 1
+//					";
+//					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//					$row = mysqli_fetch_array($res);
+//					if( $row["LO_ID"] ) {
+//						$lastLO_ID = $row["LO_ID"];
+//					}
 				}
 			}
 
