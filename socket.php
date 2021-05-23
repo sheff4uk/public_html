@@ -1,5 +1,4 @@
 <?php
-//include "config.php";
 // Двоичная строка в массив отдельных байт
 function byteStr2byteArray($s) {
 	return array_slice(unpack("C*", "\0".$s), 1);
@@ -34,7 +33,7 @@ function crc16($buf) {
 }
 
 // Прочитать все регистрации начиная с ID
-function read_transaction($ID, $curnum, $socket, $lastLO_ID) {
+function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 	$hexID = sprintf("%02x%02x%02x%02x", ($ID & 0xFF), (($ID >> 8) & 0xFF), (($ID >> 16) & 0xFF), (($ID >> 24) & 0xFF));
 	$hexcurnum = sprintf("%02x%02x", ($curnum & 0xFF), (($curnum >> 8) & 0xFF));
 	$in = "\xF8\x55\xCE\x0C\x00\x92\x03\x00\x00".hex2bin($hexcurnum).hex2bin($hexID)."\x00\x00";
@@ -120,7 +119,7 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID) {
 					$query = "
 						UPDATE WeighingTerminal
 						SET last_transaction = {$nextID}
-						WHERE = WT_ID = {$deviceID}
+						WHERE WT_ID = {$deviceID}
 					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
@@ -149,18 +148,20 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID) {
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					$row = mysqli_fetch_array($res);
-					$lastLO_ID = $row["LO_ID"];
+					if( $row["LO_ID"] ) {
+						$lastLO_ID = $row["LO_ID"];
+					}
 				}
 			}
 
 			// Если это не последняя часть
 			if( $nums > $curnum ) {
-				read_transaction($ID, ++$curnum, $socket, $lastLO_ID);
+				read_transaction($ID, ++$curnum, $socket, $lastLO_ID, $mysqli);
 			}
 		}
 	}
 	else { //Если CRC не совпали делаем попытку еще
-		read_transaction($ID, $curnum, $socket, $lastLO_ID);
+		read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli);
 	}
 }
 ///////////////////////////////////////////////////////////
