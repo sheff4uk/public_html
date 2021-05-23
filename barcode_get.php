@@ -22,27 +22,47 @@ if( $ip == $from_ip ) {
 						WHERE cassette = {$cassette} AND opening_time BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					// Если кассеты не было, записываем её в базу
+					// Если это первое сканирование
 					if( mysqli_num_rows($res) == 0 ) {
+						// Записываем номе кассеты в базу
 						$query = "
 							INSERT INTO list__Opening
 							SET cassette = {$cassette}
 						";
 						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						$LO_ID = mysqli_insert_id( $mysqli );
+
+						// Запрашиваем регистрации у весов
+						include "socket.php";
+						$query = "
+							SELECT WT.port
+								,WT.last_transaction
+								,LW.LO_ID
+							FROM WeighingTerminal WT
+							JOIN list__Weight LW ON LW.WT_ID = WT.WT_ID AND LW.nextID = WT.last_transaction
+							WHERE WT.type = 1
+						";
+						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						while( $row = mysqli_fetch_array($res) ) {
+							// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
+							if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5001)) ) {
+								read_transaction($row["last_transaction"]+1, 1, $socket, $row["LO_ID"]);
+								socket_close($socket);
+							}
+						}
 
 						//Узнаем время заливки и код
 						$query = "
 							SELECT DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
 								,DATE_FORMAT(LF.lf_time, '%H:%i') lf_time_format
 								,CW.item
-								,TIMESTAMPDIFF(HOUR, CAST(CONCAT(LF.lf_date, ' ', LF.lf_time) AS DATETIME), NOW()) maturation
-							FROM list__Filling LF
+								,o_interval(LO.LO_ID) maturation
+							FROM list__Opening LO
+							JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 							JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 							JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 							JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-							WHERE LF.cassette = {$cassette}
-							ORDER BY LF.lf_date DESC, LF.lf_time DESC
-							LIMIT 1
+							WHERE LO.LO_ID = {$LO_ID}
 						";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						$row = mysqli_fetch_array($res);
