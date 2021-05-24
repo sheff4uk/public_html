@@ -138,6 +138,12 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
+					// Удаляем недопустимые веса
+					$query = "
+						DELETE FROM list__Weight WHERE weight < 7000 OR weight > 14000
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
 				}
 				//Закрытие партии
 				elseif( $data[$i+10] == 71 ) {
