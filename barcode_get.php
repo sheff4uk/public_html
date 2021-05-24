@@ -15,16 +15,18 @@ if( $ip == $from_ip ) {
 			switch( $prefix2 ) {
 				case "11":
 					$cassette = (int)substr($bc, 2);
-					//Проверяем была ли эта кассета уже просканирован в течении часа
+					//Проверяем была ли эта кассета уже просканирована
 					$query = "
-						SELECT opening_time
+						SELECT cassette
 						FROM list__Opening
-						WHERE cassette = {$cassette} AND opening_time BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()
+						ORDER BY opening_time DESC
+						LIMIT 1
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					$row = mysqli_fetch_array($res);
 					// Если это первое сканирование
-					if( mysqli_num_rows($res) == 0 ) {
-						// Записываем номе кассеты в базу
+					if( $row["cassette"] != $cassette ) {
+						// Записываем номер кассеты в базу
 						$query = "
 							INSERT INTO list__Opening
 							SET cassette = {$cassette}
