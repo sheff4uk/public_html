@@ -104,6 +104,19 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 //					echo $goodsID." ";
 //					echo $ReceiptNumber."\r\n";
 
+					// Отмены регистрации
+					if( $netWeight < 0 ) {
+						$query = "
+							DELETE FROM list__Weight
+							WHERE weight = ABS({$netWeight})
+								AND goodsID = {$goodsID}
+								AND RN = {$ReceiptNumber}
+							ORDER BY LW_ID DESC
+							LIMIT 1
+						";
+						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					}
+
 					// Записываем в базу регистрацию
 					$query = "
 						INSERT INTO list__Weight
@@ -115,15 +128,6 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 							,goodsID = {$goodsID}
 							,RN = {$ReceiptNumber}
 					";
-//					$query = "
-//						INSERT INTO list__Weight
-//						SET weight = {$netWeight}
-//							,nextID = {$nextID}
-//							,WT_ID = {$deviceID}
-//							,weighing_time = '{$transactionDate}'
-//							,goodsID = {$goodsID}
-//							,RN = {$ReceiptNumber}
-//					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
 					// Запоминаем ID последней регистрации
