@@ -54,22 +54,44 @@ if( $ip == $from_ip ) {
 						}
 
 						//Узнаем время заливки и код
+//						$query = "
+//							SELECT DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
+//								,DATE_FORMAT(LF.lf_time, '%H:%i') lf_time_format
+//								,CW.item
+//								,o_interval(LO.LO_ID) maturation
+//							FROM list__Opening LO
+//							JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+//							JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+//							JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+//							JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+//							WHERE LO.LO_ID = {$LO_ID}
+//						";
 						$query = "
 							SELECT DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
 								,DATE_FORMAT(LF.lf_time, '%H:%i') lf_time_format
+								,DATE_FORMAT(LO.opening_time, '%H:%i') o_time_format
 								,CW.item
 								,o_interval(LO.LO_ID) maturation
+								,LO.cassette
+								,SUM(1) cnt
+								,ROUND(AVG(LW.weight)) `avg`
+								,MIN(LW.weight) `min`
+								,MAX(LW.weight) `max`
 							FROM list__Opening LO
+							JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
 							JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 							JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 							JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 							JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-							WHERE LO.LO_ID = {$LO_ID}
+							GROUP BY LO.LO_ID
+							ORDER BY LO.opening_time DESC
+							LIMIT 2
 						";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						$row = mysqli_fetch_array($res);
+						$row = mysqli_fetch_array($res); // Нужна предпоследняя
 						//Телеграм бот отправляет уведомление
-						$message = "<b>[{$cassette}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>";
+						$message = "<b>[{$row["cassette"]}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>\nДеталей: <b>{$row["cnt"]}</b>\nСредний вес: <b>{$row["avg"]}</b>\nМинимальный вес: <b>{$row["min"]}</b>\nМаксимальный вес: <b>{$row["max"]}</b>\nВремя cканирования: {$row["o_time_format"]}";
 						message_to_telegram($message);
 					}
 					break;
