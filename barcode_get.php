@@ -73,6 +73,7 @@ if( $ip == $from_ip ) {
 								,CW.item
 								,o_interval(LO.LO_ID) maturation
 								,LO.cassette
+								,CW.in_cassette - LF.underfilling details
 								,SUM(1) cnt
 								,ROUND(AVG(LW.weight)) `avg`
 								,MIN(LW.weight) `min`
@@ -91,7 +92,7 @@ if( $ip == $from_ip ) {
 						$row = mysqli_fetch_array($res);
 						$row = mysqli_fetch_array($res); // Нужна предпоследняя
 						//Телеграм бот отправляет уведомление
-						$message = "<b>[{$row["cassette"]}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>\nДеталей: <b>{$row["cnt"]}</b>\nСредний вес: <b>{$row["avg"]}</b>\nМинимальный вес: <b>{$row["min"]}</b>\nМаксимальный вес: <b>{$row["max"]}</b>\nВремя cканирования: {$row["o_time_format"]}";
+						$message = "<b>[{$row["cassette"]}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>\nДеталей в кассете: <b>{$row["details"]}</b>\nДеталей в партии: <b>{$row["cnt"]}</b>\nСредний вес: <b>{$row["avg"]}</b>\nМинимальный вес: <b>{$row["min"]}</b>\nМаксимальный вес: <b>{$row["max"]}</b>\nВремя cканирования: <b>{$row["o_time_format"]}</b>";
 						message_to_telegram($message);
 					}
 					break;
