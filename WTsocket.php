@@ -155,7 +155,7 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 						SELECT LO_ID
 						FROM list__Opening
 						WHERE opening_time > (SELECT opening_time FROM list__Opening WHERE LO_ID = {$lastLO_ID})
-							AND LO_ID != (SELECT LO_ID FROM list__Opening ORDER BY opening_time DESC LIMIT 1)
+							#AND LO_ID != (SELECT LO_ID FROM list__Opening ORDER BY opening_time DESC LIMIT 1)
 						ORDER BY opening_time
 						LIMIT 1
 					";
