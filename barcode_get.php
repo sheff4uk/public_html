@@ -35,7 +35,7 @@ if( $ip == $from_ip ) {
 						$LO_ID = mysqli_insert_id( $mysqli );
 
 						// Запрашиваем регистрации у весов
-						include "socket.php";
+						include "WTsocket.php";
 						$query = "
 							SELECT WT.port
 								,WT.last_transaction
