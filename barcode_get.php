@@ -1,8 +1,15 @@
 <?
 $bc = $_GET["bc"];
-$bc = str_pad($bc, 8, "0", STR_PAD_LEFT);
+//$bc = str_pad($bc, 8, "0", STR_PAD_LEFT);
 $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
+
+/////////////////////////////////
+if( $bc > 0 ) {
+	echo $bc;
+	die;
+}
+////////////////////////////////
 
 // Проверка доступа
 if( $ip == $from_ip ) {
@@ -39,16 +46,14 @@ if( $ip == $from_ip ) {
 						$query = "
 							SELECT WT.port
 								,WT.last_transaction
-								,LW.LO_ID
 							FROM WeighingTerminal WT
-							JOIN list__Weight LW ON LW.WT_ID = WT.WT_ID AND LW.nextID = WT.last_transaction
 							WHERE WT.type = 1
 						";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						while( $row = mysqli_fetch_array($res) ) {
 							// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
 							if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, $row["port"])) ) {
-								read_transaction($row["last_transaction"]+1, 1, $socket, $row["LO_ID"], $mysqli);
+								read_transaction($row["last_transaction"]+1, 1, $socket, $mysqli);
 								socket_close($socket);
 							}
 						}
