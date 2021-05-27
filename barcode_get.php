@@ -5,7 +5,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
 
 /////////////////////////////////
-echo "[".$bc"]";
+echo $bc;
 die;
 ////////////////////////////////
 
