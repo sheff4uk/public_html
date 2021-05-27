@@ -47,25 +47,12 @@ if( $ip == $from_ip ) {
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						while( $row = mysqli_fetch_array($res) ) {
 							// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
-							if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, $row["port"])) ) {
-								read_transaction($row["last_transaction"]+1, 1, $socket, $row["LO_ID"], $mysqli);
-								socket_close($socket);
-							}
+//							if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, $row["port"])) ) {
+//								read_transaction($row["last_transaction"]+1, 1, $socket, $row["LO_ID"], $mysqli);
+//								socket_close($socket);
+//							}
 						}
 
-						//Узнаем время заливки и код
-//						$query = "
-//							SELECT DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
-//								,DATE_FORMAT(LF.lf_time, '%H:%i') lf_time_format
-//								,CW.item
-//								,o_interval(LO.LO_ID) maturation
-//							FROM list__Opening LO
-//							JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
-//							JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
-//							JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-//							JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-//							WHERE LO.LO_ID = {$LO_ID}
-//						";
 						$query = "
 							SELECT DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
 								,DATE_FORMAT(LF.lf_time, '%H:%i') lf_time_format
