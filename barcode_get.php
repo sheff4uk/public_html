@@ -47,10 +47,10 @@ if( $ip == $from_ip ) {
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						while( $row = mysqli_fetch_array($res) ) {
 							// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
-//							if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, $row["port"])) ) {
-//								read_transaction($row["last_transaction"]+1, 1, $socket, $row["LO_ID"], $mysqli);
-//								socket_close($socket);
-//							}
+							if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, $row["port"])) ) {
+								read_transaction($row["last_transaction"]+1, 1, $socket, $row["LO_ID"], $mysqli);
+								socket_close($socket);
+							}
 						}
 
 						$query = "
