@@ -1,13 +1,8 @@
 <?
 $bc = $_GET["bc"];
-//$bc = str_pad($bc, 8, "0", STR_PAD_LEFT);
+$bc = str_pad($bc, 8, "0", STR_PAD_LEFT);
 $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
-
-/////////////////////////////////
-echo $bc;
-die;
-////////////////////////////////
 
 // Проверка доступа
 if( $ip == $from_ip ) {

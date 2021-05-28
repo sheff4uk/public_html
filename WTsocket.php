@@ -33,7 +33,7 @@ function crc16($buf) {
 }
 
 // Прочитать все регистрации начиная с ID
-function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
+function read_transaction($ID, $curnum, $socket, $mysqli) {
 	$hexID = sprintf("%02x%02x%02x%02x", ($ID & 0xFF), (($ID >> 8) & 0xFF), (($ID >> 16) & 0xFF), (($ID >> 24) & 0xFF));
 	$hexcurnum = sprintf("%02x%02x", ($curnum & 0xFF), (($curnum >> 8) & 0xFF));
 	$in = "\xF8\x55\xCE\x0C\x00\x92\x03\x00\x00".hex2bin($hexcurnum).hex2bin($hexID)."\x00\x00";
@@ -121,8 +121,7 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 							// Записываем в базу регистрацию
 							$query = "
 								INSERT INTO list__Weight
-								SET LO_ID = {$lastLO_ID}
-									,weight = {$netWeight}
+								SET weight = {$netWeight}
 									,nextID = {$nextID}
 									,WT_ID = {$deviceID}
 									,weighing_time = '{$transactionDate}'
@@ -142,39 +141,64 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 					}
 				}
 				//Закрытие партии
-				elseif( $data[$i+10] == 71 ) {
+				elseif( $data[$i+10] == 71 or $data[$i+10] == 72 ) {
 					//Идентификатор
 					$nextID = $data[$i] + ($data[$i+1] << 8) + ($data[$i+2] << 16) + ($data[$i+3] << 24);
 					//Номер терминала
 					$deviceID = $data[$i+6] + ($data[$i+7] << 8) + ($data[$i+8] << 16) + ($data[$i+9] << 24);
 					//Дата/время совершения регистрации
-					$transactionDate = sprintf("20%02d-%02d-%02d %02d:%02d:%02d", $data[$i+11], $data[$i+12], $data[$i+13], $data[$i+14], $data[$i+15], $data[$i+16]);
+					$receipt_end = sprintf("20%02d-%02d-%02d %02d:%02d:%02d", $data[$i+11], $data[$i+12], $data[$i+13], $data[$i+14], $data[$i+15], $data[$i+16]);
 
-					// Узнаем очередной LO_ID
+					// Узнаем время начала партии
 					$query = "
-						SELECT LO_ID
-						FROM list__Opening
-						WHERE opening_time > (SELECT opening_time FROM list__Opening WHERE LO_ID = {$lastLO_ID})
-							#AND LO_ID != (SELECT LO_ID FROM list__Opening ORDER BY opening_time DESC LIMIT 1)
-						ORDER BY opening_time
+						SELECT MIN(weighing_time) receipt_start
+						FROM list__Weight
+						WHERE WT_ID = {$deviceID}
+							AND LO_ID IS NULL
+					"
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					$row = mysqli_fetch_array($res);
+					$receipt_start = $row["receipt_start"];
+
+					// Из пересечения временных интервалов находим наиболее подходящую кассету
+					$query = "
+						SELECT SUB.LO_ID
+							,TIMESTAMPDIFF(SECOND, IF(SUB.opening_time > '{$receipt_start}', SUB.opening_time, '{$receipt_start}'), IF(SUB.end_time < '{$receipt_end}', SUB.end_time, '{$receipt_end}')) / TIMESTAMPDIFF(SECOND, SUB.opening_time, SUB.end_time) `share`
+						FROM (
+							SELECT LO.LO_ID
+								,LO.opening_time
+								,(SELECT opening_time FROM list__Opening WHERE opening_time > LO.opening_time ORDER BY opening_time LIMIT 1) end_time
+							FROM list__Opening LO
+							WHERE LO.opening_time > '{$receipt_start}' - INTERVAL 1 DAY
+								AND LO.opening_time <= '{$receipt_end}'
+								AND '{$receipt_start}' <= (SELECT opening_time FROM list__Opening WHERE opening_time > LO.opening_time ORDER BY opening_time LIMIT 1)
+							) SUB
+						ORDER BY `share` DESC
 						LIMIT 1
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					$row = mysqli_fetch_array($res);
-					if( $row["LO_ID"] ) {
-						$lastLO_ID = $row["LO_ID"];
-					}
+					$LO_ID = $row["LO_ID"];
+
+					// Связываем регистрации закрытой партии с подходящей по времени кассетой
+					$query = "
+						UPDATE list__Weight
+						SET LO_ID = {$LO_ID}
+						WHERE WT_ID = {$deviceID}
+							AND LO_ID IS NULL
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				}
 			}
 
 			// Если это не последняя часть
 			if( $nums > $curnum ) {
-				read_transaction($ID, ++$curnum, $socket, $lastLO_ID, $mysqli);
+				read_transaction($ID, ++$curnum, $socket, $mysqli);
 			}
 		}
 	}
 	else { //Если CRC не совпали делаем попытку еще
-		read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli);
+		read_transaction($ID, $curnum, $socket, $mysqli);
 	}
 }
 ?>
