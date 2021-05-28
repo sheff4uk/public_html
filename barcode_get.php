@@ -61,7 +61,7 @@ if( $ip == $from_ip ) {
 								,LO.cassette
 								,CW.in_cassette - LF.underfilling details
 								,SUM(IF(LW.LW_ID, 1, 0)) cnt
-								,ROUND(CW.weight * 1,02) weight
+								,ROUND(CW.weight * 1.02) weight
 								,ROUND(AVG(LW.weight)) `avg`
 								,MIN(LW.weight) `min`
 								,MAX(LW.weight) `max`
