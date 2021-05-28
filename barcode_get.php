@@ -61,7 +61,7 @@ if( $ip == $from_ip ) {
 								,LO.cassette
 								,CW.in_cassette - LF.underfilling details
 								,SUM(IF(LW.LW_ID, 1, 0)) cnt
-								,CW.weight
+								,ROUND(CW.weight * 1,02) weight
 								,ROUND(AVG(LW.weight)) `avg`
 								,MIN(LW.weight) `min`
 								,MAX(LW.weight) `max`
@@ -82,7 +82,7 @@ if( $ip == $from_ip ) {
 						$LO_ID = $row["LO_ID"];
 
 						// Формируем текст сообщения в Телеграм
-						$message = "<b>[{$row["cassette"]}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>\nДеталей в кассете: <b>{$row["details"]}</b>\nДеталей в партии: <b>{$row["cnt"]}</b>\nЭталонный вес: <b>{$row["weight"]}</b>\nСредний вес: <b>{$row["avg"]}</b>\nМинимальный вес: <b>{$row["min"]}</b>\nМаксимальный вес: <b>{$row["max"]}</b>\nВремя cканирования: <b>{$row["o_time_format"]}</b>\n";
+						$message = "<b>[{$row["cassette"]}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>\nДеталей в кассете: <b>{$row["details"]}</b>\nДеталей в партии: <b>{$row["cnt"]}</b>\nЭталонный вес +2%: <b>{$row["weight"]}</b>\nСредний вес: <b>{$row["avg"]}</b>\nМинимальный вес: <b>{$row["min"]}</b>\nМаксимальный вес: <b>{$row["max"]}</b>\nВремя cканирования: <b>{$row["o_time_format"]}</b>\n";
 
 						// Выводим все веса
 						$query = "
