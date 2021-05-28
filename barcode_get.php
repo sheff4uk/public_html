@@ -65,18 +65,19 @@ if( $ip == $from_ip ) {
 								,MIN(LW.weight) `min`
 								,MAX(LW.weight) `max`
 							FROM list__Opening LO
-							JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
+							LEFT JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
 							JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 							JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 							JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 							JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 							GROUP BY LO.LO_ID
 							ORDER BY LO.opening_time DESC
-							LIMIT 2
+							LIMIT 3
 						";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						$row = mysqli_fetch_array($res);
-						$row = mysqli_fetch_array($res); // Нужна предпоследняя
+						$row = mysqli_fetch_array($res);
+						$row = mysqli_fetch_array($res); // Нужна третья с конца
 						//Телеграм бот отправляет уведомление
 						$message = "<b>[{$row["cassette"]}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>\nДеталей в кассете: <b>{$row["details"]}</b>\nДеталей в партии: <b>{$row["cnt"]}</b>\nЭталонный вес: <b>{$row["weight"]}</b>\nСредний вес: <b>{$row["avg"]}</b>\nМинимальный вес: <b>{$row["min"]}</b>\nМаксимальный вес: <b>{$row["max"]}</b>\nВремя cканирования: <b>{$row["o_time_format"]}</b>";
 						message_to_telegram($message);
