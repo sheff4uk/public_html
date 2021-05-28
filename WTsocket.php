@@ -160,34 +160,37 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 					$row = mysqli_fetch_array($res);
 					$receipt_start = $row["receipt_start"];
 
-					// Из пересечения временных интервалов находим наиболее подходящую кассету
-					$query = "
-						SELECT SUB.LO_ID
-							,TIMESTAMPDIFF(SECOND, IF(SUB.opening_time > '{$receipt_start}', SUB.opening_time, '{$receipt_start}'), IF(SUB.end_time < '{$receipt_end}', SUB.end_time, '{$receipt_end}')) / TIMESTAMPDIFF(SECOND, SUB.opening_time, SUB.end_time) `share`
-						FROM (
-							SELECT LO.LO_ID
-								,LO.opening_time
-								,(SELECT opening_time FROM list__Opening WHERE opening_time > LO.opening_time ORDER BY opening_time LIMIT 1) end_time
-							FROM list__Opening LO
-							WHERE LO.opening_time > '{$receipt_start}' - INTERVAL 1 DAY
-								AND LO.opening_time <= '{$receipt_end}'
-								AND '{$receipt_start}' <= (SELECT opening_time FROM list__Opening WHERE opening_time > LO.opening_time ORDER BY opening_time LIMIT 1)
-							) SUB
-						ORDER BY `share` DESC
-						LIMIT 1
-					";
-					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					$row = mysqli_fetch_array($res);
-					$LO_ID = $row["LO_ID"];
+					// Если найдена незакрытая партия
+					if( $receipt_start ) {
+						// Из пересечения временных интервалов находим наиболее подходящую кассету
+						$query = "
+							SELECT SUB.LO_ID
+								,TIMESTAMPDIFF(SECOND, IF(SUB.opening_time > '{$receipt_start}', SUB.opening_time, '{$receipt_start}'), IF(SUB.end_time < '{$receipt_end}', SUB.end_time, '{$receipt_end}')) / TIMESTAMPDIFF(SECOND, SUB.opening_time, SUB.end_time) `share`
+							FROM (
+								SELECT LO.LO_ID
+									,LO.opening_time
+									,(SELECT opening_time FROM list__Opening WHERE opening_time > LO.opening_time ORDER BY opening_time LIMIT 1) end_time
+								FROM list__Opening LO
+								WHERE LO.opening_time > '{$receipt_start}' - INTERVAL 1 DAY
+									AND LO.opening_time <= '{$receipt_end}'
+									AND '{$receipt_start}' <= (SELECT opening_time FROM list__Opening WHERE opening_time > LO.opening_time ORDER BY opening_time LIMIT 1)
+								) SUB
+							ORDER BY `share` DESC
+							LIMIT 1
+						";
+						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						$row = mysqli_fetch_array($res);
+						$LO_ID = $row["LO_ID"];
 
-					// Связываем регистрации закрытой партии с подходящей по времени кассетой
-					$query = "
-						UPDATE list__Weight
-						SET LO_ID = {$LO_ID}
-						WHERE WT_ID = {$deviceID}
-							AND LO_ID IS NULL
-					";
-					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						// Связываем регистрации закрытой партии с подходящей по времени кассетой
+						$query = "
+							UPDATE list__Weight
+							SET LO_ID = {$LO_ID}
+							WHERE WT_ID = {$deviceID}
+								AND LO_ID IS NULL
+						";
+						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					}
 				}
 			}
 
