@@ -87,9 +87,11 @@ if( $ip == $from_ip ) {
 						// Выводим все веса
 						$query = "
 							SELECT LW.weight
+								,WT.post
 								,LW.goodsID
 								,IF(LW.weight BETWEEN ROUND(CW.min_weight * 1,02) AND ROUND(CW.max_weight * 1,02), 0, IF(LW.weight > ROUND(CW.max_weight * 1,02), LW.weight - ROUND(CW.max_weight * 1,02), LW.weight - ROUND(CW.min_weight * 1,02))) diff
 							FROM list__Weight LW
+							JOIN WeighingTerminal WT ON WT.WT_ID = LW.WT_ID
 							JOIN list__Opening LO ON LO.LO_ID = LW.LO_ID
 							JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 							JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
@@ -100,7 +102,7 @@ if( $ip == $from_ip ) {
 						";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						while( $row = mysqli_fetch_array($res) ) {
-							$message .= $row["weight"];
+							$message .= "({$row["post"]}) {$row["weight"]}";
 							$message .= ($row["diff"] ? " <i>".($row["diff"] > 0 ? "+" : "").($row["diff"])."</i>" : "");
 							switch ($row["goodsID"]) {
 								case 2:
