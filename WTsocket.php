@@ -155,7 +155,7 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 						FROM list__Weight
 						WHERE WT_ID = {$deviceID}
 							AND LO_ID IS NULL
-					"
+					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					$row = mysqli_fetch_array($res);
 					$receipt_start = $row["receipt_start"];
