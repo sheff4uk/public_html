@@ -52,7 +52,8 @@ if( $ip == $from_ip ) {
 						}
 
 						$query = "
-							SELECT DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
+							SELECT LO.LO_ID
+								,DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
 								,DATE_FORMAT(LF.lf_time, '%H:%i') lf_time_format
 								,DATE_FORMAT(LO.opening_time, '%H:%i') o_time_format
 								,CW.item
@@ -78,8 +79,45 @@ if( $ip == $from_ip ) {
 						$row = mysqli_fetch_array($res);
 						$row = mysqli_fetch_array($res);
 						$row = mysqli_fetch_array($res); // Нужна третья с конца
+						$LO_ID = $row["LO_ID"];
+
+						// Формируем текст сообщения в Телеграм
+						$message = "<b>[{$row["cassette"]}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>\nДеталей в кассете: <b>{$row["details"]}</b>\nДеталей в партии: <b>{$row["cnt"]}</b>\nЭталонный вес: <b>{$row["weight"]}</b>\nСредний вес: <b>{$row["avg"]}</b>\nМинимальный вес: <b>{$row["min"]}</b>\nМаксимальный вес: <b>{$row["max"]}</b>\nВремя cканирования: <b>{$row["o_time_format"]}</b>\n";
+
+						// Выводим все веса
+						$query = "
+							SELECT weight, goodsID
+							FROM list__Weight
+							WHERE LO_ID = {$LO_ID}
+							ORDER BY weighing_time
+						";
+						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						while( $row = mysqli_fetch_array($res) ) {
+							$message .= $row["weight"];
+							switch ($row["goodsID"]) {
+								case 2:
+									$message .= " <b>непролив</b>";
+									break;
+								case 3:
+									$message .= " <b>мех. трещина</b>";
+									break;
+								case 4:
+									$message .= " <b>усад. трещина</b>";
+									break;
+								case 5:
+									$message .= " <b>скол</b>";
+									break;
+								case 6:
+									$message .= " <b>дефект формы</b>";
+									break;
+								case 7:
+									$message .= " <b>дефект сборки</b>";
+									break;
+							}
+							$message .= "\n";
+						}
+
 						//Телеграм бот отправляет уведомление
-						$message = "<b>[{$row["cassette"]}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>\nДеталей в кассете: <b>{$row["details"]}</b>\nДеталей в партии: <b>{$row["cnt"]}</b>\nЭталонный вес: <b>{$row["weight"]}</b>\nСредний вес: <b>{$row["avg"]}</b>\nМинимальный вес: <b>{$row["min"]}</b>\nМаксимальный вес: <b>{$row["max"]}</b>\nВремя cканирования: <b>{$row["o_time_format"]}</b>";
 						message_to_telegram($message);
 					}
 					break;
