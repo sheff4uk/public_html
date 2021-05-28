@@ -86,14 +86,22 @@ if( $ip == $from_ip ) {
 
 						// Выводим все веса
 						$query = "
-							SELECT weight, goodsID
-							FROM list__Weight
-							WHERE LO_ID = {$LO_ID}
-							ORDER BY weighing_time
+							SELECT LW.weight
+								,LW.goodsID
+								,IF(LW.weight BETWEEN ROUND(CW.min_weight * 1,02) AND ROUND(CW.max_weight * 1,02), 0, IF(LW.weight > ROUND(CW.max_weight * 1,02), LW.weight - ROUND(CW.max_weight * 1,02), LW.weight - ROUND(CW.min_weight * 1,02))) diff
+							FROM list__Weight LW
+							JOIN list__Opening LO ON LO.LO_ID = LW.LO_ID
+							JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+							JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+							JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+							JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+							WHERE LW.LO_ID = {$LO_ID}
+							ORDER BY LW.weighing_time
 						";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						while( $row = mysqli_fetch_array($res) ) {
 							$message .= $row["weight"];
+							$message .= ($row["diff"] ? " <i>".($row["diff"] > 0 ? "+" : "").($row["diff"])."</i>" : "");
 							switch ($row["goodsID"]) {
 								case 2:
 									$message .= " <b>непролив</b>";
