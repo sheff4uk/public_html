@@ -89,7 +89,7 @@ if( $ip == $from_ip ) {
 							SELECT LW.weight
 								,WT.post
 								,LW.goodsID
-								,IF(LW.weight BETWEEN ROUND(CW.min_weight * 1,02) AND ROUND(CW.max_weight * 1,02), 0, IF(LW.weight > ROUND(CW.max_weight * 1,02), LW.weight - ROUND(CW.max_weight * 1,02), LW.weight - ROUND(CW.min_weight * 1,02))) diff
+								,IF(LW.weight BETWEEN ROUND(CW.min_weight * 1.02) AND ROUND(CW.max_weight * 1.02), 0, IF(LW.weight > ROUND(CW.max_weight * 1.02), LW.weight - ROUND(CW.max_weight * 1.02), LW.weight - ROUND(CW.min_weight * 1.02))) diff
 							FROM list__Weight LW
 							JOIN WeighingTerminal WT ON WT.WT_ID = LW.WT_ID
 							JOIN list__Opening LO ON LO.LO_ID = LW.LO_ID
