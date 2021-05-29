@@ -82,7 +82,7 @@ if( $ip == $from_ip ) {
 						$LO_ID = $row["LO_ID"];
 
 						// Формируем текст сообщения в Телеграм
-						$message = "<b>[{$row["cassette"]}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>\nДеталей в кассете: <b>{$row["details"]}</b>\nДеталей в партии: <b>{$row["cnt"]}</b>\nЭталонный вес +2%: <b>{$row["weight"]}</b>\nСредний вес: <b>{$row["avg"]}</b>\nМинимальный вес: <b>{$row["min"]}</b>\nМаксимальный вес: <b>{$row["max"]}</b>\nВремя cканирования: <b>{$row["o_time_format"]}</b>\n";
+						$message = "<b>[{$row["cassette"]}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>\nДеталей в кассете: <b>{$row["details"]}</b>\nДеталей в партии: <b>{$row["cnt"]}</b>\nЭталонный вес +2%: <b>".number_format($row["weight"], 0, '', '\'')."</b>\nСредний вес: <b>".number_format($row["avg"], 0, '', '\'')."</b>\nМинимальный вес: <b>".number_format($row["min"], 0, '', '\'')."</b>\nМаксимальный вес: <b>".number_format($row["max"], 0, '', '\'')."</b>\nВремя cканирования: <b>{$row["o_time_format"]}</b>\n";
 
 						// Выводим все веса
 						$query = "
@@ -102,7 +102,7 @@ if( $ip == $from_ip ) {
 						";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						while( $row = mysqli_fetch_array($res) ) {
-							$message .= "({$row["post"]}) ".number_format($row["weight"], 0, '', '`');
+							$message .= "({$row["post"]}) ".number_format($row["weight"], 0, '', '\'');
 							$message .= ($row["diff"] ? " <i>".($row["diff"] > 0 ? "+" : "").($row["diff"])."</i>" : "");
 							switch ($row["goodsID"]) {
 								case 2:
