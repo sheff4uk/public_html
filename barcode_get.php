@@ -102,7 +102,7 @@ if( $ip == $from_ip ) {
 						";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						while( $row = mysqli_fetch_array($res) ) {
-							$message .= "({$row["post"]}) {$row["weight"]}";
+							$message .= "({$row["post"]}) ".number_format($row["weight"], 0, '', '`');
 							$message .= ($row["diff"] ? " <i>".($row["diff"] > 0 ? "+" : "").($row["diff"])."</i>" : "");
 							switch ($row["goodsID"]) {
 								case 2:
