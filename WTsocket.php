@@ -164,13 +164,13 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 						SELECT SUB.LO_ID
 							,TIMESTAMPDIFF(SECOND, IF(SUB.opening_time > '{$receipt_start}', SUB.opening_time, '{$receipt_start}'), IF(SUB.end_time < '{$receipt_end}', SUB.end_time, '{$receipt_end}')) / TIMESTAMPDIFF(SECOND, SUB.opening_time, SUB.end_time) `share`
 						FROM (
-							SELECT LO.LO_ID
-								,LO.opening_time
-								,(SELECT opening_time FROM list__Opening WHERE opening_time > LO.opening_time ORDER BY opening_time LIMIT 1) end_time
+							SELECT (SELECT LO_ID FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) LO_ID
+								,(SELECT opening_time FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) opening_time
+								,LO.opening_time end_time
 							FROM list__Opening LO
-							WHERE LO.opening_time > '{$receipt_start}' - INTERVAL 1 DAY
-								AND LO.opening_time <= '{$receipt_end}'
-								AND '{$receipt_start}' <= (SELECT opening_time FROM list__Opening WHERE opening_time > LO.opening_time ORDER BY opening_time LIMIT 1)
+							WHERE LO.opening_time > '{$receipt_start}'
+								AND (SELECT opening_time FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) <= '{$receipt_end}'
+								AND '{$receipt_start}' <= LO.opening_time
 							) SUB
 						ORDER BY `share` DESC
 						LIMIT 1
