@@ -150,7 +150,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		<div style="margin-bottom: 10px;">
 			<fieldset>
-				<legend>Нарушение тех. процесса:</legend>
+				<legend>Нарушение тех. процесса: (условие ИЛИ)</legend>
 				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 					<label style="text-decoration: underline;" class="<?=$_GET["int24"] ? "filtered" : ""?>">
 						Менее 24 часов с момента заливки:
@@ -169,7 +169,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		<div style="margin-bottom: 10px;">
 			<fieldset>
-				<legend>Брак:</legend>
+				<legend>Брак: (условие ИЛИ)</legend>
 
 				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 					<label style="text-decoration: underline;" class="<?=$_GET["not_spill"] ? "filtered" : ""?>">
@@ -180,8 +180,15 @@ while( $row = mysqli_fetch_array($res) ) {
 
 				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 					<label style="text-decoration: underline;" class="<?=$_GET["crack"] ? "filtered" : ""?>">
-						Трещина:
+						Мех. трещина:
 						<input type="checkbox" name="crack" value="1" <?=$_GET["crack"] ? "checked" : ""?>>
+					</label>
+				</div>
+
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["crack_drying"] ? "filtered" : ""?>">
+						Усад. трещина:
+						<input type="checkbox" name="crack_drying" value="1" <?=$_GET["crack_drying"] ? "checked" : ""?>>
 					</label>
 				</div>
 
@@ -194,8 +201,15 @@ while( $row = mysqli_fetch_array($res) ) {
 
 				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 					<label style="text-decoration: underline;" class="<?=$_GET["def_form"] ? "filtered" : ""?>">
-						Дефект форм:
+						Дефект формы:
 						<input type="checkbox" name="def_form" value="1" <?=$_GET["def_form"] ? "checked" : ""?>>
+					</label>
+				</div>
+
+				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+					<label style="text-decoration: underline;" class="<?=$_GET["def_assembly"] ? "filtered" : ""?>">
+						Дефект сборки:
+						<input type="checkbox" name="def_assembly" value="1" <?=$_GET["def_assembly"] ? "checked" : ""?>>
 					</label>
 				</div>
 
@@ -245,7 +259,7 @@ foreach ($_GET as &$value) {
 			<th colspan="2">Расформовка</th>
 			<th rowspan="2">№ кассеты</th>
 			<th rowspan="2"><i class="far fa-lg fa-hourglass" title="Интервал в часах с моента заливки."></i></th>
-			<th colspan="4">Кол-во брака, шт</th>
+			<th colspan="2" rowspan="2">Брак</th>
 			<th colspan="3">Взвешивания, кг</th>
 			<th rowspan="2">Куб раствора, кг</th>
 			<th rowspan="2">Противовес</th>
@@ -255,10 +269,6 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th>Дата</th>
 			<th>Время</th>
-			<th>Непролив</th>
-			<th>Трещина</th>
-			<th>Скол</th>
-			<th>Дефект форм</th>
 			<th>№1</th>
 			<th>№2</th>
 			<th>№3</th>
@@ -274,8 +284,10 @@ $query = "
 		,o_interval(LO.LO_ID) o_interval
 		,LO.not_spill
 		,LO.crack
+		,LO.crack_drying
 		,LO.chipped
 		,LO.def_form
+		,LO.def_assembly
 		,LO.weight1
 		,LO.weight2
 		,LO.weight3
@@ -301,12 +313,20 @@ $query = "
 		".($_GET["week"] ? "AND YEARWEEK(LO.opening_time, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-		".($_GET["int24"] ? "AND o_interval(LO.LO_ID) < 24" : "")."
-		".($_GET["not_spec"] ? "AND (NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3))" : "")."
-		".($_GET["not_spill"] ? "AND LO.not_spill" : "")."
-		".($_GET["crack"] ? "AND LO.crack" : "")."
-		".($_GET["chipped"] ? "AND LO.chipped" : "")."
-		".($_GET["def_form"] ? "AND LO.def_form" : "")."
+		AND (
+			".(($_GET["int24"] or $_GET["not_spec"]) ? "0" : "1")."
+			".($_GET["int24"] ? "OR o_interval(LO.LO_ID) < 24" : "")."
+			".($_GET["not_spec"] ? "OR (NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3))" : "")."
+		)
+		AND (
+			".(($_GET["not_spill"] or $_GET["crack"] or $_GET["crack_drying"] or $_GET["chipped"] or $_GET["def_form"] or $_GET["def_assembly"]) ? "0" : "1")."
+			".($_GET["not_spill"] ? "OR LO.not_spill" : "")."
+			".($_GET["crack"] ? "OR LO.crack" : "")."
+			".($_GET["crack_drying"] ? "OR LO.crack_drying" : "")."
+			".($_GET["chipped"] ? "OR LO.chipped" : "")."
+			".($_GET["def_form"] ? "OR LO.def_form" : "")."
+			".($_GET["def_assembly"] ? "OR LO.def_assembly" : "")."
+		)
 		".($CASs ? "AND LO.cassette IN({$CASs})" : "")."
 	GROUP BY LO.LO_ID
 	ORDER BY LO.opening_time
@@ -325,10 +345,14 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["o_time"]?></td>
 		<td><?=$cassette?></td>
 		<td style="background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
-		<td style="color: red;"><?=$row["not_spill"]?></td>
-		<td style="color: red;"><?=$row["crack"]?></td>
-		<td style="color: red;"><?=$row["chipped"]?></td>
-		<td style="color: red;"><?=$row["def_form"]?></td>
+		<td class="nowrap" style="text-align: left;">
+			<?=($row["not_spill"] ? "<font color='red'>{$row["not_spill"]}</font> непролив<br>" : "")?>
+			<?=($row["crack"] ? "<font color='red'>{$row["crack"]}</font> мех. трещина<br>" : "")?>
+			<?=($row["crack_drying"] ? "<font color='red'>{$row["crack_drying"]}</font> усад. трещина<br>" : "")?>
+			<?=($row["chipped"] ? "<font color='red'>{$row["chipped"]}</font> скол<br>" : "")?>
+			<?=($row["def_form"] ? "<font color='red'>{$row["def_form"]}</font> дефект формы<br>" : "")?>
+			<?=($row["def_assembly"] ? "<font color='red'>{$row["def_assembly"]}</font> дефект сборки<br>" : "")?>
+		</td>
 		<td><?=($row["weight1"] ? $row["weight1"]/1000 : "")?><?=($row["w1_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w1_diff"] > 0 ? " +" : " ").($row["w1_diff"]/1000)."</font>" : "")?></td>
 		<td><?=($row["weight2"] ? $row["weight2"]/1000 : "")?><?=($row["w2_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w2_diff"] > 0 ? " +" : " ").($row["w2_diff"]/1000)."</font>" : "")?></td>
 		<td><?=($row["weight3"] ? $row["weight3"]/1000 : "")?><?=($row["w3_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w3_diff"] > 0 ? " +" : " ").($row["w3_diff"]/1000)."</font>" : "")?></td>
