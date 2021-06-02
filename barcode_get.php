@@ -34,23 +34,64 @@ if( $ip == $from_ip ) {
 						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						$LO_ID = mysqli_insert_id( $mysqli );
 
-						// Запрашиваем регистрации у весов
-						include "WTsocket.php";
+						include "WTsocket.php"; // Сбор данных с весов
+
+						// Список весов на конвейере
 						$query = "
-							SELECT WT.port
-								,WT.last_transaction
+							SELECT GROUP_CONCAT(WT.WT_ID) WT_IDs
 							FROM WeighingTerminal WT
 							WHERE WT.type = 1
 						";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-						while( $row = mysqli_fetch_array($res) ) {
-							// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
-							if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, $row["port"])) ) {
-								read_transaction($row["last_transaction"]+1, 1, $socket, $mysqli);
-								socket_close($socket);
+						$row = mysqli_fetch_array($res);
+						$WT_IDs = $row["WT_IDs"];
+						$i = 0;
+
+						// Попытки собрать данные и закрыть кассету
+						while( $WT_IDs and $i < 12) {
+							sleep(15); // Ждем 15 секунд
+
+							// По этому списку весов собираем данные
+							$query = "
+								SELECT WT.port
+									,WT.last_transaction
+								FROM WeighingTerminal WT
+								WHERE WT.WT_ID IN ({$WT_IDs})
+							";
+							$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+							while( $row = mysqli_fetch_array($res) ) {
+								// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
+								if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, $row["port"])) ) {
+									read_transaction($row["last_transaction"]+1, 1, $socket, $mysqli);
+									socket_close($socket);
+								}
 							}
+							// Список весов, с которых получены еще не все данные
+							$query = "
+								SELECT GROUP_CONCAT(SUB.WT_ID) WT_IDs
+								FROM (
+									SELECT WT.WT_ID
+									FROM list__Weight LW
+									JOIN WeighingTerminal WT ON WT.WT_ID = LW.WT_ID
+										AND WT.WT_ID NOT IN (
+											SELECT WT_ID
+											FROM list__Weight
+											WHERE LO_ID = (SELECT LO_ID FROM list__Opening ORDER BY opening_time DESC LIMIT 1,1)
+											GROUP BY WT_ID
+										)
+									WHERE LW.weighing_time > (SELECT opening_time FROM list__Opening ORDER BY opening_time DESC LIMIT 1,1)
+										AND LW.weighing_time < (SELECT opening_time FROM list__Opening ORDER BY opening_time DESC LIMIT 0,1)
+										AND LW.LO_ID IS NULL
+									GROUP BY LW.WT_ID
+								) SUB
+							";
+							$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+							$row = mysqli_fetch_array($res);
+							$WT_IDs = $row["WT_IDs"];
+							$i++;
 						}
 
+						// Телеграмм рассылка
 						$query = "
 							SELECT LO.LO_ID
 								,DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
@@ -73,12 +114,10 @@ if( $ip == $from_ip ) {
 							JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 							GROUP BY LO.LO_ID
 							ORDER BY LO.opening_time DESC
-							LIMIT 3
+							LIMIT 1,1
 						";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						$row = mysqli_fetch_array($res);
-						$row = mysqli_fetch_array($res);
-						$row = mysqli_fetch_array($res); // Нужна третья с конца
 						$LO_ID = $row["LO_ID"];
 
 						// Формируем текст сообщения в Телеграм
