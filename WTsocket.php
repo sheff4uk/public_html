@@ -149,8 +149,12 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 					//Дата/время совершения регистрации
 					$receipt_end = sprintf("20%02d-%02d-%02d %02d:%02d:%02d", $data[$i+11], $data[$i+12], $data[$i+13], $data[$i+14], $data[$i+15], $data[$i+16]);
 
-					// Узнаем время начала партии
+					// Узнаем время предыдущего закрытия
 					$query = "
+						#SELECT last_receiptDate receipt_start
+						#FROM WeighingTerminal
+						#WHERE WT_ID = {$deviceID}
+
 						SELECT MIN(weighing_time) receipt_start
 						FROM list__Weight
 						WHERE WT_ID = {$deviceID}
@@ -191,6 +195,14 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 						";
 						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					}
+
+					// Обновляем время закрытия последней партии
+					$query = "
+						UPDATE WeighingTerminal
+						SET last_receiptDate = '{$receipt_end}'
+						WHERE WT_ID = {$deviceID}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				}
 			}
 
