@@ -269,9 +269,9 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th>Дата</th>
 			<th>Время</th>
-			<th>№1</th>
-			<th>№2</th>
-			<th>№3</th>
+			<th>MIN</th>
+			<th>AVG</th>
+			<th>MAX</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
@@ -288,12 +288,20 @@ $query = "
 		,LO.chipped
 		,LO.def_form
 		,LO.def_assembly
-		,LO.weight1
-		,LO.weight2
-		,LO.weight3
-		,IF(LO.weight1 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight1 > CW.max_weight, LO.weight1 - CW.max_weight, LO.weight1 - CW.min_weight)) w1_diff
-		,IF(LO.weight2 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight2 > CW.max_weight, LO.weight2 - CW.max_weight, LO.weight2 - CW.min_weight)) w2_diff
-		,IF(LO.weight3 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight3 > CW.max_weight, LO.weight3 - CW.max_weight, LO.weight3 - CW.min_weight)) w3_diff
+		,MIN(LW.weight) min_weight
+		,ROUND(AVG(LW.weight)) avg_weight
+		,MAX(LW.weight) max_weight
+		,IF(MIN(LW.weight) BETWEEN ROUND(CW.min_weight * 1.02) AND ROUND(CW.max_weight * 1.02), 0, IF(MIN(LW.weight) > ROUND(CW.max_weight * 1.02), MIN(LW.weight) - ROUND(CW.max_weight * 1.02), MIN(LW.weight) - ROUND(CW.min_weight * 1.02))) min_diff
+		,IF(ROUND(AVG(LW.weight)) BETWEEN ROUND(CW.min_weight * 1.02) AND ROUND(CW.max_weight * 1.02), 0, IF(ROUND(AVG(LW.weight)) > ROUND(CW.max_weight * 1.02), ROUND(AVG(LW.weight)) - ROUND(CW.max_weight * 1.02), ROUND(AVG(LW.weight)) - ROUND(CW.min_weight * 1.02))) avg_diff
+		,IF(MAX(LW.weight) BETWEEN ROUND(CW.min_weight * 1.02) AND ROUND(CW.max_weight * 1.02), 0, IF(MAX(LW.weight) > ROUND(CW.max_weight * 1.02), MAX(LW.weight) - ROUND(CW.max_weight * 1.02), MAX(LW.weight) - ROUND(CW.min_weight * 1.02))) max_diff
+
+		#,LO.weight1
+		#,LO.weight2
+		#,LO.weight3
+		#,IF(LO.weight1 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight1 > CW.max_weight, LO.weight1 - CW.max_weight, LO.weight1 - CW.min_weight)) w1_diff
+		#,IF(LO.weight2 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight2 > CW.max_weight, LO.weight2 - CW.max_weight, LO.weight2 - CW.min_weight)) w2_diff
+		#,IF(LO.weight3 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight3 > CW.max_weight, LO.weight3 - CW.max_weight, LO.weight3 - CW.min_weight)) w3_diff
+
 		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 		,LO.cassette
 		,CW.item
@@ -302,13 +310,15 @@ $query = "
 		,LB.LB_ID
 		,LB.mix_density
 		,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
-		,SUM(1) dbl
+		,COUNT(DISTINCT LO.LO_ID, SLO.LO_ID) dbl
+		#,SUM(1) dbl
 	FROM list__Opening LO
 	JOIN list__Opening SLO ON SLO.cassette = LO.cassette AND SLO.LF_ID = LO.LF_ID
 	LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 	LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	LEFT JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
 	WHERE 1
 		".($_GET["week"] ? "AND YEARWEEK(LO.opening_time, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
@@ -353,9 +363,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			<?=($row["def_form"] ? "<font color='red'>{$row["def_form"]}</font> дефект формы<br>" : "")?>
 			<?=($row["def_assembly"] ? "<font color='red'>{$row["def_assembly"]}</font> дефект сборки<br>" : "")?>
 		</td>
-		<td><?=($row["weight1"] ? $row["weight1"]/1000 : "")?><?=($row["w1_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w1_diff"] > 0 ? " +" : " ").($row["w1_diff"]/1000)."</font>" : "")?></td>
-		<td><?=($row["weight2"] ? $row["weight2"]/1000 : "")?><?=($row["w2_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w2_diff"] > 0 ? " +" : " ").($row["w2_diff"]/1000)."</font>" : "")?></td>
-		<td><?=($row["weight3"] ? $row["weight3"]/1000 : "")?><?=($row["w3_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["w3_diff"] > 0 ? " +" : " ").($row["w3_diff"]/1000)."</font>" : "")?></td>
+		<td><?=($row["min_weight"] ? $row["min_weight"]/1000 : "")?><?=($row["min_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["min_diff"] > 0 ? " +" : " ").($row["min_diff"]/1000)."</font>" : "")?></td>
+		<td><?=($row["avg_weight"] ? $row["avg_weight"]/1000 : "")?><?=($row["avg_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["avg_diff"] > 0 ? " +" : " ").($row["avg_diff"]/1000)."</font>" : "")?></td>
+		<td><?=($row["max_weight"] ? $row["max_weight"]/1000 : "")?><?=($row["max_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["max_diff"] > 0 ? " +" : " ").($row["max_diff"]/1000)."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["mix_density"]/1000?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").($row["mix_diff"]/1000)."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
 		<td class="bg-gray"><a href="filling.php?week=<?=$row["pb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
