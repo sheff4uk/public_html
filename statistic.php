@@ -130,7 +130,7 @@ $query = "
 		,SUM(1) cnt
 		,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 		,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
-		,SUM(CW.in_cassette - LF.underfilling) fact
+		,SUM(PB.in_cassette - LF.underfilling) fact
 	FROM list__Batch LB
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -158,8 +158,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			,SUM(1) cnt
 			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 			,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
-			,SUM(CW.in_cassette - LF.underfilling) fact
-			,PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * CW.in_cassette plan
+			,SUM(PB.in_cassette - LF.underfilling) fact
+			,PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * IFNULL(PB.in_cassette, CW.in_cassette) plan
 		FROM list__Batch LB
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -234,7 +234,7 @@ if( $filter ) {
 			,SUM(1) cnt
 			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 			,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
-			,SUM(CW.in_cassette - LF.underfilling) fact
+			,SUM(PB.in_cassette - LF.underfilling) fact
 		FROM list__Batch LB
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -260,7 +260,7 @@ if( $filter ) {
 				,SUM(1) cnt
 				,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 				,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
-				,SUM(CW.in_cassette - LF.underfilling) fact
+				,SUM(PB.in_cassette - LF.underfilling) fact
 			FROM list__Batch LB
 			JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -278,7 +278,7 @@ if( $filter ) {
 		while( $subrow = mysqli_fetch_array($subres) ) {
 			// Узнаем план
 			$query = "
-				SELECT SUM(PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * CW.in_cassette) plan
+				SELECT SUM(PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * IFNULL(PB.in_cassette, CW.in_cassette)) plan
 				FROM plan__Batch PB
 				JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 				WHERE PB.fact_batches

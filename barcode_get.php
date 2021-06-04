@@ -100,7 +100,7 @@ if( $ip == $from_ip ) {
 								,CW.item
 								,o_interval(LO.LO_ID) maturation
 								,LO.cassette
-								,CW.in_cassette - LF.underfilling details
+								,PB.in_cassette - LF.underfilling details
 								,SUM(IF(LW.LW_ID, 1, 0)) cnt
 								,ROUND(CW.weight * 1.02) weight
 								,ROUND(AVG(LW.weight)) `avg`
