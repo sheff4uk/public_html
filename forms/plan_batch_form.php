@@ -79,7 +79,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<tbody style="text-align: center;">
 					<?
 					$query = "
-						SELECT CW.CW_ID, CW.item, CW.in_cassette
+						SELECT CW.CW_ID, CW.item
 						FROM CounterWeight CW
 						ORDER BY CW.CW_ID
 					";
@@ -88,7 +88,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						?>
 						<tr class="data_row">
 							<td><b style="font-size: 1.5em;"><?=$row["item"]?></b><input type="hidden" name="CW_ID[<?=$row["CW_ID"]?>]" value="<?=$row["CW_ID"]?>"><input type="hidden" name="PB_ID[<?=$row["CW_ID"]?>]"></td>
-							<td><input type="number" name="batches[<?=$row["CW_ID"]?>]" class="batches" min="0" max="30" fillings="" in_cassette="<?=$row["in_cassette"]?>" tabindex="<?=(++$index)?>" style="width: 70px;"><i class="fas fa-question-circle" title="Не редактируется. Заливки уже состоялись."></i></td>
+							<td><input type="number" name="batches[<?=$row["CW_ID"]?>]" class="batches" min="0" max="30" fillings="" in_cassette="" tabindex="<?=(++$index)?>" style="width: 70px;"><i class="fas fa-question-circle" title="Не редактируется. Заливки уже состоялись."></i></td>
 							<td><input type="number" name="fillings" class="fillings" style="width: 70px;" readonly></td>
 							<td><input type="number" name="details" class="details" style="width: 70px;" readonly></td>
 						</tr>
@@ -144,6 +144,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 			for (let sub_pb_data of pb_data) {
 				$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('fillings', sub_pb_data['fillings']);
+				$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('in_cassette', sub_pb_data['in_cassette']);
 				$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('placeholder', sub_pb_data['placeholder']);
 
 				if( sub_pb_data['PB_ID'] ) {

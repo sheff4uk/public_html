@@ -187,11 +187,11 @@ $query = "
 		,LB.batch_date
 		,COUNT(DISTINCT LB.LB_ID) batches
 		,COUNT(LF.LF_ID) fillings
-		,SUM(CW.in_cassette) details
+		,SUM(PB.in_cassette) details
 	FROM list__Batch LB
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	WHERE 1
 		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
@@ -210,12 +210,12 @@ while( $row = mysqli_fetch_array($res) ) {
 			,CW.item
 			,COUNT(DISTINCT LB.LB_ID) batches
 			,COUNT(LF.LF_ID) fillings
-			,SUM(CW.in_cassette) details
+			,SUM(PB.in_cassette) details
 			,SUM(LF.underfilling) underfilling
 		FROM list__Batch LB
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-		LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		WHERE 1
 			AND LB.batch_date = '{$row["batch_date"]}'
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
