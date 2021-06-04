@@ -129,7 +129,7 @@ $query = "
 		".($_GET["detailing"] == "week" ? ",DATE_FORMAT(LO.opening_time, '%x%v') reject_date_sort" : "")."
 		".($_GET["detailing"] == "month" ? ",DATE_FORMAT(LO.opening_time, '%Y%m') reject_date_sort" : "")."
 		,CW.item
-		,SUM(IFNULL(not_spill, 0) + IFNULL(crack, 0) + IFNULL(chipped, 0) + IFNULL(def_form, 0)) `o_reject`
+		,SUM(IFNULL(not_spill, 0) + IFNULL(crack, 0) + IFNULL(crack_drying, 0) + IFNULL(chipped, 0) + IFNULL(def_form, 0) + IFNULL(def_assembly, 0)) `o_reject`
 		,SUM(PB.in_cassette - LF.underfilling) `o_details`
 		,CW.CBD
 	FROM list__Opening LO
