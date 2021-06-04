@@ -265,7 +265,7 @@ foreach ($_GET as &$value) {
 			<th rowspan="2">Куб раствора, кг</th>
 			<th rowspan="2">Противовес</th>
 			<th rowspan="2">Дата заливки</th>
-			<th rowspan="2"></th>
+<!--			<th rowspan="2"></th>-->
 		</tr>
 		<tr>
 			<th>Дата</th>
@@ -373,9 +373,11 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td class="bg-gray"><?=$row["mix_density"]/1000?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").($row["mix_diff"]/1000)."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
 		<td class="bg-gray"><a href="filling.php?week=<?=$row["pb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
+<!--
 		<td>
-<!--			<a href="#" class="add_opening" LO_ID="<?=$row["LO_ID"]?>" title="Изменить данные расформовки"><i class="fa fa-pencil-alt fa-lg"></i></a>-->
+			<a href="#" class="add_opening" LO_ID="<?=$row["LO_ID"]?>" title="Изменить данные расформовки"><i class="fa fa-pencil-alt fa-lg"></i></a>
 		</td>
+-->
 	</tr>
 	<?
 	$o_date = $row["o_date"];
