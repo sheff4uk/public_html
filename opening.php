@@ -290,7 +290,7 @@ $query = "
 		,LO.def_form
 		,LO.def_assembly
 		,PB.in_cassette
-		,SUM(1) cnt_weight
+		,SUM(IF(LW.LW_ID, 1, 0)) cnt_weight
 		,MIN(LW.weight) min_weight
 		,ROUND(AVG(LW.weight)) avg_weight
 		,MAX(LW.weight) max_weight
