@@ -366,7 +366,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<?=($row["def_form"] ? "<font color='red'>{$row["def_form"]}</font> дефект формы<br>" : "")?>
 			<?=($row["def_assembly"] ? "<font color='red'>{$row["def_assembly"]}</font> дефект сборки<br>" : "")?>
 		</td>
-		<td><?=$row["in_cassette"]?> / <?=$row["cnt_weight"]?></td>
+		<td <?=(abs($row["in_cassette"] - $row["cnt_weight"]) > $row["in_cassette"] / 2 ? "style='color: red;'" : "")?>><?=$row["in_cassette"]?> / <?=$row["cnt_weight"]?></td>
 		<td><?=($row["min_weight"] ? $row["min_weight"]/1000 : "")?><?=($row["min_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["min_diff"] > 0 ? " +" : " ").($row["min_diff"]/1000)."</font>" : "")?></td>
 		<td><?=($row["avg_weight"] ? $row["avg_weight"]/1000 : "")?><?=($row["avg_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["avg_diff"] > 0 ? " +" : " ").($row["avg_diff"]/1000)."</font>" : "")?></td>
 		<td><?=($row["max_weight"] ? $row["max_weight"]/1000 : "")?><?=($row["max_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["max_diff"] > 0 ? " +" : " ").($row["max_diff"]/1000)."</font>" : "")?></td>
