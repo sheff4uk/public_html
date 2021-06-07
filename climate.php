@@ -76,7 +76,7 @@ $h2 = $row["h2"];
 </form>
 
 <?
-echo "<h2>Текущие показания: <span style='color: rgba(255, 100, 50, 1);' title='Участок созревания'>{$t1}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(255, 200, 0, 1);' title='Участок расформовки'>{$t2}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(100, 100, 255, 1);' title='Участок созревания'>{$h1}%</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(200, 0, 255, 1);' title='Участок расформовки'>{$h2}%</span></h2>";
+echo "<h2>Текущие показания: <span style='color: rgba(255, 100, 50, 1);' title='t_1'>{$t1}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(255, 200, 0, 1);' title='t_2'>{$t2}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(100, 100, 255, 1);' title='h_1'>{$h1}%</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(200, 0, 255, 1);' title='h_2'>{$h2}%</span></h2>";
 
 // Узнаем время начала и время окончания
 $query = "
@@ -165,7 +165,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				borderColor: 'rgba(0, 0, 255, 1)',
 				data: [{x: '<?=$start_format?>', y: 75}, {x: '<?=$end_format?>', y: 75}, ],
 			}, {
-				label: 't, Созревание',
+				label: 't_1',
 				backgroundColor: 'rgba(255, 100, 50, .5)',
 				//borderWidth: 2,
 				pointRadius: 0,
@@ -173,7 +173,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				fill: false,
 				data: [<?=$t1_data?>],
 			}, {
-				label: 't, Расформовка',
+				label: 't_2',
 				backgroundColor: 'rgba(255, 200, 0, .5)',
 				//borderWidth: 2,
 				pointRadius: 0,
@@ -181,7 +181,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				fill: false,
 				data: [<?=$t2_data?>],
 			}, {
-				label: 'h, Созревание',
+				label: 'h_1',
 				backgroundColor: 'rgba(100, 100, 255, .5)',
 				//borderWidth: 2,
 				pointRadius: 0,
@@ -189,7 +189,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				fill: false,
 				data: [<?=$h1_data?>],
 			}, {
-				label: 'h, Расформовка',
+				label: 'h_2',
 				backgroundColor: 'rgba(200, 0, 255, .5)',
 				//borderWidth: 2,
 				pointRadius: 0,
