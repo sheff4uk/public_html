@@ -195,6 +195,14 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 						WHERE WT_ID = {$deviceID}
 					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+					// Запоминаем ID последней регистрации
+					$query = "
+						UPDATE WeighingTerminal
+						SET last_transaction = {$nextID}
+						WHERE WT_ID = {$deviceID}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				}
 			}
 
