@@ -7,6 +7,7 @@ $html .= "
 	<table style='table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
 		<thead style='word-wrap: break-word;'>
 			<tr>
+				<th>№ п/п</th>
 				<th>Вес</th>
 				<th>Время</th>
 				<th>Дефект</th>
@@ -36,7 +37,9 @@ $query = "
 	ORDER BY weighing_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$i = 0;
 while( $row = mysqli_fetch_array($res) ) {
+	$i++; //Порядковый номер
 	switch ($row["goodsID"]) {
 		case 2:
 			$defect = "непролив";
@@ -63,6 +66,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 	$html .= "
 		<tr>
+			<td>{$i}</td>
 			<td>".($row["weight"]/1000).($row["weight_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["weight_diff"] > 0 ? " +" : " ").($row["weight_diff"]/1000)."</font>" : "")."</td>
 			<td>{$row["weighing_time_format"]}</td>
 			<td>{$defect}</td>
