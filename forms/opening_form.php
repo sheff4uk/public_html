@@ -111,6 +111,21 @@ this.subbut.value='Подождите, пожалуйста!';">
 	</form>
 </div>
 
+<div id='weight_form' title='Регистрации противовесов' style='display:none;'>
+	<form method='post' action="/forms/opening_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
+this.subbut.value='Подождите, пожалуйста!';">
+		<fieldset>
+			<!--Содержимое формы аяксом-->
+		</fieldset>
+<!--
+		<div>
+			<hr>
+			<input type='submit' name="subbut" value='Записать' style='float: right;'>
+		</div>
+-->
+	</form>
+</div>
+
 <script>
 	$(function() {
 		// Кнопка добавления расформовки
@@ -148,6 +163,26 @@ this.subbut.value='Подождите, пожалуйста!';">
 			}
 
 			$('#opening_form').dialog({
+				resizable: false,
+				width: 1000,
+				modal: true,
+				closeText: 'Закрыть'
+			});
+
+			return false;
+		});
+
+		// Кнопка редактирования регистраций
+		$('.edit_transactions').click( function() {
+			// Проверяем сессию
+			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
+
+			var LO_ID = $(this).attr("LO_ID");
+
+			//Рисуем форму
+			$.ajax({ url: "/ajax/opening_form_ajax.php?LO_ID="+LO_ID, dataType: "script", async: false });
+
+			$('#weight_form').dialog({
 				resizable: false,
 				width: 1000,
 				modal: true,
