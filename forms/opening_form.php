@@ -6,22 +6,20 @@ if( isset($_POST["LO_ID"]) ) {
 	session_start();
 	$not_spill = $_POST["not_spill"] ? $_POST["not_spill"] : "NULL";
 	$crack = $_POST["crack"] ? $_POST["crack"] : "NULL";
+	$crack_drying = $_POST["crack_drying"] ? $_POST["crack_drying"] : "NULL";
 	$chipped = $_POST["chipped"] ? $_POST["chipped"] : "NULL";
 	$def_form = $_POST["def_form"] ? $_POST["def_form"] : "NULL";
-	$weight1 = $_POST["weight1"]*1000;
-	$weight2 = $_POST["weight2"]*1000;
-	$weight3 = $_POST["weight3"]*1000;
+	$def_assembly = $_POST["def_assembly"] ? $_POST["def_assembly"] : "NULL";
 
 	if( $_POST["LO_ID"] ) { // Редактируем
 		$query = "
 			UPDATE list__Opening
 			SET not_spill = {$not_spill}
 				,crack = {$crack}
+				,crack_drying = {$crack_drying}
 				,chipped = {$chipped}
 				,def_form = {$def_form}
-				,weight1 = {$weight1}
-				,weight2 = {$weight2}
-				,weight3 = {$weight3}
+				,def_assembly = {$def_assembly}
 			WHERE LO_ID = {$_POST["LO_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -74,19 +72,14 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
-						<th rowspan="2">№ кассеты</th>
-						<th rowspan="2">Время</th>
-						<th colspan="4">Кол-во брака, шт</th>
-						<th colspan="3">Взвешивания, кг</th>
-					</tr>
-					<tr>
+						<th>№ кассеты</th>
+						<th>Время</th>
 						<th>Непролив</th>
-						<th>Трещина</th>
+						<th>Мех. трещина</th>
+						<th>усад. трещина</th>
 						<th>Скол</th>
-						<th>Дефект форм</th>
-						<th>№1</th>
-						<th>№2</th>
-						<th>№3</th>
+						<th>Дефект формы</th>
+						<th>Дефект сборки</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -95,11 +88,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td><span id="o_time"></span></td>
 						<td><input type="number" name="not_spill" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="crack" min="0" style="width: 70px;"></td>
+						<td><input type="number" name="crack_drying" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="chipped" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="def_form" min="0" style="width: 70px;"></td>
-						<td><input type="number" name="weight1" min="5" max="20" step="0.01" required></td>
-						<td><input type="number" name="weight2" min="5" max="20" step="0.01" required></td>
-						<td><input type="number" name="weight3" min="5" max="20" step="0.01" required></td>
+						<td><input type="number" name="def_assembly" min="0" style="width: 70px;"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -154,12 +146,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 				// Дефекты расформовки
 				$('#opening_form input[name="not_spill"]').val(opening_data['not_spill']);
 				$('#opening_form input[name="crack"]').val(opening_data['crack']);
+				$('#opening_form input[name="crack_drying"]').val(opening_data['crack_drying']);
 				$('#opening_form input[name="chipped"]').val(opening_data['chipped']);
 				$('#opening_form input[name="def_form"]').val(opening_data['def_form']);
-				// Контрольные взвешивания
-				$('#opening_form input[name="weight1"]').val(opening_data['weight1']);
-				$('#opening_form input[name="weight2"]').val(opening_data['weight2']);
-				$('#opening_form input[name="weight3"]').val(opening_data['weight3']);
+				$('#opening_form input[name="def_assembly"]').val(opening_data['def_assembly']);
 			}
 
 			$('#opening_form').dialog({
