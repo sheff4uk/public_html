@@ -64,7 +64,7 @@ include "header.php";
 		</a>
 	</section>
 	<section class="cell">
-		<a href="/files/%D0%B2%D1%8B%D0%B4%D0%B0%D1%87%D0%B0%20%D0%BF%D0%B5%D1%80%D1%87%D0%B0%D1%82%D0%BE%D0%BA.pdf" class='print'>
+		<a href="/files/%D0%B2%D1%8B%D0%B4%D0%B0%D1%87%D0%B0%20%D0%BF%D0%B5%D1%80%D1%87%D0%B0%D1%82%D0%BE%D0%BA.pdf?v=1" class='print'>
 			<p><i class="fas fa-file-pdf fa-5x"></i></p>
 			<p>Выдача перчаток</p>
 		</a>
