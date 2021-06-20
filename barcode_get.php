@@ -102,7 +102,8 @@ if( $ip == $from_ip ) {
 								,LO.cassette
 								,PB.in_cassette - LF.underfilling details
 								,SUM(IF(LW.LW_ID, 1, 0)) cnt
-								,ROUND(CW.weight * 1.02) weight
+								,ROUND(CW.weight + (CW.weight/100*CW.drying_percent)) weight
+								,CW.drying_percent
 								,ROUND(AVG(LW.weight)) `avg`
 								,MIN(LW.weight) `min`
 								,MAX(LW.weight) `max`
@@ -121,14 +122,14 @@ if( $ip == $from_ip ) {
 						$LO_ID = $row["LO_ID"];
 
 						// Формируем текст сообщения в Телеграм
-						$message = "<b>[{$row["cassette"]}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>\nДеталей в кассете: <b>{$row["details"]}</b>\nДеталей в партии: <b>{$row["cnt"]}</b>\nЭталонный вес +2%: <b>".number_format($row["weight"], 0, '', '\'')."</b>\nСредний вес: <b>".number_format($row["avg"], 0, '', '\'')."</b>\nМинимальный вес: <b>".number_format($row["min"], 0, '', '\'')."</b>\nМаксимальный вес: <b>".number_format($row["max"], 0, '', '\'')."</b>\nВремя cканирования: <b>{$row["o_time_format"]}</b>\n";
+						$message = "<b>[{$row["cassette"]}]</b> {$row["item"]}\n<b>{$row["maturation"]}</b>ч <i>{$row["lf_date_format"]} {$row["lf_time_format"]}</i>\nДеталей в кассете: <b>{$row["details"]}</b>\nДеталей в партии: <b>{$row["cnt"]}</b>\nЭталонный вес +{$row["drying_percent"]}%: <b>".number_format($row["weight"], 0, '', '\'')."</b>\nСредний вес: <b>".number_format($row["avg"], 0, '', '\'')."</b>\nМинимальный вес: <b>".number_format($row["min"], 0, '', '\'')."</b>\nМаксимальный вес: <b>".number_format($row["max"], 0, '', '\'')."</b>\nВремя cканирования: <b>{$row["o_time_format"]}</b>\n";
 
 						// Выводим все веса
 						$query = "
 							SELECT LW.weight
 								,WT.post
 								,LW.goodsID
-								,IF(LW.weight BETWEEN ROUND(CW.min_weight * 1.02) AND ROUND(CW.max_weight * 1.02), 0, IF(LW.weight > ROUND(CW.max_weight * 1.02), LW.weight - ROUND(CW.max_weight * 1.02), LW.weight - ROUND(CW.min_weight * 1.02))) diff
+								,IF(LW.weight BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(LW.weight > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), LW.weight - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), LW.weight - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) diff
 							FROM list__Weight LW
 							JOIN WeighingTerminal WT ON WT.WT_ID = LW.WT_ID
 							JOIN list__Opening LO ON LO.LO_ID = LW.LO_ID
