@@ -167,6 +167,7 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 							AND WT_ID = {$deviceID}
 							AND LO_ID IS NULL
 					";
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					$row = mysqli_fetch_array($res);
 					$RN = $row["RN"];
 
