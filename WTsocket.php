@@ -159,10 +159,22 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 					$row = mysqli_fetch_array($res);
 					$receipt_start = $row["receipt_start"];
 
+					// Узнаем номер закрытой партии
+					$query = "
+						SELECT MAX(RN) RN
+						FROM list__Weight
+						WHERE weighing_time BETWEEN '{$receipt_start}' AND '{$receipt_end}'
+							AND WT_ID = {$deviceID}
+							AND LO_ID IS NULL
+					";
+					$row = mysqli_fetch_array($res);
+					$RN = $row["RN"];
+
 					// Из пересечения временных интервалов находим наиболее подходящую кассету
 					$query = "
 						SELECT SUB.LO_ID
-							,TIMESTAMPDIFF(SECOND, IF(SUB.opening_time > '{$receipt_start}', SUB.opening_time, '{$receipt_start}'), IF(SUB.end_time < '{$receipt_end}', SUB.end_time, '{$receipt_end}')) / TIMESTAMPDIFF(SECOND, SUB.opening_time, SUB.end_time) `share`
+							#,TIMESTAMPDIFF(SECOND, IF(SUB.opening_time > '{$receipt_start}', SUB.opening_time, '{$receipt_start}'), IF(SUB.end_time < '{$receipt_end}', SUB.end_time, '{$receipt_end}')) / TIMESTAMPDIFF(SECOND, SUB.opening_time, SUB.end_time) `share`
+							,(SELECT SUM(1) FROM list__Weight WHERE RN = {$RN} AND WT_ID = {$deviceID} AND weighing_time BETWEEN SUB.opening_time AND SUB.end_time) CW_cnt
 						FROM (
 							SELECT (SELECT LO_ID FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) LO_ID
 								,(SELECT opening_time FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) opening_time
@@ -172,7 +184,7 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 								AND (SELECT opening_time FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) <= '{$receipt_end}'
 								AND '{$receipt_start}' <= LO.opening_time
 							) SUB
-						ORDER BY `share` DESC
+						ORDER BY CW_cnt DESC
 						LIMIT 1
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
