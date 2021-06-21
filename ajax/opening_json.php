@@ -7,13 +7,14 @@ $query = "
 	SELECT LO.cassette
 		,DATE_FORMAT(LO.opening_time, '%d.%m.%Y') o_date
 		,DATE_FORMAT(LO.opening_time, '%H:%i') o_time
-		,LO.not_spill
-		,LO.crack
-		,LO.crack_drying
-		,LO.chipped
-		,LO.def_form
-		,LO.def_assembly
+		,LOD.not_spill
+		,LOD.crack
+		,LOD.crack_drying
+		,LOD.chipped
+		,LOD.def_form
+		,LOD.def_assembly
 	FROM list__Opening LO
+	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	WHERE LO.LO_ID = {$LO_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

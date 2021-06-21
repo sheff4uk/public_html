@@ -129,7 +129,7 @@ $query = "
 		".($_GET["detailing"] == "week" ? ",DATE_FORMAT(LO.opening_time, '%x%v') reject_date_sort" : "")."
 		".($_GET["detailing"] == "month" ? ",DATE_FORMAT(LO.opening_time, '%Y%m') reject_date_sort" : "")."
 		,CW.item
-		,SUM(IFNULL(not_spill, 0) + IFNULL(crack, 0) + IFNULL(crack_drying, 0) + IFNULL(chipped, 0) + IFNULL(def_form, 0) + IFNULL(def_assembly, 0)) `o_reject`
+		,SUM(IFNULL(LOD.not_spill, 0) + IFNULL(LOD.crack, 0) + IFNULL(LOD.crack_drying, 0) + IFNULL(LOD.chipped, 0) + IFNULL(LOD.def_form, 0) + IFNULL(LOD.def_assembly, 0)) `o_reject`
 		,SUM(PB.in_cassette - LF.underfilling) `o_details`
 		,CW.CBD
 	FROM list__Opening LO
@@ -137,6 +137,7 @@ $query = "
 	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND DATE(LO.opening_time) >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."

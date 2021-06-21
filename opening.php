@@ -283,12 +283,12 @@ $query = "
 		,DATE_FORMAT(LO.opening_time, '%d.%m.%y') o_date
 		,DATE_FORMAT(LO.opening_time, '%H:%i') o_time
 		,o_interval(LO.LO_ID) o_interval
-		,LO.not_spill
-		,LO.crack
-		,LO.crack_drying
-		,LO.chipped
-		,LO.def_form
-		,LO.def_assembly
+		,LOD.not_spill
+		,LOD.crack
+		,LOD.crack_drying
+		,LOD.chipped
+		,LOD.def_form
+		,LOD.def_assembly
 		,PB.in_cassette
 		,COUNT(DISTINCT LW.LW_ID) cnt_weight
 		,MIN(LW.weight) min_weight
@@ -309,6 +309,7 @@ $query = "
 		#,SUM(1) dbl
 	FROM list__Opening LO
 	JOIN list__Opening SLO ON SLO.cassette = LO.cassette AND SLO.LF_ID = LO.LF_ID
+	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 	LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID

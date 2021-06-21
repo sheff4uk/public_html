@@ -125,12 +125,12 @@ $query = "
 	SELECT PB.pb_date
 		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') date
 		,COUNT(distinct(PB.CW_ID)) item_cnt
-		,SUM(IFNULL(LO.not_spill,0)) not_spill
-		,SUM(IFNULL(LO.crack,0)) crack
-		,SUM(IFNULL(LO.crack_drying,0)) crack_drying
-		,SUM(IFNULL(LO.chipped,0)) chipped
-		,SUM(IFNULL(LO.def_form,0)) def_form
-		,SUM(IFNULL(LO.def_assembly,0)) def_assembly
+		,SUM(IFNULL(LOD.not_spill,0)) not_spill
+		,SUM(IFNULL(LOD.crack,0)) crack
+		,SUM(IFNULL(LOD.crack_drying,0)) crack_drying
+		,SUM(IFNULL(LOD.chipped,0)) chipped
+		,SUM(IFNULL(LOD.def_form,0)) def_form
+		,SUM(IFNULL(LOD.def_assembly,0)) def_assembly
 		,SUM(1) cnt
 		,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 		,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -140,6 +140,7 @@ $query = "
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 	LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
@@ -155,12 +156,12 @@ while( $row = mysqli_fetch_array($res) ) {
 	$query = "
 		SELECT CW.item
 			,PB.CW_ID
-			,IFNULL(SUM(LO.not_spill), '-') not_spill
-			,IFNULL(SUM(LO.crack), '-') crack
-			,IFNULL(SUM(LO.crack_drying), '-') crack_drying
-			,IFNULL(SUM(LO.chipped), '-') chipped
-			,IFNULL(SUM(LO.def_form), '-') def_form
-			,IFNULL(SUM(LO.def_assembly), '-') def_assembly
+			,IFNULL(SUM(LOD.not_spill), '-') not_spill
+			,IFNULL(SUM(LOD.crack), '-') crack
+			,IFNULL(SUM(LOD.crack_drying), '-') crack_drying
+			,IFNULL(SUM(LOD.chipped), '-') chipped
+			,IFNULL(SUM(LOD.def_form), '-') def_form
+			,IFNULL(SUM(LOD.def_assembly), '-') def_assembly
 			,SUM(1) cnt
 			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 			,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -171,6 +172,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+		LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 		WHERE PB.pb_date LIKE '{$row["pb_date"]}'
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
@@ -237,12 +239,12 @@ while( $row = mysqli_fetch_array($res) ) {
 if( $filter ) {
 	$query = "
 		SELECT COUNT(distinct(PB.CW_ID)) item_cnt
-			,SUM(IFNULL(LO.not_spill,0)) not_spill
-			,SUM(IFNULL(LO.crack,0)) crack
-			,SUM(IFNULL(LO.crack_drying,0)) crack_drying
-			,SUM(IFNULL(LO.chipped,0)) chipped
-			,SUM(IFNULL(LO.def_form,0)) def_form
-			,SUM(IFNULL(LO.def_assembly,0)) def_assembly
+			,SUM(IFNULL(LOD.not_spill,0)) not_spill
+			,SUM(IFNULL(LOD.crack,0)) crack
+			,SUM(IFNULL(LOD.crack_drying,0)) crack_drying
+			,SUM(IFNULL(LOD.chipped,0)) chipped
+			,SUM(IFNULL(LOD.def_form,0)) def_form
+			,SUM(IFNULL(LOD.def_assembly,0)) def_assembly
 			,SUM(1) cnt
 			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 			,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -252,6 +254,7 @@ if( $filter ) {
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+		LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 		WHERE 1
 			".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
 			".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
@@ -265,12 +268,12 @@ if( $filter ) {
 		$query = "
 			SELECT CW.item
 				,PB.CW_ID
-				,IFNULL(SUM(LO.not_spill), '-') not_spill
-				,IFNULL(SUM(LO.crack), '-') crack
-				,IFNULL(SUM(LO.crack_drying), '-') crack_drying
-				,IFNULL(SUM(LO.chipped), '-') chipped
-				,IFNULL(SUM(LO.def_form), '-') def_form
-				,IFNULL(SUM(LO.def_assembly), '-') def_assembly
+				,IFNULL(SUM(LOD.not_spill), '-') not_spill
+				,IFNULL(SUM(LOD.crack), '-') crack
+				,IFNULL(SUM(LOD.crack_drying), '-') crack_drying
+				,IFNULL(SUM(LOD.chipped), '-') chipped
+				,IFNULL(SUM(LOD.def_form), '-') def_form
+				,IFNULL(SUM(LOD.def_assembly), '-') def_assembly
 				,SUM(1) cnt
 				,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
 				,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -280,6 +283,7 @@ if( $filter ) {
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 			LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+			LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 			WHERE 1
 				".($_GET["date_from"] ? "AND PB.pb_date >= '{$_GET["date_from"]}'" : "")."
 				".($_GET["date_to"] ? "AND PB.pb_date <= '{$_GET["date_to"]}'" : "")."
