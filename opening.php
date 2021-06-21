@@ -294,17 +294,9 @@ $query = "
 		,MIN(LW.weight) min_weight
 		,ROUND(AVG(LW.weight)) avg_weight
 		,MAX(LW.weight) max_weight
-		,IF(MIN(LW.weight) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(MIN(LW.weight) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MIN(LW.weight) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MIN(LW.weight) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) min_diff
-		,IF(ROUND(AVG(LW.weight)) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(ROUND(AVG(LW.weight)) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) avg_diff
-		,IF(MAX(LW.weight) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(MAX(LW.weight) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MAX(LW.weight) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MAX(LW.weight) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) max_diff
-
-		#,LO.weight1
-		#,LO.weight2
-		#,LO.weight3
-		#,IF(LO.weight1 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight1 > CW.max_weight, LO.weight1 - CW.max_weight, LO.weight1 - CW.min_weight)) w1_diff
-		#,IF(LO.weight2 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight2 > CW.max_weight, LO.weight2 - CW.max_weight, LO.weight2 - CW.min_weight)) w2_diff
-		#,IF(LO.weight3 BETWEEN CW.min_weight AND CW.max_weight, 0, IF(LO.weight3 > CW.max_weight, LO.weight3 - CW.max_weight, LO.weight3 - CW.min_weight)) w3_diff
-
+		#,IF(MIN(LW.weight) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(MIN(LW.weight) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MIN(LW.weight) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MIN(LW.weight) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) min_diff
+		#,IF(ROUND(AVG(LW.weight)) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(ROUND(AVG(LW.weight)) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) avg_diff
+		#,IF(MAX(LW.weight) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(MAX(LW.weight) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MAX(LW.weight) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MAX(LW.weight) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) max_diff
 		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 		,LO.cassette
 		,CW.item
