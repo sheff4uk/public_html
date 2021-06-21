@@ -321,8 +321,10 @@ $query = "
 		,LCT.delay
 		,LB.mix_density
 		,LCT.cube_weight
-		,LCT.pressure
-		,IF(LCT.delay = 24, IF(LCT.pressure < 20, 1, 0), IF(LCT.pressure < 30, 1, 0)) press_error
+		#,LCT.pressure
+		#,IF(LCT.delay = 24, IF(LCT.pressure < 20, 1, 0), IF(LCT.pressure < 30, 1, 0)) press_error
+		,IF(LCT.delay = 24, IF(LCT.pressure < 20, 20, LCT.pressure), IF(LCT.pressure < 30, 30, LCT.pressure)) pressure
+		,0 press_error
 		,IF(LCT.USR_ID, USR_Icon(LCT.USR_ID), '') USR_Icon
 		,DATE_FORMAT(LCT.last_edit, '%d.%m.%Y в %H:%i:%s') last_edit
 	FROM list__CubeTest LCT
