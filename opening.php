@@ -300,7 +300,7 @@ $query = "
 		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 		,LO.cassette
 		,CW.item
-		,YEARWEEK(PB.pb_date, 1) pb_week
+		,YEARWEEK(LB.batch_date, 1) pb_week
 		,PB.CW_ID
 		,LB.LB_ID
 		,LB.mix_density
