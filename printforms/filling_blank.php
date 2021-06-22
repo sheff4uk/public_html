@@ -12,10 +12,8 @@ include "../config.php";
 $PB_ID = $_GET["PB_ID"];
 
 $query = "
-	SELECT DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
-		,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
-		,RIGHT(YEARWEEK(PB.pb_date, 1), 2) week
-		,CONCAT('[00:00 ', DATE_FORMAT(ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), '%e %b'), ' - 23:59 ', DATE_FORMAT(ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)), '%e %b'), '] ', LEFT(YEARWEEK(PB.pb_date, 1), 4), 'г') week_range
+	SELECT PB.year
+		,PB.cycle
 		,PB.CW_ID
 		,PB.batches
 		,CW.item
@@ -31,10 +29,8 @@ $row = mysqli_fetch_array($res);
 
 $batches = $row["batches"];
 $item = $row["item"];
-$pb_date_format = $row["pb_date_format"];
-$pb_weekday = $row["pb_date_weekday"];
-$week = $row["week"];
-$week_range = $row["week_range"];
+$year = $row["year"];
+$cycle = $row["cycle"];
 $fillings = $row["fillings"];
 $cubetests = $row["cubetests"];
 $CW_ID = $row["CW_ID"];
@@ -85,7 +81,7 @@ echo "<title>Чеклист оператора для {$item} от {$pb_date}</t
 </head>
 <body>
 
-	<b style="float: right; width: 50%;"><span style="font-size: 1.5em;">ВНИМАНИЕ!</span> Время замеса не должно выходить за границы недели <?=$week_range?>.</b>
+	<b style="float: right; width: 50%;"><span style="font-size: 1.5em;">ВНИМАНИЕ!</span> Время замеса не должно выходить за границы текущего года.</b>
 <h3>Фактическая дата первого замеса: ________________</h3>
 
 <table>
@@ -93,8 +89,8 @@ echo "<title>Чеклист оператора для {$item} от {$pb_date}</t
 		<tr>
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
 			<th style="font-size: 2em;"><?=$item?></th>
-			<th><n style="font-size: 3em;"><?=$week?></n> неделя<br><?=$week_range?></th>
-			<th width="40"><n style="font-size: 3em;"><?=$pb_weekday?></n><br>цикл</th>
+			<th><n style="font-size: 3em;"><?=$year?></n> год</th>
+			<th width="40"><n style="font-size: 3em;"><?=$cycle?></n><br>цикл</th>
 			<th style="position: relative;">
 				<img src="../barcode.php?code=<?=$PB_ID?>&w=200&h=60" alt="barcode">
 				<span style="position: absolute; background: white; left: calc(50% - 40px); top: 48px; width: 80px;"><?=str_pad($PB_ID, 8, "0", STR_PAD_LEFT)?></span>
