@@ -110,8 +110,8 @@ if( !$_GET["week"] ) {
 				$query = "
 					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
 					UNION
-					SELECT LEFT(YEARWEEK(pb_date, 1), 4) year
-					FROM plan__Batch
+					SELECT LEFT(YEARWEEK(batch_date, 1), 4) year
+					FROM list__Batch
 					ORDER BY year DESC
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -129,13 +129,13 @@ if( !$_GET["week"] ) {
 								,DATE_FORMAT(ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())), '%e %b') WeekStart
 								,DATE_FORMAT(ADDDATE(CURDATE(), 6-WEEKDAY(CURDATE())), '%e %b') WeekEnd
 							UNION
-							SELECT LEFT(YEARWEEK(pb_date, 1), 4) year
-								,YEARWEEK(pb_date, 1) week
-								,RIGHT(YEARWEEK(pb_date, 1), 2) week_format
-								,DATE_FORMAT(ADDDATE(pb_date, 0-WEEKDAY(pb_date)), '%e %b') WeekStart
-								,DATE_FORMAT(ADDDATE(pb_date, 6-WEEKDAY(pb_date)), '%e %b') WeekEnd
-							FROM plan__Batch
-							WHERE LEFT(YEARWEEK(pb_date, 1), 4) = {$row["year"]}
+							SELECT LEFT(YEARWEEK(batch_date, 1), 4) year
+								,YEARWEEK(batch_date, 1) week
+								,RIGHT(YEARWEEK(batch_date, 1), 2) week_format
+								,DATE_FORMAT(ADDDATE(batch_date, 0-WEEKDAY(batch_date)), '%e %b') WeekStart
+								,DATE_FORMAT(ADDDATE(batch_date, 6-WEEKDAY(batch_date)), '%e %b') WeekEnd
+							FROM list__Batch
+							WHERE LEFT(YEARWEEK(batch_date, 1), 4) = {$row["year"]}
 							GROUP BY week
 						) SUB
 						WHERE SUB.year = {$row["year"]}
@@ -230,7 +230,7 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th>Неделя/Цикл</th>
+			<th>Год/Цикл</th>
 			<th>Дата время замеса</th>
 			<th>Рецепт</th>
 			<th>Куб раствора, кг</th>
@@ -252,10 +252,8 @@ foreach ($_GET as &$value) {
 // Получаем список дат и противовесов и кол-во замесов на эти даты
 $query = "
 	SELECT PB.PB_ID
-		,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
-		,RIGHT(YEARWEEK(PB.pb_date, 1), 2) week
-		,CONCAT('[', DATE_FORMAT(ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), '%e %b'), ' - ', DATE_FORMAT(ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)), '%e %b'), '] ', LEFT(YEARWEEK(PB.pb_date, 1), 4), ' г') week_range
-		,DATE_FORMAT(PB.pb_date, '%d.%m.%Y') pb_date_format
+		,PB.year
+		,PB.cycle
 		,CW.item
 		,PB.CW_ID
 		,PB.batches
@@ -268,8 +266,7 @@ $query = "
 	JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 	LEFT JOIN list__CubeTest LCT24 ON LCT24.LB_ID = LB.LB_ID AND LCT24.delay = 24
 	LEFT JOIN list__CubeTest LCT72 ON LCT72.LB_ID = LB.LB_ID AND LCT72.delay = 72
-	WHERE 1
-		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
+	WHERE PB.PB_ID IN (SELECT PB_ID FROM list__Batch WHERE YEARWEEK(batch_date) LIKE '{$_GET["week"]}' GROUP BY PB_ID)
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	GROUP BY PB.PB_ID
@@ -304,8 +301,8 @@ while( $row = mysqli_fetch_array($res) ) {
 	$test72 = mysqli_result($subres,1,'pressure');
 
 	$cnt = $row["fact_batches"];
-	echo "<tbody id='PB{$row["PB_ID"]}' style='text-align: center; border-bottom: 2px solid #333; ".(($weekday and $weekday != $row["pb_date_weekday"]) ? " border-top: 10px solid #333;" : "")."'>";
-	$weekday = $row["pb_date_weekday"];
+	echo "<tbody id='PB{$row["PB_ID"]}' style='text-align: center; border-bottom: 2px solid #333; ".(($cycle and $cycle != $row["cycle"]) ? " border-top: 10px solid #333;" : "")."'>";
+	$cycle = $row["cycle"];
 
 	$query = "
 		SELECT LB.LB_ID
@@ -373,8 +370,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		if( $cnt ) {
 			echo "
 				<td rowspan='{$cnt}' class='bg-gray'>
-					<h1>{$row["week"]}/{$row["pb_date_weekday"]}</h1>
-					<span class='nowrap'>{$row["week_range"]}</span><br>
+					{$row["year"]}
+					<h1>{$row["cycle"]}</h1>
 					<b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>
 					<i class='fas fa-cube'></i>24: <b>{$test24}</b><br>
 					<i class='fas fa-cube'></i>72: <b>{$test72}</b><br>

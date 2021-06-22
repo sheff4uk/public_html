@@ -4,14 +4,8 @@ include_once "../checkrights.php";
 $max_batches = 30; // Максимально возможное число замесов
 $PB_ID = $_GET["PB_ID"];
 $query = "
-	SELECT PB.pb_date
-		#,PB.pb_date - INTERVAL 1 DAY pb_date_min
-		#,PB.pb_date + INTERVAL 2 DAY pb_date_max
-		,IF(PB.pb_date - INTERVAL 1 DAY < ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), PB.pb_date - INTERVAL 1 DAY) pb_date_min
-		,ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)) pb_date_max
-		,WEEKDAY(PB.pb_date) + 1 pb_date_weekday
-		,RIGHT(YEARWEEK(PB.pb_date, 1), 2) week
-		,CONCAT('[', DATE_FORMAT(ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), '%e %b'), ' - ', DATE_FORMAT(ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)), '%e %b'), '] ', LEFT(YEARWEEK(PB.pb_date, 1), 4), ' г') week_range
+	SELECT PB.year
+		,PB.cycle
 		,PB.CW_ID
 		,PB.batches
 		,PB.fact_batches
@@ -28,15 +22,11 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
 
+$year = $row["year"];
+$cycle = $row["cycle"];
 $batches = $row["batches"];
 $fact_batches = $row["fact_batches"];
 $item = $row["item"];
-$pb_weekday = $row["pb_date_weekday"];
-$week = $row["week"];
-$week_range = $row["week_range"];
-$pb_date_min = $row["pb_date_min"];
-$pb_date_max = $row["pb_date_max"];
-$pb_date = $row["pb_date"];
 $fillings = $row["fillings"];
 $in_cassette = $row["in_cassette"];
 $CW_ID = $row["CW_ID"];
@@ -53,8 +43,8 @@ $html = "
 		<tr>
 			<td style='border: 1px solid black; line-height: 1em;'><img src='/img/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></td>
 			<td style='font-size: 2em; border: 1px solid black; line-height: 1em;'>{$item}</td>
-			<td style='border: 1px solid black; line-height: 1em;'><n style='font-size: 2em;'>{$week}</n> неделя<br>{$week_range}</td>
-			<td style='border: 1px solid black; line-height: 1em;' width='40'><n style='font-size: 2em;'>{$pb_weekday}</n><br>цикл</td>
+			<td style='border: 1px solid black; line-height: 1em;'><n style='font-size: 2em;'>{$year}</n> год</td>
+			<td style='border: 1px solid black; line-height: 1em;' width='120'><n style='font-size: 2em;'>{$cycle}</n><br>цикл</td>
 		</tr>
 	</table>
 ";
@@ -193,7 +183,7 @@ if( $fact_batches ) {
 		$html .= "
 			<tr class='batch_row' num='{$i}'>
 				<td style='text-align: center; font-size: 1.2em;'>{$i}</td>
-				<td><input type='datetime-local' name='batch_time[{$subrow["LB_ID"]}]' style='width: 110%;' value='{$subrow["batch_date"]}T{$subrow["batch_time_format"]}' min='{$pb_date_min}T00:00' max='{$pb_date_max}T23:59' required></td>
+				<td><input type='datetime-local' name='batch_time[{$subrow["LB_ID"]}]' style='width: 110%;' value='{$subrow["batch_date"]}T{$subrow["batch_time_format"]}' required></td>
 				<td><att></att></td>
 				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$subrow["LB_ID"]}]' value='".($subrow["io_density"]/1000)."' style='width: 110%;' required></td>" : "")."
 				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$subrow["LB_ID"]}]' value='".($subrow["sn_density"]/1000)."' style='width: 110%;' required></td>" : "")."
@@ -241,7 +231,7 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 	$html .= "
 		<tr class='batch_row' num='{$i}'>
 			<td style='text-align: center; font-size: 1.2em;'>{$i}</td>
-			<td><input type='datetime-local' name='batch_time[n_{$i}]' style='width: 110%;' min='{$pb_date_min}T00:00' max='{$pb_date_max}T23:59' required></td>
+			<td><input type='datetime-local' name='batch_time[n_{$i}]' style='width: 110%;' required></td>
 			<td><att></att></td>
 			".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[n_{$i}]' style='width: 110%;' required></td>" : "")."
 			".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[n_{$i}]' style='width: 110%;' required></td>" : "")."

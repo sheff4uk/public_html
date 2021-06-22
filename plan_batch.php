@@ -34,6 +34,8 @@ $next_cycle = $row["next_cycle"];
 			<select name="year" class="<?=$_GET["year"] ? "filtered" : ""?>" onchange="this.form.submit()">
 				<?
 				$query = "
+					SELECT YEAR(CURDATE()) year
+					UNION
 					SELECT year
 					FROM plan__Batch
 					GROUP BY year
