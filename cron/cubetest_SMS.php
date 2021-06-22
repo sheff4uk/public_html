@@ -16,7 +16,7 @@ $query = "
 	LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 24
 	WHERE LB.test = 1
 		AND LCT.LCT_ID IS NULL
-		AND PB.pb_date + INTERVAL 1 DAY = CURDATE()
+		AND LB.batch_date + INTERVAL 1 DAY = CURDATE()
 		AND HOUR(LB.batch_time) = HOUR(CURTIME())
 	UNION ALL
 	SELECT CW.item
@@ -28,7 +28,7 @@ $query = "
 	LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 72
 	WHERE LB.test = 1
 		AND LCT.LCT_ID IS NULL
-		AND PB.pb_date + INTERVAL 3 DAY = CURDATE()
+		AND LB.batch_date + INTERVAL 3 DAY = CURDATE()
 		AND HOUR(LB.batch_time) = HOUR(CURTIME())
 	ORDER BY time
 ";

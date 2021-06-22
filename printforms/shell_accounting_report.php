@@ -76,12 +76,12 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 				,CW.shell_balance
 				,ROUND((WB.fillings * PB.in_cassette) / WR.sr_cnt) `durability`
 				,ROUND(WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'), 1) `sr_avg`
-				,ROUND(AVG(IF(PB.fact_batches = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fact_batches) * PB.fillings_per_batch * PB.in_cassette)) `often`
+				,ROUND(AVG(IF(PB.fact_batches = 0, NULL, PB.fact_batches) * PB.fillings_per_batch * PB.in_cassette)) `often`
 				,MAX(PB.fact_batches * PB.fillings_per_batch * PB.in_cassette) `max`
 				,MAX(PB.fact_batches * PB.fillings_per_batch * PB.in_cassette) - CW.shell_balance `need`
 				,ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings_per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) `days_max`
 				,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings_per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d/%m/%Y') `date_max`
-				#,CEIL((CW.shell_balance - IFNULL(ROUND(AVG(IF(PB.fact_batches = 0 OR WEEKDAY(PB.pb_date) IN (5,6), NULL, PB.fact_batches) * PB.fillings_per_batch)), 0) * CW.in_cassette) / CW.shell_pallet) `pallets`
+				#,CEIL((CW.shell_balance - IFNULL(ROUND(AVG(IF(PB.fact_batches = 0, NULL, PB.fact_batches) * PB.fillings_per_batch)), 0) * CW.in_cassette) / CW.shell_pallet) `pallets`
 				,SR.sr_cnt
 			FROM CounterWeight CW
 			LEFT JOIN (
@@ -92,14 +92,15 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 				GROUP BY CW_ID
 			) SR ON SR.CW_ID = CW.CW_ID
 			LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID
-				#AND PB.pb_date BETWEEN (CURDATE() - INTERVAL 91 DAY) AND (CURDATE() - INTERVAL 1 DAY)
 			# Число заливок с 04.12.2020
 			LEFT JOIN (
-				SELECT CW_ID
-					,SUM(fact_batches * fillings_per_batch) fillings
-				FROM plan__Batch
-				WHERE pb_date BETWEEN '2020-12-04' AND CURDATE() - INTERVAL 1 DAY
-				GROUP BY CW_ID
+				SELECT PB.CW_ID
+					,SUM(1) fillings
+				FROM list__Filling LF
+				JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+				JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+				WHERE LF.lf_date BETWEEN '2020-12-04' AND CURDATE() - INTERVAL 1 DAY
+				GROUP BY PB.CW_ID
 			) WB ON WB.CW_ID = CW.CW_ID
 			# Число списаний с 04.12.2020
 			LEFT JOIN (

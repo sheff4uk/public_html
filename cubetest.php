@@ -78,7 +78,7 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 			SELECT LB.LB_ID
 				,PB.CW_ID
 				,CW.item
-				,YEARWEEK(PB.pb_date, 1) pb_week
+				,YEARWEEK(LB.batch_date, 1) lb_week
 				,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 				,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 				,LB.mix_density
@@ -97,7 +97,7 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 			SELECT LB.LB_ID
 				,PB.CW_ID
 				,CW.item
-				,YEARWEEK(PB.pb_date, 1) pb_week
+				,YEARWEEK(LB.batch_date, 1) lb_week
 				,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 				,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 				,LB.mix_density
@@ -122,7 +122,7 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 			?>
 			<tr>
 				<td class="bg-gray"><?=$row["item"]?></td>
-				<td class="bg-gray"><a href="filling.php?week=<?=$row["pb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
+				<td class="bg-gray"><a href="filling.php?week=<?=$row["lb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
 				<td class="bg-gray"><?=$row["batch_time_format"]?></td>
 				<td class="bg-gray"><?=$row["mix_density"]/1000?></td>
 				<td class="<?=$error?>"><?=$row["test_date_format"]?></td>
@@ -155,58 +155,6 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 			<input name="batch_date_from" type="date" value="<?=$_GET["batch_date_from"]?>" class="<?=$_GET["batch_date_from"] ? "filtered" : ""?>">
 			<input name="batch_date_to" type="date" value="<?=$_GET["batch_date_to"]?>" class="<?=$_GET["batch_date_to"] ? "filtered" : ""?>">
 		</div>
-<!--
-		<div class="nowrap" style="margin-bottom: 10px;">
-			<span>Неделя заливки:</span>
-			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
-				$query = "
-					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
-					UNION
-					SELECT LEFT(YEARWEEK(pb_date, 1), 4) year
-					FROM plan__Batch
-					ORDER BY year DESC
-				";
-				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-				while( $row = mysqli_fetch_array($res) ) {
-					echo "<optgroup label='{$row["year"]}'>";
-					$query = "
-						SELECT SUB.week
-							,SUB.week_format
-							,SUB.WeekStart
-							,SUB.WeekEnd
-						FROM (
-							SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
-								,YEARWEEK(CURDATE(), 1) week
-								,RIGHT(YEARWEEK(CURDATE(), 1), 2) week_format
-								,DATE_FORMAT(ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())), '%e %b') WeekStart
-								,DATE_FORMAT(ADDDATE(CURDATE(), 6-WEEKDAY(CURDATE())), '%e %b') WeekEnd
-							UNION
-							SELECT LEFT(YEARWEEK(pb_date, 1), 4) year
-								,YEARWEEK(pb_date, 1) week
-								,RIGHT(YEARWEEK(pb_date, 1), 2) week_format
-								,DATE_FORMAT(ADDDATE(pb_date, 0-WEEKDAY(pb_date)), '%e %b') WeekStart
-								,DATE_FORMAT(ADDDATE(pb_date, 6-WEEKDAY(pb_date)), '%e %b') WeekEnd
-							FROM plan__Batch
-							WHERE LEFT(YEARWEEK(pb_date, 1), 4) = {$row["year"]}
-							GROUP BY week
-						) SUB
-						WHERE SUB.year = {$row["year"]}
-						ORDER BY SUB.week DESC
-					";
-					$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					while( $subrow = mysqli_fetch_array($subres) ) {
-						$selected = ($subrow["week"] == $_GET["week"]) ? "selected" : "";
-						echo "<option value='{$subrow["week"]}' {$selected}>{$subrow["week_format"]} [{$subrow["WeekStart"]} - {$subrow["WeekEnd"]}]</option>";
-					}
-					echo "</optgroup>";
-				}
-				?>
-			</select>
-			<i class="fas fa-question-circle" title="По умолчанию устанавливается текущая неделя."></i>
-		</div>
--->
-
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Код противовеса:</span>
 			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
@@ -314,7 +262,7 @@ $query = "
 		,DATE_FORMAT(LCT.test_time, '%H:%i') test_time
 		,CW.item
 		,PB.CW_ID
-		,YEARWEEK(PB.pb_date, 1) pb_week
+		,YEARWEEK(LB.batch_date, 1) lb_week
 		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 		,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 		,TIMESTAMPDIFF(HOUR, CAST(CONCAT(LB.batch_date, ' ', LB.batch_time) as datetime), CAST(CONCAT(LCT.test_date, ' ', LCT.test_time) as datetime)) delay_fact
@@ -347,7 +295,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	?>
 	<tr id="<?=$row["LCT_ID"]?>">
 		<td class="bg-gray"><?=$row["item"]?></td>
-		<td class="bg-gray"><a href="filling.php?week=<?=$row["pb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
+		<td class="bg-gray"><a href="filling.php?week=<?=$row["lb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
 		<td class="bg-gray"><?=$row["batch_time_format"]?></td>
 		<td class="bg-gray"><?=$row["mix_density"]/1000?></td>
 		<td><?=$row["test_date"]?></td>

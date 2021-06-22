@@ -44,7 +44,7 @@ elseif( $cubetests == 3 ) {
 	$tests = array(2, round($batches/2), $batches);
 }
 
-echo "<title>Чеклист оператора для {$item} от {$pb_date}</title>";
+echo "<title>Чеклист оператора для {$item} цикл {$year}/{$cycle}</title>";
 ?>
 	<style>
 		@media print {

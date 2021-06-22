@@ -7,13 +7,12 @@ if( isset($_POST["PB_ID"]) ) {
 
 	//Узнаем есть ли связанные с планом чеклисты и число замесов
 	$query = "
-		SELECT PB.pb_date, PB.fact_batches
+		SELECT PB.fact_batches
 		FROM plan__Batch PB
 		WHERE PB.PB_ID = {$_POST["PB_ID"]}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	//$pb_date = $row["pb_date"];
 	$fact_batches = $row["fact_batches"];
 
 	// Сохраняем данные из формы
@@ -140,9 +139,10 @@ if( isset($_POST["PB_ID"]) ) {
 
 	// Получаем неделю
 	$query = "
-		SELECT YEARWEEK(pb_date, 1) week
-		FROM plan__Batch
-		WHERE PB_ID = {$_POST["PB_ID"]}
+		SELECT YEARWEEK(LB.batch_date, 1) week
+		FROM plan__Batch PB
+		JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
+		WHERE PB.PB_ID = {$_POST["PB_ID"]}
 		";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
