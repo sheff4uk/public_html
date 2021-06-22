@@ -46,57 +46,6 @@ if( !$_GET["week"] ) {
 	}
 </style>
 
-<!--
-<div id='batch_plan'>
-	<a href="#" class="button" style="width: 100%; z-index: -1;">Планируемые заливки</a>
-	<div>
-		<table>
-			<thead>
-				<tr>
-					<th>Дата</th>
-					<th>Противовес</th>
-					<th>Замесов</th>
-					<th>Заливок</th>
-					<th>План</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody style="text-align: center;">
-		<?
-		$query = "
-			SELECT PB.PB_ID
-				,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
-				,CW.item
-				,PB.batches
-				,PB.batches * CW.fillings fillings
-				,PB.batches * CW.fillings * CW.in_cassette plan
-			FROM plan__Batch PB
-			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-			WHERE PB.fact_batches = 0 AND PB.batches > 0
-				AND PB.pb_date <= CURDATE()
-			ORDER BY PB.pb_date, PB.CW_ID
-		";
-		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		while( $row = mysqli_fetch_array($res) ) {
-			?>
-			<tr>
-				<td><?=$row["pb_date_format"]?></td>
-				<td><?=$row["item"]?></td>
-				<td><?=$row["batches"]?></td>
-				<td><?=$row["fillings"]?></td>
-				<td><?=$row["plan"]?></td>
-				<td><a href="#" class="add_filling" PB_ID="<?=$row["PB_ID"]?>" title="Внести данные чеклиста оператора"><i class="fa fa-plus-square fa-lg"></i></a></td>
-			</tr>
-			<?
-
-		}
-		?>
-			</tbody>
-		</table>
-	</div>
-</div>
--->
-
 <!--Фильтр-->
 <div id="filter">
 	<h3>Фильтр</h3>
@@ -258,7 +207,7 @@ $query = "
 		,PB.CW_ID
 		,PB.batches
 		,PB.fact_batches
-		,MIN(CAST(CONCAT(LB.batch_date, ' ', LB.batch_time) AS DATETIME)) time
+		,MIN(TIMESTAMP(LB.batch_date, LB.batch_time)) time
 		,IF(COUNT(LCT24.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT24.LCT_ID) * 2 / 3), 0) `24tests`
 		,IF(COUNT(LCT72.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT72.LCT_ID) * 2 / 3), 0) `72tests`
 	FROM plan__Batch PB
@@ -270,7 +219,7 @@ $query = "
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	GROUP BY PB.PB_ID
-	ORDER BY PB.pb_date ASC, time
+	ORDER BY PB.cycle, time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
