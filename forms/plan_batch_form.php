@@ -2,18 +2,17 @@
 include_once "../config.php";
 
 // Сохранение/редактирование плана заливки
-if( isset($_POST["pb_date"]) ) {
+if( isset($_POST["cycle"]) ) {
 	session_start();
-	$pb_date = $_POST["pb_date"];
+	$year = $_POST["year"];
+	$cycle = $_POST["cycle"];
 
 	foreach ($_POST["CW_ID"] as $key => $value) {
 		// Редактируем
 		if( $_POST["PB_ID"][$key] ) {
 			$query = "
 				UPDATE plan__Batch
-				SET pb_date = '{$pb_date}'
-					,CW_ID = {$value}
-					,batches = {$_POST["batches"][$key]}
+				SET batches = {$_POST["batches"][$key]}
 					,author = {$_SESSION['id']}
 				WHERE PB_ID = {$_POST["PB_ID"][$key]}
 			";
@@ -22,7 +21,8 @@ if( isset($_POST["pb_date"]) ) {
 		elseif( $_POST["batches"][$key] > 0 ) {
 			$query = "
 				INSERT INTO plan__Batch
-				SET pb_date = '{$pb_date}'
+				SET year = {$year}
+					,cycle = {$cycle}
 					,CW_ID = {$value}
 					,batches = {$_POST["batches"][$key]}
 					,author = {$_SESSION['id']}
@@ -35,20 +35,8 @@ if( isset($_POST["pb_date"]) ) {
 		$_SESSION["success"][] = "Данные успешно сохранены.";
 	}
 
-	// Получаем неделю и цикл
-	$query = "
-		SELECT YEARWEEK(pb_date, 1) week
-			,WEEKDAY(pb_date) + 1 cycle
-		FROM plan__Batch
-		WHERE pb_date = '{$pb_date}'
-		";
-	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-	$row = mysqli_fetch_array($res);
-	$week = $row["week"];
-	$cycle = $row["cycle"];
-
 	// Перенаправление в план
-	exit ('<meta http-equiv="refresh" content="0; url=/plan_batch.php?week='.$week.'&#C'.$week.$cycle.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/plan_batch.php?year='.$year.'&#C'.$year.$cycle.'">');
 }
 ?>
 
@@ -63,10 +51,10 @@ if( isset($_POST["pb_date"]) ) {
 	<form method='post' action="/forms/plan_batch_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
-			<input type="hidden" name="pb_date">
+			<input type="hidden" name="year">
+			<input type="hidden" name="cycle">
 
-			<h3>Неделя/цикл: <span style="font-size: 2em;" id="week_cycle"></span></h3>
-<!--			<input type="date" name="pb_date" min="<?=date('Y-m-d')?>" max="<?=date('Y-m-d', strtotime("+7 day"))?>" required>-->
+			<h3>Год/цикл: <span style="font-size: 2em;" id="year_cycle"></span></h3>
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
@@ -118,21 +106,16 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
-			var pb_date = $(this).attr("pb_date"),
-				week_cycle = $(this).attr("cycle");
+			var cycle = $(this).attr("cycle"),
+				year = $(this).attr("year");
 
-			// Если все циклы задействованы, выводим предупреждение
-			if( !pb_date ) {
-				noty({text: '7 - максимальное количество циклов за неделю.', type: 'error'});
-				return false;
-			}
-
-			$('#plan_batch_form input[name="pb_date"]').val(pb_date);
-			$('#week_cycle').html(week_cycle);
+			$('#plan_batch_form input[name="year"]').val(year);
+			$('#plan_batch_form input[name="cycle"]').val(cycle);
+			$('#year_cycle').html(year + "/" + cycle);
 
 			// Данные аяксом
 			$.ajax({
-				url: "/ajax/plan_batch_json.php?pb_date=" + pb_date,
+				url: "/ajax/plan_batch_json.php?year=" + year + "&cycle=" + cycle,
 				success: function(msg) { pb_data = msg; },
 				dataType: "json",
 				async: false

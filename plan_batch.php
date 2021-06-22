@@ -4,28 +4,23 @@ $title = 'План заливки';
 include "header.php";
 include "./forms/plan_batch_form.php";
 
-// Если в фильтре не установлена неделя, показываем текущую
-if( !$_GET["week"] ) {
-	$query = "SELECT YEARWEEK(CURDATE(), 1) week";
+// Если в фильтре не установлен год, показываем текущий
+if( !$_GET["year"] ) {
+	$query = "SELECT YEAR(CURDATE()) year";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$_GET["week"] = $row["week"];
+	$_GET["year"] = $row["year"];
 }
 
-// Находим очередной цикл на этой неделе, чтобы создать новый план
+// Находим очередной цикл в этом году, чтобы создать новый план
 $query = "
-	SELECT SUB.next
-		,CONCAT(RIGHT(YEARWEEK(SUB.next, 1), 2), '/', (WEEKDAY(SUB.next) + 1)) `week_cycle`
-	FROM (
-		SELECT IF(WEEKDAY(MAX(pb_date)) = 6, NULL, IFNULL(ADDDATE(MAX(pb_date), 1), STR_TO_DATE(CONCAT({$_GET["week"]}, '_1'), '%x%v_%w'))) `next`
-		FROM plan__Batch
-		WHERE YEARWEEK(pb_date, 1) = {$_GET["week"]}
-	) SUB
+	SELECT IFNULL(MAX(cycle), 0) + 1 next_cycle
+	FROM plan__Batch
+	WHERE year = {$_GET["year"]}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
-$next = $row["next"];
-$week_cycle = $row["week_cycle"];
+$next_cycle = $row["next_cycle"];
 ?>
 
 <!--Фильтр-->
@@ -35,61 +30,23 @@ $week_cycle = $row["week_cycle"];
 		<a href="/plan_batch.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
-			<span>Неделя:</span>
-			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
+			<span>Год:</span>
+			<select name="year" class="<?=$_GET["year"] ? "filtered" : ""?>" onchange="this.form.submit()">
 				<?
 				$query = "
-					SELECT LEFT(YEARWEEK(ADDDATE(CURDATE(), 7), 1), 4) year
-					UNION
-					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
-					UNION
-					SELECT LEFT(YEARWEEK(pb_date, 1), 4) year
+					SELECT year
 					FROM plan__Batch
+					GROUP BY year
 					ORDER BY year DESC
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
-					echo "<optgroup label='{$row["year"]}'>";
-					$query = "
-						SELECT SUB.week
-							,SUB.week_format
-							,SUB.WeekStart
-							,SUB.WeekEnd
-						FROM (
-							SELECT LEFT(YEARWEEK(ADDDATE(CURDATE(), 7), 1), 4) year
-								,YEARWEEK(ADDDATE(CURDATE(), 7), 1) week
-								,RIGHT(YEARWEEK(ADDDATE(CURDATE(), 7), 1), 2) week_format
-								,DATE_FORMAT(ADDDATE(CURDATE(), 7-WEEKDAY(CURDATE())), '%e %b') WeekStart
-								,DATE_FORMAT(ADDDATE(CURDATE(), 13-WEEKDAY(CURDATE())), '%e %b') WeekEnd
-							UNION
-							SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
-								,YEARWEEK(CURDATE(), 1) week
-								,RIGHT(YEARWEEK(CURDATE(), 1), 2) week_format
-								,DATE_FORMAT(ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())), '%e %b') WeekStart
-								,DATE_FORMAT(ADDDATE(CURDATE(), 6-WEEKDAY(CURDATE())), '%e %b') WeekEnd
-							UNION
-							SELECT LEFT(YEARWEEK(pb_date, 1), 4) year
-								,YEARWEEK(pb_date, 1) week
-								,RIGHT(YEARWEEK(pb_date, 1), 2) week_format
-								,DATE_FORMAT(ADDDATE(pb_date, 0-WEEKDAY(pb_date)), '%e %b') WeekStart
-								,DATE_FORMAT(ADDDATE(pb_date, 6-WEEKDAY(pb_date)), '%e %b') WeekEnd
-							FROM plan__Batch
-							WHERE LEFT(YEARWEEK(pb_date, 1), 4) = {$row["year"]}
-							GROUP BY week
-						) SUB
-						WHERE SUB.year = {$row["year"]}
-						ORDER BY SUB.week DESC
-					";
-					$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					while( $subrow = mysqli_fetch_array($subres) ) {
-						$selected = ($subrow["week"] == $_GET["week"]) ? "selected" : "";
-						echo "<option value='{$subrow["week"]}' {$selected}>{$subrow["week_format"]} [{$subrow["WeekStart"]} - {$subrow["WeekEnd"]}]</option>";
-					}
-					echo "</optgroup>";
+					$selected = ($row["year"] == $_GET["year"]) ? "selected" : "";
+					echo "<option value='{$row["year"]}' {$selected}>{$row["year"]}</option>";
 				}
 				?>
 			</select>
-			<i class="fas fa-question-circle" title="По умолчанию устанавливается текущая неделя."></i>
+			<i class="fas fa-question-circle" title="По умолчанию устанавливается текущий год."></i>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -159,129 +116,11 @@ foreach ($_GET as &$value) {
 	});
 </script>
 
-<!--Посуточная аналитика-->
+<!--Таблица с планом-->
 <table class="main_table">
 	<thead>
 		<tr>
-			<th>День</th>
-			<th>Время первого замеса</th>
-			<th>Противовес</th>
-			<th>Замесов</th>
-			<th>Заливок</th>
-			<th>Деталей</th>
-			<th>Недоливы</th>
-		</tr>
-	</thead>
-	<tbody style="text-align: center;">
-
-<?
-$batches = 0;
-$fillings = 0;
-$details = 0;
-$underfilling = 0;
-
-$query = "
-	SELECT COUNT(distinct(PB.CW_ID)) cnt
-		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
-		,DATE_FORMAT(LB.batch_date, '%W') weekday_format
-		,LB.batch_date
-		,COUNT(DISTINCT LB.LB_ID) batches
-		,COUNT(LF.LF_ID) fillings
-		,SUM(PB.in_cassette) details
-	FROM list__Batch LB
-	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	WHERE 1
-		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
-		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	GROUP BY LB.batch_date
-	ORDER BY LB.batch_date
-";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-while( $row = mysqli_fetch_array($res) ) {
-	$cnt = $row["cnt"];
-	$d_batches = 0;
-	$d_underfilling = 0;
-
-	$query = "
-		SELECT DATE_FORMAT(MIN(LB.batch_time), '%H:%i') first_batch
-			,CW.item
-			,COUNT(DISTINCT LB.LB_ID) batches
-			,COUNT(LF.LF_ID) fillings
-			,SUM(PB.in_cassette) details
-			,SUM(LF.underfilling) underfilling
-		FROM list__Batch LB
-		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-		WHERE 1
-			AND LB.batch_date = '{$row["batch_date"]}'
-			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-		GROUP BY PB.CW_ID
-		ORDER BY MIN(LB.batch_time)
-	";
-	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-	while( $subrow = mysqli_fetch_array($subres) ) {
-		$batches += $subrow["batches"];
-		$fillings += $subrow["fillings"];
-		$details += $subrow["details"];
-		$underfilling += $subrow["underfilling"];
-		$d_underfilling += $subrow["underfilling"];
-
-		// Выводим общую ячейку с датой заливки
-		if( $cnt ) {
-			$cnt++;
-			echo "<tr style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h2>{$row["weekday_format"]}</h2>{$row["batch_date_format"]}</td>";
-			$cnt = 0;
-		}
-		else {
-			echo "<tr id='{$subrow["PB_ID"]}'>";
-		}
-		?>
-			<td><?=$subrow["first_batch"]?></td>
-			<td><?=$subrow["item"]?></td>
-			<td><?=$subrow["batches"]?></td>
-			<td><?=$subrow["fillings"]?></td>
-			<td><?=($subrow["details"] - $subrow["underfilling"])?></td>
-			<td><?=$subrow["underfilling"]?></td>
-		</tr>
-		<?
-
-	}
-?>
-		<tr class="summary">
-			<td></td>
-			<td>Итог:</td>
-			<td><?=$row["batches"]?></td>
-			<td><?=$row["fillings"]?></td>
-			<td><?=($row["details"] - $d_underfilling)?></td>
-			<td><?=$d_underfilling?></td>
-		</tr>
-<?
-}
-?>
-		<tr class="total">
-			<td></td>
-			<td></td>
-			<td>Итог:</td>
-			<td><?=$batches?></td>
-			<td><?=$fillings?></td>
-			<td><?=($details - $underfilling)?></td>
-			<td><?=$underfilling?></td>
-		</tr>
-	</tbody>
-</table>
-
-<!--Таблица с планом-->
-<h2>План</h2>
-<table>
-	<thead>
-		<tr>
-			<th>Неделя/Цикл</th>
+			<th>Цикл</th>
 			<th>Противовес</th>
 			<th>Замесов</th>
 			<th>Заливок</th>
@@ -303,35 +142,30 @@ $underfilling = 0;
 
 $query = "
 	SELECT SUM(1) + 1 cnt
-		,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
-		,WEEKDAY(PB.pb_date) + 1 cycle
-		,RIGHT(YEARWEEK(PB.pb_date, 1), 2) week
-		,CONCAT('[', DATE_FORMAT(ADDDATE(PB.pb_date, 0-WEEKDAY(PB.pb_date)), '%e %b'), ' - ', DATE_FORMAT(ADDDATE(PB.pb_date, 6-WEEKDAY(PB.pb_date)), '%e %b'), '] ', LEFT(YEARWEEK(PB.pb_date, 1), 4), ' г') week_range
-		,PB.pb_date
+		,PB.cycle
 		,SUM(PB.batches) batches
 		,SUM(PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings)) fillings
 		,SUM(PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * IFNULL(PB.in_cassette, CW.in_cassette)) plan
 		,SUM(PB.fact_batches * PB.fillings_per_batch * PB.in_cassette) details
-		,IF(SUM(PB.batches) = SUM(PB.fact_batches), (SELECT TIMESTAMPDIFF(MINUTE, MAX(CAST(CONCAT(batch_date, ' ', batch_time) AS DATETIME)), CAST(CONCAT(PB.pb_date, ' 23:59:59') AS DATETIME)) FROM list__Batch WHERE PB_ID IN (SELECT PB_ID FROM plan__Batch WHERE pb_date = PB.pb_date)), NULL) diff
+		,IF(SUM(PB.batches) = SUM(PB.fact_batches), (SELECT TIMESTAMPDIFF(MINUTE, MIN(TIMESTAMP(batch_date, batch_time)), MAX(TIMESTAMP(batch_date, batch_time))) FROM list__Batch WHERE PB_ID IN (SELECT PB_ID FROM plan__Batch WHERE year = PB.year AND cycle = PB.cycle)), NULL) duration
+
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	WHERE 1
-		".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
+	WHERE PB.year = {$_GET["year"]}
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	GROUP BY PB.pb_date
-	ORDER BY PB.pb_date
+	GROUP BY PB.cycle
+	ORDER BY PB.cycle
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	echo "<tbody id='C{$_GET["week"]}{$row["cycle"]}' style='text-align: center; border-bottom: 2px solid #333;'>";
+	echo "<tbody id='C{$_GET["year"]}{$row["cycle"]}' style='text-align: center; border-bottom: 2px solid #333;'>";
 	$cnt = $row["cnt"];
 	$d_batches = 0;
 	$d_underfilling = 0;
 
 	$query = "
 		SELECT PB.PB_ID
-			,PB.pb_date
 			,CW.item
 			,PB.CW_ID
 			,PB.batches
@@ -339,18 +173,18 @@ while( $row = mysqli_fetch_array($res) ) {
 			,PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * IFNULL(PB.in_cassette, CW.in_cassette) plan
 			,PB.fact_batches * PB.fillings_per_batch * PB.in_cassette details
 			,SUM(LF.underfilling) underfilling
-			,IF(PB.batches > 0 AND PB.fact_batches = 0 AND PB.pb_date <= (CURRENT_DATE() + INTERVAL 1 DAY), 1, 0) printable
-			,(SELECT PB_ID FROM plan__Batch WHERE CW_ID = PB.CW_ID AND fact_batches = 0 AND batches > 0 ORDER BY pb_date LIMIT 1) current_PB_ID
+			,IF(PB.batches > 0 AND PB.fact_batches = 0, 1, 0) printable
+			,(SELECT PB_ID FROM plan__Batch WHERE CW_ID = PB.CW_ID AND fact_batches = 0 AND batches > 0 ORDER BY year, cycle LIMIT 1) current_PB_ID
 		FROM plan__Batch PB
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 		LEFT JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		WHERE 1
-			AND PB.pb_date = '{$row["pb_date"]}'
+		WHERE PB.year = {$_GET["year"]}
+			AND PB.cycle = '{$row["cycle"]}'
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 		GROUP BY PB.PB_ID
-		ORDER BY PB.pb_date DESC, PB.CW_ID
+		ORDER BY PB.CW_ID
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
@@ -364,7 +198,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		// Выводим общую ячейку с датой заливки
 		if( $last_cycle != $row["cycle"] ) {
 			echo "<tr id='{$subrow["PB_ID"]}' style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h3>{$row["week"]}/<span style='font-size: 1.5em;'>{$row["cycle"]}</span></h3><span class='nowrap'>{$row["week_range"]}</span><br>".($row["diff"] < 0 ? "Отставание: <b style='color: red;'>{$row["diff"]}</b> мин" : ($row["diff"] > 0 ? "Опережение: <b style='color: green;'>{$row["diff"]}</b> мин" : ""))."</td>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h3>{$row["cycle"]}</h3><span class='nowrap'>{$row["week_range"]}</span><br>".($row["duration"] ? "Продолжительность: <b>{$row["duration"]}</b> мин" : "")."</td>";
 		}
 		else {
 			echo "<tr id='{$subrow["PB_ID"]}'>";
@@ -402,7 +236,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<?
 			// Выводим общую ячейку с кнопками действий
 			if( $last_cycle != $row["cycle"] ) {
-				echo "<td rowspan='{$cnt}'><a href='#' class='add_pb' pb_date='{$row["pb_date"]}' cycle='{$row["week"]}/{$row["cycle"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a></td>";
+				echo "<td rowspan='{$cnt}'><a href='#' class='add_pb' cycle='{$row["cycle"]}' year='{$_GET["year"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a></td>";
 			}
 			?>
 		</tr>
@@ -476,9 +310,7 @@ else {
 				SELECT PBL.PB_ID
 					,Friendly_date(PBL.date_time) friendly_date
 					,DATE_FORMAT(PBL.date_time, '%H:%i') time
-					,DATE_FORMAT(PB.pb_date, '%d.%m.%y') pb_date_format
-					,WEEKDAY(PB.pb_date) + 1 cycle
-					,RIGHT(YEARWEEK(PB.pb_date, 1), 2) week
+					,PB.cycle
 					,CW.item
 					,CONCAT('<n style=\"text-decoration: line-through;\">', SPBL.batches, '</n>&nbsp;<i class=\"fas fa-arrow-right\"></i>&nbsp;') prev_batches
 					,PBL.batches
@@ -486,7 +318,7 @@ else {
 				FROM plan__BatchLog PBL
 				LEFT JOIN plan__BatchLog SPBL ON SPBL.PBL_ID = PBL.prev_ID
 				JOIN plan__Batch PB ON PB.PB_ID = PBL.PB_ID
-					".($_GET["week"] ? "AND YEARWEEK(PB.pb_date, 1) LIKE '{$_GET["week"]}'" : "")."
+					AND PB.year = {$_GET["year"]}
 					".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 					".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 				JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -512,7 +344,7 @@ else {
 	</table>
 </div>
 
-<div id="add_btn" class="add_pb" pb_date="<?=$next?>" cycle="<?=$week_cycle?>" title="Внести данные очередного плана заливки"></div>
+<div id="add_btn" class="add_pb" cycle="<?=$next_cycle?>" year="<?=$_GET["year"]?>" title="Внести данные очередного плана заливки"></div>
 
 <script>
 	$(function() {

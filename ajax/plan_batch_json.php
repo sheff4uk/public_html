@@ -1,7 +1,8 @@
 <?
 include_once "../checkrights.php";
 
-$pb_date = $_GET["pb_date"];
+$year = $_GET["year"];
+$cycle = $_GET["cycle"];
 
 $query = "
 	SELECT CW.CW_ID
@@ -10,11 +11,9 @@ $query = "
 		,IFNULL(PB.fillings_per_batch, CW.fillings) fillings
 		,IFNULL(PB.in_cassette, CW.in_cassette) in_cassette
 		,PB.PB_ID
-		,IFNULL(PB.batches, PPB.batches) `placeholder`
+		,IFNULL(PB.batches, (SELECT batches FROM plan__Batch WHERE CW_ID = CW.CW_ID AND year = {$year} AND cycle < {$cycle} ORDER BY cycle DESC LIMIT 1)) `placeholder`
 	FROM CounterWeight CW
-	LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID AND PB.pb_date = '{$pb_date}'
-	LEFT JOIN plan__Batch PPB ON PPB.CW_ID = CW.CW_ID AND PPB.pb_date = ADDDATE('{$pb_date}', -1)
-		AND YEARWEEK(PPB.pb_date, 1) = YEARWEEK('{$pb_date}', 1)
+	LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID AND PB.year = {$year} AND PB.cycle = {$cycle}
 	ORDER BY CW.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
