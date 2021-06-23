@@ -104,6 +104,7 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th>Производственные сутки</th>
 			<th>Время первого замеса</th>
+			<th>Цикл</th>
 			<th>Противовес</th>
 			<th>Замесов</th>
 			<th>Заливок</th>
@@ -150,6 +151,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			,COUNT(LF.LF_ID) fillings
 			,SUM(PB.in_cassette) details
 			,SUM(LF.underfilling) underfilling
+			,PB.year
+			,PB.cycle
 		FROM list__Batch LB
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
@@ -181,6 +184,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		}
 		?>
 			<td><?=$subrow["first_batch"]?></td>
+			<td><?=$subrow["year"]?>/<?=$subrow["cycle"]?></td>
 			<td><?=$subrow["item"]?></td>
 			<td><?=$subrow["batches"]?></td>
 			<td><?=$subrow["fillings"]?></td>
@@ -193,6 +197,7 @@ while( $row = mysqli_fetch_array($res) ) {
 ?>
 		<tr class="summary">
 			<td></td>
+			<td></td>
 			<td>Итог:</td>
 			<td><?=$row["batches"]?></td>
 			<td><?=$row["fillings"]?></td>
@@ -203,6 +208,7 @@ while( $row = mysqli_fetch_array($res) ) {
 }
 ?>
 		<tr class="total">
+			<td></td>
 			<td></td>
 			<td></td>
 			<td>Итог:</td>
