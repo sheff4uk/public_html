@@ -183,7 +183,7 @@ foreach ($_GET as &$value) {
 			<th>Дата время замеса</th>
 			<th>Рецепт</th>
 			<th>Куб раствора, кг</th>
-			<th>t, ℃ 22±7</th>
+			<th>t, ℃ 22±8</th>
 			<th>Окалина,<br>кг ±5</th>
 			<th>КМП,<br>кг ±5</th>
 			<th>Отсев,<br>кг ±5</th>
@@ -262,7 +262,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.sn_density
 			,LB.mix_density
 			,LB.temp
-			,IF(ABS(22 - LB.temp) <= 7, NULL, IF(LB.temp - 22 > 7, LB.temp - 29, LB.temp - 15)) temp_diff
+			,IF(ABS(22 - LB.temp) <= 8, NULL, IF(LB.temp - 22 > 8, LB.temp - 30, LB.temp - 14)) temp_diff
 			,LB.iron_oxide
 			,LB.sand
 			,LB.crushed_stone
