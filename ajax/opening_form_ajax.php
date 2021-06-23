@@ -20,7 +20,7 @@ $html .= "
 
 $query = "
 	SELECT LW.weight
-		#,IF(LW.weight BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(LW.weight > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), LW.weight - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), LW.weight - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) weight_diff
+		,IF(LW.weight BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(LW.weight > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), LW.weight - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), LW.weight - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) weight_diff
 		,LW.nextID
 		,DATE_FORMAT(LW.weighing_time, '%H:%i:%s') weighing_time_format
 		,LW.goodsID
