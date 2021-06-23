@@ -121,7 +121,7 @@ $details = 0;
 $underfilling = 0;
 
 $query = "
-	SELECT COUNT(distinct(PB.CW_ID)) cnt
+	SELECT COUNT(DISTINCT PB.CW_ID, PB.cycle) cnt
 		,DATE_FORMAT(LB.prod_day, '%d.%m.%y') prod_day_format
 		,DATE_FORMAT(LB.prod_day, '%W') prod_weekday_format
 		,LB.prod_day
@@ -151,7 +151,6 @@ while( $row = mysqli_fetch_array($res) ) {
 			,COUNT(LF.LF_ID) fillings
 			,SUM(PB.in_cassette) details
 			,SUM(LF.underfilling) underfilling
-			,PB.year
 			,PB.cycle
 		FROM list__Batch LB
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
@@ -161,7 +160,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			AND LB.prod_day = '{$row["prod_day"]}'
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-		GROUP BY PB.CW_ID
+		GROUP BY PB.CW_ID, PB.cycle
 		ORDER BY MIN(TIMESTAMP(LB.batch_date, LB.batch_time))
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -184,7 +183,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		}
 		?>
 			<td><?=$subrow["first_batch"]?></td>
-			<td><?=$subrow["year"]?>/<?=$subrow["cycle"]?></td>
+			<td><?=$subrow["cycle"]?></td>
 			<td><?=$subrow["item"]?></td>
 			<td><?=$subrow["batches"]?></td>
 			<td><?=$subrow["fillings"]?></td>
