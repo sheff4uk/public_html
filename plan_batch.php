@@ -4,7 +4,27 @@ $title = 'План заливки';
 include "header.php";
 include "./forms/plan_batch_form.php";
 
-// Если в фильтре не установлен год, показываем текущий
+$page = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+
+//Запись подтверждения печати чек-листа
+if( isset($_GET["print_confirm"]) ) {
+	session_start();
+	$PB_ID = $_GET["print_confirm"];
+	$year = $_GET["year"];
+
+	$query = "
+		UPDATE plan__Batch
+		SET print_time = NOW()
+			,print_author = {$_SESSION['id']}
+		WHERE PB_ID = {$PB_ID}
+	";
+	mysqli_query( $mysqli, $query );
+
+	// Перенаправление в план
+	exit ('<meta http-equiv="refresh" content="0; url='.$page.'?year='.$year.'#'.$PB_ID.'">');
+}
+
+// Если в фильтре не установлен год, показываем текущий год
 if( !$_GET["year"] ) {
 	$query = "SELECT YEAR(CURDATE()) year";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -130,7 +150,8 @@ foreach ($_GET as &$value) {
 			<th>Факт</th>
 			<th>Недоливы</th>
 			<th>Расчетное время, ч</th>
-			<th></th>
+			<th>Бланк чек-листа</th>
+			<th>Распечатан</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -177,6 +198,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			,SUM(LF.underfilling) underfilling
 			,IF(PB.batches > 0 AND PB.fact_batches = 0, 1, 0) printable
 			,(SELECT PB_ID FROM plan__Batch WHERE CW_ID = PB.CW_ID AND fact_batches = 0 AND batches > 0 ORDER BY year, cycle LIMIT 1) current_PB_ID
+			,Friendly_date(PB.print_time) friendly_print_date
+			,DATE_FORMAT(PB.print_time, '%H:%i') friendly_print_time
+			,USR_Icon(PB.print_author) icon_print_author
 		FROM plan__Batch PB
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
@@ -235,6 +259,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				}
 				?>
 			</td>
+			<td><?=($subrow["friendly_print_date"] ? $subrow["friendly_print_date"]." ".$subrow["friendly_print_time"]." ".$subrow["icon_print_author"] : "")?></td>
 			<?
 			// Выводим общую ячейку с кнопками действий
 			if( $last_cycle != $row["cycle"] ) {
@@ -264,6 +289,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$d_underfilling?></td>
 			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
 			<td></td>
+			<td></td>
 		</tr>
 <?
 	echo "</tbody>";
@@ -287,6 +313,7 @@ else {
 			<td><?=($details - $underfilling)?></td>
 			<td><?=$underfilling?></td>
 			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
+			<td></td>
 			<td></td>
 			<td></td>
 		</tr>
@@ -350,7 +377,15 @@ else {
 
 <script>
 	$(function() {
-		$(".print").printPage();
+		$(".print")
+			.click(function(){
+				var id = $(this).parents("tr").attr("id");
+				confirm(
+					"<h1>Бланк чек-листа оператора был распечатан?</h1>",
+					"<?=$page?>?year=<?=$_GET["year"]?>&print_confirm=" + id
+				);
+			})
+			.printPage();
 	});
 </script>
 

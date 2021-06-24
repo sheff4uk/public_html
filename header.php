@@ -109,7 +109,7 @@ function src_url($src) {
 
 			var nav = $("#"+loc);
 			if (nav.length) {
-				var destination = nav.offset().top - 200;
+				var destination = nav.offset().top - 300;
 				$("body:not(:animated)").animate({ scrollTop: destination }, 200);
 				$("html").animate({ scrollTop: destination }, 200);
 			}
