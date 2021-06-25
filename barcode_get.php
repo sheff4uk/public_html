@@ -169,7 +169,7 @@ if( $ip == $from_ip ) {
 						}
 
 						//Телеграм бот отправляет уведомление
-						message_to_telegram($message);
+						message_to_telegram($message, TELEGRAM_CHATID);
 					}
 					break;
 				/////////////////////////////////////
@@ -199,7 +199,7 @@ if( $ip == $from_ip ) {
 			$test = (int)$bc;
 			//Телеграм бот отправляет уведомление
 			$message = "Test label <b>{$bc}</b>";
-			message_to_telegram($message);
+			message_to_telegram($message, TELEGRAM_CHATID);
 			break;
 		/////////////////////////////////////
 	}
