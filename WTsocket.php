@@ -161,7 +161,7 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 
 					// Узнаем номер закрытой партии
 					$query = "
-						SELECT MAX(RN) RN
+						SELECT IFNULL(MAX(RN), 0) RN
 						FROM list__Weight
 						WHERE weighing_time BETWEEN '{$receipt_start}' AND '{$receipt_end}'
 							AND WT_ID = {$deviceID}
