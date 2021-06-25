@@ -84,15 +84,30 @@ switch( $_GET["do"] ) {
 	case "smscode":
 		if( isset($_SESSION["sms_code"]) ) die();
 		$sms_code = rand(1000, 9999);
-		$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=".($_SESSION['mtel'])."&msg=Код доступа:+".($sms_code)."&json=1");
-		$json = json_decode($body);
-		if( $json ) { // Получен ответ от сервера
-			if( $json->status == "OK" ) { // Запрос выполнился
-				$_SESSION["sms_code"] = $sms_code;
-			}
-			else $_SESSION["error"][] = "Запрос не выполнился (возможно ошибка авторизации, параметрах, итд...) Код ошибки: $json->status_code Текст ошибки: $json->status_text";
+
+		//Узнаем есть ли у пользователя telegram chatid
+		$query = "SELECT chatid FROM Users WHERE phone='{$_SESSION['mtel']}'";
+		$result = mysqli_query( $mysqli, $query );
+		$myrow = mysqli_fetch_array($result);
+		$chatid = $myrow["chatid"];
+
+		//Если есть chatid, отправляем код в телеграм
+		if( $chatid ) {
+			message_to_telegram("Код доступа: {$sms_code}", $chatid);
+			$_SESSION["sms_code"] = $sms_code;
 		}
-		else $_SESSION["error"][] = "Запрос не выполнился Не удалось установить связь с сервером.";
+		// Иначе код в СМС
+		else {
+			$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=".($_SESSION['mtel'])."&msg=Код+доступа:+".($sms_code)."&json=1");
+			$json = json_decode($body);
+			if( $json ) { // Получен ответ от сервера
+				if( $json->status == "OK" ) { // Запрос выполнился
+					$_SESSION["sms_code"] = $sms_code;
+				}
+				else $_SESSION["error"][] = "Запрос не выполнился (возможно ошибка авторизации, параметрах, итд...) Код ошибки: $json->status_code Текст ошибки: $json->status_text";
+			}
+			else $_SESSION["error"][] = "Запрос не выполнился Не удалось установить связь с сервером.";
+		}
 
 		// Если не было ошибок - показываем форму ввода пароля
 		if( count($_SESSION["error"] ) == 0) {
