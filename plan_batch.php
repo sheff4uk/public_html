@@ -259,7 +259,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				}
 				?>
 			</td>
-			<td><?=($subrow["friendly_print_date"] ? $subrow["friendly_print_date"]." ".$subrow["friendly_print_time"]." ".$subrow["icon_print_author"] : "")?></td>
+			<td class="nowrap" style="transform: scale(.8); overflow: unset;"><?=($subrow["friendly_print_date"] ? $subrow["icon_print_author"]." ".$subrow["friendly_print_date"]." ".$subrow["friendly_print_time"] : "")?></td>
 			<?
 			// Выводим общую ячейку с кнопками действий
 			if( $last_cycle != $row["cycle"] ) {
