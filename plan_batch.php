@@ -223,11 +223,11 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		// Выводим общую ячейку с датой заливки
 		if( $last_cycle != $row["cycle"] ) {
-			echo "<tr id='{$subrow["PB_ID"]}' style='border-top: 2px solid #333;'>";
+			echo "<tr id='{$subrow["PB_ID"]}' item='{$subrow["item"]}' style='border-top: 2px solid #333;'>";
 			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h3>{$row["cycle"]}</h3><span class='nowrap'>{$row["week_range"]}</span><br>".($row["duration"] ? "Продолжительность: <b>{$row["duration"]}</b> мин" : "")."</td>";
 		}
 		else {
-			echo "<tr id='{$subrow["PB_ID"]}'>";
+			echo "<tr id='{$subrow["PB_ID"]}' item='{$subrow["item"]}'>";
 		}
 		if($subrow["batches"] > 0) {
 			$intdiv = intdiv($subrow["batches"] + 1, 4);
@@ -379,9 +379,10 @@ else {
 	$(function() {
 		$(".print")
 			.click(function(){
-				var id = $(this).parents("tr").attr("id");
+				var id = $(this).parents("tr").attr("id"),
+					item = $(this).parents("tr").attr("item");
 				confirm(
-					"<h1>Бланк чек-листа оператора был распечатан?</h1>",
+					"<h1>Бланк чек-листа оператора был распечатан?</h1><span style='font-size: 1.2em;'>Этим Вы подтверждаете, что заливка кода <b>" + item + "</b> начнется в ближайшее время.</span>",
 					"<?=$page?>?year=<?=$_GET["year"]?>&print_confirm=" + id
 				);
 			})
