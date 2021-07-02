@@ -2,7 +2,7 @@
 include "config.php";
 require_once "vendor/autoload.php";
 
-try {
+//try {
 	$bot = new \TelegramBot\Api\Client(TELEGRAM_TOKEN);
 	// команда для start
 	$bot->command('start', function ($message) use ($bot) {
@@ -17,8 +17,8 @@ try {
 		$bot->sendMessage($message->getChat()->getId(), $answer);
 	});
 	$bot->run();
-}
-catch (\TelegramBot\Api\Exception $e) {
-	$e->getMessage();
-}
+//}
+//catch (\TelegramBot\Api\Exception $e) {
+//	$e->getMessage();
+//}
 ?>
