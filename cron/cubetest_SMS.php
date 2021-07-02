@@ -16,8 +16,8 @@ $query = "
 	LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 24
 	WHERE LB.test = 1
 		AND LCT.LCT_ID IS NULL
-		#AND LB.batch_date + INTERVAL 1 DAY = CURDATE()
-		#AND HOUR(LB.batch_time) = HOUR(CURTIME())
+		AND LB.batch_date + INTERVAL 1 DAY = CURDATE()
+		AND HOUR(LB.batch_time) = HOUR(CURTIME())
 	UNION ALL
 	SELECT CW.item
 		,DATE_FORMAT(LB.batch_time, '%H:%i') time
@@ -28,8 +28,8 @@ $query = "
 	LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 72
 	WHERE LB.test = 1
 		AND LCT.LCT_ID IS NULL
-		#AND LB.batch_date + INTERVAL 3 DAY = CURDATE()
-		#AND HOUR(LB.batch_time) = HOUR(CURTIME())
+		AND LB.batch_date + INTERVAL 3 DAY = CURDATE()
+		AND HOUR(LB.batch_time) = HOUR(CURTIME())
 	ORDER BY time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
