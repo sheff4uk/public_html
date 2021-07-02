@@ -22,7 +22,7 @@ require_once "vendor/autoload.php";
 //	$e->getMessage();
 //}
 
-try {
+//try {
 	$bot = new \TelegramBot\Api\Client(TELEGRAM_TOKEN);
 
 
@@ -42,7 +42,7 @@ try {
 
 	$bot->run();
 
-} catch (\TelegramBot\Api\Exception $e) {
-	$e->getMessage();
-}
+//} catch (\TelegramBot\Api\Exception $e) {
+//	$e->getMessage();
+//}
 ?>
