@@ -1,7 +1,7 @@
 <?
 $path = dirname(dirname($argv[0]));
 $key = $argv[1];
-$mtel = $argv[2];
+//$mtel = $argv[2];
 include $path."/config.php";
 // Проверка доступа
 if( $key != $script_key ) die('Access denied!');
@@ -37,6 +37,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$text .= "{$row["item"]} {$row["time"]} [{$row["delay"]}]\n";
 }
 if( $text ) {
-	$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=".($mtel)."&msg=".urlencode($text)."&json=1");
+	//$body = file_get_contents("https://sms.ru/sms/send?api_id=".($api_id)."&to=".($mtel)."&msg=".urlencode($text)."&json=1");
+	function message_to_telegram($text, '-1001582214873');
 }
 ?>
