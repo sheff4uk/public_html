@@ -1,5 +1,6 @@
 <?
 $bc = $_GET["bc"];
+message_to_telegram($bc, '217756119');
 $bc = str_pad($bc, 8, "0", STR_PAD_LEFT);
 $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
