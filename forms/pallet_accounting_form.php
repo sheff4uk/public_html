@@ -193,7 +193,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td><input type="date" name="pr_date" required></td>
+						<td><input type="date" name="pr_date" max="<?=date('Y-m-d')?>" required></td>
 						<td>
 							<select name="CB_ID" style="width: 150px;" required>
 								<option value=""></option>
@@ -244,7 +244,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td><input type="date" name="pa_date" required></td>
+						<td><input type="date" name="pa_date" max="<?=date('Y-m-d')?>" required></td>
 						<td>
 							<select name="PS_ID" style="width: 150px;" required>
 								<option value=""></option>
@@ -292,7 +292,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td><input type="date" name="pd_date" required></td>
+						<td><input type="date" max="<?=date('Y-m-d')?>" name="pd_date" required></td>
 						<td><input type="number" name="pd_cnt" min="0" style="width: 70px;" required></td>
 					</tr>
 				</tbody>
