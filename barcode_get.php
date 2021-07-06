@@ -3,7 +3,7 @@ $bc = $_GET["bc"];
 $bc = str_pad($bc, 8, "0", STR_PAD_LEFT);
 $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
-//message_to_telegram($_GET["bc"], '217756119');
+message_to_telegram($_GET["bc"], '217756119');
 
 // Проверка доступа
 //if( $ip == $from_ip ) {
