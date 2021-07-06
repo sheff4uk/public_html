@@ -3,10 +3,10 @@ $bc = $_GET["bc"];
 $bc = str_pad($bc, 8, "0", STR_PAD_LEFT);
 $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
-message_to_telegram($_GET["bc"], '217756119');
+//message_to_telegram($_GET["bc"], '217756119');
 
 // Проверка доступа
-if( $ip == $from_ip ) {
+//if( $ip == $from_ip ) {
 	// Узнаем префикс штрихкода
 	$prefix1 = substr($bc, 0, 1);
 	$prefix2 = substr($bc, 0, 2);
@@ -204,5 +204,5 @@ if( $ip == $from_ip ) {
 			break;
 		/////////////////////////////////////
 	}
-}
+//}
 ?>
