@@ -261,8 +261,8 @@ foreach ($_GET as &$value) {
 			<th rowspan="2"><i class="far fa-lg fa-hourglass" title="Интервал в часах с моента заливки."></i></th>
 			<th colspan="2" rowspan="2">Брак</th>
 			<th rowspan="2">Деталей залито/зарегистрировано</th>
-			<th rowspan="2">Средний вес, кг</th>
-			<th rowspan="2">Куб раствора, кг</th>
+			<th rowspan="2">Средний вес, г</th>
+			<th rowspan="2">Куб раствора, г</th>
 			<th rowspan="2">Противовес</th>
 			<th rowspan="2">Дата заливки</th>
 <!--			<th rowspan="2"></th>-->
@@ -358,9 +358,9 @@ while( $row = mysqli_fetch_array($res) ) {
 		</td>
 		<td <?=(abs($row["in_cassette"] - $row["cnt_weight"]) > $row["in_cassette"] / 2 ? "style='color: red;'" : "")?>><?=$row["in_cassette"]?> / <?=$row["cnt_weight"]?></td>
 <!--		<td><?=($row["min_weight"] ? $row["min_weight"]/1000 : "")?><?=($row["min_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["min_diff"] > 0 ? " +" : " ").($row["min_diff"]/1000)."</font>" : "")?></td>-->
-		<td><a href="#" class="edit_transactions" LO_ID="<?=$row["LO_ID"]?>" title="Список регистраций"><?=($row["avg_weight"] ? $row["avg_weight"]/1000 : "")?><?=($row["avg_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["avg_diff"] > 0 ? " +" : " ").($row["avg_diff"]/1000)."</font>" : "")?></a></td>
+		<td><a href="#" class="edit_transactions" LO_ID="<?=$row["LO_ID"]?>" title="Список регистраций"><?=($row["avg_weight"] ? number_format($row["avg_weight"], 0, ',', '&nbsp;') : "")?><?=($row["avg_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["avg_diff"] > 0 ? " +" : " ").number_format($row["avg_diff"], 0, ',', '&nbsp;')."</font>" : "")?></a></td>
 <!--		<td><?=($row["max_weight"] ? $row["max_weight"]/1000 : "")?><?=($row["max_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["max_diff"] > 0 ? " +" : " ").($row["max_diff"]/1000)."</font>" : "")?></td>-->
-		<td class="bg-gray"><?=$row["mix_density"]/1000?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").($row["mix_diff"]/1000)."</font>" : "")?></td>
+		<td class="bg-gray"><?=number_format($row["mix_density"], 0, ',', '&nbsp;')?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").number_format($row["mix_diff"], 0, ',', '&nbsp;')."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
 		<td class="bg-gray"><a href="filling.php?week=<?=$row["lb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
 <!--

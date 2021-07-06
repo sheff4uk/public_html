@@ -8,7 +8,7 @@ $html .= "
 		<thead style='word-wrap: break-word;'>
 			<tr>
 				<th>№ п/п</th>
-				<th>Вес</th>
+				<th>Вес, г</th>
 				<th>Время</th>
 				<th>Дефект</th>
 				<th>Партия</th>
@@ -67,7 +67,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$html .= "
 		<tr>
 			<td>{$i}</td>
-			<td>".($row["weight"]/1000).($row["weight_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["weight_diff"] > 0 ? " +" : " ").($row["weight_diff"]/1000)."</font>" : "")."</td>
+			<td>".number_format($row["weight"], 0, ',', '&nbsp;').($row["weight_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["weight_diff"] > 0 ? " +" : " ").number_format($row["weight_diff"], 0, ',', '&nbsp;')."</font>" : "")."</td>
 			<td>{$row["weighing_time_format"]}</td>
 			<td>{$defect}</td>
 			<td>{$row["RN"]}</td>
