@@ -186,7 +186,7 @@ for ($i = 1; $i <= $batches; $i++) {
 			".($row["wt_cnt"] ? "<td></td>" : "")."
 			{$fillings_cell}
 			<td></td>
-			<td style='text-align: center;'>".(in_array($i, $tests) ? "<n style='font-size: 1.4em;'>&#10065;</n>" : "&#10065;")."</td>
+			<td style='text-align: center;'>".(in_array($i, $tests) ? "<b style='font-size: 1.4em;'>&#10065;</b>" : "&#10065;")."</td>
 			<td></td>
 		</tr>
 	";
