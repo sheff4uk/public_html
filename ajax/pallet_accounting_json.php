@@ -1,8 +1,9 @@
 <?
 include_once "../checkrights.php";
 
-if( isset($_GET["PR_ID"]) ) {
-	$PR_ID = $_GET["PR_ID"];
+// Возврат поддонов
+if( $_GET["type"] == "R" ) {
+	$PR_ID = $_GET["ID"];
 
 	$query = "
 		SELECT PR.pr_date
@@ -15,12 +16,13 @@ if( isset($_GET["PR_ID"]) ) {
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$PR_data = array( "pr_date"=>$row["pr_date"], "CB_ID"=>$row["CB_ID"], "pr_cnt"=>$row["pr_cnt"], "pr_reject"=>$row["pr_reject"], "pr_wrong_format"=>$row["pr_wrong_format"] );
+	$PR_data = array( "date"=>$row["pr_date"], "source"=>$row["CB_ID"], "cnt"=>$row["pr_cnt"], "broken"=>$row["pr_reject"], "wrong"=>$row["pr_wrong_format"] );
 
 	echo json_encode($PR_data);
 }
-elseif( isset($_GET["PA_ID"]) ) {
-	$PA_ID = $_GET["PA_ID"];
+// Приобретение поддонов
+elseif( $_GET["type"] == "A" ) {
+	$PA_ID = $_GET["ID"];
 
 	$query = "
 		SELECT PA.pa_date
@@ -33,12 +35,29 @@ elseif( isset($_GET["PA_ID"]) ) {
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$PA_data = array( "pa_date"=>$row["pa_date"], "PS_ID"=>$row["PS_ID"], "pa_cnt"=>$row["pa_cnt"], "pa_reject"=>$row["pa_reject"], "pallet_cost"=>$row["pallet_cost"] );
+	$PA_data = array( "date"=>$row["pa_date"], "source"=>$row["PS_ID"], "cnt"=>$row["pa_cnt"], "broken"=>$row["pa_reject"], "cost"=>$row["pallet_cost"] );
 
 	echo json_encode($PA_data);
 }
-elseif( isset($_GET["PD_ID"]) ) {
-	$PD_ID = $_GET["PD_ID"];
+// Ремонт поддонов
+elseif( $_GET["type"] == "F" ) {
+	$PF_ID = $_GET["ID"];
+
+	$query = "
+		SELECT PF.pd_date
+			,PF.pd_cnt * -1 pd_cnt
+		FROM pallet__Disposal PF
+		WHERE PF.PD_ID = {$PF_ID}
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$PF_data = array( "date"=>$row["pd_date"], "source"=>"", "cnt"=>$row["pd_cnt"] );
+
+	echo json_encode($PF_data);
+}
+// Списание поддонов
+elseif( $_GET["type"] == "D" ) {
+	$PD_ID = $_GET["ID"];
 
 	$query = "
 		SELECT PD.pd_date

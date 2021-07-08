@@ -17,23 +17,7 @@ include "./forms/pallet_accounting_form.php";
 ?>
 
 <style>
-	#pallet_disposal_btn {
-		text-align: center;
-		line-height: 68px;
-		color: #fff;
-		bottom: 250px;
-		cursor: pointer;
-		width: 56px;
-		height: 56px;
-		opacity: .4;
-		position: fixed;
-		right: 20px;
-		z-index: 9;
-		border-radius: 50%;
-		background-color: #db4437;
-		box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
-	}
-	#pallet_arrival_btn {
+	#incoming_btn {
 		text-align: center;
 		line-height: 68px;
 		color: #fff;
@@ -49,7 +33,7 @@ include "./forms/pallet_accounting_form.php";
 		background-color: #16A085;
 		box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
 	}
-	#pallet_return_btn {
+	#disposal_btn {
 		text-align: center;
 		line-height: 68px;
 		color: #fff;
@@ -62,10 +46,10 @@ include "./forms/pallet_accounting_form.php";
 		right: 20px;
 		z-index: 9;
 		border-radius: 50%;
-		background-color: #16A085;
+		background-color: #db4437;
 		box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
 	}
-	#pallet_disposal_btn:hover, #pallet_arrival_btn:hover, #pallet_return_btn:hover {
+	#incoming_btn:hover, #disposal_btn:hover {
 		opacity: 1;
 	}
 </style>
@@ -159,10 +143,10 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th>Дата</th>
-			<th>Поставщик поддонов / Клиент</th>
+			<th>Источник</th>
 			<th>Отгружено поддонов</th>
-			<th>Утилизировано поддонов</th>
-			<th>Приобретено / возвращено поддонов</th>
+			<th>Списано поддонов</th>
+			<th>Поступило поддонов</th>
 			<th>Из них бракованных</th>
 			<th>Из них другого формата</th>
 			<th>Кол-во годных поддонов</th>
@@ -245,7 +229,32 @@ $query = "
 		,NULL
 		,NULL
 	FROM pallet__Disposal PD
-	WHERE 1
+	WHERE PD.pd_cnt > 0
+		".($_GET["date_from"] ? "AND PD.pd_date >= '{$_GET["date_from"]}'" : "")."
+		".($_GET["date_to"] ? "AND PD.pd_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["CB_ID"] ? "AND 0" : "")."
+		".($_GET["PS_ID"] ? "AND 0" : "")."
+
+	UNION
+
+	SELECT 'F'
+		,PD.PD_ID
+		,DATE_FORMAT(PD.pd_date, '%d.%m.%Y')
+		,'<b>Ремонт</b>'
+		,NULL
+		,NULL
+		,PD.pd_cnt * -1
+		,NULL
+		,NULL
+		,PD.pd_cnt * -1
+		,NULL
+		,NULL
+		,PD.pd_date
+		,NULL
+		,NULL
+		,NULL
+	FROM pallet__Disposal PD
+	WHERE PD.pd_cnt < 0
 		".($_GET["date_from"] ? "AND PD.pd_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND PD.pd_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CB_ID"] ? "AND 0" : "")."
@@ -304,7 +313,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><b style="color: green;"><?=$row["pr_good"]?></b></td>
 		<td><?=(isset($row["pallet_cost"]) ? number_format($row["pallet_cost"], 0, '', ' ') : "")?></td>
 		<td><?=(isset($row["sum_cost"]) ? number_format($row["sum_cost"], 0, '', ' ') : "")?></td>
-		<td><?=($row["type"] ? "<a href='#' ".($row["type"] == "A" ? "class='add_arrival' PA_ID='{$row["ID"]}'" : ($row["type"] == "R" ? "class='add_return' PR_ID='{$row["ID"]}'" : "class='add_disposal' PD_ID='{$row["ID"]}'"))." title='Редактировать'><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?></td>
+		<td><?=($row["type"] ? "<a href='#' ".($row["type"] == "D" ? "class='add_disposal' PD_ID='{$row["ID"]}'" : "class='add_incoming' incoming_ID='{$row["ID"]}' type='{$row["type"]}'")."><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?></td>
 	</tr>
 	<?
 }
@@ -379,9 +388,8 @@ while( $row = mysqli_fetch_array($res) ) {
 	</table>
 </div>
 
-<div id="pallet_disposal_btn" class="add_disposal" title="Утилизация поддонов"><i class="fas fa-2x fa-trash-alt"></i></div>
-<div id="pallet_arrival_btn" class="add_arrival" title="Приобретение поддонов"><i class="fas fa-2x fa-plus"></i></div>
-<div id="pallet_return_btn" class="add_return" title="Возврат поддонов"><i class="fas fa-2x fa-undo-alt"></i></div>
+<div id="incoming_btn" class="add_incoming" title="Поступление поддонов"><i class="fas fa-2x fa-plus"></i></div>
+<div id="disposal_btn" class="add_disposal" title="Списание поддонов"><i class="fas fa-2x fa-minus"></i></div>
 
 <?
 include "footer.php";
