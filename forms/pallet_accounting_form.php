@@ -224,7 +224,7 @@ if( isset($_POST["pd_cnt"]) ) {
 <div id='pallet_incoming_form' title='Поступление поддонов' style='display:none;'>
 	<form method='post' action="/forms/pallet_accounting_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
-		<fieldset>
+		<fieldset style="background: #16A08588;">
 			<input type="hidden" name="incoming_ID">
 			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
 			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
