@@ -206,12 +206,11 @@ function src_url($src) {
 		$menu["Анализ"]["Брак"] = "statistic.php";
 		$menu["Анализ"]["<i class='fas fa-trash fa-lg'></i> Статистика брака"] = "daily_reject_stat.php";
 		$menu["Доп. данные"]["<i class='fas fa-cube fa-lg'></i> Испытания кубов"] = "cubetest.php";
-		//$menu["Доп. данные"]["<i class='fas fa-trash fa-lg'></i> Суточный брак"] = "daily_reject.php";
-		$menu["Учет"]["Поддоны противовесов"] = "pallet_accounting.php";
-		$menu["Учет"]["Сырьё/комплектующие"] = "material_accounting.php";
+		$menu["Учет"]["<i class='fas fa-stream fa-lg'></i> Поддоны противовесов"] = "pallet_accounting.php";
+		$menu["Учет"]["<i class='fas fa-shapes fa-lg'></i> Сырьё"] = "material_accounting.php";
 		$menu["Учет"]["<i class='fas fa-th fa-lg'></i> Формы"] = "shell_accounting.php";
 		$menu["Учет"]["<i class='fas fa-gas-pump fa-lg'></i> Дизтопливо"] = "fuel_accounting.php";
-		$menu["Учет"]["<i class='fas fa-sign-language fa-lg'></i> СИЗ"] = "overal_accounting.php";
+		$menu["Учет"]["<i class='fas fa-sign-language fa-lg'></i> СИЗ/расходники"] = "overal_accounting.php";
 		$menu["<i class='fas fa-cog fa-lg'></i>"]["Рецепты"] = "mix_formula.php";
 		$menu["Выход {$USR_Icon}"] = "exit.php";
 	}
