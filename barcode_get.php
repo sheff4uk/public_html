@@ -13,7 +13,7 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 
 	switch( $prefix ) {
 		case "11":
-			$bc = substr($bc, 0, 10);			//Обрезаем до 10 символов
+			$bc = substr($bc, 0, 8);			//Обрезаем до 8 символов
 			$cassette = (int)substr($bc, 2);	//Выделяем номер кассеты
 			//Проверяем была ли эта кассета уже просканирована
 			$query = "
