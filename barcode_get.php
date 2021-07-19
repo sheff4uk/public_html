@@ -55,16 +55,26 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 					$query = "
 						SELECT WT.port
 							,WT.last_transaction
+							,WT.post
 						FROM WeighingTerminal WT
 						WHERE WT.WT_ID IN ({$WT_IDs})
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) ) {
 						// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
-						if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, $row["port"])) ) {
+						$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+						if( socket_connect($socket, $from_ip, $row["port"]) ) {
 							read_transaction($row["last_transaction"]+1, 1, $socket, $mysqli);
-							socket_close($socket);
 						}
+						else {
+							message_to_telegram("Post {$row["post"]} is offline!", '217756119');
+						}
+						socket_close($socket);
+
+//						if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, $row["port"])) ) {
+//							read_transaction($row["last_transaction"]+1, 1, $socket, $mysqli);
+//							socket_close($socket);
+//						}
 					}
 					// Список весов, с которых получены еще не все данные
 					$query = "
