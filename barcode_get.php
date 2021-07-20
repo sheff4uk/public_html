@@ -148,7 +148,7 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 					JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 					JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 					WHERE LW.LO_ID = {$LO_ID}
-					HAVING diff > 0 OR goodsID NOT IN(1,8)
+					HAVING diff > 0 OR diff < 0 OR goodsID NOT IN(1,8)
 					ORDER BY LW.weighing_time
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
