@@ -32,8 +32,8 @@ function crc16($buf) {
 	return sprintf("%02x%02x", ($crc & 0xFF), (($crc >> 8) & 0xFF));
 }
 
-// Прочитать все регистрации начиная с ID
-function read_transaction($ID, $curnum, $socket, $mysqli) {
+// Функция читает регистрации с терминалов на конвейере
+function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 	$hexID = sprintf("%02x%02x%02x%02x", ($ID & 0xFF), (($ID >> 8) & 0xFF), (($ID >> 16) & 0xFF), (($ID >> 24) & 0xFF));
 	$hexcurnum = sprintf("%02x%02x", ($curnum & 0xFF), (($curnum >> 8) & 0xFF));
 	$in = "\xF8\x55\xCE\x0C\x00\x92\x03\x00\x00".hex2bin($hexcurnum).hex2bin($hexID)."\x00\x00";
@@ -221,12 +221,123 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 
 			// Если это не последняя часть
 			if( $nums > $curnum ) {
-				read_transaction($ID, ++$curnum, $socket, $mysqli);
+				read_transaction_LW($ID, ++$curnum, $socket, $mysqli);
 			}
 		}
 	}
 	else { //Если CRC не совпали делаем попытку еще
-		read_transaction($ID, $curnum, $socket, $mysqli);
+		read_transaction_LW($ID, $curnum, $socket, $mysqli);
+	}
+}
+
+// Функция читает регистрации с терминала этикеток на паллеты
+function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
+	$hexID = sprintf("%02x%02x%02x%02x", ($ID & 0xFF), (($ID >> 8) & 0xFF), (($ID >> 16) & 0xFF), (($ID >> 24) & 0xFF));
+	$hexcurnum = sprintf("%02x%02x", ($curnum & 0xFF), (($curnum >> 8) & 0xFF));
+	$in = "\xF8\x55\xCE\x0C\x00\x92\x03\x00\x00".hex2bin($hexcurnum).hex2bin($hexID)."\x00\x00";
+	$crc = crc16(byteStr2byteArray($in));
+	$in .= hex2bin($crc);
+
+	socket_write($socket, $in);
+
+	//Заголовок
+	$result = socket_read($socket, 3);
+
+	//Длина тела сообщения
+	$length = socket_read($socket, 2);
+	$result .= $length;
+	$length = hexdec(bin2hex($length));
+	$length = (($length & 0xFF) << 8) + (($length >> 8) & 0xFF);
+
+	// Тело сообщения
+	$result .= socket_read($socket, $length);
+
+	//Читаем CRC
+	$crc = socket_read($socket, 2);
+
+	//Ответ в массив
+	$data = byteStr2byteArray($result);
+
+	//Сравниваем CRC
+	if( crc16($data) == bin2hex($crc) ) {
+
+		//Если ответ 0x52 CMD_TCP_ACK_TRANSACTION
+		if( $data[5] == 0x52 ) {
+
+			//Число частей в файле
+			$nums = $data[7] + ($data[8] << 8);
+
+			//Номер текущей части
+			$curnum = $data[9] + ($data[10] << 8);
+
+			//Длина записи
+			$curlen = $data[11] + ($data[12] << 8);
+
+			for( $i=13; $i < $curlen; $i=$i+104) {
+				// Этикетирование паллета
+				if( $data[$i+10] == 1 ) {
+					//Идентификатор
+					$nextID = $data[$i] + ($data[$i+1] << 8) + ($data[$i+2] << 16) + ($data[$i+3] << 24);
+					//Номер терминала
+					$deviceID = $data[$i+6] + ($data[$i+7] << 8) + ($data[$i+8] << 16) + ($data[$i+9] << 24);
+					//Дата/время совершения регистрации
+					$transactionDate = sprintf("20%02d-%02d-%02d %02d:%02d:%02d", $data[$i+11], $data[$i+12], $data[$i+13], $data[$i+14], $data[$i+15], $data[$i+16]);
+					//ID товара
+					$goodsID = $data[$i+37] + ($data[$i+38] << 8) + ($data[$i+39] << 16) + ($data[$i+40] << 24);
+
+					// Записываем в базу регистрацию
+					$query = "
+						INSERT INTO list__PackingPallet
+						SET packed_time = '{$transactionDate}'
+							,nextID = {$nextID}
+							,WT_ID = {$deviceID}
+							,CW_ID = {$goodsID}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+					// Запоминаем ID последней регистрации
+					$query = "
+						UPDATE WeighingTerminal
+						SET last_transaction = {$nextID}
+						WHERE WT_ID = {$deviceID}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				}
+				//Закрытие партии
+				elseif( $data[$i+10] == 71 or $data[$i+10] == 72 ) {
+					//Идентификатор
+					$nextID = $data[$i] + ($data[$i+1] << 8) + ($data[$i+2] << 16) + ($data[$i+3] << 24);
+					//Номер терминала
+					$deviceID = $data[$i+6] + ($data[$i+7] << 8) + ($data[$i+8] << 16) + ($data[$i+9] << 24);
+					//Дата/время совершения регистрации
+					$receipt_end = sprintf("20%02d-%02d-%02d %02d:%02d:%02d", $data[$i+11], $data[$i+12], $data[$i+13], $data[$i+14], $data[$i+15], $data[$i+16]);
+
+					// Обновляем время закрытия последней партии
+					$query = "
+						UPDATE WeighingTerminal
+						SET last_receiptDate = '{$receipt_end}'
+						WHERE WT_ID = {$deviceID}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+					// Запоминаем ID последней регистрации
+					$query = "
+						UPDATE WeighingTerminal
+						SET last_transaction = {$nextID}
+						WHERE WT_ID = {$deviceID}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				}
+			}
+
+			// Если это не последняя часть
+			if( $nums > $curnum ) {
+				read_transaction_LPP($ID, ++$curnum, $socket, $mysqli);
+			}
+		}
+	}
+	else { //Если CRC не совпали делаем попытку еще
+		read_transaction_LPP($ID, $curnum, $socket, $mysqli);
 	}
 }
 ?>

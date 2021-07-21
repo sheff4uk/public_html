@@ -34,13 +34,17 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				$LO_ID = mysqli_insert_id( $mysqli );
 
-				include "WTsocket.php"; // Сбор данных с весов
+				////////////////////////////////////////////////////////
+				// функции сбора данных с весовых терминалов
+				include "functions_WT.php";
+				////////////////////////////////////////////////////////
 
 				// Список весов на конвейере
 				$query = "
 					SELECT GROUP_CONCAT(WT.WT_ID) WT_IDs
 					FROM WeighingTerminal WT
 					WHERE WT.type = 1
+						AND WT.act = 1
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				$row = mysqli_fetch_array($res);
@@ -53,9 +57,9 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 
 					// По этому списку весов собираем данные
 					$query = "
-						SELECT WT.port
+						SELECT WT.WT_ID
+							,WT.port
 							,WT.last_transaction
-							,WT.post
 						FROM WeighingTerminal WT
 						WHERE WT.WT_ID IN ({$WT_IDs})
 					";
@@ -64,10 +68,10 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 						// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
 						$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 						if( socket_connect($socket, $from_ip, $row["port"]) ) {
-							read_transaction($row["last_transaction"]+1, 1, $socket, $mysqli);
+							read_transaction_LW($row["last_transaction"]+1, 1, $socket, $mysqli);
 						}
 						else {
-							message_to_telegram("Post {$row["post"]} is offline!", '217756119');
+							message_to_telegram("Terminal {$row["WT_ID"]} is offline!", '217756119');
 						}
 						socket_close($socket);
 
@@ -100,6 +104,30 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 					$WT_IDs = $row["WT_IDs"];
 					$i++;
 				}
+				////////////////////////////////////////////////////////////
+
+				// По этому списку терминалов собираем данные по упаковке паллетов
+				$query = "
+					SELECT WT.WT_ID
+						,WT.port
+						,WT.last_transaction
+					FROM WeighingTerminal WT
+					WHERE WT.type = 2
+						AND WT.act = 1
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
+					$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+					if( socket_connect($socket, $from_ip, $row["port"]) ) {
+						read_transaction_LPP($row["last_transaction"]+1, 1, $socket, $mysqli);
+					}
+					else {
+						message_to_telegram("Terminal {$row["WT_ID"]} is offline!", '217756119');
+					}
+					socket_close($socket);
+				}
+				////////////////////////////////////////////////////////////
 
 				// Телеграмм рассылка
 				$query = "
