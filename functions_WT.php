@@ -92,6 +92,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 					}
 					//ID товара
 					$goodsID = $data[$i+37] + ($data[$i+38] << 8) + ($data[$i+39] << 16) + ($data[$i+40] << 24);
+					$goodsID = ($goodsID == 8 ? 1 : $goodsID);
 					//Номер партии
 					$ReceiptNumber = $data[$i+76] + ($data[$i+77] << 8) + ($data[$i+78] << 16) + ($data[$i+79] << 24);
 
