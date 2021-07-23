@@ -75,6 +75,12 @@ include "header.php";
 			<p>Расстановка персонала на конвейере</p>
 		</a>
 	</section>
+	<section class="cell">
+		<a href="/files/Cube%20Test%20Report.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>Cube Test Report</p>
+		</a>
+	</section>
 </fieldset>
 
 <fieldset class="files_wrap">
