@@ -118,7 +118,7 @@ $pallet_balance = $row["pallet_balance"];
 <table class="main_table">
 	<thead>
 		<tr>
-			<th colspan="3"><h1>Pallets report</h1></th>
+			<th colspan="2"><h1>Pallets report</h1></th>
 			<th colspan="2"><b>Debt in pallets (Vesta): <span style="font-size: 2em; color: red;"><?=$pallet_balance?></span></b></th>
 			<th colspan="2"><b>Debt in rubles: <span style="font-size: 2em; color: red;">&#8381;<?=number_format(( $pallet_balance * $actual_pallet_cost ), 0, '', ' ')?></span></b></th>
 		</tr>
@@ -157,7 +157,6 @@ $query = "
 
 		SELECT DATE_FORMAT(LS.ls_date, '%d/%m/%Y')
 			,SUM(pallets) pallets_shipment
-			,NULL
 			,NULL
 			,NULL
 			,NULL

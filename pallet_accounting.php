@@ -149,7 +149,6 @@ foreach ($_GET as &$value) {
 			<th>Списано поддонов</th>
 			<th>Поступило поддонов</th>
 			<th>Из них бракованных</th>
-			<th>Кол-во годных поддонов</th>
 			<th>Стоимость поддона, руб</th>
 			<th>Сумма, руб</th>
 			<th></th>
@@ -168,7 +167,6 @@ $query = "
 		,NULL pd_cnt
 		,PR.pr_cnt
 		,PR.pr_reject
-		,PR.pr_cnt - PR.pr_reject pr_good
 		,NULL pallet_cost
 		,NULL sum_cost
 		,PR.pr_date date
@@ -195,7 +193,6 @@ $query = "
 		,NULL
 		,PA.pa_cnt
 		,PA.pa_reject
-		,PA.pa_cnt - PA.pa_reject
 		,PA.pallet_cost
 		,PA.pallet_cost * PA.pa_cnt
 		,PA.pa_date
@@ -225,7 +222,6 @@ $query = "
 		,NULL
 		,NULL
 		,NULL
-		,NULL
 		,PD.pd_date
 		,NULL
 		,NULL
@@ -249,7 +245,6 @@ $query = "
 		,NULL
 		,PD.pd_cnt * -1
 		,NULL
-		,PD.pd_cnt * -1
 		,NULL
 		,NULL
 		,PD.pd_date
@@ -272,7 +267,6 @@ $query = "
 		,CB.brand
 		,PN.pallet_name
 		,SUM(pallets)
-		,NULL
 		,NULL
 		,NULL
 		,NULL
@@ -301,7 +295,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	$pd_cnt += $row["pd_cnt"];
 	$pr_cnt += $row["pr_cnt"];
 	$pr_reject += $row["pr_reject"];
-	$pr_good += $row["pr_good"];
 	$pa_cnt += $row["pa_cnt"];
 	$pa_reject += $row["pa_reject"];
 	$sum_cost += $row["sum_cost"];
@@ -314,7 +307,6 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><b><?=$row["pd_cnt"]?></b></td>
 		<td><b><?=$row["pr_cnt"]?></b></td>
 		<td><b style="color: red;"><?=$row["pr_reject"]?></b></td>
-		<td><b style="color: green;"><?=$row["pr_good"]?></b></td>
 		<td><?=(isset($row["pallet_cost"]) ? number_format($row["pallet_cost"], 0, '', ' ') : "")?></td>
 		<td><?=(isset($row["sum_cost"]) ? number_format($row["sum_cost"], 0, '', ' ') : "")?></td>
 		<td><?=($row["type"] ? "<a href='#' ".($row["type"] == "D" ? "class='add_disposal' PD_ID='{$row["ID"]}'" : "class='add_incoming' incoming_ID='{$row["ID"]}' type='{$row["type"]}'")."><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?></td>
@@ -330,7 +322,6 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><b><?=$pd_cnt?></b></td>
 			<td><b><?=$pr_cnt?></b></td>
 			<td><b><?=$pr_reject?></b></td>
-			<td><b><?=$pr_good?></b></td>
 			<td></td>
 			<td><?=(isset($sum_cost) ? number_format($sum_cost, 0, '', ' ') : "")?></td>
 			<td></td>
