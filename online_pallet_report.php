@@ -127,7 +127,6 @@ $pallet_balance = $row["pallet_balance"];
 			<th>Number of pallets shipped</th>
 			<th>Number of pallets returned</th>
 			<th>Number of broken pallets returned</th>
-			<th>Number of returned pallets of the wrong size</th>
 			<th>Usable pallets returned</th>
 			<th>Number of missing pallets (shipped pallets - usable pallets returned)</th>
 		</tr>
@@ -140,7 +139,6 @@ $query = "
 		,SUM(SUB.pallets_shipment) pallets_shipment
 		,SUM(SUB.pr_cnt) pr_cnt
 		,SUM(SUB.pr_reject) pr_reject
-		,SUM(SUB.pr_wrong_format) pr_wrong_format
 		,SUM(SUB.pr_good) pr_good
 		,IFNULL(SUM(SUB.pallets_shipment), 0) - IFNULL(SUM(SUB.pr_good), 0) missing
 	FROM (
@@ -148,8 +146,7 @@ $query = "
 			,NULL pallets_shipment
 			,PR.pr_cnt
 			,PR.pr_reject
-			,PR.pr_wrong_format
-			,PR.pr_cnt - PR.pr_reject - PR.pr_wrong_format pr_good
+			,PR.pr_cnt - PR.pr_reject pr_good
 			,PR.pr_date date
 		FROM pallet__Return PR
 		WHERE PR.CB_ID = 2
@@ -180,7 +177,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	$pallets_shipment += $row["pallets_shipment"];
 	$pr_cnt += $row["pr_cnt"];
 	$pr_reject += $row["pr_reject"];
-	$pr_wrong_format += $row["pr_wrong_format"];
 	$pr_good += $row["pr_good"];
 	$missing += $row["missing"];
 	?>
@@ -189,7 +185,6 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["pallets_shipment"]?></td>
 		<td><?=$row["pr_cnt"]?></td>
 		<td><n style="color: red;"><?=$row["pr_reject"]?></n></td>
-		<td><n style="color: red;"><?=$row["pr_wrong_format"]?></n></td>
 		<td><n style="color: green;"><?=$row["pr_good"]?></n></td>
 		<td><b><?=$row["missing"]?></b></td>
 	</tr>
@@ -201,7 +196,6 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><b><?=$pallets_shipment?></b></td>
 			<td><b><?=$pr_cnt?></b></td>
 			<td><b><?=$pr_reject?></b></td>
-			<td><b><?=$pr_wrong_format?></b></td>
 			<td><b><?=$pr_good?></b></td>
 			<td><b><?=$missing?></b></td>
 		</tr>

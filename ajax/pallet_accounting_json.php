@@ -10,13 +10,12 @@ if( $_GET["type"] == "R" ) {
 			,PR.CB_ID
 			,PR.pr_cnt
 			,PR.pr_reject
-			,PR.pr_wrong_format
 		FROM pallet__Return PR
 		WHERE PR.PR_ID = {$PR_ID}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$PR_data = array( "date"=>$row["pr_date"], "source"=>$row["CB_ID"], "cnt"=>$row["pr_cnt"], "broken"=>$row["pr_reject"], "wrong"=>$row["pr_wrong_format"] );
+	$PR_data = array( "date"=>$row["pr_date"], "source"=>$row["CB_ID"], "cnt"=>$row["pr_cnt"], "broken"=>$row["pr_reject"] );
 
 	echo json_encode($PR_data);
 }
@@ -44,14 +43,15 @@ elseif( $_GET["type"] == "F" ) {
 	$PF_ID = $_GET["ID"];
 
 	$query = "
-		SELECT PF.pd_date
+		SELECT PF.PN_ID
+			,PF.pd_date
 			,PF.pd_cnt * -1 pd_cnt
 		FROM pallet__Disposal PF
 		WHERE PF.PD_ID = {$PF_ID}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$PF_data = array( "date"=>$row["pd_date"], "source"=>"", "cnt"=>$row["pd_cnt"] );
+	$PF_data = array( "PN_ID"=>$row["PN_ID"], "date"=>$row["pd_date"], "source"=>"", "cnt"=>$row["pd_cnt"] );
 
 	echo json_encode($PF_data);
 }
@@ -60,14 +60,15 @@ elseif( $_GET["type"] == "D" ) {
 	$PD_ID = $_GET["ID"];
 
 	$query = "
-		SELECT PD.pd_date
+		SELECT PD.PN_ID
+			,PD.pd_date
 			,PD.pd_cnt
 		FROM pallet__Disposal PD
 		WHERE PD.PD_ID = {$PD_ID}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$PD_data = array( "pd_date"=>$row["pd_date"], "pd_cnt"=>$row["pd_cnt"] );
+	$PD_data = array( "PN_ID"=>$row["PN_ID"], "pd_date"=>$row["pd_date"], "pd_cnt"=>$row["pd_cnt"] );
 
 	echo json_encode($PD_data);
 }

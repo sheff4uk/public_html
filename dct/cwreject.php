@@ -94,10 +94,10 @@ if( isset($_POST["WT_ID"]) ) {
 			</script>
 			<?
 
-			echo "Дата/время заливки: <b>{$row["lf_date_format"]} {$row["lf_time_format"]}</b><br>";
+			echo "Заливка: <b>{$row["lf_date_format"]} {$row["lf_time_format"]}</b><br>";
 			echo "Кассета: <b>{$row["cassette"]}</b><br>";
 			echo "Вес: <b>{$row["weight"]}</b> г.<br>";
-			echo "Дата/время регистрации: <b>{$row["weighing_time_format"]}</b><br>";
+			echo "Регистрация: <b>{$row["weighing_time_format"]}</b><br>";
 		}
 		?>
 	</body>

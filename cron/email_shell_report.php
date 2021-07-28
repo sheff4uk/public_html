@@ -112,7 +112,6 @@ $message .= "
 				<th>Number of pallets shipped today</th>
 				<th>Pallets returned today</th>
 				<th>Broken pallets</th>
-				<th>Pallets of the wrong size</th>
 				<th>Usable pallets returned today</th>
 				<th>Debt in pallets (Vesta)</th>
 				<th>Debt in rubles</th>
@@ -138,8 +137,7 @@ $message .= "
 $query = "
 	SELECT SUM(PR.pr_cnt) pr_cnt
 		,SUM(PR.pr_reject) pr_reject
-		,SUM(PR.pr_wrong_format) pr_wrong_format
-		,SUM(PR.pr_cnt - PR.pr_reject - PR.pr_wrong_format) pr_good
+		,SUM(PR.pr_cnt - PR.pr_reject) pr_good
 	FROM pallet__Return PR
 	JOIN ClientBrand CB ON CB.CB_ID = PR.CB_ID
 	WHERE PR.pr_date = CURDATE()
@@ -150,7 +148,6 @@ $row = mysqli_fetch_array($res);
 $message .= "
 	<td>{$row["pr_cnt"]}</td>
 	<td>{$row["pr_reject"]}</td>
-	<td>{$row["pr_wrong_format"]}</td>
 	<td>{$row["pr_good"]}</td>
 ";
 
@@ -158,6 +155,7 @@ $message .= "
 $query = "
 	SELECT PA.pallet_cost
 	FROM pallet__Arrival PA
+	JOIN pallet__Supplier PS ON PS.PS_ID = PA.PS_ID AND PS.PN_ID = 1
 	WHERE PA.pallet_cost > 0
 	ORDER BY PA.pa_date DESC, PA.PA_ID DESC
 	LIMIT 1
