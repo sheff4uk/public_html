@@ -144,7 +144,7 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th>Цикл</th>
 			<th>Противовес</th>
-			<th>Замесов</th>
+			<th colspan="2">Замесов</th>
 			<th>Заливок</th>
 			<th>План</th>
 			<th>Факт</th>
@@ -152,7 +152,6 @@ foreach ($_GET as &$value) {
 			<th>Расчетное время, ч</th>
 			<th>Бланк чек-листа</th>
 			<th>Распечатан</th>
-			<th colspan="3">Журнал изменений</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -193,6 +192,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			,CW.item
 			,PB.CW_ID
 			,PB.batches
+			,USR_Icon(author) icon_author
+			,Friendly_date(change_time) friendly_date
+			,DATE_FORMAT(change_time, '%H:%i') friendly_time
 			,PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) fillings
 			,PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * IFNULL(PB.in_cassette, CW.in_cassette) plan
 			,PB.fact_batches * PB.fillings_per_batch * PB.in_cassette details
@@ -242,7 +244,25 @@ while( $row = mysqli_fetch_array($res) ) {
 		}
 		?>
 			<td><?=$subrow["item"]?></td>
-			<td><?=$subrow["batches"]?></td>
+			<td colspan="2"><div style="transform: scale(.8);">
+				<?
+				// Журнал изменений кол-ва замесов
+				$query = "
+					SELECT batches
+						,USR_Icon(author) icon_author
+						,Friendly_date(date_time) friendly_date
+						,DATE_FORMAT(date_time, '%H:%i') friendly_time
+					FROM plan__BatchLog
+					WHERE PB_ID = {$subrow["PB_ID"]}
+					ORDER BY date_time
+				";
+				$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $subsubrow = mysqli_fetch_array($subsubres) ) {
+					echo "<n style='text-decoration: line-through;' class='nowrap'>{$subsubrow["batches"]} {$subsubrow["icon_author"]} {$subsubrow["friendly_date"]} {$subsubrow["friendly_time"]}</n><br>";
+				}
+				echo "</div><n class='nowrap'><b>{$subrow["batches"]}</b> {$subrow["icon_author"]} {$subrow["friendly_date"]} {$subrow["friendly_time"]}</n>";
+				?>
+			</td>
 			<td><?=$subrow["fillings"]?></td>
 			<td><?=$subrow["plan"]?></td>
 			<td class='bg-gray'><?=($subrow["details"] - $subrow["underfilling"])?></td>
@@ -262,59 +282,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			</td>
 			<td class="nowrap" style="transform: scale(.8); overflow: unset;"><?=($subrow["friendly_print_date"] ? $subrow["icon_print_author"]." ".$subrow["friendly_print_date"]." ".$subrow["friendly_print_time"] : "")?></td>
 			<?
-			// Выводим общую ячейку с журналом и кнопками действий
+			// Выводим общую ячейку с кнопками действий
 			if( $last_cycle != $row["cycle"] ) {
-				echo "<td rowspan='{$cnt}' colspan='3' style='font-size: .8em;'>";
-				?>
-					<table style="border: 2px dotted #999;">
-<!--						<thead>-->
-							<tr>
-								<th>Время изменения</th>
-								<th>Противовес</th>
-								<th>Замесов</th>
-								<th>Автор</th>
-								<th>Ссылка</th>
-							</tr>
-<!--						</thead>-->
-						<tbody style="text-align: center;">
-							<?
-							$query = "
-								SELECT PBL.PB_ID
-									,Friendly_date(PBL.date_time) friendly_date
-									,DATE_FORMAT(PBL.date_time, '%H:%i') time
-									,PB.cycle
-									,CW.item
-									,CONCAT('<n style=\"text-decoration: line-through;\">', SPBL.batches, '</n>&nbsp;<i class=\"fas fa-arrow-right\"></i>&nbsp;') prev_batches
-									,PBL.batches
-									,USR_Icon(PBL.author) usr_icon
-								FROM plan__BatchLog PBL
-								LEFT JOIN plan__BatchLog SPBL ON SPBL.PBL_ID = PBL.prev_ID
-								JOIN plan__Batch PB ON PB.PB_ID = PBL.PB_ID
-									AND PB.year = {$_GET["year"]}
-									AND PB.cycle = {$row["cycle"]}
-									".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-									".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-								JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-								WHERE PBL.date_time IS NOT NULL
-								ORDER BY PBL.date_time DESC
-							";
-							$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-							while( $subsubrow = mysqli_fetch_array($subsubres) ) {
-							?>
-								<tr>
-									<td><?=$subsubrow["friendly_date"]?><br><?=$subsubrow["time"]?></td>
-									<td class="bg-gray"><?=$subsubrow["item"]?></td>
-									<td class="bg-gray"><?=$subsubrow["prev_batches"]?><?=$subsubrow["batches"]?></td>
-									<td><?=$subsubrow["usr_icon"]?></td>
-									<td><a href="#<?=$subsubrow["PB_ID"]?>"><i class="fas fa-link fa-lg"></i></a></td>
-								</tr>
-							<?
-							}
-							?>
-						</tbody>
-					</table>
-				<?
-				echo "</td>";
 				echo "<td rowspan='{$cnt}'><a href='#' class='add_pb' cycle='{$row["cycle"]}' year='{$_GET["year"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a></td>";
 			}
 			?>
@@ -334,7 +303,7 @@ while( $row = mysqli_fetch_array($res) ) {
 ?>
 		<tr class="summary">
 			<td>Итог:</td>
-			<td><?=$row["batches"]?></td>
+			<td colspan="2"><?=$row["batches"]?></td>
 			<td><?=$row["fillings"]?></td>
 			<td><?=$row["plan"]?></td>
 			<td><?=($row["details"] - $d_underfilling)?></td>
@@ -359,15 +328,12 @@ else {
 		<tr class="total">
 			<td></td>
 			<td>Итог:</td>
-			<td><?=$batches?></td>
+			<td colspan="2"><?=$batches?></td>
 			<td><?=$fillings?></td>
 			<td><?=$plan?></td>
 			<td><?=($details - $underfilling)?></td>
 			<td><?=$underfilling?></td>
 			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
-			<td></td>
-			<td></td>
-			<td></td>
 			<td></td>
 			<td></td>
 			<td></td>
