@@ -46,7 +46,7 @@ $query = "
 		,SUM(1) details
 		,SUM(IF(LW.goodsID = 6, 1, NULL)) d_shell
 		,SUM(IF(LW.goodsID = 7, 1, NULL)) d_assembly
-		,(SELECT opening_time FROM list__Opening WHERE opening_time < LO.opening_time AND cassette = LO.cassette ORDER BY opening_time DESC LIMIT 1) cassette_assembly
+		,(SELECT DATE_FORMAT(opening_time, '%d.%m.%Y %H:%i') FROM list__Opening WHERE opening_time < LO.opening_time AND cassette = LO.cassette ORDER BY opening_time DESC LIMIT 1) cassette_assembly
 	FROM list__Opening LO
 	JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
