@@ -163,5 +163,5 @@ $headers  = "Content-type: text/html; charset=utf-8 \r\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
 
 //mail($to, $subject, $message, $headers);
-mail($to, $subject, "Hello!", $headers);
+mail("sheff4uk@gmail.com", $subject, $message, $headers);
 ?>
