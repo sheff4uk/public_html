@@ -4,6 +4,7 @@ $key = $argv[1];
 $to = $argv[2];
 
 include $path."/config.php";
+echo $cassetts;
 // Проверка доступа
 if( $key != $script_key ) die('Access denied!');
 
