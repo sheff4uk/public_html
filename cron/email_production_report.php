@@ -7,10 +7,10 @@ include $path."/config.php";
 // Проверка доступа
 if( $key != $script_key ) die('Access denied!');
 
-$from = date_create( '-1 days' );
-$from_format = date_format($from, 'd.m.Y');
-$to = date_create();
-$to_format = date_format($to, 'd.m.Y');
+$from_date = date_create( '-1 days' );
+$from_format = date_format($from_date, 'd.m.Y');
+$to_date = date_create();
+$to_format = date_format($to_date, 'd.m.Y');
 $subject = "[KONSTANTA] Производственный отчет за {$from_format}";
 
 $message = "
@@ -162,6 +162,5 @@ $message .= "
 $headers  = "Content-type: text/html; charset=utf-8 \r\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
 
-//mail($to, $subject, $message, $headers);
-mail("sheff4uk@gmail.com", $subject, $message, $headers);
+mail($to, $subject, $message, $headers);
 ?>
