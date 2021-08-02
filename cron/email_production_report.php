@@ -58,10 +58,11 @@ $query = "
 	ORDER BY LO.opening_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+echo mysqli_num_rows($res);
 while( $row = mysqli_fetch_array($res) ) {
 	$message .= "
 		<tr>
-			<td>{$row["shift"]}</td>
+			<td>{$row["shift"]}!</td>
 			<td>{$row["friendly_opening_time"]}</td>
 			<td>{$row["cassette"]}</td>
 			<td>{$row["item"]}</td>
