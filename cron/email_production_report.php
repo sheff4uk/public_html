@@ -54,7 +54,7 @@ $query = "
 	JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
 	WHERE DATE(LO.opening_time - INTERVAL 7 HOUR) = CURDATE() - INTERVAL 1 DAY
 	GROUP BY LO.LO_ID
-	HAVING d_shell OR d_assembly
+	HAVING d_shell > 0 OR d_assembly > 0
 	ORDER BY LO.opening_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -62,7 +62,7 @@ echo mysqli_num_rows($res);
 while( $row = mysqli_fetch_array($res) ) {
 	$message .= "
 		<tr>
-			<td>{$row["shift"]}!</td>
+			<td>{$row["shift"]}</td>
 			<td>{$row["friendly_opening_time"]}</td>
 			<td>{$row["cassette"]}</td>
 			<td>{$row["item"]}</td>
