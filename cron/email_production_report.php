@@ -52,9 +52,9 @@ $query = "
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
-	WHERE DATE(LO.opening_time - INTERVAL 7 HOUR) = CURDATE() - INTERVAL 1 DAY
+	#WHERE DATE(LO.opening_time - INTERVAL 7 HOUR) = CURDATE() - INTERVAL 1 DAY
 	GROUP BY LO.LO_ID
-	HAVING d_shell > 0 OR d_assembly > 0
+	HAVING d_shell OR d_assembly
 	ORDER BY LO.opening_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
