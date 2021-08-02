@@ -3,21 +3,22 @@ $path = dirname(dirname($argv[0]));
 $key = $argv[1];
 $to = $argv[2];
 
-//include $path."/config.php";
-include "../config.php";
+include $path."/config.php";
 // Проверка доступа
-//if( $key != $script_key ) die('Access denied!');
+if( $key != $script_key ) die('Access denied!');
 
-$date = date_create( '-1 days' );
-$date_format = date_format($date, 'd.m.Y');
-$subject = "[KONSTANTA] Производственный отчет за {$date_format}";
+$from = date_create( '-1 days' );
+$from_format = date_format($from, 'd.m.Y');
+$to = date_create();
+$to_format = date_format($to, 'd.m.Y');
+$subject = "[KONSTANTA] Производственный отчет за {$from_format}";
 
 $message = "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 		<tr>
 			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
 			<th><n style='font-size: 2em;'>Ответственность мастеров</n></th>
-			<th>Производственные сутки: <n style='font-size: 2em;'>{$date_format}</n></th>
+			<th>Производственные сутки:<br>c 07:00 {$from_format} до 07:00 {$to_format}</th>
 		</tr>
 	</table>
 
@@ -58,7 +59,6 @@ $query = "
 	ORDER BY LO.opening_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-echo mysqli_num_rows($res);
 while( $row = mysqli_fetch_array($res) ) {
 	$message .= "
 		<tr>
@@ -86,7 +86,7 @@ $message .= "
 		<tr>
 			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
 			<th><n style='font-size: 2em;'>Ответственность операторов</n></th>
-			<th>Производственные сутки: <n style='font-size: 2em;'>{$date_format}</n></th>
+			<th>Производственные сутки:<br>c 07:00 {$from_format} до 07:00 {$to_format}</th>
 		</tr>
 	</table>
 
@@ -162,6 +162,5 @@ $message .= "
 $headers  = "Content-type: text/html; charset=utf-8 \r\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
 
-//mail($to, $subject, $message, $headers);
-echo $message;
+mail($to, $subject, $message, $headers);
 ?>
