@@ -2,6 +2,8 @@
 $path = dirname(dirname($argv[0]));
 $key = $argv[1];
 $to = $argv[2];
+echo $key;
+echo $to;
 
 include $path."/config.php";
 // Проверка доступа
@@ -162,6 +164,5 @@ $message .= "
 $headers  = "Content-type: text/html; charset=utf-8 \r\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
 
-//mail($to, $subject, $message, $headers);
-mail($to, $subject, "Hello!", $headers);
+mail($to, $subject, $message, $headers);
 ?>
