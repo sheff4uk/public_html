@@ -4,7 +4,6 @@ $key = $argv[1];
 $to = $argv[2];
 
 include $path."/config.php";
-echo $cassetts;
 // Проверка доступа
 if( $key != $script_key ) die('Access denied!');
 
@@ -59,7 +58,7 @@ $query = "
 	HAVING d_shell OR d_assembly
 	ORDER BY LO.opening_time
 ";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query1: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$message .= "
 		<tr>
@@ -136,7 +135,7 @@ $query = "
 	ORDER BY LO.opening_time
 	LIMIT 100
 ";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query2: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$message .= "
 		<tr>
