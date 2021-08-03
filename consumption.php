@@ -124,7 +124,7 @@ foreach ($_GET as &$value) {
 			<th>На деталь, г</th>
 		</tr>
 	</thead>
-	<tbody style="text-align: center;">
+	<tbody style="text-align: center;" class="nowrap">
 		<?
 		$query = "
 			SELECT CW.item
