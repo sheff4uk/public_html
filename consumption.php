@@ -169,10 +169,10 @@ foreach ($_GET as &$value) {
 				<td style="background: #8b451388;"><?=number_format($row["crushed_stone"] * 1000/$row["details"], 2, ',', ' ')?></td>
 				<td style="background: #70809088;"><?=number_format($row["cement"], 0, ',', ' ')?></td>
 				<td style="background: #70809088;"><?=number_format($row["cement"] * 1000/$row["details"], 2, ',', ' ')?></td>
-				<td style="background: #80800080;"><?=number_format($row["plasticizer"], 3, ',', ' ')?></td>
-				<td style="background: #80800080;"><?=number_format($row["plasticizer"] * 1000/$row["details"], 3, ',', ' ')?></td>
-				<td style="background: #c0c0c088;"><?=number_format($row["calcium"] * $row["details"] / 1000, 3, ',', ' ')?></td>
-				<td style="background: #c0c0c088;"><?=number_format($row["calcium"], 3, ',', ' ')?></td>
+				<td style="background: #80800080;"><?=number_format($row["plasticizer"], 0, ',', ' ')?></td>
+				<td style="background: #80800080;"><?=number_format($row["plasticizer"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #c0c0c088;"><?=number_format($row["calcium"] * $row["details"] / 1000, 0, ',', ' ')?></td>
+				<td style="background: #c0c0c088;"><?=number_format($row["calcium"], 0, ',', ' ')?></td>
 				<td style="background: #ffff6688;"><?=number_format($row["reinforcement"] * $row["details"] / 1000, 3, ',', ' ')?></td>
 				<td style="background: #ffff6688;"><?=number_format($row["reinforcement"], 0, ',', ' ')?></td>
 			</tr>
@@ -191,9 +191,9 @@ foreach ($_GET as &$value) {
 			<td></td>
 			<td><?=number_format($cement, 0, ',', ' ')?></td>
 			<td></td>
-			<td><?=number_format($plasticizer, 3, ',', ' ')?></td>
+			<td><?=number_format($plasticizer, 0, ',', ' ')?></td>
 			<td></td>
-			<td><?=number_format($calcium/1000, 3, ',', ' ')?></td>
+			<td><?=number_format($calcium/1000, 0, ',', ' ')?></td>
 			<td></td>
 			<td><?=number_format($reinforcement/1000, 3, ',', ' ')?></td>
 			<td></td>
