@@ -294,7 +294,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 								?>
 							</select>
 						</td>
-						<td><input type="number" name="cnt" min="1" style="width: 70px;" required></td>
+						<td><input type="number" name="cnt" min="0" style="width: 70px;" required></td>
 						<td class="broken"><input type="number" name="broken" min="0" style="width: 70px;"></td>
 						<td class="cost"><input type="number" name="cost" min="0" style="width: 120px;"></td>
 					</tr>
@@ -343,7 +343,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 								?>
 							</select>
 						</td>
-						<td><input type="number" name="pd_cnt" min="1" style="width: 70px;" required></td>
+						<td><input type="number" name="pd_cnt" min="0" style="width: 70px;" required></td>
 					</tr>
 				</tbody>
 			</table>

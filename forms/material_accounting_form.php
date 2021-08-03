@@ -179,7 +179,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 								$query = "
 									SELECT MN.MN_ID, MN.material_name
 									FROM material__Name MN
-									ORDER BY MN.MN_ID
+									ORDER BY MN.material_name
 								";
 								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 								while( $row = mysqli_fetch_array($res) ) {
@@ -195,7 +195,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 								$query = "
 									SELECT MS.MS_ID, MS.supplier
 									FROM material__Supplier MS
-									ORDER BY MS.MS_ID
+									ORDER BY MS.supplier
 								";
 								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 								while( $row = mysqli_fetch_array($res) ) {
@@ -211,7 +211,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 								$query = "
 									SELECT MC.MC_ID, MC.carrier
 									FROM material__Carrier MC
-									ORDER BY MC.MC_ID
+									ORDER BY MC.carrier
 								";
 								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 								while( $row = mysqli_fetch_array($res) ) {
@@ -250,7 +250,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody>
 					<?
-					$query = "SELECT MN_ID, material_name FROM material__Name ORDER BY MN_ID";
+					$query = "SELECT MN_ID, material_name FROM material__Name ORDER BY material_name";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) )
 					{
@@ -289,7 +289,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody>
 					<?
-					$query = "SELECT MS_ID, supplier FROM material__Supplier ORDER BY MS_ID";
+					$query = "SELECT MS_ID, supplier FROM material__Supplier ORDER BY supplier";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) )
 					{
@@ -328,7 +328,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody>
 					<?
-					$query = "SELECT MC_ID, carrier FROM material__Carrier ORDER BY MC_ID";
+					$query = "SELECT MC_ID, carrier FROM material__Carrier ORDER BY carrier";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) )
 					{
