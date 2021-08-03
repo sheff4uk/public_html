@@ -116,10 +116,10 @@ foreach ($_GET as &$value) {
 			<th>На деталь, г</th>
 			<th>Расход, кг</th>
 			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
+			<th>Расход, г</th>
+			<th>На деталь, мг</th>
+			<th>Расход, г</th>
+			<th>На деталь, мг</th>
 			<th>Расход, кг</th>
 			<th>На деталь, г</th>
 		</tr>
@@ -133,8 +133,8 @@ foreach ($_GET as &$value) {
 				,SUM(LB.sand) sand
 				,SUM(LB.crushed_stone) crushed_stone
 				,SUM(LB.cement) cement
-				,SUM(LB.plasticizer) / 10 plasticizer
-				,CW.drawing_volume * CW.calcium / 1000 calcium
+				,SUM(LB.plasticizer) * 1000 / 10 plasticizer
+				,CW.drawing_volume * CW.calcium calcium
 				,CW.reinforcement
 			FROM plan__Batch PB
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
