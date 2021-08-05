@@ -163,6 +163,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 					// Узнаем номер закрытой партии
 					$query = "
 						SELECT IFNULL(MAX(RN), 0) RN
+							,SUM(1) cnt
 						FROM list__Weight
 						WHERE weighing_time BETWEEN '{$receipt_start}' AND '{$receipt_end}'
 							AND WT_ID = {$deviceID}
@@ -171,36 +172,68 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					$row = mysqli_fetch_array($res);
 					$RN = $row["RN"];
+					$cnt = $row["cnt"];
 
-					// Из пересечения временных интервалов находим наиболее подходящую кассету
-					$query = "
-						SELECT SUB.LO_ID
-							#,TIMESTAMPDIFF(SECOND, IF(SUB.opening_time > '{$receipt_start}', SUB.opening_time, '{$receipt_start}'), IF(SUB.end_time < '{$receipt_end}', SUB.end_time, '{$receipt_end}')) / TIMESTAMPDIFF(SECOND, SUB.opening_time, SUB.end_time) `share`
-							,(SELECT SUM(1) FROM list__Weight WHERE RN = {$RN} AND WT_ID = {$deviceID} AND weighing_time BETWEEN SUB.opening_time AND SUB.end_time) CW_cnt
-						FROM (
-							SELECT (SELECT LO_ID FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) LO_ID
-								,(SELECT opening_time FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) opening_time
-								,LO.opening_time end_time
-							FROM list__Opening LO
-							WHERE LO.opening_time > '{$receipt_start}'
-								AND (SELECT opening_time FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) <= '{$receipt_end}'
-								AND '{$receipt_start}' <= LO.opening_time
-							) SUB
-						ORDER BY CW_cnt DESC
-						LIMIT 1
-					";
-					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					$row = mysqli_fetch_array($res);
-					$LO_ID = $row["LO_ID"];
+					// Если закрытая партия небыла пустой
+					if( $cnt > 0 ) {
+						// Из пересечения временных интервалов находим наиболее подходящую кассету
+						$query = "
+							SELECT SUB.LO_ID
+								#,TIMESTAMPDIFF(SECOND, IF(SUB.opening_time > '{$receipt_start}', SUB.opening_time, '{$receipt_start}'), IF(SUB.end_time < '{$receipt_end}', SUB.end_time, '{$receipt_end}')) / TIMESTAMPDIFF(SECOND, SUB.opening_time, SUB.end_time) `share`
+								,IFNULL((SELECT SUM(1) FROM list__Weight WHERE RN = {$RN} AND WT_ID = {$deviceID} AND weighing_time BETWEEN SUB.opening_time AND SUB.end_time), 0) CW_cnt
+							FROM (
+								SELECT (SELECT LO_ID FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) LO_ID
+									,(SELECT opening_time FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) opening_time
+									,LO.opening_time end_time
+								FROM list__Opening LO
+								WHERE LO.opening_time > '{$receipt_start}'
+									AND (SELECT opening_time FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) <= '{$receipt_end}'
+									AND '{$receipt_start}' <= LO.opening_time
+								) SUB
+							ORDER BY CW_cnt DESC
+							#LIMIT 1
+						";
+						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						$row = mysqli_fetch_array($res);
+						$LO_ID = $row["LO_ID"];
+						$CW_cnt = $row["CW_cnt"];
 
-					// Связываем регистрации закрытой партии с подходящей по времени кассетой
-					$query = "
-						UPDATE list__Weight
-						SET LO_ID = {$LO_ID}
-						WHERE WT_ID = {$deviceID}
-							AND LO_ID IS NULL
-					";
-					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						// Связываем регистрации закрытой партии с подходящей по времени кассетой
+						$query = "
+							UPDATE list__Weight
+							SET LO_ID = {$LO_ID}
+							WHERE WT_ID = {$deviceID}
+								AND LO_ID IS NULL
+						";
+						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+						$receipt_err = 0;
+						// Попытка прочитать вторую строку запроса, чтобы выявить не закрытую партию
+						if( $row = mysqli_fetch_array($res) ) {
+							if( $row["CW_cnt"] / $CW_cnt >= 0,5 ) $receipt_err = 1;
+						}
+
+						// Выявляем трещины и сколы на посту
+						$query = "
+							SELECT WT.post
+								,SUM(IF(goodsID = 3, 1, 0)) crack
+								,SUM(IF(goodsID = 5, 1, 0)) chip
+							FROM list__Weight LW
+							JOIN WeightingTerminal WT ON WT.WT_ID = LW.WT_ID
+							WHERE LW.RN = {$RN}
+								AND LW.WT_ID = {$deviceID}
+						";
+						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						$row = mysqli_fetch_array($res);
+						$post = $row["post"];
+						$crack = $row["crack"];
+						$chip = $row["chip"];
+						// Если в партии были трещины или сколы или незакрытие, сообщаем в телеграм
+						if( $crack or $chip or $receipt_err) {
+							$message = "Пост <b>{$post}</b>, партия <b>{$RN}</b>\n".($crack ? "·трещин: <b>{$crack}</b>\n").($chip ? "·сколов: <b>{$chip}</b>\n").($receipt_err ? "<b>Пропущено закрытие партии!</b>");
+							message_to_telegram($message, TELEGRAM_CHATID);
+						}
+					}
 
 					// Обновляем время закрытия последней партии
 					$query = "
@@ -217,27 +250,6 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						WHERE WT_ID = {$deviceID}
 					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-
-					// Выявляем трещины и сколы на посту
-					$query = "
-						SELECT WT.post
-							,SUM(IF(goodsID = 3, 1, 0)) crack
-							,SUM(IF(goodsID = 5, 1, 0)) chip
-						FROM list__Weight LW
-						JOIN WeightingTerminal WT ON WT.WT_ID = LW.WT_ID
-						WHERE LW.RN = {$RN}
-							AND LW.WT_ID = {$deviceID}
-					";
-					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					$row = mysqli_fetch_array($res);
-					$post = $row["post"];
-					$crack = $row["crack"];
-					$chip = $row["chip"];
-					// Если в партии были трещины или сколы, сообщаем в телеграм
-					if( $crack or $chip ) {
-						$message = "Пост <b>{$post}</b>, партия <b>{$RN}</b>\n".($crack ? "·трещин: <b>{$crack}</b>\n").($chip ? "·сколов: <b>{$chip}</b>\n");
-						message_to_telegram($message, TELEGRAM_CHATID);
-					}
 				}
 			}
 
