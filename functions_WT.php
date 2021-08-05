@@ -163,7 +163,6 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 					// Узнаем номер закрытой партии
 					$query = "
 						SELECT IFNULL(MAX(RN), 0) RN
-							,SUM(1) cnt
 						FROM list__Weight
 						WHERE weighing_time BETWEEN '{$receipt_start}' AND '{$receipt_end}'
 							AND WT_ID = {$deviceID}
@@ -172,10 +171,9 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					$row = mysqli_fetch_array($res);
 					$RN = $row["RN"];
-					$cnt = $row["cnt"];
 
-					// Если закрытая партия небыла пустой
-					if( $cnt > 0 ) {
+					// Если закрытая партия не была пустой
+					if( $RN > 0 ) {
 						// Из пересечения временных интервалов находим наиболее подходящую кассету
 						$query = "
 							SELECT SUB.LO_ID
