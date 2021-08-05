@@ -208,7 +208,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						$receipt_err = 0;
 						// Попытка прочитать вторую строку запроса, чтобы выявить не закрытую партию
 						if( $row = mysqli_fetch_array($res) ) {
-							if( $row["CW_cnt"] / $CW_cnt >= 0.5 ) $receipt_err = 1;
+							if( $row["CW_cnt"] / $CW_cnt >= 1/2 ) $receipt_err = 1;
 						}
 
 						// Выявляем трещины и сколы на посту
@@ -217,7 +217,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 								,SUM(IF(goodsID = 3, 1, 0)) crack
 								,SUM(IF(goodsID = 5, 1, 0)) chip
 							FROM list__Weight LW
-							JOIN WeightingTerminal WT ON WT.WT_ID = LW.WT_ID
+							JOIN WeighingTerminal WT ON WT.WT_ID = LW.WT_ID
 							WHERE LW.RN = {$RN}
 								AND LW.WT_ID = {$deviceID}
 						";
