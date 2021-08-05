@@ -210,7 +210,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						$receipt_err = 0;
 						// Попытка прочитать вторую строку запроса, чтобы выявить не закрытую партию
 						if( $row = mysqli_fetch_array($res) ) {
-							if( $row["CW_cnt"] / $CW_cnt >= 0,5 ) $receipt_err = 1;
+							if( $row["CW_cnt"] / $CW_cnt >= 0.5 ) $receipt_err = 1;
 						}
 
 						// Выявляем трещины и сколы на посту
@@ -230,7 +230,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						$chip = $row["chip"];
 						// Если в партии были трещины или сколы или незакрытие, сообщаем в телеграм
 						if( $crack or $chip or $receipt_err) {
-							$message = "Пост <b>{$post}</b>, партия <b>{$RN}</b>\n".($crack ? "·трещин: <b>{$crack}</b>\n").($chip ? "·сколов: <b>{$chip}</b>\n").($receipt_err ? "<b>Пропущено закрытие партии!</b>");
+							$message = "Пост <b>{$post}</b>, партия <b>{$RN}</b>\n".($crack ? "·трещин: <b>{$crack}</b>\n" : "").($chip ? "·сколов: <b>{$chip}</b>\n" : "").($receipt_err ? "<b>Пропущено закрытие партии!</b>" : "");
 							message_to_telegram($message, TELEGRAM_CHATID);
 						}
 					}
