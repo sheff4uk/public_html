@@ -217,6 +217,27 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						WHERE WT_ID = {$deviceID}
 					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+					// Выявляем трещины и сколы на посту
+					$query = "
+						SELECT WT.post
+							,SUM(IF(goodsID = 3, 1, 0)) crack
+							,SUM(IF(goodsID = 5, 1, 0)) chip
+						FROM list__Weight LW
+						JOIN WeightingTerminal WT ON WT.WT_ID = LW.WT_ID
+						WHERE LW.RN = {$RN}
+							AND LW.WT_ID = {$deviceID}
+					";
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					$row = mysqli_fetch_array($res);
+					$post = $row["post"];
+					$crack = $row["crack"];
+					$chip = $row["chip"];
+					// Если в партии были трещины или сколы, сообщаем в телеграм
+					if( $crack or $chip ) {
+						$message = "Пост <b>{$post}</b>\n".($crack ? "·трещин: <b>{$crack}</b>\n").($chip ? "·сколов: <b>{$chip}</b>\n");
+						message_to_telegram($message, TELEGRAM_CHATID);
+					}
 				}
 			}
 
