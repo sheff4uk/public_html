@@ -235,7 +235,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 					$chip = $row["chip"];
 					// Если в партии были трещины или сколы, сообщаем в телеграм
 					if( $crack or $chip ) {
-						$message = "Пост <b>{$post}</b>\n".($crack ? "·трещин: <b>{$crack}</b>\n").($chip ? "·сколов: <b>{$chip}</b>\n");
+						$message = "Пост <b>{$post}</b>, партия <b>{$RN}</b>\n".($crack ? "·трещин: <b>{$crack}</b>\n").($chip ? "·сколов: <b>{$chip}</b>\n");
 						message_to_telegram($message, TELEGRAM_CHATID);
 					}
 				}
