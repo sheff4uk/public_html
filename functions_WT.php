@@ -228,7 +228,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						$chip = $row["chip"];
 						// Если в партии были трещины или сколы или незакрытие, сообщаем в телеграм
 						if( $crack or $chip or $receipt_err) {
-							$message = "Пост <b>{$post}</b>, партия <b>{$RN}</b>\n".($crack ? "·трещин: <b>{$crack}</b>\n" : "").($chip ? "·сколов: <b>{$chip}</b>\n" : "").($receipt_err ? "<b>Пропущено закрытие партии!</b>" : "");
+							$message = "Пост <b>{$post}</b>, партия <b>{$RN}</b>\n".($crack ? "трещина: <b>{$crack}</b>\n" : "").($chip ? "скол: <b>{$chip}</b>\n" : "").($receipt_err ? "<b>Пропущено закрытие партии!</b>" : "");
 							message_to_telegram($message, TELEGRAM_CHATID);
 						}
 					}
