@@ -159,7 +159,7 @@ $message .= "
 		</tbody>
 	</table>
 ";
-//,abdelbasset@konstanta.ltd,shabalina@konstanta.ltd
+
 //$headers  = "Content-type: text/html; charset=utf-8 \r\n";
 $headers  = "Content-Type: text/html; charset=«utf-8»\r\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
