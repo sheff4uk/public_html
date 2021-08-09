@@ -12,7 +12,8 @@ $from_format = date_format($from_date, 'd.m.Y');
 $to_date = date_create();
 $to_format = date_format($to_date, 'd.m.Y');
 //$subject = "[KONSTANTA] Производственный отчет за {$from_format}";
-$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Производственный отчет за {$from_format}"). "?=";
+//$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Производственный отчет за {$from_format}"). "?=";
+$subject = "=?windows-1251?b?". base64_encode("[KONSTANTA] Производственный отчет за {$from_format}"). "?=";
 
 $message = "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
@@ -161,7 +162,8 @@ $message .= "
 ";
 
 //$headers  = "Content-type: text/html; charset=utf-8 \r\n";
-$headers  = "Content-Type: text/html; charset=«utf-8»\r\n";
+//$headers  = "Content-Type: text/html; charset=«utf-8»\r\n";
+$headers  = "Content-type: text/html; charset=\"windows-1251\"\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
 
 mail($to, $subject, $message, $headers);
