@@ -211,6 +211,28 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 							if( $row["CW_cnt"] / $CW_cnt >= 1/2 ) $receipt_err = 1;
 						}
 
+						// Выявляем повторяющийся брак (3 и более подряд)
+						$query = "
+							SELECT goodsID
+							FROM list__Weight
+							WHERE WT_ID = {$deviceID}
+								AND RN = {$RN}
+						";
+						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						$reject_cnt = 0;
+						$reject_err = 0;
+						$prev_goodsID = 0;
+						while( $row = mysqli_fetch_array($res) ) {
+							if( $prev_goodsID == $row["goodsID"] and $row["goodsID"] > 1 ) {
+								++$reject_cnt;
+							}
+							else {
+								$reject_cnt = 0;
+							}
+							if( $reject_cnt > 2 ) $reject_err = 1;
+							$prev_goodsID == $row["goodsID"];
+						}
+
 						// Выявляем трещины и сколы на посту
 						$query = "
 							SELECT WT.post
@@ -226,9 +248,9 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						$post = $row["post"];
 						$crack = $row["crack"];
 						$chip = $row["chip"];
-						// Если в партии были трещины или сколы или незакрытие, сообщаем в телеграм
-						if( $crack or $chip or $receipt_err) {
-							$message = "Пост <b>{$post}</b>, партия <b>{$RN}</b>\n".($crack ? "трещина: <b>{$crack}</b>\n" : "").($chip ? "скол: <b>{$chip}</b>\n" : "").($receipt_err ? "<b>Пропущено закрытие партии!</b>" : "");
+						// Если в партии были трещины или сколы или незакрытие или повторения брака сообщаем в телеграм
+						if( $crack or $chip or $receipt_err or $reject_err ) {
+							$message = "Пост <b>{$post}</b>, партия <b>{$RN}</b>\n".($crack ? "трещина: <b>{$crack}</b>\n" : "").($chip ? "скол: <b>{$chip}</b>\n" : "").($receipt_err ? "<b>Пропущено закрытие партии!</b>\n" : "").($reject_err ? "<b>Подряд идущий одинаковый брак!</b>" : "");
 							message_to_telegram($message, TELEGRAM_CHATID);
 						}
 					}
