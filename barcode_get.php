@@ -230,7 +230,7 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 		default: // TEST
 			//Телеграм бот отправляет уведомление
 			$message = "Test label <b>{$bc}</b>";
-			message_to_telegram($message, TELEGRAM_CHATID);
+			//message_to_telegram($message, TELEGRAM_CHATID);
 			break;
 		/////////////////////////////////////
 	}
