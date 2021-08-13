@@ -368,6 +368,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					,PN.pallet_name
 					,PN.pn_balance
 				FROM pallet__Name PN
+				ORDER BY PN.PN_ID
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
@@ -403,7 +404,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				FROM pallet__ClientBalance PCB
 				JOIN pallet__Name PN ON PN.PN_ID = PCB.PN_ID
 				JOIN ClientBrand CB ON CB.CB_ID = PCB.CB_ID
-				ORDER BY PCB.CB_ID
+				ORDER BY PCB.CB_ID, PCB.PN_ID
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
