@@ -151,7 +151,7 @@ $message .= "
 	<td>{$row["pr_good"]}</td>
 ";
 
-// Узнаем актуальную стоимость поддона
+// Узнаем актуальную стоимость поддона (дерево)
 $query = "
 	SELECT PA.pallet_cost
 	FROM pallet__Arrival PA
@@ -164,11 +164,12 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 $row = mysqli_fetch_array($res);
 $actual_pallet_cost = $row["pallet_cost"];
 
-// Узнаем долг в поддонах
+// Узнаем долг в поддонах (дерево)
 $query = "
-	SELECT CB.pallet_balance
-	FROM ClientBrand CB
-	WHERE CB.CB_ID = {$CB_ID}
+	SELECT PCB.pallet_balance
+	FROM pallet__ClientBalance PCB
+	WHERE PCB.CB_ID = {$CB_ID}
+		AND PCB.PN_ID = 1
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);

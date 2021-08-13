@@ -10,12 +10,13 @@ if( $_GET["type"] == "R" ) {
 			,PR.CB_ID
 			,PR.pr_cnt
 			,PR.pr_reject
+			,PR.PN_ID
 		FROM pallet__Return PR
 		WHERE PR.PR_ID = {$PR_ID}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$PR_data = array( "date"=>$row["pr_date"], "source"=>$row["CB_ID"], "cnt"=>$row["pr_cnt"], "broken"=>$row["pr_reject"] );
+	$PR_data = array( "date"=>$row["pr_date"], "source"=>$row["CB_ID"], "cnt"=>$row["pr_cnt"], "broken"=>$row["pr_reject"], "PN_ID"=>$row["PN_ID"] );
 
 	echo json_encode($PR_data);
 }

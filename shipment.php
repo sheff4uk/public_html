@@ -146,7 +146,8 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th>Дата</th>
 			<th>Противовес</th>
-			<th>Поддонов</th>
+			<th>Поддон</th>
+			<th>Кол-во</th>
 			<th>Деталей</th>
 			<th></th>
 		</tr>
@@ -181,8 +182,10 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LS.CW_ID
 			,LS.pallets
 			,LS.pallets * CW.in_pallet details
+			,PN.pallet_name
 		FROM list__Shipment LS
 		JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
+		JOIN pallet__Name PN ON PN.PN_ID = LS.PN_ID
 		WHERE 1
 			AND LS.ls_date = '{$row["ls_date"]}'
 			".($_GET["CW_ID"] ? "AND LS.CW_ID={$_GET["CW_ID"]}" : "")."
@@ -207,6 +210,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		?>
 			<td><?=$subrow["item"]?></td>
+			<td><?=$subrow["pallet_name"]?></td>
 			<td><?=$subrow["pallets"]?></td>
 			<td><?=$subrow["details"]?></td>
 			<td>
@@ -218,6 +222,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	}
 ?>
 		<tr class="summary">
+			<td></td>
 			<td>Итог:</td>
 			<td><?=$row["pallets"]?></td>
 			<td><?=$row["details"]?></td>
@@ -227,6 +232,7 @@ while( $row = mysqli_fetch_array($res) ) {
 }
 ?>
 		<tr class="total">
+			<td></td>
 			<td></td>
 			<td>Итог:</td>
 			<td><?=$pallets?></td>

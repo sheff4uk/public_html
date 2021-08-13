@@ -87,6 +87,26 @@ include "./forms/pallet_accounting_form.php";
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>Поддон:</span>
+			<select name="PN_ID" class="<?=$_GET["PN_ID"] ? "filtered" : ""?>" style="width: 100px;">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT PN.PN_ID
+						,PN.pallet_name
+					FROM pallet__Name PN
+					ORDER BY PN.PN_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["PN_ID"] == $_GET["PN_ID"]) ? "selected" : "";
+					echo "<option value='{$row["PN_ID"]}' {$selected}>{$row["pallet_name"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Поставщик поддонов:</span>
 			<select name="PS_ID" class="<?=$_GET["PS_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
@@ -143,7 +163,7 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th>Дата</th>
-			<th>Источник</th>
+			<th>Субъект</th>
 			<th>Поддон</th>
 			<th>Отгружено поддонов</th>
 			<th>Списано поддонов</th>
@@ -175,11 +195,12 @@ $query = "
 		,NULL LS_ID
 	FROM pallet__Return PR
 	JOIN ClientBrand CB ON CB.CB_ID = PR.CB_ID
-	JOIN pallet__Name PN ON PN.PN_ID = CB.PN_ID
+	JOIN pallet__Name PN ON PN.PN_ID = PR.PN_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND PR.pr_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND PR.pr_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CB_ID"] ? "AND PR.CB_ID = {$_GET["CB_ID"]}" : "")."
+		".($_GET["PN_ID"] ? "AND PR.PN_ID = {$_GET["PN_ID"]}" : "")."
 		".($_GET["PS_ID"] ? "AND 0" : "")."
 
 	UNION
@@ -206,6 +227,7 @@ $query = "
 		".($_GET["date_from"] ? "AND PA.pa_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND PA.pa_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CB_ID"] ? "AND 0" : "")."
+		".($_GET["PN_ID"] ? "AND PS.PN_ID = {$_GET["PN_ID"]}" : "")."
 		".($_GET["PS_ID"] ? "AND PS.PS_ID = {$_GET["PS_ID"]}" : "")."
 
 
@@ -232,6 +254,7 @@ $query = "
 		".($_GET["date_from"] ? "AND PD.pd_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND PD.pd_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CB_ID"] ? "AND 0" : "")."
+		".($_GET["PN_ID"] ? "AND PD.PN_ID = {$_GET["PN_ID"]}" : "")."
 		".($_GET["PS_ID"] ? "AND 0" : "")."
 
 	UNION
@@ -257,6 +280,7 @@ $query = "
 		".($_GET["date_from"] ? "AND PD.pd_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND PD.pd_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CB_ID"] ? "AND 0" : "")."
+		".($_GET["PN_ID"] ? "AND PD.PN_ID = {$_GET["PN_ID"]}" : "")."
 		".($_GET["PS_ID"] ? "AND 0" : "")."
 
 	UNION
@@ -266,7 +290,7 @@ $query = "
 		,DATE_FORMAT(LS.ls_date, '%d.%m.%Y')
 		,CB.brand
 		,PN.pallet_name
-		,SUM(pallets)
+		,LS.pallets
 		,NULL
 		,NULL
 		,NULL
@@ -279,14 +303,13 @@ $query = "
 	FROM list__Shipment LS
 	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
 	JOIN ClientBrand CB ON CB.CB_ID = CW.CB_ID
-	JOIN pallet__Name PN ON PN.PN_ID = CB.PN_ID
+	JOIN pallet__Name PN ON PN.PN_ID = LS.PN_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND LS.ls_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND LS.ls_date <= '{$_GET["date_to"]}'" : "")."
-		".($_GET["CB_ID"] ? "AND CW.CB_ID = {$_GET["CB_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND CB.CB_ID = {$_GET["CB_ID"]}" : "")."
+		".($_GET["PN_ID"] ? "AND LS.PN_ID = {$_GET["PN_ID"]}" : "")."
 		".($_GET["PS_ID"] ? "AND 0" : "")."
-	GROUP BY CW.CB_ID, LS.ls_date
-
 	ORDER BY date, type, CB_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -330,12 +353,12 @@ while( $row = mysqli_fetch_array($res) ) {
 </table>
 
 <div>
+	<h2>Поддоны на производстве:</h2>
 	<table style="font-size: 1.5em;">
 		<thead>
 			<tr>
-				<th>Наименование поддона</th>
-				<th>Кол-во поддонов на производстве</th>
-				<th>Кол-во поддонов у клиентов</th>
+				<th>Наименование</th>
+				<th>Кол-во</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -343,11 +366,44 @@ while( $row = mysqli_fetch_array($res) ) {
 			$query = "
 				SELECT PN.PN_ID
 					,PN.pallet_name
-					,CB.brand
 					,PN.pn_balance
-					,CB.pallet_balance
 				FROM pallet__Name PN
-				JOIN ClientBrand CB ON CB.PN_ID = PN.PN_ID
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $row = mysqli_fetch_array($res) ) {
+				?>
+					<tr>
+						<td style="text-align: center;"><?=$row["pallet_name"]?></td>
+						<td style="text-align: center;"><?=$row["pn_balance"]?></td>
+					</tr>
+				<?
+			}
+			?>
+		</tbody>
+	</table>
+</div>
+
+<div>
+	<h2>Поддоны у клиентов:</h2>
+	<table style="font-size: 1.5em;">
+		<thead>
+			<tr>
+				<th>Клиент</th>
+				<th>Наименование</th>
+				<th>Кол-во</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?
+			$query = "
+				SELECT PCB.PN_ID
+					,PN.pallet_name
+					,CB.brand
+					,PCB.pallet_balance
+				FROM pallet__ClientBalance PCB
+				JOIN pallet__Name PN ON PN.PN_ID = PCB.PN_ID
+				JOIN ClientBrand CB ON CB.CB_ID = PCB.CB_ID
+				ORDER BY PCB.CB_ID
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
@@ -365,8 +421,8 @@ while( $row = mysqli_fetch_array($res) ) {
 				$actual_pallet_cost = $subrow["pallet_cost"];
 				?>
 					<tr>
-						<td style="text-align: center;"><?=$row["pallet_name"]." (".$row["brand"].")"?></td>
-						<td style="text-align: center;"><?=$row["pn_balance"]?></td>
+						<td style="text-align: center;"><?=$row["brand"]?></td>
+						<td style="text-align: center;"><?=$row["pallet_name"]?></td>
 						<td style="text-align: center;"><?=$row["pallet_balance"]." шт, на сумму <b>".number_format(( $row["pallet_balance"] * $actual_pallet_cost ), 0, '', ' ')."</b> руб."?></td>
 					</tr>
 				<?

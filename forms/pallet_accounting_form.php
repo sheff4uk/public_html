@@ -266,13 +266,16 @@ this.subbut.value='Подождите, пожалуйста!';">
 								<optgroup label="Приобретение">
 									<?
 									$query = "
-										SELECT PS.PS_ID, PS.pallet_supplier
+										SELECT PS.PS_ID
+											,PS.pallet_supplier
+											,PN.pallet_name
 										FROM pallet__Supplier PS
+										JOIN pallet__Name PN ON PN.PN_ID = PS.PN_ID
 										ORDER BY PS.PS_ID
 									";
 									$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 									while( $row = mysqli_fetch_array($res) ) {
-										echo "<option value='A{$row["PS_ID"]}' class='obt'>{$row["pallet_supplier"]}</option>";
+										echo "<option value='A{$row["PS_ID"]}' class='obt'>{$row["pallet_supplier"]} ({$row["pallet_name"]})</option>";
 									}
 									?>
 								</optgroup>
@@ -420,8 +423,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 			var cls =  $('#pallet_incoming_form select[name="source"] option:selected').attr('class');
 
 			if( cls == 'rtrn' ) {
-				$('#pallet_incoming_form .pallet').hide('fast');
-				$('#pallet_incoming_form select[name="PN_ID"]').prop('required', false);
+				$('#pallet_incoming_form .pallet').show('fast');
+				$('#pallet_incoming_form select[name="PN_ID"]').prop('required', true);
 				$('#pallet_incoming_form .broken').show('fast');
 				$('#pallet_incoming_form input[name="broken"]').prop('required', true);
 				$('#pallet_incoming_form .cost').hide('fast');

@@ -70,6 +70,7 @@ if( !$_GET["date_to"] ) {
 $query = "
 	SELECT PA.pallet_cost
 	FROM pallet__Arrival PA
+	JOIN pallet__Supplier PS ON PS.PS_ID = PA.PS_ID AND PS.PN_ID = 1
 	WHERE PA.pallet_cost > 0
 	ORDER BY PA.pa_date DESC, PA.PA_ID DESC
 	LIMIT 1
@@ -80,9 +81,10 @@ $actual_pallet_cost = $row["pallet_cost"];
 
 // Узнаем долг в поддонах
 $query = "
-	SELECT CB.pallet_balance
-	FROM ClientBrand CB
-	WHERE CB.CB_ID = 2
+	SELECT PCB.pallet_balance
+	FROM pallet__ClientBalance PCB
+	WHERE PCB.CB_ID = 2
+		AND PCB.PN_ID = 1
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);

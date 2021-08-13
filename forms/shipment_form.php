@@ -7,6 +7,7 @@ if( isset($_POST["CW_ID"]) ) {
 	$ls_date = $_POST["ls_date"];
 	$CW_ID = $_POST["CW_ID"];
 	$pallets = $_POST["pallets"];
+	$PN_ID = $_POST["PN_ID"];
 
 	if( $_POST["LS_ID"] ) { // Редактируем
 		$query = "
@@ -14,6 +15,7 @@ if( isset($_POST["CW_ID"]) ) {
 			SET ls_date = '{$ls_date}'
 				,CW_ID = {$CW_ID}
 				,pallets = {$pallets}
+				,PN_ID = {$PN_ID}
 			WHERE LS_ID = {$_POST["LS_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -27,6 +29,7 @@ if( isset($_POST["CW_ID"]) ) {
 			SET ls_date = '{$ls_date}'
 				,CW_ID = {$CW_ID}
 				,pallets = {$pallets}
+				,PN_ID = {$PN_ID}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -75,7 +78,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th>Дата</th>
 						<th>Противовес</th>
-						<th>Поддонов</th>
+						<th>Поддон</th>
+						<th>Кол-во</th>
 						<th>Деталей</th>
 					</tr>
 				</thead>
@@ -98,6 +102,22 @@ this.subbut.value='Подождите, пожалуйста!';">
 								?>
 							</select>
 						</td>
+						<td>
+							<select name="PN_ID" style="width: 150px;" required>
+								<option value=""></option>
+								<?
+								$query = "
+									SELECT PN.PN_ID
+										,PN.pallet_name
+									FROM pallet__Name PN
+								";
+								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+								while( $row = mysqli_fetch_array($res) ) {
+									echo "<option value='{$row["PN_ID"]}'>{$row["pallet_name"]}</option>";
+								}
+								?>
+							</select>
+						</td>
 						<td><input type="number" name="pallets" min="0" max="80" style="width: 70px;" required></td>
 						<td><input type="number" name="amount" style="width: 70px;" readonly></td>
 					</tr>
@@ -113,17 +133,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 <script>
 	$(function() {
-//		<?
-//		if( isset($_GET["add"]) ) {
-//		?>
-//		// Если было добавление, автоматичеки открывается форма для новой записи
-//		$(document).ready(function() {
-//			$('#add_btn').click();
-//		});
-//		<?
-//		}
-//		?>
-
 		// Кнопка добавления
 		$('.add_ps').click( function() {
 			// Проверяем сессию
@@ -143,6 +152,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				});
 
 				$('#shipment_form select[name="CW_ID"]').val(ps_data['CW_ID']);
+				$('#shipment_form select[name="PN_ID"]').val(ps_data['PN_ID']);
 				$('#shipment_form input[name="pallets"]').val(ps_data['pallets']);
 				$('#shipment_form input[name="amount"]').val(ps_data['amount']);
 				// В случае клонирования очищаем идентификатор и дату
