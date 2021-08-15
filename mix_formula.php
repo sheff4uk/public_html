@@ -84,8 +84,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<div id="add_btn" class="add_formula" title="Добавить новый рецепт"></div>
-
 <?
 include "footer.php";
 ?>
