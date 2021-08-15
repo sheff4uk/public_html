@@ -121,25 +121,6 @@ if( !$_GET["week"] ) {
 			</select>
 		</div>
 
-		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Бренд:</span>
-			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
-				<option value=""></option>
-				<?
-				$query = "
-					SELECT CB.CB_ID, CB.brand
-					FROM ClientBrand CB
-					ORDER BY CB.CB_ID
-				";
-				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-				while( $row = mysqli_fetch_array($res) ) {
-					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
-					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
-				}
-				?>
-			</select>
-		</div>
-
 <!--
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>№ кассеты:</span>
@@ -181,7 +162,6 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th>Год/Цикл</th>
 			<th>Дата время замеса</th>
-			<th>Рецепт</th>
 			<th>Куб раствора, кг</th>
 			<th>t, ℃ 22±8</th>
 			<th>Окалина,<br>кг ±5</th>
@@ -205,6 +185,7 @@ $query = "
 		,PB.cycle
 		,CW.item
 		,PB.CW_ID
+		,MF.MF_ID
 		,PB.batches
 		,PB.fact_batches
 		,MIN(TIMESTAMP(LB.batch_date, LB.batch_time)) time
@@ -212,12 +193,12 @@ $query = "
 		,IF(COUNT(LCT72.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT72.LCT_ID) * 2 / 3), 0) `72tests`
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID
 	JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 	LEFT JOIN list__CubeTest LCT24 ON LCT24.LB_ID = LB.LB_ID AND LCT24.delay = 24
 	LEFT JOIN list__CubeTest LCT72 ON LCT72.LB_ID = LB.LB_ID AND LCT72.delay = 72
 	WHERE PB.PB_ID IN (SELECT PB_ID FROM list__Batch WHERE YEARWEEK(batch_date, 1) LIKE '{$_GET["week"]}' GROUP BY PB_ID)
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	GROUP BY PB.PB_ID
 	ORDER BY PB.cycle, time
 ";
@@ -258,8 +239,6 @@ while( $row = mysqli_fetch_array($res) ) {
 			,OP.name
 			,DATE_FORMAT(LB.batch_date, '%d.%m') batch_date_format
 			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
-			,LB.io_density
-			,LB.sn_density
 			,LB.mix_density
 			,LB.temp
 			,IF(ABS(22 - LB.temp) <= 8, NULL, IF(LB.temp - 22 > 8, LB.temp - 30, LB.temp - 14)) temp_diff
@@ -271,15 +250,13 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.water
 			,SUM(LF.underfilling) underfilling
 			,LB.test
-			,mix_letter(LB.LB_ID) letter
-			,mix_id(LB.LB_ID) MF_ID
 			,mix_diff({$row["CW_ID"]}, LB.mix_density) mix_diff
-			,mix_io_diff(mix_id(LB.LB_ID), LB.iron_oxide) io_diff
-			,mix_sn_diff(mix_id(LB.LB_ID), LB.sand) sn_diff
-			,mix_cs_diff(mix_id(LB.LB_ID), LB.crushed_stone) cs_diff
-			,mix_cm_diff(mix_id(LB.LB_ID), LB.cement) cm_diff
-			,mix_pl_diff(mix_id(LB.LB_ID), LB.plasticizer) pl_diff
-			,mix_wt_diff(mix_id(LB.LB_ID), LB.water) wt_diff
+			,mix_io_diff({$row["MF_ID"]}, LB.iron_oxide) io_diff
+			,mix_sn_diff({$row["MF_ID"]}, LB.sand) sn_diff
+			,mix_cs_diff({$row["MF_ID"]}, LB.crushed_stone) cs_diff
+			,mix_cm_diff({$row["MF_ID"]}, LB.cement) cm_diff
+			,mix_pl_diff({$row["MF_ID"]}, LB.plasticizer) pl_diff
+			,mix_wt_diff({$row["MF_ID"]}, LB.water) wt_diff
 		FROM list__Batch LB
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
@@ -326,15 +303,14 @@ while( $row = mysqli_fetch_array($res) ) {
 		}
 		?>
 		<td><?=$subrow["batch_date_format"]?> <?=$subrow["batch_time_format"]?></td>
-		<td><span class="nowrap"><?=$subrow["MF_ID"] ? "<a href='mix_formula.php#{$subrow["MF_ID"]}' target='_blank'><b>{$subrow["letter"]}</b></a> " : "<i class='fas fa-exclamation-triangle' style='color: red;' title='Подходящий рецепт не обнаружен'></i> "?><?=($subrow["io_density"] ? "<i title='Плотность окалины' style='text-decoration: underline; background: #a52a2a80;'>".($subrow["io_density"]/1000)."</i> " : "")?><?=($subrow["sn_density"] ? "<i title='Плотность КМП' style='text-decoration: underline; background: #f4a46082;'>".($subrow["sn_density"]/1000)."</i> " : "")?></span></td>
 				<td><?=$subrow["mix_density"]/1000?> <?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
 				<td><?=$subrow["temp"]?><?=($subrow["temp_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["temp_diff"] > 0 ? " +" : " ").($subrow["temp_diff"])."</font>" : "")?></td>
-				<td style="background: #a52a2a80; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
-				<td style="background: #f4a46082; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["sand"]?><?=($subrow["sn_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sn_diff"] > 0 ? " +" : " ").($subrow["sn_diff"])."</font>" : "")?></td>
-				<td style="background: #8b45137a; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
-				<td style="background: #7080906b; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["cement"]?><?=($subrow["cm_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cm_diff"] > 0 ? " +" : " ").($subrow["cm_diff"])."</font>" : "")?></td>
-				<td style="background: #80800080; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["plasticizer"]?><?=($subrow["pl_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["pl_diff"] > 0 ? " +" : " ").($subrow["pl_diff"])."</font>" : "")?></td>
-				<td style="background: #1e90ff85; <?=($subrow["MF_ID"] ? "" : "color: red;")?>"><?=$subrow["water"]?><?=($subrow["wt_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["wt_diff"])."</font>" : "")?></td>
+				<td style="background: #a52a2a80;"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
+				<td style="background: #f4a46082;"><?=$subrow["sand"]?><?=($subrow["sn_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sn_diff"] > 0 ? " +" : " ").($subrow["sn_diff"])."</font>" : "")?></td>
+				<td style="background: #8b45137a;"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
+				<td style="background: #7080906b;"><?=$subrow["cement"]?><?=($subrow["cm_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cm_diff"] > 0 ? " +" : " ").($subrow["cm_diff"])."</font>" : "")?></td>
+				<td style="background: #80800080;"><?=$subrow["plasticizer"]?><?=($subrow["pl_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["pl_diff"] > 0 ? " +" : " ").($subrow["pl_diff"])."</font>" : "")?></td>
+				<td style="background: #1e90ff85;"><?=$subrow["water"]?><?=($subrow["wt_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["wt_diff"])."</font>" : "")?></td>
 				<td colspan="2" class="nowrap"><?=$cassette?></td>
 				<td><?=$subrow["underfilling"]?></td>
 				<td><?=$subrow["name"]?></td>

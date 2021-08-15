@@ -51,16 +51,12 @@ $html = "
 
 // Данные рецепта
 $query = "
-	SELECT GROUP_CONCAT(CONCAT('<span style=\'font-size: 1.5em;\' class=\'nowrap\'>', MF.letter, '</span>') ORDER BY MF.letter SEPARATOR '<br>') ltr
-		,GROUP_CONCAT(CONCAT(ROUND(MF.io_min/1000, 2), '&ndash;', ROUND(MF.io_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') io
-		,GROUP_CONCAT(CONCAT(ROUND(MF.sn_min/1000, 2), '&ndash;', ROUND(MF.sn_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') sn
-		,GROUP_CONCAT(CONCAT(ROUND(MF.cs_min/1000, 2), '&ndash;', ROUND(MF.cs_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') cs
-		,GROUP_CONCAT(IFNULL(CONCAT(MF.iron_oxide, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') iron_oxide
-		,GROUP_CONCAT(IFNULL(CONCAT(MF.sand, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') sand
-		,GROUP_CONCAT(IFNULL(CONCAT(MF.crushed_stone, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') crushed_stone
-		,GROUP_CONCAT(IFNULL(CONCAT(MF.cement, ' ±2'), 0) ORDER BY MF.letter SEPARATOR '<br>') cement
-		,GROUP_CONCAT(IFNULL(CONCAT(MF.plasticizer, ' ±0.1'), 0) ORDER BY MF.letter SEPARATOR '<br>') plasticizer
-		,GROUP_CONCAT(IFNULL(CONCAT('min ', MF.water), 0) ORDER BY MF.letter SEPARATOR '<br>') water
+	SELECT IFNULL(CONCAT(MF.iron_oxide, ' ±5'), 0) iron_oxide
+		,IFNULL(CONCAT(MF.sand, ' ±5'), 0) sand
+		,IFNULL(CONCAT(MF.crushed_stone, ' ±5'), 0) crushed_stone
+		,IFNULL(CONCAT(MF.cement, ' ±2'), 0) cement
+		,IFNULL(CONCAT(MF.plasticizer, ' ±0.1'), 0) plasticizer
+		,IFNULL(CONCAT('min ', MF.water), 0) water
 		,COUNT(MF.iron_oxide) io_cnt
 		,COUNT(MF.sand) sn_cnt
 		,COUNT(MF.crushed_stone) cs_cnt
@@ -77,33 +73,22 @@ $html .= "
 	<table style='font-size: .85em; table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
 		<thead style='word-wrap: break-word;'>
 			<tr>
-				<th rowspan='3' width='30'>№<br>п/п</th>
-				<th rowspan='3' width='160'>Дата и время замеса</th>
-				<th rowspan='2' width='30' style='word-wrap: break-word;'>Рецепт</th>
-				<th colspan='".(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0) + ($row["cs"] ? 1 : 0))."'>Масса куба, кг</th>
-				<th rowspan='3' width='40'>t, ℃ 22±8</th>
-				".($row["io_cnt"] ? "<th rowspan='2'>Окалина, кг</th>" : "")."
-				".($row["sn_cnt"] ? "<th rowspan='2'>КМП, кг</th>" : "")."
-				".($row["cs_cnt"] ? "<th rowspan='2'>Отсев, кг</th>" : "")."
-				".($row["cm_cnt"] ? "<th rowspan='2'>Цемент, кг</th>" : "")."
-				".($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор, кг</th>" : "")."
-				".($row["wt_cnt"] ? "<th rowspan='2'>Вода, кг</th>" : "")."
-				<th rowspan='3' colspan='{$fillings}' width='".($fillings * 50)."'>№ кассеты</th>
-				<th rowspan='3'>Недолив</th>
-				<th rowspan='3' width='30'><i class='fas fa-cube' title='Испытание куба'></i></th>
-				<th rowspan='3'>Оператор</th>
+				<th rowspan='2' width='30'>№<br>п/п</th>
+				<th rowspan='2' width='160'>Дата и время замеса</th>
+				<th>Масса куба раствора, кг</th>
+				<th rowspan='2' width='40'>t, ℃ 22±8</th>
+				".($row["io_cnt"] ? "<th>Окалина, кг</th>" : "")."
+				".($row["sn_cnt"] ? "<th>КМП, кг</th>" : "")."
+				".($row["cs_cnt"] ? "<th>Отсев, кг</th>" : "")."
+				".($row["cm_cnt"] ? "<th>Цемент, кг</th>" : "")."
+				".($row["pl_cnt"] ? "<th>Пластификатор, кг</th>" : "")."
+				".($row["wt_cnt"] ? "<th>Вода, кг</th>" : "")."
+				<th rowspan='2' colspan='{$fillings}' width='".($fillings * 50)."'>№ кассеты</th>
+				<th rowspan='2'>Недолив</th>
+				<th rowspan='2' width='30'><i class='fas fa-cube' title='Испытание куба'></i></th>
+				<th rowspan='2'>Оператор</th>
 			</tr>
 			<tr>
-				".(($row["io"] ? "<th>Окалины</th>" : ""))."
-				".(($row["sn"] ? "<th>КМП</th>" : ""))."
-				".(($row["cs"] ? "<th>Отсева</th>" : ""))."
-				<th>Раствора</th>
-			</tr>
-			<tr>
-				<th>{$row["ltr"]}</th>
-				".(($row["io"] ? "<th class='nowrap'>{$row["io"]}</th>" : ""))."
-				".(($row["sn"] ? "<th class='nowrap'>{$row["sn"]}</th>" : ""))."
-				".(($row["cs"] ? "<th class='nowrap'>{$row["cs"]}</th>" : ""))."
 				<th class='nowrap'>{$spec}</th>
 				".($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")."
 				".($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")."
@@ -123,8 +108,6 @@ if( $fact_batches ) {
 			,LB.OP_ID
 			,LB.batch_date
 			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
-			,LB.io_density
-			,LB.sn_density
 			,LB.mix_density
 			,LB.temp
 			,IFNULL(LB.iron_oxide, 0) iron_oxide
@@ -184,9 +167,6 @@ if( $fact_batches ) {
 			<tr class='batch_row' num='{$i}'>
 				<td style='text-align: center; font-size: 1.2em;'>{$i}</td>
 				<td><input type='datetime-local' name='batch_time[{$subrow["LB_ID"]}]' style='width: 110%;' value='{$subrow["batch_date"]}T{$subrow["batch_time_format"]}' required></td>
-				<td><att></att></td>
-				".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[{$subrow["LB_ID"]}]' value='".($subrow["io_density"]/1000)."' style='width: 110%;' required></td>" : "")."
-				".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[{$subrow["LB_ID"]}]' value='".($subrow["sn_density"]/1000)."' style='width: 110%;' required></td>" : "")."
 				<td><input type='number' min='2' max='4' step='0.01' name='mix_density[{$subrow["LB_ID"]}]' value='".($subrow["mix_density"]/1000)."' style='width: 110%;' required></td>
 				<td><input type='number' min='5' max='45' name='temp[{$subrow["LB_ID"]}]' value='{$subrow["temp"]}' style='width: 110%;' required></td>
 				".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[{$subrow["LB_ID"]}]' value='{$subrow["iron_oxide"]}' style='width: 110%;' required></td>" : "")."
@@ -232,9 +212,6 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 		<tr class='batch_row' num='{$i}'>
 			<td style='text-align: center; font-size: 1.2em;'>{$i}</td>
 			<td><input type='datetime-local' name='batch_time[n_{$i}]' style='width: 110%;' required></td>
-			<td><att></att></td>
-			".($row["io"] ? "<td><input type='number' min='2' max='3' step='0.01' name='io_density[n_{$i}]' style='width: 110%;' required></td>" : "")."
-			".($row["sn"] ? "<td><input type='number' min='1' max='2' step='0.01' name='sn_density[n_{$i}]' style='width: 110%;' required></td>" : "")."
 			<td><input type='number' min='2' max='4' step='0.01' name='mix_density[n_{$i}]' style='width: 110%;' required></td>
 			<td><input type='number' min='5' max='45' name='temp[n_{$i}]' style='width: 110%;' required></td>
 			".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[n_{$i}]' style='width: 110%;' required></td>" : "")."

@@ -102,15 +102,12 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 <?
 // Данные рецепта
 $query = "
-	SELECT GROUP_CONCAT(CONCAT('<span style=\'font-size: 1.5em;\' class=\'nowrap\'>', MF.letter, '</span>') ORDER BY MF.letter SEPARATOR '<br>') ltr
-		,GROUP_CONCAT(CONCAT(ROUND(MF.io_min/1000, 2), '&ndash;', ROUND(MF.io_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') io
-		,GROUP_CONCAT(CONCAT(ROUND(MF.sn_min/1000, 2), '&ndash;', ROUND(MF.sn_max/1000, 2)) ORDER BY MF.letter SEPARATOR '<br>') sn
-		,GROUP_CONCAT(IFNULL(CONCAT(MF.iron_oxide, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') iron_oxide
-		,GROUP_CONCAT(IFNULL(CONCAT(MF.sand, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') sand
-		,GROUP_CONCAT(IFNULL(CONCAT(MF.crushed_stone, ' ±5'), 0) ORDER BY MF.letter SEPARATOR '<br>') crushed_stone
-		,GROUP_CONCAT(IFNULL(CONCAT(MF.cement, ' ±2'), 0) ORDER BY MF.letter SEPARATOR '<br>') cement
-		,GROUP_CONCAT(IFNULL(CONCAT(MF.plasticizer, ' ±0.1'), 0) ORDER BY MF.letter SEPARATOR '<br>') plasticizer
-		,GROUP_CONCAT(IFNULL(CONCAT('min ', MF.water), 0) ORDER BY MF.letter SEPARATOR '<br>') water
+	SELECT IFNULL(CONCAT(MF.iron_oxide, ' ±5'), 0) iron_oxide
+		,IFNULL(CONCAT(MF.sand, ' ±5'), 0) sand
+		,IFNULL(CONCAT(MF.crushed_stone, ' ±5'), 0) crushed_stone
+		,IFNULL(CONCAT(MF.cement, ' ±2'), 0) cement
+		,IFNULL(CONCAT(MF.plasticizer, ' ±0.1'), 0) plasticizer
+		,IFNULL(CONCAT('min ', MF.water), 0) water
 		,COUNT(MF.iron_oxide) io_cnt
 		,COUNT(MF.sand) sn_cnt
 		,COUNT(MF.crushed_stone) cs_cnt
@@ -127,31 +124,22 @@ $row = mysqli_fetch_array($res);
 <table>
 	<thead style="word-wrap: break-word;">
 		<tr>
-			<th rowspan="3" width="30">№<br>п/п</th>
-			<th rowspan="3">Время замеса</th>
-			<th rowspan="2" width="40">Рецепт</th>
-			<th colspan="<?=(1 + ($row["io"] ? 1 : 0) + ($row["sn"] ? 1 : 0))?>">Масса куба, кг</th>
-			<th rowspan="3" width="30" style="border-right: 4px solid;">t, ℃ 22±8</th>
-			<?=($row["io_cnt"] ? "<th rowspan='2'>Окалина, кг</th>" : "")?>
-			<?=($row["sn_cnt"] ? "<th rowspan='2'>КМП, кг</th>" : "")?>
-			<?=($row["cs_cnt"] ? "<th rowspan='2'>Отсев, кг</th>" : "")?>
-			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент, кг</th>" : "")?>
-			<?=($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор, кг</th>" : "")?>
-			<?=($row["wt_cnt"] ? "<th rowspan='2'>Вода, кг</th>" : "")?>
-			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 60)?>" style="border-left: 4px solid;">№ кассеты</th>
-			<th rowspan="3" width="40">Недолив</th>
-			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
-			<th rowspan="3">Оператор</th>
+			<th rowspan="2" width="30">№<br>п/п</th>
+			<th rowspan="2">Время замеса</th>
+			<th>Масса куба раствора, кг</th>
+			<th rowspan="2" width="30" style="border-right: 4px solid;">t, ℃ 22±8</th>
+			<?=($row["io_cnt"] ? "<th>Окалина, кг</th>" : "")?>
+			<?=($row["sn_cnt"] ? "<th>КМП, кг</th>" : "")?>
+			<?=($row["cs_cnt"] ? "<th>Отсев, кг</th>" : "")?>
+			<?=($row["cm_cnt"] ? "<th>Цемент, кг</th>" : "")?>
+			<?=($row["pl_cnt"] ? "<th>Пластификатор, кг</th>" : "")?>
+			<?=($row["wt_cnt"] ? "<th>Вода, кг</th>" : "")?>
+			<th rowspan="2" colspan="<?=$fillings?>" width="<?=($fillings * 60)?>" style="border-left: 4px solid;">№ кассеты</th>
+			<th rowspan="2" width="40">Недолив</th>
+			<th rowspan="2" width="20"><i class="fas fa-cube"></i></th>
+			<th rowspan="2">Оператор</th>
 		</tr>
 		<tr>
-			<?=(($row["io"] ? "<th>Окалины</th>" : ""))?>
-			<?=(($row["sn"] ? "<th>КМП</th>" : ""))?>
-			<th>Раствора</th>
-		</tr>
-		<tr>
-			<th><?=$row["ltr"]?></th>
-			<?=(($row["io"] ? "<th class='nowrap'>{$row["io"]}</th>" : ""))?>
-			<?=(($row["sn"] ? "<th class='nowrap'>{$row["sn"]}</th>" : ""))?>
 			<th class="nowrap"><?=$spec?></th>
 			<?=($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")?>
@@ -173,9 +161,6 @@ for ($i = 1; $i <= $batches; $i++) {
 		<tr>
 			<td style='text-align: center;'>{$i}</td>
 			<td style='text-align: center;'>__:__</td>
-			<td></td>
-			".($row["io"] ? "<td></td>" : "")."
-			".($row["sn"] ? "<td></td>" : "")."
 			<td></td>
 			<td style='border-right: 4px solid;'></td>
 			".($row["io_cnt"] ? "<td></td>" : "")."

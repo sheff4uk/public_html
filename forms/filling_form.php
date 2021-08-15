@@ -21,8 +21,6 @@ if( isset($_POST["PB_ID"]) ) {
 		foreach ($_POST["batch_time"] as $key => $value) {
 			$batch_date = substr($value, 0, 10);
 			$batch_time = substr($value, -5);
-			$io_density = $_POST["io_density"][$key] ? $_POST["io_density"][$key]*1000 : "NULL";
-			$sn_density = $_POST["sn_density"][$key] ? $_POST["sn_density"][$key]*1000 : "NULL";
 			$mix_density = $_POST["mix_density"][$key]*1000;
 			$temp = $_POST["temp"][$key] ? $_POST["temp"][$key] : "NULL";
 			$iron_oxide = $_POST["iron_oxide"][$key] ? $_POST["iron_oxide"][$key] : "NULL";
@@ -41,8 +39,6 @@ if( isset($_POST["PB_ID"]) ) {
 					SET PB_ID = {$_POST["PB_ID"]}
 						,batch_date = '{$batch_date}'
 						,batch_time = '{$batch_time}'
-						,io_density = {$io_density}
-						,sn_density = {$sn_density}
 						,mix_density = {$mix_density}
 						,temp = {$temp}
 						,iron_oxide = {$iron_oxide}
@@ -83,8 +79,6 @@ if( isset($_POST["PB_ID"]) ) {
 					SET PB_ID = {$_POST["PB_ID"]}
 						,batch_date = '{$batch_date}'
 						,batch_time = '{$batch_time}'
-						,io_density = {$io_density}
-						,sn_density = {$sn_density}
 						,mix_density = {$mix_density}
 						,temp = {$temp}
 						,iron_oxide = {$iron_oxide}
