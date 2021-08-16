@@ -10,6 +10,7 @@ if( isset($_POST["cnt"]) ) {
 	if( $pref == "R" ) {
 		$pr_date = $_POST["date"];
 		$CB_ID = substr($_POST["source"], 1);
+		$PN_ID = $_POST["PN_ID"];
 		$pr_cnt = $_POST["cnt"];
 		$pr_reject = $_POST["broken"];
 
@@ -18,6 +19,7 @@ if( isset($_POST["cnt"]) ) {
 				UPDATE pallet__Return
 				SET pr_date = '{$pr_date}'
 					,CB_ID = {$CB_ID}
+					,PN_ID = {$PN_ID}
 					,pr_cnt = {$pr_cnt}
 					,pr_reject = {$pr_reject}
 				WHERE PR_ID = {$_POST["incoming_ID"]}
@@ -32,6 +34,7 @@ if( isset($_POST["cnt"]) ) {
 				INSERT INTO pallet__Return
 				SET pr_date = '{$pr_date}'
 					,CB_ID = {$CB_ID}
+					,PN_ID = {$PN_ID}
 					,pr_cnt = {$pr_cnt}
 					,pr_reject = {$pr_reject}
 			";

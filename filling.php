@@ -14,38 +14,6 @@ if( !$_GET["week"] ) {
 }
 ?>
 
-<style>
-	#batch_plan {
-		position: relative;
-	}
-	#batch_plan:hover > div {
-		height: 300px;
-		opacity: 1;
-	}
-	#batch_plan > div {
-		background: #fff;
-		height: 0px;
-		border: 1px solid #bbb;
-		padding: 10px;
-		border-radius: 5px;
-		margin-top: 10px;
-		z-index: 2;
-		position: absolute;
-		top: -10px;
-		left: 0px;
-		width: 100%;
-		overflow: auto;
-		opacity: 0;
-		transition: .3s;
-		-webkit-transition: .3s;
-		box-shadow: 5px 5px 8px #666;
-	}
-	#batch_plan > div table {
-		width: 100%;
-		table-layout: fixed;
-	}
-</style>
-
 <!--Фильтр-->
 <div id="filter">
 	<h3>Фильтр</h3>
