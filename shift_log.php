@@ -168,11 +168,9 @@ foreach ($_GET as &$value) {
 		<?
 		// Вторая смена
 		$query = "
-			SELECT CONCAT(MU.Surname, ' ', IFNULL(MU.Name, '')) master
-				,CONCAT(OU.Surname, ' ', IFNULL(OU.Name, '')) operator
+			SELECT USR_Icon(SL.master) master
+				,USR_Icon(SL.operator) operator
 			FROM ShiftLog SL
-			LEFT JOIN Users MU on MU.USR_ID = SL.master
-			LEFT JOIN Users OU on OU.USR_ID = SL.operator
 			WHERE SL.working_day LIKE '{$row["next_day"]}' AND SL.shift = 2
 		";
 		$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
