@@ -31,7 +31,6 @@ if( isset($_POST["PB_ID"]) ) {
 			$water = $_POST["water"][$key];
 			$underfilling = $_POST["underfilling"][$key] ? $_POST["underfilling"][$key] : 0;
 			$test = $_POST["test"][$key] ? 1 : 0;
-			$OP_ID = $_POST["OP_ID"][$key];
 
 			if( strpos($key,"n_") === 0 ) { // Добавляем замес
 				$query = "
@@ -48,7 +47,6 @@ if( isset($_POST["PB_ID"]) ) {
 						,plasticizer = {$plasticizer}
 						,water = {$water}
 						,test = {$test}
-						,OP_ID = {$OP_ID}
 				";
 				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
@@ -88,7 +86,6 @@ if( isset($_POST["PB_ID"]) ) {
 						,plasticizer = {$plasticizer}
 						,water = {$water}
 						,test = {$test}
-						,OP_ID = {$OP_ID}
 					WHERE LB_ID = {$key}
 				";
 				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

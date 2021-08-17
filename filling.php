@@ -204,7 +204,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 	$query = "
 		SELECT LB.LB_ID
-			,OP.name
+			,USR_Name(operator) name
 			,DATE_FORMAT(LB.batch_date, '%d.%m') batch_date_format
 			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 			,LB.mix_density
@@ -227,7 +227,6 @@ while( $row = mysqli_fetch_array($res) ) {
 			,mix_wt_diff({$row["MF_ID"]}, LB.water) wt_diff
 		FROM list__Batch LB
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		JOIN Operator OP ON OP.OP_ID = LB.OP_ID
 		WHERE LB.PB_ID = {$row["PB_ID"]}
 		GROUP BY LB.LB_ID
 		ORDER BY LB.batch_date, LB.batch_time

@@ -113,99 +113,14 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#formula_form input[name="plasticizer"]').val(mf_data['plasticizer']);
 			$('#formula_form input[name="water"]').val(mf_data['water']);
 
-		$('#formula_form').dialog({
-			resizable: false,
-			width: 1000,
-			modal: true,
-			closeText: 'Закрыть'
-		});
+			$('#formula_form').dialog({
+				resizable: false,
+				width: 1000,
+				modal: true,
+				closeText: 'Закрыть'
+			});
 
 			return false;
 		});
-
-		$('#formula_form input[name="io_min"]').change(function() {
-			var val = $(this).val();
-			$('#formula_form input[name="iron_oxide"]').attr('required', true);
-			if( val ) {
-				$('#formula_form input[name="io_max"]').attr('min', val);
-			}
-			else {
-				$('#formula_form input[name="io_max"]').attr('min', 2);
-			}
-			if( !val && !$('#formula_form input[name="io_max"]').val() ) {
-				$('#formula_form input[name="iron_oxide"]').attr('required', false);
-			}
-		});
-
-		$('#formula_form input[name="io_max"]').change(function() {
-			var val = $(this).val();
-			$('#formula_form input[name="iron_oxide"]').attr('required', true);
-			if( val ) {
-				$('#formula_form input[name="io_min"]').attr('max', val);
-			}
-			else {
-				$('#formula_form input[name="io_min"]').attr('max', 3);
-			}
-			if( !val && !$('#formula_form input[name="io_min"]').val() ) {
-				$('#formula_form input[name="iron_oxide"]').attr('required', false);
-			}
-		});
-
-		$('#formula_form input[name="sn_min"]').change(function() {
-			var val = $(this).val();
-			$('#formula_form input[name="sand"]').attr('required', true);
-			if( val ) {
-				$('#formula_form input[name="sn_max"]').attr('min', val);
-			}
-			else {
-				$('#formula_form input[name="sn_max"]').attr('min', 1);
-			}
-			if( !val && !$('#formula_form input[name="sn_max"]').val() ) {
-				$('#formula_form input[name="sand"]').attr('required', false);
-			}
-		});
-
-		$('#formula_form input[name="sn_max"]').change(function() {
-			var val = $(this).val();
-			$('#formula_form input[name="sand"]').attr('required', true);
-			if( val ) {
-				$('#formula_form input[name="sn_min"]').attr('max', val);
-			}
-			else {
-				$('#formula_form input[name="sn_min"]').attr('max', 2);
-			}
-			if( !val && !$('#formula_form input[name="sn_min"]').val() ) {
-				$('#formula_form input[name="sand"]').attr('required', false);
-			}
-		});
-
-		$('#formula_form input[name="cs_min"]').change(function() {
-			var val = $(this).val();
-			$('#formula_form input[name="crushed_stone"]').attr('required', true);
-			if( val ) {
-				$('#formula_form input[name="cs_max"]').attr('min', val);
-			}
-			else {
-				$('#formula_form input[name="cs_max"]').attr('min', 1);
-			}
-			if( !val && !$('#formula_form input[name="cs_max"]').val() ) {
-				$('#formula_form input[name="crushed_stone"]').attr('required', false);
-			}
-		});
-
-		$('#formula_form input[name="cs_max"]').change(function() {
-			var val = $(this).val();
-			$('#formula_form input[name="crushed_stone"]').attr('required', true);
-			if( val ) {
-				$('#formula_form input[name="cs_min"]').attr('max', val);
-			}
-			else {
-				$('#formula_form input[name="cs_min"]').attr('max', 2);
-			}
-			if( !val && !$('#formula_form input[name="cs_min"]').val() ) {
-				$('#formula_form input[name="crushed_stone"]').attr('required', false);
-			}
-		});
-
 	});
 </script>

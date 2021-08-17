@@ -137,7 +137,6 @@ $row = mysqli_fetch_array($res);
 			<th rowspan="2" colspan="<?=$fillings?>" width="<?=($fillings * 60)?>" style="border-left: 4px solid;">№ кассеты</th>
 			<th rowspan="2" width="40">Недолив</th>
 			<th rowspan="2" width="20"><i class="fas fa-cube"></i></th>
-			<th rowspan="2">Оператор</th>
 		</tr>
 		<tr>
 			<th class="nowrap"><?=$spec?></th>
@@ -172,7 +171,6 @@ for ($i = 1; $i <= $batches; $i++) {
 			{$fillings_cell}
 			<td></td>
 			<td style='text-align: center;'>".(in_array($i, $tests) ? "<b style='font-size: 1.4em;'>&#10065;</b>" : "&#10065;")."</td>
-			<td></td>
 		</tr>
 	";
 }

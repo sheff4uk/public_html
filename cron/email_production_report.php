@@ -34,6 +34,7 @@ $message = "
 				<th>Дефект формы</th>
 				<th>Дефект сборки</th>
 				<th>Сборка кассеты</th>
+				<th>Мастер</th>
 			</tr>
 		</thead>
 		<tbody style='text-align: center;'>
@@ -48,6 +49,7 @@ $query = "
 		,SUM(IF(LW.goodsID = 6, 1, NULL)) d_shell
 		,SUM(IF(LW.goodsID = 7, 1, NULL)) d_assembly
 		,(SELECT DATE_FORMAT(opening_time, '%d.%m.%Y %H:%i') FROM list__Opening WHERE opening_time < LO.opening_time AND cassette = LO.cassette ORDER BY opening_time DESC LIMIT 1) cassette_assembly
+		,USR_Name(LO.master) name
 	FROM list__Opening LO
 	JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
@@ -71,6 +73,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>{$row["d_shell"]}</td>
 			<td>{$row["d_assembly"]}</td>
 			<td>{$row["cassette_assembly"]}</td>
+			<td>{$row["name"]}</td>
 		</tr>
 	";
 }
@@ -122,11 +125,10 @@ $query = "
 		,SUM(IF(LW.weight > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 1, NULL)) light
 		,SUM(IF(LW.weight < ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)), 1, NULL)) heavy
 		,DATE_FORMAT(TIMESTAMP(LF.lf_date, LF.lf_time), '%d.%m.%Y %H:%i') friendly_lf_time
-		,OP.name
+		,USR_Name(LB.operator) name
 	FROM list__Opening LO
 	JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
-	JOIN Operator OP ON OP.OP_ID = LB.OP_ID
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
