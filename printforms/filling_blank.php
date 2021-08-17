@@ -142,9 +142,9 @@ $row = mysqli_fetch_array($res);
 			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
 		</tr>
 		<tr>
-			<?=($row["io_cnt"] ? "<th style='text-align: left;'><sup>куб:</sup></th>" : "")?>
-			<?=($row["sn_cnt"] ? "<th style='text-align: left;'><sup>куб:</sup></th>" : "")?>
-			<?=($row["cs_cnt"] ? "<th style='text-align: left;'><sup>куб:</sup></th>" : "")?>
+			<?=($row["io_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
+			<?=($row["sn_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
+			<?=($row["cs_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 		</tr>
 		<tr>
 			<th class="nowrap"><?=$spec?> кг</th>
