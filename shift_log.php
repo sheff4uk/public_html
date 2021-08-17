@@ -150,8 +150,8 @@ foreach ($_GET as &$value) {
 	while( $row = mysqli_fetch_array($res) ) {
 		// Первая смена
 		$query = "
-			SELECT USR_Name(SL.master) master
-				,USR_Name(SL.operator) operator
+			SELECT USR_Icon(SL.master) master
+				,USR_Icon(SL.operator) operator
 			FROM ShiftLog SL
 			WHERE SL.working_day LIKE '{$row["next_day"]}' AND SL.shift = 1
 		";

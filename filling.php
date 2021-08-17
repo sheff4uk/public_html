@@ -204,7 +204,6 @@ while( $row = mysqli_fetch_array($res) ) {
 
 	$query = "
 		SELECT LB.LB_ID
-			#,USR_Name(operator) name
 			,USR_Icon(operator) name
 			,DATE_FORMAT(LB.batch_date, '%d.%m') batch_date_format
 			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
