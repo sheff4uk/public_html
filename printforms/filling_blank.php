@@ -40,6 +40,9 @@ $spec = $row["spec"];
 if( $cubetests == 1 ) {
 	$tests = array(round($batches/2));
 }
+elseif( $cubetests == 2 ) {
+	$tests = array(2, round($batches/2));
+}
 elseif( $cubetests == 3 ) {
 	$tests = array(2, round($batches/2), $batches);
 }
