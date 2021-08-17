@@ -105,12 +105,12 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 <?
 // Данные рецепта
 $query = "
-	SELECT IFNULL(CONCAT(MF.iron_oxide, ' ±5'), 0) iron_oxide
-		,IFNULL(CONCAT(MF.sand, ' ±5'), 0) sand
-		,IFNULL(CONCAT(MF.crushed_stone, ' ±5'), 0) crushed_stone
-		,IFNULL(CONCAT(MF.cement, ' ±2'), 0) cement
-		,IFNULL(CONCAT(MF.plasticizer, ' ±0.1'), 0) plasticizer
-		,IFNULL(CONCAT('min ', MF.water), 0) water
+	SELECT IFNULL(CONCAT(MF.iron_oxide, ' ±5 кг'), 0) iron_oxide
+		,IFNULL(CONCAT(MF.sand, ' ±5 кг'), 0) sand
+		,IFNULL(CONCAT(MF.crushed_stone, ' ±5 кг'), 0) crushed_stone
+		,IFNULL(CONCAT(MF.cement, ' ±2 кг'), 0) cement
+		,IFNULL(CONCAT(MF.plasticizer, ' ±0.1 кг'), 0) plasticizer
+		,IFNULL(CONCAT('min ', MF.water, ' л'), 0) water
 		,COUNT(MF.iron_oxide) io_cnt
 		,COUNT(MF.sand) sn_cnt
 		,COUNT(MF.crushed_stone) cs_cnt
@@ -127,22 +127,27 @@ $row = mysqli_fetch_array($res);
 <table>
 	<thead style="word-wrap: break-word;">
 		<tr>
-			<th rowspan="2" width="30">№<br>п/п</th>
-			<th rowspan="2">Время замеса</th>
-			<th>Масса куба раствора, кг</th>
-			<th rowspan="2" width="30" style="border-right: 4px solid;">t, ℃ 22±8</th>
-			<?=($row["io_cnt"] ? "<th>Окалина, кг</th>" : "")?>
-			<?=($row["sn_cnt"] ? "<th>КМП, кг</th>" : "")?>
-			<?=($row["cs_cnt"] ? "<th>Отсев, кг</th>" : "")?>
-			<?=($row["cm_cnt"] ? "<th>Цемент, кг</th>" : "")?>
-			<?=($row["pl_cnt"] ? "<th>Пластификатор, кг</th>" : "")?>
-			<?=($row["wt_cnt"] ? "<th>Вода, кг</th>" : "")?>
-			<th rowspan="2" colspan="<?=$fillings?>" width="<?=($fillings * 60)?>" style="border-left: 4px solid;">№ кассеты</th>
-			<th rowspan="2" width="40">Недолив</th>
-			<th rowspan="2" width="20"><i class="fas fa-cube"></i></th>
+			<th rowspan="3" width="30">№<br>п/п</th>
+			<th rowspan="3">Время замеса</th>
+			<th  rowspan="2">Масса куба раствора</th>
+			<th rowspan="3" width="30" style="border-right: 4px solid;">t, ℃ 22±8</th>
+			<?=($row["io_cnt"] ? "<th>Окалина</th>" : "")?>
+			<?=($row["sn_cnt"] ? "<th>КМП</th>" : "")?>
+			<?=($row["cs_cnt"] ? "<th>Отсев</th>" : "")?>
+			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент</th>" : "")?>
+			<?=($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор</th>" : "")?>
+			<?=($row["wt_cnt"] ? "<th rowspan='2'>Вода</th>" : "")?>
+			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 60)?>" style="border-left: 4px solid;">№ кассеты</th>
+			<th rowspan="3" width="40">Недолив</th>
+			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
 		</tr>
 		<tr>
-			<th class="nowrap"><?=$spec?></th>
+			<?=($row["io_cnt"] ? "<th style='text-align: left;'><sup>куб:</sup></th>" : "")?>
+			<?=($row["sn_cnt"] ? "<th style='text-align: left;'><sup>куб:</sup></th>" : "")?>
+			<?=($row["cs_cnt"] ? "<th style='text-align: left;'><sup>куб:</sup></th>" : "")?>
+		</tr>
+		<tr>
+			<th class="nowrap"><?=$spec?> кг</th>
 			<?=($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")?>
