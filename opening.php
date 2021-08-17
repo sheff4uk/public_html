@@ -280,7 +280,8 @@ $query = "
 	SELECT LO.LO_ID
 		,DATE_FORMAT(LO.opening_time, '%d.%m.%y') o_date
 		,DATE_FORMAT(LO.opening_time, '%H:%i') o_time
-		,USR_Name(LO.master) master
+		#,USR_Name(LO.master) master
+		,USR_Icon(LO.master) master
 		,o_interval(LO.LO_ID) o_interval
 		,LOD.not_spill
 		,LOD.crack
