@@ -86,7 +86,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 									echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
 								}
 								?>
-								<optgroup label="уволены">
+								<optgroup label="уволены:">
 									<?
 									$query = "
 										SELECT USR_ID
@@ -121,7 +121,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 									echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
 								}
 								?>
-								<optgroup label="уволены">
+								<optgroup label="уволены:">
 									<?
 									$query = "
 										SELECT USR_ID
@@ -159,7 +159,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 									echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
 								}
 								?>
-								<optgroup label="уволены">
+								<optgroup label="уволены:">
 									<?
 									$query = "
 										SELECT USR_ID
@@ -194,7 +194,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 									echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
 								}
 								?>
-								<optgroup label="уволены">
+								<optgroup label="уволены:">
 									<?
 									$query = "
 										SELECT USR_ID
