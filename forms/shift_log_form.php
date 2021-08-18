@@ -78,6 +78,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 										,USR_Name(USR_ID) name
 									FROM Users
 									WHERE RL_ID = 2
+										AND act = 1
 									ORDER BY USR_ID
 								";
 								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -85,6 +86,22 @@ this.subbut.value='Подождите, пожалуйста!';">
 									echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
 								}
 								?>
+								<optgroup label="уволены">
+									<?
+									$query = "
+										SELECT USR_ID
+											,USR_Name(USR_ID) name
+										FROM Users
+										WHERE RL_ID = 2
+											AND act = 0
+										ORDER BY USR_ID
+									";
+									$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+									while( $row = mysqli_fetch_array($res) ) {
+										echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
+									}
+									?>
+								</optgroup>
 							</select>
 						</td>
 						<td>
@@ -96,6 +113,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 										,USR_Name(USR_ID) name
 									FROM Users
 									WHERE RL_ID = 3
+										AND act = 1
 									ORDER BY USR_ID
 								";
 								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -103,6 +121,22 @@ this.subbut.value='Подождите, пожалуйста!';">
 									echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
 								}
 								?>
+								<optgroup label="уволены">
+									<?
+									$query = "
+										SELECT USR_ID
+											,USR_Name(USR_ID) name
+										FROM Users
+										WHERE RL_ID = 3
+											AND act = 0
+										ORDER BY USR_ID
+									";
+									$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+									while( $row = mysqli_fetch_array($res) ) {
+										echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
+									}
+									?>
+								</optgroup>
 							</select>
 						</td>
 					</tr>
@@ -117,6 +151,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 										,USR_Name(USR_ID) name
 									FROM Users
 									WHERE RL_ID = 2
+										AND act = 1
 									ORDER BY USR_ID
 								";
 								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -124,6 +159,22 @@ this.subbut.value='Подождите, пожалуйста!';">
 									echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
 								}
 								?>
+								<optgroup label="уволены">
+									<?
+									$query = "
+										SELECT USR_ID
+											,USR_Name(USR_ID) name
+										FROM Users
+										WHERE RL_ID = 2
+											AND act = 0
+										ORDER BY USR_ID
+									";
+									$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+									while( $row = mysqli_fetch_array($res) ) {
+										echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
+									}
+									?>
+								</optgroup>
 							</select>
 						</td>
 						<td>
@@ -135,6 +186,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 										,USR_Name(USR_ID) name
 									FROM Users
 									WHERE RL_ID = 3
+										AND act = 1
 									ORDER BY USR_ID
 								";
 								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -142,6 +194,22 @@ this.subbut.value='Подождите, пожалуйста!';">
 									echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
 								}
 								?>
+								<optgroup label="уволены">
+									<?
+									$query = "
+										SELECT USR_ID
+											,USR_Name(USR_ID) name
+										FROM Users
+										WHERE RL_ID = 3
+											AND act = 0
+										ORDER BY USR_ID
+									";
+									$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+									while( $row = mysqli_fetch_array($res) ) {
+										echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
+									}
+									?>
+								</optgroup>
 							</select>
 						</td>
 					</tr>
