@@ -34,7 +34,7 @@ function crc16($buf) {
 }
 
 // Прочитать все регистрации начиная с ID
-function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
+function read_transaction($ID, $curnum, $socket, $mysqli) {
 	$hexID = sprintf("%02x%02x%02x%02x", ($ID & 0xFF), (($ID >> 8) & 0xFF), (($ID >> 16) & 0xFF), (($ID >> 24) & 0xFF));
 	$hexcurnum = sprintf("%02x%02x", ($curnum & 0xFF), (($curnum >> 8) & 0xFF));
 	$in = "\xF8\x55\xCE\x0C\x00\x92\x03\x00\x00".hex2bin($hexcurnum).hex2bin($hexID)."\x00\x00";
@@ -91,6 +91,8 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 					if( ($data[$i+22] >> 7) == 1 ) {
 						$netWeight = ((-1 >> 32) << 32) + $netWeight;
 					}
+					// Количество штук
+					$quantity = $data[$i+27] + ($data[$i+28] << 8) + ($data[$i+29] << 16) + ($data[$i+30] << 24);
 					//ID товара
 					$goodsID = $data[$i+37] + ($data[$i+38] << 8) + ($data[$i+39] << 16) + ($data[$i+40] << 24);
 
@@ -101,6 +103,7 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 					echo $deviceID." ";
 					echo $transactionDate." ";
 					echo $netWeight." ";
+					echo $quantity." ";
 					echo $goodsID." ";
 					echo $ReceiptNumber."\r\n";
 				}
@@ -118,21 +121,57 @@ function read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli) {
 					echo $transactionDate." ";
 					echo "Закрытие партии\r\n";
 				}
+				//Закрытие партии
+				elseif( $data[$i+10] == 72 ) {
+					//Идентификатор
+					$nextID = $data[$i] + ($data[$i+1] << 8) + ($data[$i+2] << 16) + ($data[$i+3] << 24);
+					//Номер терминала
+					$deviceID = $data[$i+6] + ($data[$i+7] << 8) + ($data[$i+8] << 16) + ($data[$i+9] << 24);
+					//Дата/время совершения регистрации
+					$transactionDate = sprintf("20%02d-%02d-%02d %02d:%02d:%02d", $data[$i+11], $data[$i+12], $data[$i+13], $data[$i+14], $data[$i+15], $data[$i+16]);
+
+					echo $nextID." ";
+					echo $deviceID." ";
+					echo $transactionDate." ";
+					echo "Аварийное закрытие партии\r\n";
+				}
 			}
 
 			// Если это не последняя часть
 			if( $nums > $curnum ) {
-				read_transaction($ID, ++$curnum, $socket, $lastLO_ID, $mysqli);
+				read_transaction($ID, ++$curnum, $socket, $mysqli);
 			}
 		}
 	}
 	else { //Если CRC не совпали делаем попытку еще
-		read_transaction($ID, $curnum, $socket, $lastLO_ID, $mysqli);
+		read_transaction($ID, $curnum, $socket, $mysqli);
 	}
 }
 /////////////////////////////////////////////////////////
-if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5001)) ) {
-	read_transaction(39181, 1, $socket, 0, $mysqli);
+//	$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+//	if( socket_connect($socket, $from_ip, 5002) ) {
+//		echo "OK\n";
+//	}
+//	else {
+//		echo "ERROR\n";
+//	}
+//	socket_close($socket);
+
+if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5002)) ) {
+//if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, "192.168.0.20", 5001)) ) {
+	//read_transaction(52445, 1, $socket, 0, $mysqli);
+//////////////////////////////
+//	$in = "\xF8\x55\xCE\x02\x00\x91\x04";
+//	$crc = crc16(byteStr2byteArray($in));
+//	$in .= hex2bin($crc);
+//
+//	socket_write($socket, $in);
+//	$result = socket_read($socket, 8);
+//	$data = byteStr2byteArray($result);
+//	echo dechex($data[5])."\r\n";
+//	//echo $result;
+////////////////////////////////////////
+	read_transaction(166280, 1, $socket, $mysqli);
 	socket_close($socket);
 }
 
