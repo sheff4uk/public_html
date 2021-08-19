@@ -159,6 +159,9 @@ $query = "
 		,MIN(TIMESTAMP(LB.batch_date, LB.batch_time)) time
 		,IF(COUNT(LCT24.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT24.LCT_ID) * 2 / 3), 0) `24tests`
 		,IF(COUNT(LCT72.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT72.LCT_ID) * 2 / 3), 0) `72tests`
+		,PB.io_density
+		,PB.sn_density
+		,PB.cs_density
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID
@@ -201,6 +204,9 @@ while( $row = mysqli_fetch_array($res) ) {
 	$cnt = $row["fact_batches"];
 	echo "<tbody id='PB{$row["PB_ID"]}' style='text-align: center; border-bottom: 2px solid #333; ".(($cycle and $cycle != $row["cycle"]) ? " border-top: 10px solid #333;" : "")."'>";
 	$cycle = $row["cycle"];
+	$io_density = $row["io_density"]/1000;
+	$sn_density = $row["sn_density"]/1000;
+	$cs_density = $row["cs_density"]/1000;
 
 	$query = "
 		SELECT LB.LB_ID
@@ -263,8 +269,11 @@ while( $row = mysqli_fetch_array($res) ) {
 					{$row["year"]}
 					<h1>{$row["cycle"]}</h1>
 					<b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>
-					<i class='fas fa-cube'></i>24: <b>{$test24}</b><br>
-					<i class='fas fa-cube'></i>72: <b>{$test72}</b><br>
+					<i class='fas fa-cube'></i>24: <b>{$test24}</b>МПа<br>
+					<i class='fas fa-cube'></i>72: <b>{$test72}</b>МПа<br>
+					".($io_density ? "окалина: <b>{$io_density}</b>кг" : "")."
+					".($sn_density ? "КМП: <b>{$sn_density}</b>кг" : "")."
+					".($cs_density ? "отсев: <b>{$cs_density}</b>кг" : "")."
 				</td>
 			";
 		}

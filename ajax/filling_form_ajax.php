@@ -14,6 +14,9 @@ $query = "
 		,IFNULL(PB.in_cassette, CW.in_cassette) in_cassette
 		,CONCAT(ROUND(CW.min_density/1000, 2), '&ndash;', ROUND(CW.max_density/1000, 2)) spec
 		,MIN(LB.batch_date) batch_date
+		,PB.io_density
+		,PB.sn_density
+		,PB.cs_density
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
@@ -32,6 +35,9 @@ $in_cassette = $row["in_cassette"];
 $CW_ID = $row["CW_ID"];
 $spec = $row["spec"];
 $batch_date = $row["batch_date"];
+$io_density = $row["io_density"];
+$sn_density = $row["sn_density"];
+$cs_density = $row["cs_density"];
 
 $html = "
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
@@ -73,19 +79,24 @@ $html .= "
 	<table style='font-size: .85em; table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
 		<thead style='word-wrap: break-word;'>
 			<tr>
-				<th rowspan='2' width='30'>№<br>п/п</th>
-				<th rowspan='2' width='180'>Дата и время замеса</th>
-				<th>Масса куба раствора, кг</th>
-				<th rowspan='2' width='40'>t, ℃ 22±8</th>
+				<th rowspan='3' width='30'>№<br>п/п</th>
+				<th rowspan='3' width='180'>Дата и время замеса</th>
+				<th rowspan='2'>Масса куба раствора, кг</th>
+				<th rowspan='3' width='40'>t, ℃ 22±8</th>
 				".($row["io_cnt"] ? "<th>Окалина, кг</th>" : "")."
 				".($row["sn_cnt"] ? "<th>КМП, кг</th>" : "")."
 				".($row["cs_cnt"] ? "<th>Отсев, кг</th>" : "")."
-				".($row["cm_cnt"] ? "<th>Цемент, кг</th>" : "")."
-				".($row["pl_cnt"] ? "<th>Пластификатор, кг</th>" : "")."
-				".($row["wt_cnt"] ? "<th>Вода, кг</th>" : "")."
-				<th rowspan='2' colspan='{$fillings}' width='".($fillings * 50)."'>№ кассеты</th>
-				<th rowspan='2'>Недолив</th>
-				<th rowspan='2' width='30'><i class='fas fa-cube' title='Испытание куба'></i></th>
+				".($row["cm_cnt"] ? "<th rowspan='2'>Цемент, кг</th>" : "")."
+				".($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор, кг</th>" : "")."
+				".($row["wt_cnt"] ? "<th rowspan='2'>Вода, кг</th>" : "")."
+				<th rowspan='3' colspan='{$fillings}' width='".($fillings * 50)."'>№ кассеты</th>
+				<th rowspan='3'>Недолив</th>
+				<th rowspan='3' width='30'><i class='fas fa-cube' title='Испытание куба'></i></th>
+			</tr>
+			<tr>
+				".($row["io_cnt"] ? "<th><input type='number' min='2' max='3' step='0.01' value='".($io_density/1000)."' name='io_density' style='width: 100%; background-color: #a52a2a80;' required></th>" : "")."
+				".($row["sn_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($sn_density/1000)."' name='sn_density' style='width: 100%; background-color: #f4a46082;' required></th>" : "")."
+				".($row["cs_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($cs_density/1000)."' name='cs_density' style='width: 100%; background-color: #8b45137a;' required></th>" : "")."
 			</tr>
 			<tr>
 				<th class='nowrap'>{$spec}</th>

@@ -113,9 +113,18 @@ if( isset($_POST["PB_ID"]) ) {
 			}
 		}
 		// Обновляем фактическое число замесов и число заливок на замес
+		$io_density = $_POST["io_density"] ? $_POST["io_density"]*1000 : "NULL";
+		$sn_density = $_POST["sn_density"] ? $_POST["sn_density"]*1000 : "NULL";
+		$cs_density = $_POST["cs_density"] ? $_POST["cs_density"]*1000 : "NULL";
+
 		$query = "
 			UPDATE plan__Batch
-			SET fact_batches = {$_POST["fact_batches"]}, fillings_per_batch = {$_POST["fillings_per_batch"]}, in_cassette = {$_POST["in_cassette"]}
+			SET fact_batches = {$_POST["fact_batches"]}
+				,fillings_per_batch = {$_POST["fillings_per_batch"]}
+				,in_cassette = {$_POST["in_cassette"]}
+				,io_density = {$io_density}
+				,sn_density = {$sn_density}
+				,cs_density = {$cs_density}
 			WHERE PB_ID = {$_POST["PB_ID"]}
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
