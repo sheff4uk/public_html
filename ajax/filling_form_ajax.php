@@ -82,7 +82,7 @@ $html .= "
 				<th rowspan='3' width='30'>№<br>п/п</th>
 				<th rowspan='3' width='180'>Дата и время замеса</th>
 				<th rowspan='2'>Масса куба раствора, кг</th>
-				<th rowspan='3' width='40'>t, ℃ 22±8</th>
+				<th rowspan='3' width='50'>t, ℃ 22±8</th>
 				".($row["io_cnt"] ? "<th>Окалина, кг</th>" : "")."
 				".($row["sn_cnt"] ? "<th>КМП, кг</th>" : "")."
 				".($row["cs_cnt"] ? "<th>Отсев, кг</th>" : "")."
