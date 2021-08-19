@@ -38,13 +38,13 @@ $spec = $row["spec"];
 
 // Массив с номерами контрольных замесов (кубы)
 if( $cubetests == 1 ) {
-	$tests = array(round($batches/2));
+	$tests = array(round($batches/2)+1);
 }
 elseif( $cubetests == 2 ) {
-	$tests = array(2, round($batches/2));
+	$tests = array(2, round($batches/2)+1);
 }
 elseif( $cubetests == 3 ) {
-	$tests = array(2, round($batches/2), $batches);
+	$tests = array(2, round($batches/2)+1, $batches);
 }
 
 echo "<title>Чеклист оператора для {$item} цикл {$year}/{$cycle}</title>";
