@@ -256,7 +256,7 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th colspan="3">Расформовка</th>
+			<th colspan="2">Расформовка</th>
 			<th rowspan="2">№ кассеты</th>
 			<th rowspan="2"><i class="far fa-lg fa-hourglass" title="Интервал в часах с моента заливки."></i></th>
 			<th colspan="2" rowspan="2">Брак</th>
@@ -270,7 +270,6 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th>Дата</th>
 			<th>Время</th>
-			<th>Мастер</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
@@ -280,7 +279,6 @@ $query = "
 	SELECT LO.LO_ID
 		,DATE_FORMAT(LO.opening_time, '%d.%m.%y') o_date
 		,DATE_FORMAT(LO.opening_time, '%H:%i') o_time
-		,USR_Icon(LO.master) master
 		,o_interval(LO.LO_ID) o_interval
 		,LOD.not_spill
 		,LOD.crack
@@ -348,7 +346,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	<tr id="<?=$row["LO_ID"]?>" style="<?=(($o_date and $o_date != $row["o_date"]) ? "border-top: 10px solid #333;" : "")?>">
 		<td><?=$row["o_date"]?></td>
 		<td><?=$row["o_time"]?></td>
-		<td><?=$row["master"]?></td>
 		<td><?=$cassette?></td>
 		<td style="background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
 		<td colspan="2" class="nowrap" style="text-align: left;">
