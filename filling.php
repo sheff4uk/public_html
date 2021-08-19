@@ -271,9 +271,9 @@ while( $row = mysqli_fetch_array($res) ) {
 					<b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>
 					<i class='fas fa-cube'></i>24: <b>{$test24}</b>МПа<br>
 					<i class='fas fa-cube'></i>72: <b>{$test72}</b>МПа<br>
-					".($io_density ? "окалина: <b>{$io_density}</b>кг" : "")."
-					".($sn_density ? "КМП: <b>{$sn_density}</b>кг" : "")."
-					".($cs_density ? "отсев: <b>{$cs_density}</b>кг" : "")."
+					".($io_density ? "<span class='nowrap'>окалина: <b>{$io_density}</b>кг</span>" : "")."
+					".($sn_density ? "<span class='nowrap'>КМП: <b>{$sn_density}</b>кг</span>" : "")."
+					".($cs_density ? "<span class='nowrap'>отсев: <b>{$cs_density}</b>кг</span>" : "")."
 				</td>
 			";
 		}
