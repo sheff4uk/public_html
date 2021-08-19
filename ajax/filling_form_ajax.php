@@ -50,7 +50,7 @@ $html = "
 			<td style='border: 1px solid black; line-height: 1em;'><img src='/img/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></td>
 			<td style='font-size: 2em; border: 1px solid black; line-height: 1em;'>{$item}</td>
 			<td style='border: 1px solid black; line-height: 1em;'><n style='font-size: 2em;'>{$year}</n> год</td>
-			<td style='border: 1px solid black; line-height: 1em;' width='120'><n style='font-size: 2em;'>{$cycle}</n><br>цикл</td>
+			<td style='border: 1px solid black; line-height: 1em;' width='140'><n style='font-size: 2em;'>{$cycle}</n> цикл</td>
 		</tr>
 	</table>
 ";
