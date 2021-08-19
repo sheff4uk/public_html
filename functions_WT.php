@@ -177,11 +177,10 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						// Из пересечения временных интервалов находим наиболее подходящую кассету
 						$query = "
 							SELECT SUB.LO_ID
-								#,TIMESTAMPDIFF(SECOND, IF(SUB.opening_time > '{$receipt_start}', SUB.opening_time, '{$receipt_start}'), IF(SUB.end_time < '{$receipt_end}', SUB.end_time, '{$receipt_end}')) / TIMESTAMPDIFF(SECOND, SUB.opening_time, SUB.end_time) `share`
-								,IFNULL((SELECT SUM(1) FROM list__Weight WHERE RN = {$RN} AND WT_ID = {$deviceID} AND weighing_time BETWEEN SUB.opening_time AND SUB.end_time), 0) CW_cnt
+								,IFNULL((SELECT SUM(1) FROM list__Weight WHERE RN = {$RN} AND WT_ID = {$deviceID} AND weighing_time BETWEEN (SELECT opening_time FROM list__Opening WHERE LO_ID = SUB.LO_ID) AND SUB.end_time), 0) CW_cnt
+								,(SELECT cassette FROM list__Opening WHERE LO_ID = SUB.LO_ID) cassette
 							FROM (
 								SELECT (SELECT LO_ID FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) LO_ID
-									,(SELECT opening_time FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) opening_time
 									,LO.opening_time end_time
 								FROM list__Opening LO
 								WHERE LO.opening_time > '{$receipt_start}'
@@ -195,6 +194,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						$row = mysqli_fetch_array($res);
 						$LO_ID = $row["LO_ID"];
 						$CW_cnt = $row["CW_cnt"];
+						$cassette = $row["cassette"];
 
 						// Связываем регистрации закрытой партии с подходящей по времени кассетой
 						$query = "
@@ -250,7 +250,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						$chip = $row["chip"];
 						// Если в партии были трещины или сколы или незакрытие или повторения брака сообщаем в телеграм
 						if( $crack or $chip or $receipt_err or $reject_err ) {
-							$message = "Пост <b>{$post}</b>, партия <b>{$RN}</b>\n".($crack ? "трещина: <b>{$crack}</b>\n" : "").($chip ? "скол: <b>{$chip}</b>\n" : "").($receipt_err ? "<b>Пропущено закрытие партии!</b>\n" : "").($reject_err ? "<b>Подряд идущий одинаковый брак (3 и более)!</b>" : "");
+							$message = "Пост <b>{$post}</b>, кассета: <b>{$cassette}</b>, партия <b>{$RN}</b>\n".($crack ? "трещина: <b>{$crack}</b>\n" : "").($chip ? "скол: <b>{$chip}</b>\n" : "").($receipt_err ? "<b>Пропущено закрытие партии!</b>\n" : "").($reject_err ? "<b>Подряд идущий одинаковый брак (3 и более)!</b>" : "");
 							message_to_telegram($message, TELEGRAM_CHATID);
 						}
 					}
