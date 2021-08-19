@@ -84,7 +84,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 </head>
 <body>
 
-	<b style="float: right; width: 50%;"><span style="font-size: 1.5em;">ВНИМАНИЕ!</span> Время замеса не должно выходить за границы текущего года.</b>
+	<b style="float: right; width: 55%;"><span style="font-size: 1.5em;">ВНИМАНИЕ!</span> Время замеса не должно выходить за границы текущего года.</b>
 <h3>Фактическая дата первого замеса: ________________</h3>
 
 <table>
