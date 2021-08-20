@@ -73,7 +73,7 @@ if( isset($_POST["WT_ID"]) ) {
 				<form method="post" style="font-size: 2em;">
 					<input type="hidden" name="WT_ID" value="<?=$_GET["WT_ID"]?>">
 					<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
-					<select name="pallet_status" onchange="this.form.submit()" style="font-size: 1em;">
+					<select name="PN_ID" onchange="this.form.submit()" style="font-size: 1em;">
 						<option value="0">На складе</option>
 						<?
 						$query = "
@@ -92,7 +92,7 @@ if( isset($_POST["WT_ID"]) ) {
 			</fieldset>
 			<script>
 				$(function() {
-					$('select[name="pallet_status"]').val(<?=$row["PN_ID"]?>);
+					$('select[name="PN_ID"]').val(<?=$row["PN_ID"]?>);
 				});
 			</script>
 			<?
