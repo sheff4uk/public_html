@@ -71,7 +71,7 @@ if( isset($_POST["WT_ID"]) ) {
 			//Форма изменения статуса противовеса
 			?>
 			<fieldset>
-				<legend>Статус паллета</legend>
+				<legend>Статус поддона</legend>
 				<form method="post" style="font-size: 2em;">
 					<input type="hidden" name="WT_ID" value="<?=$_GET["WT_ID"]?>">
 					<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
