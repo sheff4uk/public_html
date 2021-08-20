@@ -102,7 +102,7 @@ if( isset($_POST["WT_ID"]) ) {
 			echo "
 			<br>
 				Контроль: <b>{$row["packed_time_format"]}</b><br>
-				".($row["PN_ID"] ? "Отгрузка: {$row["shipment_time_format"]}" : "")."
+				".($row["PN_ID"] ? "Отгрузка: <b>{$row["shipment_time_format"]}</b>" : "")."
 			";
 		}
 		?>
