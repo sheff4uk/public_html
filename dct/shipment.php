@@ -80,7 +80,7 @@ if( isset($_POST["WT_ID"]) ) {
 							SELECT PN.PN_ID
 								,PN.pallet_name
 							FROM pallet__Name PN
-							ORDRE BY PN.PN_ID
+							ORDER BY PN.PN_ID
 						";
 						$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						while( $subrow = mysqli_fetch_array($subres) ) {
