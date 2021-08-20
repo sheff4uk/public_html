@@ -73,7 +73,6 @@ if( isset($_POST["WT_ID"]) ) {
 				<form method="post" style="font-size: 2em;">
 					<input type="hidden" name="WT_ID" value="<?=$_GET["WT_ID"]?>">
 					<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
-					<input type="datetime-local">
 					<select name="pallet_status">
 						<option value="0">На складе</option>
 						<?
@@ -81,10 +80,11 @@ if( isset($_POST["WT_ID"]) ) {
 							SELECT PN.PN_ID
 								,PN.pallet_name
 							FROM pallet__Name PN
+							ORDRE BY PN.PN_ID
 						";
-						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-						while( $row = mysqli_fetch_array($res) ) {
-							echo "<option value='{$row["PN_ID"]}'>Отгружен ({$row["pallet_name"]})</option>";
+						$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						while( $subrow = mysqli_fetch_array($subres) ) {
+							echo "<option value='{$subrow["PN_ID"]}'>Отгружен ({$subrow["pallet_name"]})</option>";
 						}
 						?>
 					</select>
