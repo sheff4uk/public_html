@@ -52,7 +52,8 @@ if( isset($_POST["WT_ID"]) ) {
 		<?
 		if( isset($_GET["WT_ID"]) ) {
 			$query = "
-				SELECT DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i') packed_time_format
+				SELECT CW.item
+					,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i') packed_time_format
 					,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
 					,IFNULL(LPP.PN_ID, 0) PN_ID
 				FROM list__PackingPallet LPP
@@ -100,7 +101,8 @@ if( isset($_POST["WT_ID"]) ) {
 			<?
 
 			echo "
-			<br>
+				<br>
+				Код: <b>{$row["item"]}</b><br>
 				Контроль: <b>{$row["packed_time_format"]}</b><br>
 				".($row["PN_ID"] ? "Отгрузка: <b>{$row["shipment_time_format"]}</b>" : "")."
 			";
