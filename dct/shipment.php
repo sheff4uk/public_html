@@ -10,7 +10,7 @@ if( isset($_POST["WT_ID"]) ) {
 		WHERE WT_ID = {$_POST["WT_ID"]} AND nextID = {$_POST["nextID"]}
 	";
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-	exit ('<meta http-equiv="refresh" content="0; url=/dct/cwreject.php?WT_ID='.$_POST["WT_ID"].'&nextID='.$_POST["nextID"].'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php?WT_ID='.$_POST["WT_ID"].'&nextID='.$_POST["nextID"].'">');
 }
 ?>
 
@@ -33,7 +33,7 @@ if( isset($_POST["WT_ID"]) ) {
 					{
 						var WT_ID = Number(barcode.substr(0, 8)),
 							nextID = Number(barcode.substr(8, 8));
-						$(location).attr('href','/dct/cwreject.php?WT_ID='+WT_ID+'&nextID='+nextID);
+						$(location).attr('href','/dct/shipment.php?WT_ID='+WT_ID+'&nextID='+nextID);
 						barcode="";
 						return false;
 					}
