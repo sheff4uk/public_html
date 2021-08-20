@@ -52,11 +52,11 @@ if( isset($_POST["WT_ID"]) ) {
 		if( isset($_GET["WT_ID"]) ) {
 			$query = "
 				SELECT LW.weight
-					,DATE_FORMAT(LW.weighing_time, '%d.%m.%Y %h:%i') weighing_time_format
+					,DATE_FORMAT(LW.weighing_time, '%d.%m.%Y %H:%i') weighing_time_format
 					,LW.goodsID
 					,LO.cassette
 					,DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
-					,DATE_FORMAT(LF.lf_time, '%h:%i') lf_time_format
+					,DATE_FORMAT(LF.lf_time, '%H:%i') lf_time_format
 				FROM list__Weight LW
 				JOIN list__Opening LO ON LO.LO_ID = LW.LO_ID
 				JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID

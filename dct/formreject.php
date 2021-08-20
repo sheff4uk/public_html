@@ -101,7 +101,7 @@ if( isset($_POST["SI_ID"]) ) {
 			echo "<h4>Циклы:</h4>";
 
 			$query = "
-				SELECT DATE_FORMAT(SL.event_time, '%d.%m.%Y %h:%i') event_time_format
+				SELECT DATE_FORMAT(SL.event_time, '%d.%m.%Y %H:%i') event_time_format
 				FROM shell__Log SL
 				WHERE SL.SI_ID = {$_GET["SI_ID"]}
 				ORDER BY SL.event_time
