@@ -66,6 +66,8 @@ if( isset($_POST["WT_ID"]) ) {
 			$nextID = str_pad($_GET["nextID"], 8, "0", STR_PAD_LEFT);
 			echo "<h1 style='text-align: center;'>{$WT_ID}{$nextID}</h1>";
 
+			if( $row["packed_time_format"] == "" ) die("<h1 style='color: red;'>Это не поддон!</h1>");
+
 			//Форма изменения статуса противовеса
 			?>
 			<fieldset>
@@ -98,6 +100,7 @@ if( isset($_POST["WT_ID"]) ) {
 			<?
 
 			echo "
+			<br>
 				Контроль: <b>{$row["packed_time_format"]}</b><br>
 				".($row["PN_ID"] ? "Отгрузка: {$row["shipment_time_format"]}" : "")."
 			";
