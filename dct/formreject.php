@@ -75,6 +75,8 @@ if( isset($_POST["SI_ID"]) ) {
 			$row = mysqli_fetch_array($res);
 			echo "<h1 style='text-align: center;'>{$_GET["SI_ID"]}</h1>";
 
+			if( $row["sa_date_format"] == "" ) die("<h1 style='color: red;'>Форма с таким номером не найдена!</h1>");
+
 			//Если списана, выводим дату списания
 			if( $row["reject_date_format"] ) {
 				echo "Дата списания: <b style='color: red;'>{$row["reject_date_format"]}</b><br>";

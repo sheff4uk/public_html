@@ -69,6 +69,8 @@ if( isset($_POST["WT_ID"]) ) {
 			$nextID = str_pad($_GET["nextID"], 8, "0", STR_PAD_LEFT);
 			echo "<h1 style='text-align: center;'>{$WT_ID}{$nextID}</h1>";
 
+			if( $row["weighing_time_format"] == "" ) die("<h1 style='color: red;'>Противовес с таким номером не найден!</h1>");
+
 			//Форма изменения статуса противовеса
 			?>
 			<fieldset>
