@@ -19,21 +19,20 @@ $CASs = implode(",", $CAS);
 $query = "
 	SELECT LB.LB_ID
 		,LF.cassette
-		,DATE_FORMAT(LF.lf_date, '%d.%m.%y') lf_date_format
-		,DATE_FORMAT(LF.lf_time, '%H:%i') lf_time_format
-		,YEARWEEk(LF.lf_date, 1) week
+		,DATE_FORMAT(LF.filling_time, '%d.%m.%y %H:%i') filling_time_format
+		,YEARWEEk(LF.filling_time, 1) week
 	FROM list__Filling LF
 	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 	WHERE 1
 		AND LO.LO_ID IS NULL
-		AND YEARWEEK(LF.lf_date + INTERVAL 1 DAY, 1) LIKE '{$_GET["week"]}'
-		AND(SELECT LF_ID FROM list__Filling WHERE cassette = LF.cassette AND lf_date > LF.lf_date LIMIT 1) IS NOT NULL
-	ORDER BY LF.lf_date, LF.lf_time
+		AND YEARWEEK(LF.filling_time + INTERVAL 1 DAY, 1) LIKE '{$_GET["week"]}'
+		AND(SELECT LF_ID FROM list__Filling WHERE cassette = LF.cassette AND filling_time > LF.filling_time LIMIT 1) IS NOT NULL
+	ORDER BY LF.filling_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$errors .= "<p>Кассета <b class='cassette'>{$row["cassette"]}</b> залита <a href='filling.php?week={$row["week"]}#{$row["LB_ID"]}' target='_blank'>{$row["lf_date_format"]} {$row["lf_time_format"]}</a>. Нет данных по расформовке.</p>";
+	$errors .= "<p>Кассета <b class='cassette'>{$row["cassette"]}</b> залита <a href='filling.php?week={$row["week"]}#{$row["LB_ID"]}' target='_blank'>{$row["filling_time_format"]}</a>. Нет данных по расформовке.</p>";
 }
 ?>
 

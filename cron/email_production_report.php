@@ -124,7 +124,7 @@ $query = "
 		,SUM(IF(LW.goodsID = 4, 1, NULL)) crack_drying
 		,SUM(IF(LW.weight > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 1, NULL)) light
 		,SUM(IF(LW.weight < ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)), 1, NULL)) heavy
-		,DATE_FORMAT(TIMESTAMP(LF.lf_date, LF.lf_time), '%d.%m.%Y %H:%i') friendly_lf_time
+		,DATE_FORMAT(LF.filling_time, '%d.%m.%Y %H:%i') filling_time_format
 		,USR_Name(LB.operator) name
 	FROM list__Opening LO
 	JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
@@ -151,7 +151,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>{$row["crack_drying"]}</td>
 			<td>{$row["light"]}</td>
 			<td>{$row["heavy"]}</td>
-			<td>{$row["friendly_lf_time"]}</td>
+			<td>{$row["filling_time_format"]}</td>
 			<td>{$row["name"]}</td>
 		</tr>
 	";

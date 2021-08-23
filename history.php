@@ -44,7 +44,7 @@ $query = "
 	FROM (
 		SELECT LF.cassette
 			,LF.LF_ID
-			,ADDTIME(CONVERT(LF.lf_date, DATETIME), LF.lf_time) date_time
+			LF.filling_time date_time
 			,NULL `link`
 			,CW.item
 			,NULL `interval`
@@ -130,7 +130,7 @@ $query = "
 	FROM (
 		SELECT LF.cassette
 			,LF.LF_ID
-			,ADDTIME(CONVERT(LF.lf_date, DATETIME), LF.lf_time) date_time
+			,LF.filling_time date_time
 			,NULL `link`
 			,CW.item
 			,NULL `interval`

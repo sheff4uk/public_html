@@ -55,8 +55,7 @@ if( isset($_POST["WT_ID"]) ) {
 					,DATE_FORMAT(LW.weighing_time, '%d.%m.%Y %H:%i') weighing_time_format
 					,LW.goodsID
 					,LO.cassette
-					,DATE_FORMAT(LF.lf_date, '%d.%m.%Y') lf_date_format
-					,DATE_FORMAT(LF.lf_time, '%H:%i') lf_time_format
+					,DATE_FORMAT(LF.filling_time, '%d.%m.%Y %H:%i') filling_time_format
 				FROM list__Weight LW
 				JOIN list__Opening LO ON LO.LO_ID = LW.LO_ID
 				JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
@@ -96,7 +95,7 @@ if( isset($_POST["WT_ID"]) ) {
 			</script>
 			<?
 
-			echo "Заливка: <b>{$row["lf_date_format"]} {$row["lf_time_format"]}</b><br>";
+			echo "Заливка: <b>{$row["filling_time_format"]}</b><br>";
 			echo "Кассета: <b>{$row["cassette"]}</b><br>";
 			echo "Вес: <b>{$row["weight"]}</b> г.<br>";
 			echo "Регистрация: <b>{$row["weighing_time_format"]}</b><br>";

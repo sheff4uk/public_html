@@ -99,7 +99,7 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 				FROM list__Filling LF
 				JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 				JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-				WHERE LF.lf_date BETWEEN '2020-12-04' AND CURDATE() - INTERVAL 1 DAY
+				WHERE DATE(LF.filling_time) BETWEEN '2020-12-04' AND CURDATE() - INTERVAL 1 DAY
 				GROUP BY PB.CW_ID
 			) WB ON WB.CW_ID = CW.CW_ID
 			# Число списаний с 04.12.2020
