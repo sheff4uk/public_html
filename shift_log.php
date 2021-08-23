@@ -118,6 +118,8 @@ foreach ($_GET as &$value) {
 		SELECT ADDDATE(working_day, 0-WEEKDAY(working_day)) first_day
 		FROM ShiftLog
 		WHERE YEARWEEK(working_day, 1) LIKE '{$_GET["week"]}'
+		ORDER BY first_day
+		LIMIT 1
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
