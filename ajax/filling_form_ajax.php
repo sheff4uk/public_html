@@ -127,10 +127,9 @@ if( $fact_batches ) {
 			,IFNULL(LB.water, 0) water
 			,SUM(LF.underfilling) underfilling
 			,LB.test
-			,IF(LCT.LCT_ID, 1, 0) is_test
+			,IF((SELECT SUM(1) FROM list__CubeTest WHERE LB_ID = LB.LB_ID), 1, 0) is_test
 		FROM list__Batch LB
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID
 		WHERE LB.PB_ID = {$PB_ID}
 		GROUP BY LB.LB_ID
 		ORDER BY LB.batch_date, LB.batch_time
