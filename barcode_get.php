@@ -2,7 +2,6 @@
 $bc = $_GET["bc"];
 $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
-//message_to_telegram($_GET["bc"], '217756119');
 
 // Проверка доступа и корректность кода (не менее 8 символов)
 if( $ip == $from_ip and strlen($bc) >= 8 ) {
@@ -18,21 +17,54 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 			//Проверяем была ли эта кассета уже просканирована
 			$query = "
 				SELECT cassette
-				FROM list__Opening
-				ORDER BY opening_time DESC
+				FROM list__Assembling
+				ORDER BY assembling_time DESC
 				LIMIT 1
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			$row = mysqli_fetch_array($res);
 			// Если это первое сканирование
 			if( $row["cassette"] != $cassette ) {
-				// Записываем номер кассеты в базу
+				// Узнаем была ли заливка этой кассеты после предыдущего сканирования
 				$query = "
-					INSERT INTO list__Opening
-					SET cassette = {$cassette}
+					SELECT LF.LF_ID
+					FROM list__Assembling LA
+					LEFT JOIN list__Filling LF ON LF.LA_ID = LA.LA_ID
+					WHERE LA.cassette = {$cassette}
+					ORDER BY LA.assembling_time DESC
+					LIMIT 1
 				";
-				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-				$LO_ID = mysqli_insert_id( $mysqli );
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				$row = mysqli_fetch_array($res);
+				// Если эта кассета залита
+				if( $row["LF_ID"] ) {
+					// Делаем запись о сборке
+					$query = "
+						INSERT INTO list__Assembling
+						SET cassette = {$cassette}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+					// Делаем запись о расформовке
+					$query = "
+						INSERT INTO list__Opening
+						SET cassette = {$cassette}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				}
+				else {
+					// Обновляем время сборки у кассеты
+					$query = "
+						UPDATE list__Assembling
+						SET assembling_time = now()
+						WHERE cassette = {$cassette}
+						ORDER BY assembling_time DESC
+						LIMIT 1
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				}
+
+
 
 				////////////////////////////////////////////////////////
 				// функции сбора данных с весовых терминалов
