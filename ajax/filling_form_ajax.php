@@ -60,7 +60,7 @@ $query = "
 	SELECT LF.cassette
 	FROM list__Batch LB
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-	WHERE LB.PB_ID = (SELECT PB_ID FROM plan__Batch WHERE CW_ID = 4 AND fact_batches > 0 AND PB_ID < {$PB_ID} ORDER BY PB_ID DESC LIMIT 1)
+	WHERE LB.PB_ID = (SELECT PB_ID FROM plan__Batch WHERE CW_ID = {$CW_ID} AND fact_batches > 0 AND PB_ID < {$PB_ID} ORDER BY PB_ID DESC LIMIT 1)
 	ORDER BY LF.cassette
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
