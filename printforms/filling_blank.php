@@ -60,7 +60,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 
 		body, td {
 			font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
-			font-size: 10pt;
+			font-size: 9pt;
 		}
 		table {
 			table-layout: fixed;
