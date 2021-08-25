@@ -90,7 +90,7 @@ if( isset($_POST["WT_ID"]) ) {
 					<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
 					<select name="PN_ID" onchange="this.form.submit()" style="font-size: 1em;">
 						<option value="0">На складе</option>
-						<option value="0">Отгружен</option>
+						<option value="1">Отгружен</option>
 						<?
 //						$query = "
 //							SELECT PN.PN_ID
