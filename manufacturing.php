@@ -154,7 +154,7 @@ foreach ($_GET as &$value) {
 
 			<th>Время</th>
 			<th>Противовес</th>
-			<th>Плотность р-ра, г</th>
+			<th>Куб раствора, г</th>
 			<th>Оператор</th>
 			<th>Дефекты</th>
 
@@ -205,16 +205,16 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	?>
 	<tr>
-		<td><?=$row["assembling_time_format"]?></td>
-		<td><b class="cassette"><?=$row["cassette"]?></b></td>
-		<td><?=$row["assembling_master"]?></td>
-		<td></td>
+		<td style="background-color: rgba(255, 127, 80, 0.5);"><?=$row["assembling_time_format"]?></td>
+		<td style="background-color: rgba(255, 127, 80, 0.5);"><b class="cassette"><?=$row["cassette"]?></b></td>
+		<td style="background-color: rgba(255, 127, 80, 0.5);"><?=$row["assembling_master"]?></td>
+		<td style="background-color: rgba(255, 127, 80, 0.5);"></td>
 
-		<td><?=$row["filling_time_format"]?></td>
-		<td><?=$row["item"]?></td>
-		<td><?=number_format($row["mix_density"], 0, ',', '&nbsp;')?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").number_format($row["mix_diff"], 0, ',', '&nbsp;')."</font>" : "")?></td>
-		<td><?=$row["operator"]?></td>
-		<td></td>
+		<td style="background-color: rgba(127, 255, 212, 0.5);"><?=$row["filling_time_format"]?></td>
+		<td style="background-color: rgba(127, 255, 212, 0.5);"><?=$row["item"]?></td>
+		<td style="background-color: rgba(127, 255, 212, 0.5);"><?=number_format($row["mix_density"], 0, ',', '&nbsp;')?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").number_format($row["mix_diff"], 0, ',', '&nbsp;')."</font>" : "")?></td>
+		<td style="background-color: rgba(127, 255, 212, 0.5);"><?=$row["operator"]?></td>
+		<td style="background-color: rgba(127, 255, 212, 0.5);"></td>
 
 		<td><?=$row["opening_time_format"]?></td>
 		<td style="background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
