@@ -44,7 +44,7 @@ $query = "
 	FROM (
 		SELECT LF.cassette
 			,LF.LF_ID
-			LF.filling_time date_time
+			,LF.filling_time date_time
 			,NULL `link`
 			,CW.item
 			,NULL `interval`
