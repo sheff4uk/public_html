@@ -65,7 +65,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$cassettes .= "<b>{$row["cassette"]}</b>";
+	$cassettes .= "<b class='cassette'>{$row["cassette"]}</b>";
 }
 
 $html = "<div>Вероятные номера кассет: {$cassettes}</div>";
