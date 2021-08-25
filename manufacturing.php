@@ -205,16 +205,16 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	?>
 	<tr>
-		<td style="background-color: rgba(255, 127, 80, 0.5);"><?=$row["assembling_time_format"]?></td>
-		<td style="background-color: rgba(255, 127, 80, 0.5);"><b class="cassette"><?=$row["cassette"]?></b></td>
-		<td style="background-color: rgba(255, 127, 80, 0.5);"><?=$row["assembling_master"]?></td>
-		<td style="background-color: rgba(255, 127, 80, 0.5);"></td>
+		<td style="background-color: rgba(255, 127, 80, 0.3);"><?=$row["assembling_time_format"]?></td>
+		<td style="background-color: rgba(255, 127, 80, 0.3);"><b class="cassette"><?=$row["cassette"]?></b></td>
+		<td style="background-color: rgba(255, 127, 80, 0.3);"><?=$row["assembling_master"]?></td>
+		<td style="background-color: rgba(255, 127, 80, 0.3);"></td>
 
-		<td style="background-color: rgba(127, 255, 212, 0.5);"><?=$row["filling_time_format"]?></td>
-		<td style="background-color: rgba(127, 255, 212, 0.5);"><?=$row["item"]?></td>
-		<td style="background-color: rgba(127, 255, 212, 0.5);"><?=number_format($row["mix_density"], 0, ',', '&nbsp;')?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").number_format($row["mix_diff"], 0, ',', '&nbsp;')."</font>" : "")?></td>
-		<td style="background-color: rgba(127, 255, 212, 0.5);"><?=$row["operator"]?></td>
-		<td style="background-color: rgba(127, 255, 212, 0.5);"></td>
+		<td style="background-color: rgba(127, 255, 212, 0.3);"><?=$row["filling_time_format"]?></td>
+		<td style="background-color: rgba(127, 255, 212, 0.3);"><?=$row["item"]?></td>
+		<td style="background-color: rgba(127, 255, 212, 0.3);"><?=number_format($row["mix_density"], 0, ',', '&nbsp;')?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").number_format($row["mix_diff"], 0, ',', '&nbsp;')."</font>" : "")?></td>
+		<td style="background-color: rgba(127, 255, 212, 0.3);"><?=$row["operator"]?></td>
+		<td style="background-color: rgba(127, 255, 212, 0.3);"></td>
 
 		<td><?=$row["opening_time_format"]?></td>
 		<td style="background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
