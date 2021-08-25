@@ -1,7 +1,7 @@
 <?
 include_once "../config.php";
 
-//Изменение статуса поддона
+//Изменение статуса поддона из формы
 if( isset($_POST["WT_ID"]) ) {
 	$query = "
 		UPDATE list__PackingPallet
@@ -11,6 +11,18 @@ if( isset($_POST["WT_ID"]) ) {
 	";
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php?WT_ID='.$_POST["WT_ID"].'&nextID='.$_POST["nextID"].'">');
+}
+
+//Изменение статуса поддона сканированием
+if( isset($_GET["scan"]) ) {
+	$query = "
+		UPDATE list__PackingPallet
+		SET PN_ID = 1
+			,shipment_time = NOW()
+		WHERE WT_ID = {$_GET["WT_ID"]} AND nextID = {$_GET["nextID"]}
+	";
+	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php?WT_ID='.$_GET["WT_ID"].'&nextID='.$_GET["nextID"].'">');
 }
 ?>
 
@@ -52,17 +64,6 @@ if( isset($_POST["WT_ID"]) ) {
 		<?
 		if( isset($_GET["WT_ID"]) ) {
 			// Если было сканирование
-			if( isset($_GET["scan"]) ) {
-				// Меняем статус на отгружено
-				$query = "
-					UPDATE list__PackingPallet
-					SET PN_ID = 1
-						,shipment_time = NOW()
-					WHERE WT_ID = {$_GET["WT_ID"]} AND nextID = {$_GET["nextID"]}
-				";
-				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-			}
-
 			$query = "
 				SELECT CW.item
 					,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i') packed_time_format
