@@ -192,7 +192,7 @@ $query = "
 		,USR_Icon(LO.opening_master) opening_master
 
 	FROM list__Assembling LA
-	LEFT JOIN list__Filling LF ON LF.LA_ID = LA.LA_ID
+	JOIN list__Filling LF ON LF.LA_ID = LA.LA_ID
 	LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
