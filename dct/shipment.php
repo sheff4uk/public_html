@@ -33,7 +33,7 @@ if( isset($_POST["WT_ID"]) ) {
 					{
 						var WT_ID = Number(barcode.substr(0, 8)),
 							nextID = Number(barcode.substr(8, 8));
-						$(location).attr('href','/dct/shipment.php?WT_ID='+WT_ID+'&nextID='+nextID);
+						$(location).attr('href','/dct/shipment.php?WT_ID='+WT_ID+'&nextID='+nextID+'&scan');
 						barcode="";
 						return false;
 					}
@@ -51,6 +51,9 @@ if( isset($_POST["WT_ID"]) ) {
 		<h3>Отсканируйте поддон</h3>
 		<?
 		if( isset($_GET["WT_ID"]) ) {
+			// Если было сканирование
+			if( isset($_GET["scan"]) ) {
+
 			$query = "
 				SELECT CW.item
 					,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i') packed_time_format
@@ -78,17 +81,18 @@ if( isset($_POST["WT_ID"]) ) {
 					<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
 					<select name="PN_ID" onchange="this.form.submit()" style="font-size: 1em;">
 						<option value="0">На складе</option>
+						<option value="0">Отгружен</option>
 						<?
-						$query = "
-							SELECT PN.PN_ID
-								,PN.pallet_name
-							FROM pallet__Name PN
-							ORDER BY PN.PN_ID
-						";
-						$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-						while( $subrow = mysqli_fetch_array($subres) ) {
-							echo "<option value='{$subrow["PN_ID"]}'>Отгружен ({$subrow["pallet_name"]})</option>";
-						}
+//						$query = "
+//							SELECT PN.PN_ID
+//								,PN.pallet_name
+//							FROM pallet__Name PN
+//							ORDER BY PN.PN_ID
+//						";
+//						$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//						while( $subrow = mysqli_fetch_array($subres) ) {
+//							echo "<option value='{$subrow["PN_ID"]}'>Отгружен ({$subrow["pallet_name"]})</option>";
+//						}
 						?>
 					</select>
 				</form>
