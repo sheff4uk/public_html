@@ -55,6 +55,21 @@ $html = "
 	</table>
 ";
 
+// Формируем список вероятных номеров кассет
+$query = "
+	SELECT LF.cassette
+	FROM list__Batch LB
+	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+	WHERE LB.PB_ID = (SELECT PB_ID FROM plan__Batch WHERE CW_ID = 4 AND fact_batches > 0 AND PB_ID < {$PB_ID} ORDER BY PB_ID DESC LIMIT 1)
+	ORDER BY LF.cassette
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+while( $row = mysqli_fetch_array($res) ) {
+	$cassettes .= "<b>{$row["cassette"]}</b>";
+}
+
+$html = "<div>Вероятные номера кассет: {$cassettes}</div>";
+
 // Данные рецепта
 $query = "
 	SELECT IFNULL(CONCAT(MF.iron_oxide, ' ±5'), 0) iron_oxide
