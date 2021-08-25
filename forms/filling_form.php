@@ -193,6 +193,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 			$('#filling_form #rows').change();
 			$('#filling_form input[type=time]').change();
+			$('#filling_form input.cassette').trigger('focusout');
 
 			return false;
 		}
@@ -228,6 +229,25 @@ this.subbut.value='Подождите, пожалуйста!';">
 			filling_form(PB_ID);
 
 			return false;
+		});
+
+		// Сохраняем номер кассеты до его изменения
+		$('#filling_form').on('focusin', 'input.cassette', function(){
+			$(this).data('val', $(this).val());
+		});
+
+		// Отмечаем введенные кассеты в списке вероятных номеров кассет
+		$('#filling_form').on('focusout', 'input.cassette', function() {
+			var prev = $(this).data('val');
+			var current = $(this).val();
+			$('#c_' + prev).css({'background-color': '', 'border-color': ''});
+			$('#c_' + current).css({'background-color': 'green', 'border-color': 'green'});
+			if( $('#c_' + current).text() ) {
+				$(this).css({'background-color': 'green', 'border-color': 'green'});
+			}
+			else {
+				$(this).css({'background-color': '', 'border-color': ''});
+			}
 		});
 
 		// Изменение числа строк в форме

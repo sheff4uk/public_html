@@ -65,9 +65,8 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$cassettes .= "<b class='cassette'>{$row["cassette"]}</b>";
+	$cassettes .= "<b class='cassette' id='c_{$row["cassette"]}'>{$row["cassette"]}</b>";
 }
-
 $html .= "<div style='width: 100%; border: 1px solid; padding: 10px;'><span>Вероятные номера кассет:</span> {$cassettes}</div>";
 
 // Данные рецепта
@@ -164,7 +163,7 @@ if( $fact_batches ) {
 		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$fillings_cell = "";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
-			$fillings_cell .= "<td><input type='number' min='1' max='{$cassetts}' name='cassette[{$subrow["LB_ID"]}][{$subsubrow["LF_ID"]}]' value='{$subsubrow["cassette"]}' style='width: 100%; background-color: coral;' required ".($subsubrow["is_link"] ? "readonly" : "")."></td>";
+			$fillings_cell .= "<td><input type='number' class='cassette' min='1' max='{$cassetts}' name='cassette[{$subrow["LB_ID"]}][{$subsubrow["LF_ID"]}]' value='{$subsubrow["cassette"]}' style='width: 50px;' required ".($subsubrow["is_link"] ? "readonly" : "")."></td>";
 		}
 
 		$html .= "
