@@ -193,6 +193,12 @@ $query = "
 		,IF((SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF((SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), (SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), (SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) avg_diff
 		,USR_Icon(LO.opening_master) opening_master
 
+		,LOD.not_spill
+		,LOD.crack
+		,LOD.crack_drying
+		,LOD.chipped
+		,LOD.def_form
+		,LOD.def_assembly
 	FROM list__Assembling LA
 	JOIN list__Filling LF ON LF.LA_ID = LA.LA_ID
 	LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
@@ -210,20 +216,29 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td style="background-color: rgba(255, 127, 80, 0.3);"><?=$row["assembling_time_format"]?></td>
 		<td style="background-color: rgba(255, 127, 80, 0.3);"><b class="cassette"><?=$row["cassette"]?></b></td>
 		<td style="background-color: rgba(255, 127, 80, 0.3);"><?=$row["assembling_master"]?></td>
-		<td style="background-color: rgba(255, 127, 80, 0.3);"></td>
+		<td class="nowrap" style="background-color: rgba(255, 127, 80, 0.3); text-align: left;">
+			<?=($row["def_form"] ? "<span><font color='red'>{$row["def_form"]}</font> дефект формы</span><br>" : "")?>
+			<?=($row["def_assembly"] ? "<span><font color='red'>{$row["def_assembly"]}</font> дефект сборки</span><br>" : "")?>
+		</td>
 
 		<td style="background-color: rgba(127, 255, 212, 0.3);"><a href="filling.php?week=<?=$row["lb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["filling_time_format"]?></a></td>
 		<td style="background-color: rgba(127, 255, 212, 0.3);"><?=$row["item"]?></td>
 		<td style="background-color: rgba(127, 255, 212, 0.3);"><?=number_format($row["mix_density"], 0, ',', '&nbsp;')?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").number_format($row["mix_diff"], 0, ',', '&nbsp;')."</font>" : "")?></td>
 		<td style="background-color: rgba(127, 255, 212, 0.3);"><?=$row["operator"]?></td>
-		<td style="background-color: rgba(127, 255, 212, 0.3);"></td>
+		<td class="nowrap" style="background-color: rgba(127, 255, 212, 0.3); text-align: left;">
+			<?=($row["not_spill"] ? "<span><font color='red'>{$row["not_spill"]}</font> непролив</span><br>" : "")?>
+			<?=($row["crack_drying"] ? "<span><font color='red'>{$row["crack_drying"]}</font> усад. трещина</span><br>" : "")?>
+		</td>
 
 		<td><?=$row["opening_time_format"]?></td>
 		<td style="background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
 		<td <?=(abs($row["in_cassette"] - $row["cnt_weight"]) > $row["in_cassette"] / 2 ? "style='color: red;'" : "")?>><?=$row["in_cassette"]?> / <?=$row["cnt_weight"]?></td>
 		<td><a href="#" class="edit_transactions" LO_ID="<?=$row["LO_ID"]?>" title="Список регистраций"><?=($row["avg_weight"] ? number_format($row["avg_weight"], 0, ',', '&nbsp;') : "")?><?=($row["avg_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["avg_diff"] > 0 ? " +" : " ").number_format($row["avg_diff"], 0, ',', '&nbsp;')."</font>" : "")?></a></td>
 		<td><?=$row["opening_master"]?></td>
-		<td></td>
+		<td class="nowrap" style="text-align: left;">
+			<?=($row["crack"] ? "<span><font color='red'>{$row["crack"]}</font> мех. трещина</span><br>" : "")?>
+			<?=($row["chipped"] ? "<span><font color='red'>{$row["chipped"]}</font> скол</span><br>" : "")?>
+		</td>
 	</tr>
 	<?
 }

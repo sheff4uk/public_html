@@ -196,8 +196,9 @@ function src_url($src) {
 	if( !empty($_SESSION['id']) ) {
 		$menu["Бланки"] = "blanks.php";
 		$menu["План"]["<i class='fas fa-fill fa-lg'></i> Заливка"] = "plan_batch.php";
-		$menu["Факт"]["<i class='fas fa-fill-drip fa-lg'></i> Заливка"] = "filling.php";
+		$menu["Факт"]["<i class='fas fa-fill-drip fa-lg'></i> Чек листы операторов"] = "filling.php";
 		$menu["Факт"]["<i class='fas fa-expand fa-lg'></i> Расформовка"] = "opening.php";
+		$menu["Факт"]["<i class='fas fa-industry fa-lg'></i> Стадии производства"] = "manufacturing.php";
 		$menu["Факт"]["<i class='fas fa-truck fa-lg'></i> Отгрузка"] = "shipment.php";
 		$menu["Анализ"]["<i class='fas fa-cogs fa-lg'></i> Заливки по суткам"] = "daily_production.php";
 		$menu["Анализ"]["<i class='fas fa-history fa-lg'></i> История кассет"] = "history.php";
