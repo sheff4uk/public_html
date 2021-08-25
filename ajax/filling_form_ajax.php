@@ -68,7 +68,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$cassettes .= "<b class='cassette'>{$row["cassette"]}</b>";
 }
 
-$html .= "<div>Вероятные номера кассет: {$cassettes}</div>";
+$html .= "<div style='width: 100%; border: 1px solid; padding: 10px;'><span>Вероятные номера кассет:</span> {$cassettes}</div>";
 
 // Данные рецепта
 $query = "
