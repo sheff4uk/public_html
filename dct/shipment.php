@@ -53,6 +53,15 @@ if( isset($_POST["WT_ID"]) ) {
 		if( isset($_GET["WT_ID"]) ) {
 			// Если было сканирование
 			if( isset($_GET["scan"]) ) {
+				// Меняем статус на отгружено
+				$query = "
+					UPDATE list__PackingPallet
+					SET PN_ID = 1
+						,shipment_time = NOW()
+					WHERE WT_ID = {$_GET["WT_ID"]} AND nextID = {$_GET["nextID"]}
+				";
+				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			}
 
 			$query = "
 				SELECT CW.item
