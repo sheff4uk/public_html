@@ -103,6 +103,20 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 </table>
 
 <?
+// Формируем список вероятных номеров кассет
+$query = "
+	SELECT LF.cassette
+	FROM list__Batch LB
+	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+	WHERE LB.PB_ID = (SELECT PB_ID FROM plan__Batch WHERE CW_ID = {$CW_ID} AND fact_batches > 0 AND PB_ID < {$PB_ID} ORDER BY PB_ID DESC LIMIT 1)
+	ORDER BY LF.cassette
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+while( $row = mysqli_fetch_array($res) ) {
+	$cassettes .= "<b style='border: 2px solid #333; border-radius: 5px; margin: 0 2px; display: inline-block;'>{$row["cassette"]}</b>";
+}
+echo "<div style='border: 1px solid; padding: 10px;'><span>Вероятные номера кассет:</span> {$cassettes}<br><b>Пожалуйста указывайте номера кассет разборчиво.</b></div>";
+
 // Данные рецепта
 $query = "
 	SELECT IFNULL(CONCAT(MF.iron_oxide, ' ±5 кг'), 0) iron_oxide
