@@ -16,7 +16,7 @@ $query = "
 		,PB.cycle
 		,PB.CW_ID
 		,PB.batches
-		,CW.item
+		,SUBSTRING(CW.item, -3, 3) item
 		,CW.fillings
 		,CW.cubetests
 		,CONCAT(ROUND(CW.min_density/1000, 2), '&ndash;', ROUND(CW.max_density/1000, 2)) spec
@@ -52,7 +52,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 	<style>
 		@media print {
 			@page {
-				size: landscape;
+				size: portrait;
 /*				padding: 0;*/
 /*				margin: 0;*/
 			}
@@ -91,10 +91,10 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 	<thead>
 		<tr>
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
-			<th style="font-size: 2em;"><?=$item?></th>
-			<th><n style="font-size: 3em;"><?=$year?></n> год</th>
-			<th width="120"><n style="font-size: 3em;"><?=$cycle?></n> цикл</th>
-			<th style="position: relative;">
+			<th width="75" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">код</span><n style="font-size: 3em;"><?=$item?></n></th>
+			<th width="100" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">год</span><n style="font-size: 3em;"><?=$year?></n></th>
+			<th width="75" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">цикл</span><n style="font-size: 3em;"><?=$cycle?></n></th>
+			<th width="200" style="position: relative;">
 				<img src="../barcode.php?code=<?=$PB_ID?>&w=200&h=60" alt="barcode">
 				<span style="position: absolute; background: white; left: calc(50% - 40px); top: 48px; width: 80px;"><?=str_pad($PB_ID, 8, "0", STR_PAD_LEFT)?></span>
 			</th>
@@ -151,7 +151,7 @@ $row = mysqli_fetch_array($res);
 			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент</th>" : "")?>
 			<?=($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор</th>" : "")?>
 			<?=($row["wt_cnt"] ? "<th rowspan='2'>Вода</th>" : "")?>
-			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 60)?>" style="border-left: 4px solid;">№ кассеты</th>
+			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>" style="border-left: 4px solid;">№ кассеты</th>
 			<th rowspan="3" width="40">Недолив</th>
 			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
 		</tr>
