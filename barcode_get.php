@@ -104,7 +104,7 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 							read_transaction_LW($row["last_transaction"]+1, 1, $socket, $mysqli);
 						}
 						else {
-							message_to_telegram("Пост <b>{$row["post"]}</b>\nНет связи с весами!", TELEGRAM_CHATID);
+							message_to_telegram("Пост <b>{$row["post"]}</b>\n<b>Нет связи с весами!</b>", TELEGRAM_CHATID);
 						}
 						socket_close($socket);
 					}
@@ -151,7 +151,7 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 						read_transaction_LPP($row["last_transaction"]+1, 1, $socket, $mysqli);
 					}
 					else {
-						message_to_telegram("Нет связи с терминалом этикетирования паллетов!", TELEGRAM_CHATID);
+						message_to_telegram("<b>Нет связи с терминалом этикетирования паллетов!</b>", TELEGRAM_CHATID);
 					}
 					socket_close($socket);
 				}
@@ -160,7 +160,7 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 				// Предупреждаем если долго нет данных по замесам
 				$query = "
 					SELECT PB.cycle
-						,CW.item
+						,SUBSTRING(CW.item, -3, 3) item
 					FROM plan__Batch PB
 					JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 					WHERE PB.print_time + INTERVAL 24 hour < NOW()
