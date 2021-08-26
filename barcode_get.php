@@ -169,7 +169,7 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
-					message_to_telegram("Цикл: <b>{$row["cycle"]}</b><br>Код: <b>{$row["item"]}</b><br><b>Нет данных по заливкам более 24 часов!</b>", TELEGRAM_CHATID);
+					message_to_telegram("Цикл: <b>{$row["cycle"]}</b>\nКод: <b>{$row["item"]}</b>\n<b>Нет данных по заливкам более 24 часов!</b>", TELEGRAM_CHATID);
 				}
 				///////////////////////////////////////////////////////////
 			}
