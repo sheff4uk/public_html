@@ -48,10 +48,11 @@ $query = "
 		,SUM(1) details
 		,SUM(IF(LW.goodsID = 6, 1, NULL)) d_shell
 		,SUM(IF(LW.goodsID = 7, 1, NULL)) d_assembly
-		,(SELECT DATE_FORMAT(opening_time, '%d.%m.%Y %H:%i') FROM list__Opening WHERE opening_time < LO.opening_time AND cassette = LO.cassette ORDER BY opening_time DESC LIMIT 1) cassette_assembly
-		,(SELECT USR_Name(opening_master) FROM list__Opening WHERE opening_time < LO.opening_time AND cassette = LO.cassette ORDER BY opening_time DESC LIMIT 1) name
+		,DATE_FORMAT(LA.assembling_time, '%d.%m.%Y %H:%i') assembling_time
+		,USR_Name(LA.assembling_master) assembling_master
 	FROM list__Opening LO
 	JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+	JOIN list__Assembling LA ON LA.LA_ID = LF.LA_ID
 	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -72,8 +73,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>{$row["details"]}</td>
 			<td>{$row["d_shell"]}</td>
 			<td>{$row["d_assembly"]}</td>
-			<td>{$row["cassette_assembly"]}</td>
-			<td>{$row["name"]}</td>
+			<td>{$row["assembling_time"]}</td>
+			<td>{$row["assembling_master"]}</td>
 		</tr>
 	";
 }
