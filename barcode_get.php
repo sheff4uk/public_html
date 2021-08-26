@@ -156,6 +156,22 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 					socket_close($socket);
 				}
 				////////////////////////////////////////////////////////////
+
+				// Предупреждаем если долго нет данных по замесам
+				$query = "
+					SELECT PB.cycle
+						,CW.item
+					FROM plan__Batch PB
+					JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+					WHERE PB.print_time + INTERVAL 24 hour < NOW()
+						AND PB.batches > 0
+						AND PB.fact_batches = 0
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					message_to_telegram("Цикл: <b>{$row["cycle"]}</b><br>Код: <b>{$row["item"]}</b><br><b>Нет данных по заливкам более 24 часов!</b>", TELEGRAM_CHATID);
+				}
+				///////////////////////////////////////////////////////////
 			}
 			break;
 		/////////////////////////////////////
