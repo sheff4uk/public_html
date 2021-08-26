@@ -231,9 +231,9 @@ while( $row = mysqli_fetch_array($res) ) {
 		</td>
 
 		<td><?=$row["opening_time_format"]?></td>
-		<td style="background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
+		<td style="background: rgb(255,0,0,<?=($row["o_interval"] ? (24 - $row["o_interval"]) / 10 : 0)?>);"><?=$row["o_interval"]?></td>
 		<td <?=(abs($row["in_cassette"] - $row["cnt_weight"]) > $row["in_cassette"] / 2 ? "style='color: red;'" : "")?>><?=$row["in_cassette"]?> / <?=$row["cnt_weight"]?></td>
-		<td><a href="#" class="edit_transactions" LO_ID="<?=$row["LO_ID"]?>" title="Список регистраций"><?=($row["avg_weight"] ? number_format($row["avg_weight"], 0, ',', '&nbsp;') : "")?><?=($row["avg_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["avg_diff"] > 0 ? " +" : " ").number_format($row["avg_diff"], 0, ',', '&nbsp;')."</font>" : "")?></a></td>
+		<td><a href="#" class="transactions" LO_ID="<?=$row["LO_ID"]?>" cassette="<?=$row["cassette"]?>" item="<?=$row["item"]?>" title="Список регистраций"><?=($row["avg_weight"] ? number_format($row["avg_weight"], 0, ',', '&nbsp;') : "")?><?=($row["avg_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["avg_diff"] > 0 ? " +" : " ").number_format($row["avg_diff"], 0, ',', '&nbsp;')."</font>" : "")?></a></td>
 		<td><?=$row["opening_master"]?></td>
 		<td class="nowrap" style="text-align: left;">
 			<?=($row["crack"] ? "<span><font color='red'>{$row["crack"]}</font> мех. трещина</span><br>" : "")?>
@@ -245,6 +245,43 @@ while( $row = mysqli_fetch_array($res) ) {
 ?>
 	</tbody>
 </table>
+
+<div id='weight_form' title='Регистрации противовесов' style='display:none;'>
+	<span style="display: inline-block; width: 30%;">Кассета: <b id="cassette" style="font-size: 2em;"></b></span>
+	<span style="display: inline-block; width: 30%;">Код: <b id="item" style="font-size: 2em;"></b></span>
+	<fieldset>
+		<!--Содержимое формы аяксом-->
+	</fieldset>
+</div>
+
+<script>
+	$(function() {
+		// Кнопка просмотра регистраций
+		$('.transactions').click( function() {
+			// Проверяем сессию
+			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
+
+			var LO_ID = $(this).attr("LO_ID"),
+				cassette = $(this).attr("cassette"),
+				item = $(this).attr("item");
+
+			$('#cassette').text(cassette);
+			$('#item').text(item);
+
+			//Рисуем форму
+			$.ajax({ url: "/ajax/opening_form_ajax.php?LO_ID="+LO_ID, dataType: "script", async: false });
+
+			$('#weight_form').dialog({
+				resizable: false,
+				width: 1000,
+				modal: true,
+				closeText: 'Закрыть'
+			});
+
+			return false;
+		});
+	});
+</script>
 
 <?
 include "footer.php";
