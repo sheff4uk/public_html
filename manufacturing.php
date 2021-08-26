@@ -217,8 +217,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td style="background-color: rgba(255, 127, 80, 0.3);"><b class="cassette"><?=$row["cassette"]?></b></td>
 		<td style="background-color: rgba(255, 127, 80, 0.3);"><?=$row["assembling_master"]?></td>
 		<td class="nowrap" style="background-color: rgba(255, 127, 80, 0.3); text-align: left;">
-			<?=($row["def_form"] ? "<span><font color='red'>{$row["def_form"]}</font> дефект формы</span><br>" : "")?>
-			<?=($row["def_assembly"] ? "<span><font color='red'>{$row["def_assembly"]}</font> дефект сборки</span><br>" : "")?>
+			<?=($row["def_form"] ? "<span><font color='red'>{$row["def_form"]}</font> д. формы</span><br>" : "")?>
+			<?=($row["def_assembly"] ? "<span><font color='red'>{$row["def_assembly"]}</font> д. сборки</span><br>" : "")?>
 		</td>
 
 		<td style="background-color: rgba(127, 255, 212, 0.3);"><a href="filling.php?week=<?=$row["lb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["filling_time_format"]?></a></td>
