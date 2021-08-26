@@ -207,6 +207,8 @@ $query = "
 	LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	WHERE YEARWEEK(LA.assembling_time, 1) LIKE '{$_GET["week"]}'
+		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+		".($CASs ? "AND LO.cassette IN({$CASs})" : "")."
 	ORDER BY LA.assembling_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
