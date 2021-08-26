@@ -179,7 +179,7 @@ $query = "
 		,DATE_FORMAT(LF.filling_time, '%d.%m.%y %H:%i') filling_time_format
 		,YEARWEEK(LB.batch_date, 1) lb_week
 		,LB.LB_ID
-		,CW.item
+		,SUBSTRING(CW.item, -3, 3) item
 		,LB.mix_density
 		,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
 		,USR_Icon(LB.operator) operator
@@ -222,7 +222,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		</td>
 
 		<td style="background-color: rgba(127, 255, 212, 0.3);"><a href="filling.php?week=<?=$row["lb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["filling_time_format"]?></a></td>
-		<td style="background-color: rgba(127, 255, 212, 0.3);"><?=$row["item"]?></td>
+		<td style="background-color: rgba(127, 255, 212, 0.3); font-size: 2em;"><?=$row["item"]?></td>
 		<td style="background-color: rgba(127, 255, 212, 0.3);"><?=number_format($row["mix_density"], 0, ',', '&nbsp;')?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").number_format($row["mix_diff"], 0, ',', '&nbsp;')."</font>" : "")?></td>
 		<td style="background-color: rgba(127, 255, 212, 0.3);"><?=$row["operator"]?></td>
 		<td class="nowrap" style="background-color: rgba(127, 255, 212, 0.3); text-align: left;">
