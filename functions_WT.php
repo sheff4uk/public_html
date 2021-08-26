@@ -336,18 +336,38 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 					$deviceID = $data[$i+6] + ($data[$i+7] << 8) + ($data[$i+8] << 16) + ($data[$i+9] << 24);
 					//Дата/время совершения регистрации
 					$transactionDate = sprintf("20%02d-%02d-%02d %02d:%02d:%02d", $data[$i+11], $data[$i+12], $data[$i+13], $data[$i+14], $data[$i+15], $data[$i+16]);
+					// Количество штук
+					$quantity = $data[$i+27] + ($data[$i+28] << 8) + ($data[$i+29] << 16) + ($data[$i+30] << 24);
+					//Если количество отрицательное
+					if( ($data[$i+30] >> 7) == 1 ) {
+						$quantity = ((-1 >> 32) << 32) + $quantity;
+					}
 					//ID товара
 					$goodsID = $data[$i+37] + ($data[$i+38] << 8) + ($data[$i+39] << 16) + ($data[$i+40] << 24);
 
-					// Записываем в базу регистрацию
-					$query = "
-						INSERT INTO list__PackingPallet
-						SET packed_time = '{$transactionDate}'
-							,nextID = {$nextID}
-							,WT_ID = {$deviceID}
-							,CW_ID = {$goodsID}
-					";
-					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					// Если количество положительное
+					if( $quantity > 0 ) {
+						// Записываем в базу регистрацию
+						$query = "
+							INSERT INTO list__PackingPallet
+							SET packed_time = '{$transactionDate}'
+								,nextID = {$nextID}
+								,WT_ID = {$deviceID}
+								,CW_ID = {$goodsID}
+						";
+						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					}
+					else {
+						// Иначе сторнируем
+						$query = "
+							DELETE FROM list__PackingPallet
+							WHERE CW_ID = {$goodsID}
+								AND WT_ID = {$deviceID}
+							ORDER BY nextID DESC
+							LIMIT 1
+						";
+						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					}
 
 					// Запоминаем ID последней регистрации
 					$query = "
