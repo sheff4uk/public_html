@@ -115,7 +115,7 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	$cassettes .= "<b style='border: 2px solid #333; border-radius: 5px; margin: 0 2px; display: inline-block;'>{$row["cassette"]}</b>";
 }
-echo "<div style='border: 1px solid; padding: 10px;'><span>Вероятные номера кассет:</span> {$cassettes}<br><b>Пожалуйста указывайте номера кассет разборчиво.</b></div>";
+//echo "<div style='border: 1px solid; padding: 10px;'><span>Вероятные номера кассет:</span> {$cassettes}<br><b>Пожалуйста указывайте номера кассет разборчиво.</b></div>";
 
 // Данные рецепта
 $query = "
@@ -151,7 +151,8 @@ $row = mysqli_fetch_array($res);
 			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент</th>" : "")?>
 			<?=($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор</th>" : "")?>
 			<?=($row["wt_cnt"] ? "<th rowspan='2'>Вода</th>" : "")?>
-			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>" style="border-left: 4px solid;">№ кассеты</th>
+			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>" style="border-left: 4px solid;">№ кассеты<br>Пожалуйста указывайте номера разборчиво</th>
+			<th rowspan="3" width="60">Вероятные номера кассет</th>
 			<th rowspan="3" width="40">Недолив</th>
 			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
 		</tr>
@@ -191,6 +192,7 @@ for ($i = 1; $i <= $batches; $i++) {
 			".($row["pl_cnt"] ? "<td></td>" : "")."
 			".($row["wt_cnt"] ? "<td></td>" : "")."
 			{$fillings_cell}
+			".($i == 1 ? "<td rowspan='{$batches}'>{$cassettes}</td>" : "")."
 			<td></td>
 			<td style='text-align: center;'>".(in_array($i, $tests) ? "<b style='font-size: 1.4em;'>&#10065;</b>" : "&#10065;")."</td>
 		</tr>
