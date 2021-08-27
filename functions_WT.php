@@ -366,7 +366,7 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 							ORDER BY nextID DESC
 							LIMIT 1
 						";
-						//mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					}
 
 					// Запоминаем ID последней регистрации
