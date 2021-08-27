@@ -113,7 +113,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	$cassettes .= "<b style='border: 1px solid #333; border-radius: 5px; margin: 0 2px; padding: 2px; display: inline-block;'>{$row["cassette"]}</b>";
+	$cassettes .= "<b style='border: 1px solid #333; border-radius: 5px; margin: 0 1px; padding: 2px; display: inline-block;'>{$row["cassette"]}</b>";
 }
 //echo "<div style='border: 1px solid; padding: 10px;'><span>Вероятные номера кассет:</span> {$cassettes}<br><b>Пожалуйста указывайте номера кассет разборчиво.</b></div>";
 
