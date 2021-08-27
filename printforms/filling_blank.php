@@ -52,7 +52,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 	<style>
 		@media print {
 			@page {
-				size: portrait;
+				size: landscape;
 /*				padding: 0;*/
 /*				margin: 0;*/
 			}
@@ -60,7 +60,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 
 		body, td {
 			font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif;
-			font-size: 9pt;
+			font-size: 10pt;
 		}
 		table {
 			table-layout: fixed;
