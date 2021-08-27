@@ -1,6 +1,13 @@
 <?
 include_once "../config.php";
 
+//ID поддона введен вручную
+if( isset($_POST["barcode"]) ) {
+	$WT_ID = substr($_POST["barcode"], 0, 8);
+	$nextID = substr($_POST["barcode"], -8, 8);
+	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php?WT_ID='.$WT_ID.'&nextID='.$nextID.'">');
+}
+
 //Изменение статуса поддона из формы
 if( isset($_POST["WT_ID"]) ) {
 	$query = "
@@ -61,6 +68,22 @@ if( isset($_GET["scan"]) ) {
 	</head>
 	<body>
 		<h3>Отсканируйте поддон</h3>
+			<?
+			if( isset($_GET["WT_ID"]) ) {
+				$WT_ID = str_pad($_GET["WT_ID"], 8, "0", STR_PAD_LEFT);
+				$nextID = str_pad($_GET["nextID"], 8, "0", STR_PAD_LEFT);
+			}
+			?>
+
+			<form method="post">
+				<fieldset>
+					<legend><b>ID поддона:</b></legend>
+					<input type="text" name="barcode" style="width: 140px;" value="<?=$WT_ID?><?=$nextID?>">
+					<input type="submit" value="OK">
+				</fieldset>
+			</form>
+			<br>
+
 		<?
 		if( isset($_GET["WT_ID"]) ) {
 			// Если было сканирование
@@ -76,16 +99,14 @@ if( isset($_GET["scan"]) ) {
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			$row = mysqli_fetch_array($res);
 
-			$WT_ID = str_pad($_GET["WT_ID"], 8, "0", STR_PAD_LEFT);
-			$nextID = str_pad($_GET["nextID"], 8, "0", STR_PAD_LEFT);
-			echo "<h1 style='text-align: center;'>{$WT_ID}{$nextID}</h1>";
+			//echo "<h1 style='text-align: center;'>{$WT_ID}{$nextID}</h1>";
 
 			if( $row["packed_time_format"] == "" ) die("<h1 style='color: red;'>Поддон с таким номером не найден!</h1>");
 
 			//Форма изменения статуса противовеса
 			?>
 			<fieldset>
-				<legend>Статус поддона</legend>
+				<legend><b>Статус поддона:</b></legend>
 				<form method="post" style="font-size: 2em;">
 					<input type="hidden" name="WT_ID" value="<?=$_GET["WT_ID"]?>">
 					<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
@@ -118,7 +139,7 @@ if( isset($_GET["scan"]) ) {
 				<br>
 				Код: <b>{$row["item"]}</b><br>
 				Контроль: <b>{$row["packed_time_format"]}</b><br>
-				".($row["PN_ID"] ? "Отгрузка: <b>{$row["shipment_time_format"]}</b>" : "")."
+				".($row["PN_ID"] ? "<span style='color: darkgreen;'>Отгрузка: <b>{$row["shipment_time_format"]}</b></span>" : "")."
 			";
 		}
 		?>
