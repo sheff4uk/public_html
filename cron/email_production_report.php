@@ -11,7 +11,6 @@ $from_date = date_create( '-1 days' );
 $from_format = date_format($from_date, 'd.m.Y');
 $to_date = date_create();
 $to_format = date_format($to_date, 'd.m.Y');
-//$subject = "[KONSTANTA] Производственный отчет за {$from_format}";
 $subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Производственный отчет за {$from_format}"). "?=";
 
 $message = "
@@ -42,13 +41,13 @@ $message = "
 
 $query = "
 	SELECT IF(HOUR(LO.opening_time - INTERVAL 7 HOUR) < 12, 1, 2) shift
-		,DATE_FORMAT(LO.opening_time, '%d.%m.%Y %H:%i') friendly_opening_time
+		,DATE_FORMAT(LO.opening_time, '%d.%m.%Y %H:%i') opening_time_format
 		,LO.cassette
 		,CW.item
 		,SUM(1) details
 		,SUM(IF(LW.goodsID = 6, 1, NULL)) d_shell
 		,SUM(IF(LW.goodsID = 7, 1, NULL)) d_assembly
-		,DATE_FORMAT(LA.assembling_time, '%d.%m.%Y %H:%i') assembling_time
+		,DATE_FORMAT(LA.assembling_time, '%d.%m.%Y %H:%i') assembling_time_format
 		,USR_Name(LA.assembling_master) assembling_master
 	FROM list__Opening LO
 	JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
@@ -67,13 +66,13 @@ while( $row = mysqli_fetch_array($res) ) {
 	$message .= "
 		<tr>
 			<td>{$row["shift"]}</td>
-			<td>{$row["friendly_opening_time"]}</td>
+			<td>{$row["opening_time_format"]}</td>
 			<td>{$row["cassette"]}</td>
 			<td>{$row["item"]}</td>
 			<td>{$row["details"]}</td>
 			<td>{$row["d_shell"]}</td>
 			<td>{$row["d_assembly"]}</td>
-			<td>{$row["assembling_time"]}</td>
+			<td>{$row["assembling_time_format"]}</td>
 			<td>{$row["assembling_master"]}</td>
 		</tr>
 	";
@@ -117,14 +116,14 @@ $message .= "
 
 $query = "
 	SELECT IF(HOUR(LO.opening_time - INTERVAL 7 HOUR) < 12, 1, 2) shift
-		,DATE_FORMAT(LO.opening_time, '%d.%m.%Y %H:%i') friendly_opening_time
+		,DATE_FORMAT(LO.opening_time, '%d.%m.%Y %H:%i') opening_time_format
 		,LO.cassette
 		,CW.item
 		,SUM(1) details
 		,SUM(IF(LW.goodsID = 2, 1, NULL)) not_spill
 		,SUM(IF(LW.goodsID = 4, 1, NULL)) crack_drying
-		,SUM(IF(LW.weight > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 1, NULL)) light
-		,SUM(IF(LW.weight < ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)), 1, NULL)) heavy
+		,SUM(IF(LW.weight < ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)), 1, NULL)) light
+		,SUM(IF(LW.weight > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 1, NULL)) heavy
 		,DATE_FORMAT(LF.filling_time, '%d.%m.%Y %H:%i') filling_time_format
 		,USR_Name(LB.operator) name
 	FROM list__Opening LO
@@ -144,7 +143,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$message .= "
 		<tr>
 			<td>{$row["shift"]}</td>
-			<td>{$row["friendly_opening_time"]}</td>
+			<td>{$row["opening_time_format"]}</td>
 			<td>{$row["cassette"]}</td>
 			<td>{$row["item"]}</td>
 			<td>{$row["details"]}</td>
@@ -163,7 +162,6 @@ $message .= "
 	</table>
 ";
 
-//$headers  = "Content-type: text/html; charset=utf-8 \r\n";
 $headers  = "Content-type: text/html; charset=\"utf-8\"\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
 
