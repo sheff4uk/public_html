@@ -179,6 +179,15 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 							SELECT SUB.LO_ID
 								,IFNULL((SELECT SUM(1) FROM list__Weight WHERE RN = {$RN} AND WT_ID = {$deviceID} AND weighing_time BETWEEN (SELECT opening_time FROM list__Opening WHERE LO_ID = SUB.LO_ID) AND SUB.end_time), 0) CW_cnt
 								,(SELECT cassette FROM list__Opening WHERE LO_ID = SUB.LO_ID) cassette
+								,(
+									SELECT CW.item
+									FROM list__Opening LO
+									JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+									JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+									JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+									JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+									WHERE LO.LO_ID = SUB.LO_ID
+								) item
 							FROM (
 								SELECT (SELECT LO_ID FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) LO_ID
 									,LO.opening_time end_time
@@ -195,6 +204,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						$LO_ID = $row["LO_ID"];
 						$CW_cnt = $row["CW_cnt"];
 						$cassette = $row["cassette"];
+						$item = $row["item"];
 
 						// Связываем регистрации закрытой партии с подходящей по времени кассетой
 						$query = "
@@ -250,7 +260,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						$chip = $row["chip"];
 						// Если в партии были трещины или сколы или незакрытие или повторения брака сообщаем в телеграм
 						if( $crack or $chip or $receipt_err or $reject_err ) {
-							$message = "Пост <b>{$post}</b>, кассета: <b>{$cassette}</b>, партия <b>{$RN}</b>\n".($crack ? "трещина: <b>{$crack}</b>\n" : "").($chip ? "скол: <b>{$chip}</b>\n" : "").($receipt_err ? "<b>Пропущено закрытие партии!</b>\n" : "").($reject_err ? "<b>Подряд идущий одинаковый брак (3 и более)!</b>" : "");
+							$message = "Пост <b>{$post}</b>, кассета: <b>{$cassette}</b>, код: <b>{$item}</b>, партия <b>{$RN}</b>\n".($crack ? "трещина: <b>{$crack}</b>\n" : "").($chip ? "скол: <b>{$chip}</b>\n" : "").($receipt_err ? "<b>Пропущено закрытие партии!</b>\n" : "").($reject_err ? "<b>Подряд идущий одинаковый брак (3 и более)!</b>" : "");
 							message_to_telegram($message, TELEGRAM_CHATID);
 						}
 					}
