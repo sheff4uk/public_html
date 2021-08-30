@@ -136,7 +136,6 @@ $query = "
 	GROUP BY LO.LO_ID
 	HAVING not_spill OR crack_drying OR light OR heavy
 	ORDER BY LO.opening_time
-	LIMIT 100
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query2: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
