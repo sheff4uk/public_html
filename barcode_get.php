@@ -2,11 +2,10 @@
 $bc = $_GET["bc"];
 $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
-message_to_telegram($bc, '217756119');
+//message_to_telegram($bc, '217756119');
 
 // Проверка доступа и корректность кода (не менее 8 символов)
-//if( $ip == $from_ip and strlen($bc) >= 8 ) {
-if( strlen($bc) >= 8 ) {
+if( $ip == $from_ip and strlen($bc) >= 8 ) {
 	$bc = ltrim($bc, '0'); //Удаляем нули вначале
 	$bc = str_pad($bc, 8, "0", STR_PAD_LEFT); //Достраиваем код нулями слева до 8 символов (для тестовых этикеток)
 
