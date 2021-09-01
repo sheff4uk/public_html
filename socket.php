@@ -93,11 +93,17 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 					}
 					// Количество штук
 					$quantity = $data[$i+27] + ($data[$i+28] << 8) + ($data[$i+29] << 16) + ($data[$i+30] << 24);
+					//Если количество отрицательное
+					if( ($data[$i+30] >> 7) == 1 ) {
+						$quantity = ((-1 >> 32) << 32) + $quantity;
+					}
 					//ID товара
 					$goodsID = $data[$i+37] + ($data[$i+38] << 8) + ($data[$i+39] << 16) + ($data[$i+40] << 24);
 
 					//Номер партии
 					$ReceiptNumber = $data[$i+76] + ($data[$i+77] << 8) + ($data[$i+78] << 16) + ($data[$i+79] << 24);
+
+					$AddrGoods = $data[$i+96] + ($data[$i+97] << 8) + ($data[$i+98] << 16) + ($data[$i+99] << 24);
 
 					echo $nextID." ";
 					echo $deviceID." ";
@@ -105,7 +111,8 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 					echo $netWeight." ";
 					echo $quantity." ";
 					echo $goodsID." ";
-					echo $ReceiptNumber."\r\n";
+					echo $ReceiptNumber." ";
+					echo $AddrGoods."\r\n";
 				}
 				//Закрытие партии
 				elseif( $data[$i+10] == 71 ) {
@@ -157,7 +164,25 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 //	}
 //	socket_close($socket);
 
-if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5002)) ) {
+// Записываем текст терминала
+if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5020)) ) {
+	$in = "\xF8\x55\xCE\x19\x00\xAA".hex2bin(bin2hex("31/08/21 (1)            "));
+	$crc = crc16(byteStr2byteArray($in));
+	$in .= hex2bin($crc);
+
+	socket_write($socket, $in);
+
+	$result = socket_read($socket, 5);
+	$result = socket_read($socket, 1);
+	$result = bin2hex($result);
+	echo $result."\r\n";
+
+	socket_close($socket);
+}
+die();
+/////////////////////////////
+
+if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5020)) ) {
 //if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, "192.168.0.20", 5001)) ) {
 	//read_transaction(52445, 1, $socket, 0, $mysqli);
 //////////////////////////////
@@ -171,7 +196,7 @@ if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect
 //	echo dechex($data[5])."\r\n";
 //	//echo $result;
 ////////////////////////////////////////
-	read_transaction(166280, 1, $socket, $mysqli);
+	read_transaction(700, 1, $socket, $mysqli);
 	socket_close($socket);
 }
 
