@@ -2,7 +2,7 @@
 $bc = $_GET["bc"];
 $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
-//message_to_telegram($bc, '217756119');
+message_to_telegram($bc, '217756119');
 
 // Проверка доступа и корректность кода (не менее 8 символов)
 if( $ip == $from_ip and strlen($bc) >= 8 ) {
