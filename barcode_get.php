@@ -163,7 +163,7 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 						";
 						$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						$subrow = mysqli_fetch_array($subres);
-						$filling_time_format = $row["filling_time_format"]." (".$row["shift"].")";
+						$filling_time_format = $subrow["filling_time_format"]." (".$subrow["shift"].")";
 						// Запись в терминал дату заливки
 						set_terminal_text($filling_time_format, $socket, $mysqli);
 					}
