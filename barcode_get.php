@@ -149,7 +149,23 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 					// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
 					$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 					if( socket_connect($socket, $from_ip, $row["port"]) ) {
+						// Чтение регистраций поддонов
 						read_transaction_LPP($row["last_transaction"]+1, 1, $socket, $mysqli);
+
+						// Узнаем дату заливки последней сканированной кассеты
+						$query = "
+							SELECT DATE_FORMAT(LF.filling_time, '%d/%m/%y') filling_time_format
+								,IF(TIME(LF.filling_time) BETWEEN '07:00:00' AND '18:59:59', 1, 2) shift
+							FROM list__Opening LO
+							JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+							ORDER BY LO.opening_time DESC
+							LIMIT 1
+						";
+						$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						$subrow = mysqli_fetch_array($subres);
+						$filling_time_format = $row["filling_time_format"]." (".$row["shift"].")";
+						// Запись в терминал дату заливки
+						set_terminal_text($filling_time_format, $socket, $mysqli);
 					}
 					else {
 						message_to_telegram("<b>Нет связи с терминалом этикетирования паллетов!</b>", TELEGRAM_CHATID);

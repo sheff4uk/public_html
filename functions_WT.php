@@ -424,4 +424,14 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 		read_transaction_LPP($ID, $curnum, $socket, $mysqli);
 	}
 }
+
+// Функция обновляет текст терминала
+function set_terminal_text($text, $socket, $mysqli) {
+	$text = str_pad($text, 24);
+	$in = "\xF8\x55\xCE\x19\x00\xAA".hex2bin(bin2hex($text));
+	$crc = crc16(byteStr2byteArray($in));
+	$in .= hex2bin($crc);
+
+	socket_write($socket, $in);
+}
 ?>
