@@ -53,7 +53,8 @@ if( isset($_POST["WT_ID"]) ) {
 		<?
 		if( isset($_GET["WT_ID"]) ) {
 			$query = "
-				SELECT LW.weight
+				SELECT CW.item
+					,LW.weight
 					,DATE_FORMAT(LW.weighing_time, '%d.%m.%Y %H:%i') weighing_time_format
 					,LW.goodsID
 					,LO.cassette
@@ -61,6 +62,9 @@ if( isset($_POST["WT_ID"]) ) {
 				FROM list__Weight LW
 				JOIN list__Opening LO ON LO.LO_ID = LW.LO_ID
 				JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+				JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+				JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+				JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 				WHERE LW.WT_ID = {$_GET["WT_ID"]} AND LW.nextID = {$_GET["nextID"]}
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -97,6 +101,7 @@ if( isset($_POST["WT_ID"]) ) {
 			</script>
 			<?
 
+			echo "Код: <b>{$row["item"]}</b><br>";
 			echo "Заливка: <b>{$row["filling_time_format"]}</b><br>";
 			echo "Кассета: <b>{$row["cassette"]}</b><br>";
 			echo "Вес: <b>{$row["weight"]}</b> г.<br>";
