@@ -15,7 +15,7 @@ if( isset($_POST["WT_ID"]) ) {
 	$query = "
 		UPDATE list__PackingPallet
 		SET PN_ID = IF({$_POST["PN_ID"]} = 0, NULL, {$_POST["PN_ID"]})
-			,shipment_time = IF({$_POST["PN_ID"]} = 0, NULL, NOW())
+			,scan_time = IF({$_POST["PN_ID"]} = 0, NULL, NOW())
 		WHERE WT_ID = {$_POST["WT_ID"]} AND nextID = {$_POST["nextID"]}
 	";
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -27,7 +27,7 @@ if( isset($_GET["scan"]) ) {
 	$query = "
 		UPDATE list__PackingPallet
 		SET PN_ID = 1
-			,shipment_time = NOW()
+			,scan_time = NOW()
 		WHERE WT_ID = {$_GET["WT_ID"]} AND nextID = {$_GET["nextID"]}
 	";
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -92,7 +92,7 @@ if( isset($_GET["scan"]) ) {
 			$query = "
 				SELECT CW.item
 					,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i') packed_time_format
-					,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
+					,DATE_FORMAT(LPP.scan_time, '%d.%m.%Y %H:%i') scan_time_format
 					,IFNULL(LPP.PN_ID, 0) PN_ID
 				FROM list__PackingPallet LPP
 				JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID
@@ -141,7 +141,7 @@ if( isset($_GET["scan"]) ) {
 				<br>
 				Код: <b>{$row["item"]}</b><br>
 				Контроль: <b>{$row["packed_time_format"]}</b><br>
-				".($row["PN_ID"] ? "<span style='color: darkgreen;'>Отгрузка: <b>{$row["shipment_time_format"]}</b></span>" : "")."
+				".($row["PN_ID"] ? "<span style='color: darkgreen;'>Отгрузка: <b>{$row["scan_time_format"]}</b></span>" : "")."
 			";
 		}
 		?>
