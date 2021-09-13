@@ -76,7 +76,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						?>
 						<tr class="data_row">
 							<td><b style="font-size: 1.5em;"><?=$row["item"]?></b><input type="hidden" name="CW_ID[<?=$row["CW_ID"]?>]" value="<?=$row["CW_ID"]?>"><input type="hidden" name="PB_ID[<?=$row["CW_ID"]?>]"></td>
-							<td><input type="number" name="batches[<?=$row["CW_ID"]?>]" class="batches" min="0" max="30" fillings="" in_cassette="" tabindex="<?=(++$index)?>" style="width: 70px;"><i class="fas fa-question-circle" title="Не редактируется. Заливки уже состоялись."></i></td>
+							<td><input type="number" name="batches[<?=$row["CW_ID"]?>]" class="batches" min="0" max="40" fillings="" in_cassette="" tabindex="<?=(++$index)?>" style="width: 70px;"><i class="fas fa-question-circle" title="Не редактируется. Заливки уже состоялись."></i></td>
 							<td><input type="number" name="fillings" class="fillings" style="width: 70px;" readonly></td>
 							<td><input type="number" name="details" class="details" style="width: 70px;" readonly></td>
 						</tr>
