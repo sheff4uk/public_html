@@ -33,6 +33,19 @@ if( isset($_GET["scan"]) ) {
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php?WT_ID='.$_GET["WT_ID"].'&nextID='.$_GET["nextID"].'">');
 }
+
+//Отгрузка машины
+if( isset($_POST["lpp_id"]) ) {
+	foreach ($_POST["lpp_id"] as $key => $value) {
+		$query = "
+			UPDATE list__PackingPallet
+			SET shipment_time = NOW()
+			WHERE LPP_ID = {$value}
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	}
+	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php">');
+}
 ?>
 
 <!DOCTYPE html>
@@ -144,6 +157,55 @@ if( isset($_GET["scan"]) ) {
 				".($row["PN_ID"] ? "<span style='color: darkgreen;'>Отгрузка: <b>{$row["scan_time_format"]}</b></span>" : "")."
 			";
 		}
+
+		// Список подготовленных к отгрузке поддонов
+		$i = 0;
+		echo "<fieldset><legend><b>Сканированные поддоны:</b></legend>";
+		echo "<form method='post'>";
+		echo "
+			<table cellspacing='0' cellpadding='2' border='1'>
+				<thead>
+					<tr>
+						<th>№ п/п</th>
+						<th>Код</th>
+						<th>Время сканирования</th>
+						<th>Последние 3 цифры штрих-кода</th>
+					</tr>
+				</thead>
+				<tbody>
+		";
+		$query = "
+			SELECT LPP.LPP_ID
+				,substr(CW.item, -3, 3) item
+				,DATE_FORMAT(LPP.scan_time, '%d.%m %H:%i:%s') scan_time_format
+				,substr(lpad(LPP.nextID, 8, '0'), -3, 3) last3dig
+			FROM list__PackingPallet LPP
+			JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID
+			WHERE LPP.scan_time IS NOT NULL
+				AND LPP.shipment_time IS NULL
+			ORDER BY LPP.scan_time
+		";
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		while( $row = mysqli_fetch_array($res) ) {
+			$i++;
+			echo "
+				<tr>
+					<td><input type='hidden' name='lpp_id[]' value='{$row["LPP_ID"]}'>{$i}</td>
+					<td>{$row["item"]}</td>
+					<td>{$row["scan_time_format"]}</td>
+					<td>{$row["last3dig"]}</td>
+				</tr>
+			";
+		}
+		echo "
+				</tbody>
+			</table>
+		";
+		if( $i > 0 ) {
+			echo "<br><input type='submit' value='Отгрузить'>";
+		}
+		echo "</form>";
+		echo "</fieldset>";
 		?>
 	</body>
 </html>
