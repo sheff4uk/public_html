@@ -26,6 +26,12 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 			$row = mysqli_fetch_array($res);
 			// Если это первое сканирование
 			if( $row["cassette"] != $cassette ) {
+				// Отлавливаем интересуемые кассеты
+				if( $cassette == 114 ) {
+					$message = "Кассета 114 прибыла на расформовку";
+					message_to_telegram($message, TELEGRAM_CHATID);
+				}
+
 				// Узнаем была ли заливка этой кассеты после предыдущего сканирования
 				$query = "
 					SELECT LF.LF_ID
