@@ -33,13 +33,17 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 				}
 
 				// Узнаем была ли заливка этой кассеты после предыдущего сканирования
+//				$query = "
+//					SELECT LF.LF_ID
+//					FROM list__Assembling LA
+//					LEFT JOIN list__Filling LF ON LF.LA_ID = LA.LA_ID
+//					WHERE LA.cassette = {$cassette}
+//					ORDER BY LA.assembling_time DESC
+//					LIMIT 1
+//				";
+				// Узнаем, залита ли кассета
 				$query = "
-					SELECT LF.LF_ID
-					FROM list__Assembling LA
-					LEFT JOIN list__Filling LF ON LF.LA_ID = LA.LA_ID
-					WHERE LA.cassette = {$cassette}
-					ORDER BY LA.assembling_time DESC
-					LIMIT 1
+					SELECT IF((SELECT filling_time FROM list__Filling WHERE cassette = {$cassette} ORDER BY filling_time DESC LIMIT 1) > (SELECT opening_time FROM list__Opening WHERE cassette = {$cassette} ORDER BY opening_time DESC LIMIT 1), 1, 0) is_filling
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				$row = mysqli_fetch_array($res);
