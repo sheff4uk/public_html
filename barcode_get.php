@@ -48,7 +48,7 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				$row = mysqli_fetch_array($res);
 				// Если эта кассета залита
-				if( $row["LF_ID"] ) {
+				if( $row["is_filling"] == 1 ) {
 					// Делаем запись о сборке
 					$query = "
 						INSERT INTO list__Assembling
