@@ -27,10 +27,10 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 			// Если это первое сканирование
 			if( $row["cassette"] != $cassette ) {
 				// Отлавливаем интересуемые кассеты
-				if( $cassette == 114 ) {
-					$message = "Кассета 114 прибыла на расформовку";
-					message_to_telegram($message, TELEGRAM_CHATID);
-				}
+//				if( $cassette == 114 ) {
+//					$message = "Кассета 114 прибыла на расформовку";
+//					message_to_telegram($message, TELEGRAM_CHATID);
+//				}
 
 				// Узнаем была ли заливка этой кассеты после предыдущего сканирования
 //				$query = "
