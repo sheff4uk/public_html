@@ -1,7 +1,7 @@
 <?
 include_once "../config.php";
 $ip = $_SERVER['REMOTE_ADDR'];
-//if( $ip != $from_ip ) die("Access denied");
+if( $ip != $from_ip ) die("Access denied");
 
 //ID поддона введен вручную
 if( isset($_POST["barcode"]) ) {
