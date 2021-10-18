@@ -240,13 +240,47 @@ this.subbut.value='Подождите, пожалуйста!';">
 		$('#filling_form').on('focusout', 'input.cassette', function() {
 			var prev = $(this).data('val');
 			var current = $(this).val();
-			$('#c_' + prev).css({'background-color': '', 'border-color': ''});
+
+			var cnt = 0;
+			$('input.cassette').each(function (index, el){
+				var v = $(el).val();
+				if( v == prev ) cnt = cnt + 1;
+			});
+			// Если бывший номер больше не задействован
+			if( cnt == 0 ) {
+				$('#c_' + prev).css({'background-color': '', 'border-color': ''});
+			}
+			// Если остался только один экземпляр с бывшим номером
+			else if( cnt == 1 ) {
+				$('input.cassette').each(function (index, el){
+					if( $(el).val() == prev ) {
+						$(el).css({'background-color': 'green', 'border-color': 'green'});
+					}
+				});
+			}
+
 			$('#c_' + current).css({'background-color': 'green', 'border-color': 'green'});
 			if( $('#c_' + current).text() ) {
 				$(this).css({'background-color': 'green', 'border-color': 'green'});
 			}
 			else {
 				$(this).css({'background-color': '', 'border-color': ''});
+			}
+
+			// Дубликаты красным цветом
+			var cnt = 0;
+			$('input.cassette').each(function (index, el){
+				var v = $(el).val();
+				if( v == current ) {
+					cnt = cnt + 1;
+				}
+			});
+			if( cnt > 1 ) {
+				$('input.cassette').each(function (index, el){
+					if( $(el).val() == current ) {
+						$(el).css({'background-color': 'red', 'border-color': 'red'});
+					}
+				});
 			}
 		});
 
