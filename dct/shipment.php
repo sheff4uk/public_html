@@ -106,9 +106,9 @@ if( isset($_POST["lpp_id"]) ) {
 			$query = "
 				SELECT LPP.LPP_ID
 					,CW.item
-					,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i') packed_time_format
-					,DATE_FORMAT(LPP.scan_time, '%d.%m.%Y %H:%i') scan_time_format
-					,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
+					,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i:%s') packed_time_format
+					,DATE_FORMAT(LPP.scan_time, '%d.%m.%Y %H:%i:%s') scan_time_format
+					,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i:%s') shipment_time_format
 					,IFNULL(LPP.PN_ID, 0) PN_ID
 				FROM list__PackingPallet LPP
 				JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID
