@@ -94,8 +94,8 @@ if( isset($_POST["lpp_id"]) ) {
 			<form method="post">
 				<fieldset>
 					<legend><b>ID поддона:</b></legend>
-					<input type="text" name="barcode" style="width: 140px;" value="<?=$WT_ID?><?=$nextID?>">
-					<input type="submit" value="OK">
+					<input type="text" name="barcode" style="width: 210px; font-size: 1.4em;" value="<?=$WT_ID?><?=$nextID?>">
+					<input type="submit" style="font-size: 1.4em; background-color: yellow;" value="OK">
 				</fieldset>
 			</form>
 			<br>
