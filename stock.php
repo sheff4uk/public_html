@@ -42,14 +42,17 @@ while( $row = mysqli_fetch_array($res) ) {
 
 <div id="wr_stock">
 	<h2>Складской запас</h2>
-	<table>
+	<table style="text-align: center; font-weight: bold;">
 		<thead>
 			<tr>
 				<th rowspan="2">Код</th>
-				<th colspan="3">Кол-во поддонов</th>
+				<th colspan="6">Кол-во поддонов</th>
 			</tr>
 			<tr>
-				<th>Не готовые</th>
+				<th>4д</th>
+				<th>3д</th>
+				<th>2д</th>
+				<th>1д</th>
 				<th>Готовые</th>
 				<th>Всего</th>
 			</tr>
@@ -58,7 +61,10 @@ while( $row = mysqli_fetch_array($res) ) {
 		<?
 			$query = "
 				SELECT substr(CW.item, -3, 3) short_item
-					,SUM(IF(NOW() - INTERVAL 90 HOUR < LPP.packed_time, 1, 0)) not_ready
+					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 18 HOUR AND NOW() - INTERVAL 0 HOUR, 1, 0)) day4
+					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 42 HOUR AND NOW() - INTERVAL 18 HOUR, 1, 0)) day3
+					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 66 HOUR AND NOW() - INTERVAL 42 HOUR, 1, 0)) day2
+					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 90 HOUR AND NOW() - INTERVAL 66 HOUR, 1, 0)) day1
 					,SUM(IF(NOW() - INTERVAL 90 HOUR < LPP.packed_time, 0, 1)) ready
 					,SUM(1) total
 				FROM list__PackingPallet LPP
@@ -70,8 +76,11 @@ while( $row = mysqli_fetch_array($res) ) {
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
 				echo "<tr>";
-				echo "<td><b style='font-size: 1.5em; width: 80px; display: inline-block;'>{$row["short_item"]}</b></td>";
-				echo "<td style='color: red;'>{$row["not_ready"]}</td>";
+				echo "<td><b style='font-size: 1.5em; width: 60px; display: inline-block;'>{$row["short_item"]}</b></td>";
+				echo "<td style='color: rgb(100,0,0);'>{$row["day4"]}</td>";
+				echo "<td style='color: rgb(150,0,0);'>{$row["day3"]}</td>";
+				echo "<td style='color: rgb(200,0,0);'>{$row["day2"]}</td>";
+				echo "<td style='color: rgb(250,0,0);'>{$row["day1"]}</td>";
 				echo "<td style='color: orange;'>{$row["ready"]}</td>";
 				echo "<td>{$row["total"]}</td>";
 				echo "<tr>";
