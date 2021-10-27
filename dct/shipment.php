@@ -36,14 +36,35 @@ if( isset($_POST["WT_ID"]) ) {
 
 //Отгрузка машины
 if( isset($_POST["lpp_id"]) ) {
+	$LPP_IDs = "0";
 	foreach ($_POST["lpp_id"] as $key => $value) {
-		$query = "
-			UPDATE list__PackingPallet
-			SET shipment_time = NOW()
-			WHERE LPP_ID = {$value}
-		";
-		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		$LPP_IDs .= ",{$value}";
 	}
+	$query = "
+		UPDATE list__PackingPallet
+		SET shipment_time = NOW()
+		WHERE LPP_ID IN ({$LPP_IDs})
+	";
+	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+	// Сообщение в телеграм об отгрузке машины
+	$message = "<b>Машина отправлена:</b>";
+	$query = "
+		SELECT CW.item
+			,SUM(1) cnt
+		FROM list__PackingPallet LPP
+		JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID
+		WHERE LPP.LPP_ID IN ({$LPP_IDs})
+		GROUP BY LPP.CW_ID
+		ORDER BY LPP.CW_ID
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		$message .= "\n{$row["item"]} x {$row["cnt"]}";
+	}
+	message_to_telegram($message, '217756119');
+	//message_to_telegram($bc, TELEGRAM_CHATID);
+
 	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php">');
 }
 ?>
@@ -158,7 +179,7 @@ if( isset($_POST["lpp_id"]) ) {
 			echo "
 				<span style='display: inline-block; width: 120px;'>Код:</span><b style='font-size: 2em;'>{$row["item"]}</b><br>
 				<span style='display: inline-block; width: 120px;'>Контроль:</span><b>{$row["packed_time_format"]}</b><br>
-				".($row["scan_time_format"] ? "<span style='display: inline-block; width: 120px;'>Сканирование:</span><span style='color: green;'><b>{$row["scan_time_format"]}</b></span>" : "")."
+				".($row["scan_time_format"] ? "<span style='display: inline-block; width: 120px;'>Сканирование:</span><span style='color: green;'><b>{$row["scan_time_format"]}</b></span><br>" : "")."
 				".($row["shipment_time_format"] ? "<span style='display: inline-block; width: 120px;'>Отгрузка:</span><span style='color: red;'><b>{$row["shipment_time_format"]}</b></span>" : "")."
 				<br>
 			";
