@@ -143,7 +143,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			},
 			function() {
 				var shipment_time = $(this).html();
-				$('.pallet_row[shipment_time="'+shipment_time+'"]').css('font-size', '1px');
+				$('.pallet_row[shipment_time="'+shipment_time+'"]').css('font-size', '');
 			}
 		);
 	});
