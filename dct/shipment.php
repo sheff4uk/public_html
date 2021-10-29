@@ -48,7 +48,7 @@ if( isset($_POST["lpp_id"]) ) {
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
 	// Сообщение в телеграм об отгрузке машины
-	$message = "<b>Машина отправлена:</b>";
+	$message = "🚛";
 	$query = "
 		SELECT CW.item
 			,SUM(1) cnt
@@ -77,6 +77,29 @@ if( isset($_POST["lpp_id"]) ) {
 		<script src="../js/jquery-1.11.3.min.js"></script>
 		<script>
 			$(function() {
+//				var $down = 0;
+//
+//				function soundClick() {
+//					var audio = new Audio(); // Создаём новый элемент Audio
+//					audio.src = 'please_scan_the_cassette.mp3'; // Указываем путь к звуку "клика"
+//					if( $down ) {
+//						audio.autoplay = true; // Автоматически запускаем
+//					}
+//				}
+//
+//				function repeatOnDown() {
+//					setTimeout(function(){
+//						soundClick();
+//						if( $down ) { repeatOnDown(); }
+//					}, 10000);
+//				}
+//
+//				$('body').on('mousedown', function(){
+//					$down = 1;
+//					repeatOnDown();
+//				});
+//				$('body').on('mouseup', function(){ $down = 0; });
+
 				// Считывание штрихкода
 				var barcode="";
 				$(document).keydown(function(e)
@@ -143,7 +166,7 @@ if( isset($_POST["lpp_id"]) ) {
 
 			if( $row["packed_time_format"] == "" ) die("<h1 style='color: red;'>Поддон с таким номером не найден!</h1>");
 
-			//Форма изменения статуса противовеса
+			//Форма изменения статуса поддона
 			?>
 			<fieldset style="display: none;">
 				<legend><b>Статус поддона:</b></legend>
