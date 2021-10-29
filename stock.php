@@ -38,6 +38,21 @@ while( $row = mysqli_fetch_array($res) ) {
 	#wr_stock:hover {
 		left: 0px;
 	}
+	#wr_shipment {
+		position: fixed;
+		background-color: white;
+		right: -120px;
+		border: 1px solid #bbb;
+		padding: 10px;
+		border-radius: 10px;
+		width: 140px;
+		opacity: .8;
+		transition: .3s;
+		z-index: 10;
+	}
+	#wr_shipment:hover {
+		right: 0px;
+	}
 </style>
 
 <div id="wr_stock">
@@ -90,6 +105,50 @@ while( $row = mysqli_fetch_array($res) ) {
 	</table>
 </div>
 
+<div id="wr_shipment">
+	<h2>Отгрузки</h2>
+	<table style="text-align: center; font-weight: bold;">
+		<thead>
+			<tr>
+				<th>Время отгрузки</th>
+			</tr>
+		</thead>
+		<tbody>
+		<?
+			$query = "
+				SELECT DATE_FORMAT(shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
+					,shipment_time
+				FROM list__PackingPallet
+				GROUP BY shipment_time
+				ORDER BY shipment_time DESC
+				LIMIT 20
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $row = mysqli_fetch_array($res) ) {
+				echo "<tr>";
+				echo "<td class='shipment'>{$row["shipment_time_format"]}</td>";
+				echo "<tr>";
+			}
+		?>
+		</tbody>
+	</table>
+</div>
+
+<script>
+	$(function() {
+		$('.shipment').hover(
+			function() {
+				var shipment_time = $(this).html();
+				$('.pallet_row[shipment_time="'+shipment_time+'"]').css('font-size', '14px');
+			},
+			function() {
+				var shipment_time = $(this).html();
+				$('.pallet_row[shipment_time="'+shipment_time+'"]').css('font-size', '1px');
+			}
+		);
+	});
+</script>
+
 <table class="main_table">
 	<thead>
 		<tr>
@@ -127,7 +186,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	echo "<tr>";
+	echo "<tr class='pallet_row' shipment_time='{$row["shipment_time_format"]}'>";
 	echo "<td>{$row["packed_time_format"]}</td>";
 	foreach ( $cw_arr as $value ) {
 		if( $value == $row["CW_ID"] ) {
