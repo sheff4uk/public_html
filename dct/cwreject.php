@@ -1,7 +1,7 @@
 <?
 include_once "../config.php";
 $ip = $_SERVER['REMOTE_ADDR'];
-//if( $ip != $from_ip ) die("Access denied");
+if( $ip != $from_ip ) die("Access denied");
 
 //Изменение статуса противовеса
 if( isset($_POST["WT_ID"]) ) {
