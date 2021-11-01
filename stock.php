@@ -83,7 +83,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					,SUM(IF(NOW() - INTERVAL 90 HOUR < LPP.packed_time, 0, 1)) ready
 					,SUM(1) total
 				FROM list__PackingPallet LPP
-				JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID
+				JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID AND CW.CB_ID = 2
 				WHERE LPP.packed_time > NOW() - INTERVAL 4 WEEK AND LPP.shipment_time IS NULL
 				GROUP BY LPP.CW_ID
 				ORDER BY LPP.CW_ID ASC
@@ -174,15 +174,16 @@ while( $row = mysqli_fetch_array($res) ) {
 
 <?
 $query = "
-	SELECT DATE_FORMAT(packed_time, '%d.%m.%Y %H:%i') packed_time_format
-		,DATE_FORMAT(shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
-		,nextID
-		,CW_ID
-		,shipment_time
-		,IF(IFNULL(shipment_time, NOW()) - INTERVAL 90 HOUR < packed_time, 0, 1) ready
-	FROM list__PackingPallet
-	WHERE packed_time > NOW() - INTERVAL 4 WEEK
-	ORDER BY packed_time DESC
+	SELECT DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i') packed_time_format
+		,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
+		,LPP.nextID
+		,LPP.CW_ID
+		,LPP.shipment_time
+		,IF(IFNULL(LPP.shipment_time, NOW()) - INTERVAL 90 HOUR < LPP.packed_time, 0, 1) ready
+	FROM list__PackingPallet LPP
+	JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID AND CW.CB_ID = 2
+	WHERE LPP.packed_time > NOW() - INTERVAL 4 WEEK
+	ORDER BY LPP.packed_time DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
