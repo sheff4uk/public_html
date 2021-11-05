@@ -4,6 +4,8 @@ include_once "../config.php";
 // Сохранение/редактирование расформовки
 if( isset($_POST["CW_ID"]) ) {
 	session_start();
+	$s_fraction = ($_POST["s_fraction"] != '') ? $_POST["s_fraction"] : "NULL";
+	$l_fraction = ($_POST["l_fraction"] != '') ? $_POST["l_fraction"] : "NULL";
 	$iron_oxide = ($_POST["iron_oxide"] != '') ? $_POST["iron_oxide"] : "NULL";
 	$sand = ($_POST["sand"] != '') ? $_POST["sand"] : "NULL";
 	$crushed_stone = ($_POST["crushed_stone"] != '') ? $_POST["crushed_stone"] : "NULL";
@@ -14,7 +16,9 @@ if( isset($_POST["CW_ID"]) ) {
 	if( $_POST["MF_ID"] ) { // Редактируем
 		$query = "
 			UPDATE MixFormula
-			SET iron_oxide = {$iron_oxide}
+			SET s_fraction = {$s_fraction}
+				,l_fraction = {$l_fraction}
+				,iron_oxide = {$iron_oxide}
 				,sand = {$sand}
 				,crushed_stone = {$crushed_stone}
 				,cement = {$cement}
@@ -54,9 +58,11 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<thead>
 					<tr>
 						<th rowspan="2">Противовес</th>
-						<th colspan="6">Ингредиенты</th>
+						<th colspan="8">Ингредиенты</th>
 					</tr>
 					<tr>
+						<th>Мелкая дробь, кг</th>
+						<th>Крупная дробь, кг</th>
 						<th>Окалина, кг</th>
 						<th>КМП, кг</th>
 						<th>Отсев, кг</th>
@@ -68,6 +74,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<tbody style="text-align: center;">
 					<tr>
 						<td><input type="hidden" name="CW_ID"><b id="item"></b></td>
+						<td style="background: "><input type="number" name="s_fraction" min="0" style="width: 80px;"></td>
+						<td style="background: "><input type="number" name="l_fraction" min="0" style="width: 80px;"></td>
 						<td style="background: #a52a2a80;"><input type="number" name="iron_oxide" min="0" style="width: 80px;"></td>
 						<td style="background: #f4a46082;"><input type="number" name="sand" min="0" style="width: 80px;"></td>
 						<td style="background: #8b45137a;"><input type="number" name="crushed_stone" min="0" style="width: 80px;"></td>
@@ -106,6 +114,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 			$('#formula_form input[name="MF_ID"]').val(MF_ID);
 			$('#formula_form #item').text(item);
+			$('#formula_form input[name="s_fraction"]').val(mf_data['s_fraction']);
+			$('#formula_form input[name="l_fraction"]').val(mf_data['l_fraction']);
 			$('#formula_form input[name="iron_oxide"]').val(mf_data['iron_oxide']);
 			$('#formula_form input[name="sand"]').val(mf_data['sand']);
 			$('#formula_form input[name="crushed_stone"]').val(mf_data['crushed_stone']);

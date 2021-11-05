@@ -9,10 +9,12 @@ include "./forms/mix_formula_form.php";
 	<thead>
 		<tr>
 			<th rowspan="2">Противовес</th>
-			<th colspan="6">Ингредиенты</th>
+			<th colspan="8">Ингредиенты</th>
 			<th rowspan="2"></th>
 		</tr>
 		<tr>
+			<th>Мелкая дробь, кг</th>
+			<th>Крупная дробь, кг</th>
 			<th>Окалина, кг</th>
 			<th>КМП, кг</th>
 			<th>Отсев, кг</th>
@@ -28,21 +30,25 @@ $query = "
 	SELECT CW.CW_ID
 		,CW.item
 		,MF.MF_ID
+		,MF.s_fraction
+		,MF.l_fraction
 		,MF.iron_oxide
 		,MF.sand
 		,MF.crushed_stone
 		,MF.cement
 		,MF.plasticizer
 		,MF.water
-	FROM MixFormula MF
-	JOIN CounterWeight CW ON CW.CW_ID = MF.CW_ID
-	ORDER BY MF.CW_ID
+	FROM CounterWeight CW
+	LEFT JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID
+	ORDER BY CW.CW_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	?>
 	<tr id="<?=$row["MF_ID"]?>">
 		<td><b><?=$row["item"]?></b></td>
+		<td style="background: "><?=$row["s_fraction"]?></td>
+		<td style="background: "><?=$row["l_fraction"]?></td>
 		<td style="background: #a52a2a80;"><?=$row["iron_oxide"]?></td>
 		<td style="background: #f4a46082;"><?=$row["sand"]?></td>
 		<td style="background: #8b45137a;"><?=$row["crushed_stone"]?></td>

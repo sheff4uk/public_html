@@ -4,7 +4,9 @@ include_once "../checkrights.php";
 $MF_ID = $_GET["MF_ID"];
 
 $query = "
-	SELECT MF.iron_oxide
+	SELECT MF.s_fraction
+		,MF.l_fraction
+		,MF.iron_oxide
 		,MF.sand
 		,MF.crushed_stone
 		,MF.cement
@@ -15,7 +17,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
-$MF_data = array( "iron_oxide"=>$row["iron_oxide"], "sand"=>$row["sand"], "crushed_stone"=>$row["crushed_stone"], "cement"=>$row["cement"], "plasticizer"=>$row["plasticizer"], "water"=>$row["water"] );
+$MF_data = array( "s_fraction"=>$row["s_fraction"], "l_fraction"=>$row["l_fraction"], "iron_oxide"=>$row["iron_oxide"], "sand"=>$row["sand"], "crushed_stone"=>$row["crushed_stone"], "cement"=>$row["cement"], "plasticizer"=>$row["plasticizer"], "water"=>$row["water"] );
 
 echo json_encode($MF_data);
 ?>
