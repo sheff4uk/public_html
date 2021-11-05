@@ -3,6 +3,13 @@ include_once "../config.php";
 $ip = $_SERVER['REMOTE_ADDR'];
 if( $ip != $from_ip ) die("Access denied");
 
+//ID противовеса введен вручную
+if( isset($_POST["barcode"]) ) {
+	$WT_ID = substr($_POST["barcode"], 0, 8);
+	$nextID = substr($_POST["barcode"], -8, 8);
+	exit ('<meta http-equiv="refresh" content="0; url=/dct/cwreject.php?WT_ID='.$WT_ID.'&nextID='.$nextID.'">');
+}
+
 //Изменение статуса противовеса
 if( isset($_POST["WT_ID"]) ) {
 	$query = "
@@ -50,6 +57,22 @@ if( isset($_POST["WT_ID"]) ) {
 	</head>
 	<body>
 		<h3>Отсканируйте противовес</h3>
+		<?
+		if( isset($_GET["WT_ID"]) ) {
+			$WT_ID = str_pad($_GET["WT_ID"], 8, "0", STR_PAD_LEFT);
+			$nextID = str_pad($_GET["nextID"], 8, "0", STR_PAD_LEFT);
+		}
+		?>
+
+		<form method="post">
+			<fieldset>
+				<legend><b>ID противовеса:</b></legend>
+				<input type="text" name="barcode" style="width: 210px; font-size: 1.4em;" value="<?=$WT_ID?><?=$nextID?>">
+				<input type="submit" style="font-size: 1.4em; background-color: yellow;" value="OK">
+			</fieldset>
+		</form>
+		<br>
+
 		<?
 		if( isset($_GET["WT_ID"]) ) {
 			$query = "
