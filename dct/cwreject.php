@@ -93,9 +93,9 @@ if( isset($_POST["WT_ID"]) ) {
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			$row = mysqli_fetch_array($res);
 
-			$WT_ID = str_pad($_GET["WT_ID"], 8, "0", STR_PAD_LEFT);
-			$nextID = str_pad($_GET["nextID"], 8, "0", STR_PAD_LEFT);
-			echo "<h1 style='text-align: center;'>{$WT_ID}{$nextID}</h1>";
+			//$WT_ID = str_pad($_GET["WT_ID"], 8, "0", STR_PAD_LEFT);
+			//$nextID = str_pad($_GET["nextID"], 8, "0", STR_PAD_LEFT);
+			//echo "<h1 style='text-align: center;'>{$WT_ID}{$nextID}</h1>";
 
 			if( $row["weighing_time_format"] == "" ) die("<h1 style='color: red;'>Противовес с таким номером не найден!</h1>");
 
