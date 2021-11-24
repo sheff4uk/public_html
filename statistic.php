@@ -128,7 +128,7 @@ $query = "
 		,SUM(IFNULL(LOD.def_form,0)) def_form
 		,SUM(IFNULL(LOD.def_assembly,0)) def_assembly
 		,SUM(1) cnt
-		,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
+		,SUM(IF(o_interval(LO.LO_ID) < 24, (PB.in_cassette - LF.underfilling), NULL)) o_interval
 		#,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
 		,SUM(PB.in_cassette - LF.underfilling) fact
 	FROM list__Batch LB
@@ -159,7 +159,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,IFNULL(SUM(LOD.def_form), '-') def_form
 			,IFNULL(SUM(LOD.def_assembly), '-') def_assembly
 			,SUM(1) cnt
-			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
+			,SUM(IF(o_interval(LO.LO_ID) < 24, (PB.in_cassette - LF.underfilling), NULL)) o_interval
 			#,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
 			,SUM(PB.in_cassette - LF.underfilling) fact
 		FROM list__Batch LB
@@ -237,7 +237,7 @@ if( $filter ) {
 			,SUM(IFNULL(LOD.def_form,0)) def_form
 			,SUM(IFNULL(LOD.def_assembly,0)) def_assembly
 			,SUM(1) cnt
-			,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
+			,SUM(IF(o_interval(LO.LO_ID) < 24, (PB.in_cassette - LF.underfilling), NULL)) o_interval
 			#,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
 			,SUM(PB.in_cassette - LF.underfilling) fact
 		FROM list__Batch LB
@@ -266,7 +266,7 @@ if( $filter ) {
 				,IFNULL(SUM(LOD.def_form), '-') def_form
 				,IFNULL(SUM(LOD.def_assembly), '-') def_assembly
 				,SUM(1) cnt
-				,SUM(IF(o_interval(LO.LO_ID) < 24, 1, NULL)) o_interval
+				,SUM(IF(o_interval(LO.LO_ID) < 24, (PB.in_cassette - LF.underfilling), NULL)) o_interval
 				#,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
 				,SUM(PB.in_cassette - LF.underfilling) fact
 			FROM list__Batch LB
