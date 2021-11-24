@@ -189,7 +189,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		echo "<td>{$subrow["item"]}</td>";
 		echo "<td>{$subrow["cnt"]}</td>";
-		echo "<td style='color:red;'>{$subrow["o_interval"]}</td>";
+		echo "<td>{$subrow["o_interval"]}</td>";
 		//echo "<td>{$subrow["not_spec"]}</td>";
 		echo "<td>{$subrow["not_spill"]}</td>";
 		echo "<td>{$subrow["crack"]}</td>";
@@ -298,7 +298,7 @@ if( $filter ) {
 
 			echo "<td>{$subrow["item"]}</td>";
 			echo "<td>{$subrow["cnt"]}</td>";
-			echo "<td style='color:red;'>{$subrow["o_interval"]}</td>";
+			echo "<td>{$subrow["o_interval"]}</td>";
 			//echo "<td>{$subrow["not_spec"]}</td>";
 			echo "<td>{$subrow["not_spill"]}</td>";
 			echo "<td>{$subrow["crack"]}</td>";
