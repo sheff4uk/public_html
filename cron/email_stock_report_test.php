@@ -38,14 +38,26 @@ $message = "
 ";
 
 $query = "
-	SELECT CW.item
-		,SUM(1) pallets
-		,SUM(CW.in_pallet) details
-	FROM list__PackingPallet LPP
-	JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID AND CW.CB_ID = 2
-	WHERE LPP.packed_time > NOW() - INTERVAL 4 WEEK AND LPP.shipment_time IS NULL
-	GROUP BY LPP.CW_ID
-	ORDER BY LPP.CW_ID ASC
+	SELECT IF(HOUR(LO.opening_time - INTERVAL 7 HOUR) < 12, 1, 2) shift
+		,DATE_FORMAT(LO.opening_time, '%d.%m.%Y %H:%i') opening_time_format
+		,LO.cassette
+		,CW.item
+		,SUM(1) details
+		,SUM(IF(LW.goodsID = 6, 1, NULL)) d_shell
+		,SUM(IF(LW.goodsID = 7, 1, NULL)) d_assembly
+		,DATE_FORMAT(LA.assembling_time, '%d.%m.%Y %H:%i') assembling_time_format
+		,USR_Name(LA.assembling_master) assembling_master
+	FROM list__Opening LO
+	JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+	JOIN list__Assembling LA ON LA.LA_ID = LF.LA_ID
+	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
+	WHERE DATE(LO.opening_time - INTERVAL 7 HOUR) = CURDATE() - INTERVAL 1 DAY
+	GROUP BY LO.LO_ID
+	HAVING d_shell OR d_assembly
+	ORDER BY LO.opening_time
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
