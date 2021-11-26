@@ -57,7 +57,8 @@ $message .= "
 	</table>
 ";
 
-$headers  = "Content-type: text/html; charset=\"utf-8\"\r\n";
+$headers  = "MIME-Version: 1.0\r\n";
+$headers .= "Content-type: text/html; charset=\"utf-8\"\r\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
 
 mail($to, $subject, $message, $headers);
