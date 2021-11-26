@@ -60,5 +60,5 @@ $message .= "
 $headers = "Content-type: text/html; charset=\"utf-8\"\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
 
-mail($to, $subject, '', $headers);
+mail($to, $subject, $message, $headers);
 ?>
