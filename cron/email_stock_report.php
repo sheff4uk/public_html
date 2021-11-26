@@ -9,13 +9,13 @@ if( $key != $script_key ) die('Access denied!');
 
 $date = date_create();
 $date_format = date_format($date, 'd.m.Y');
-$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Складской остаток {$date_format}"). "?=";
+$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Stock report {$date_format}"). "?=";
 
 $message = "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 		<tr>
 			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
-			<th><n style='font-size: 2em;'>Складской остаток</n></th>
+			<th><n style='font-size: 2em;'>Stock report</n></th>
 			<th>{$date_format}</th>
 		</tr>
 	</table>
@@ -23,9 +23,9 @@ $message = "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 		<thead style='word-wrap: break-word;'>
 			<tr>
-				<th>Код</th>
-				<th>Поддонов</th>
-				<th>Деталей</th>
+				<th>Item</th>
+				<th>Pallets</th>
+				<th>Details</th>
 			</tr>
 		</thead>
 		<tbody style='text-align: center;'>
