@@ -43,26 +43,28 @@ if( isset($_POST["lpp_id"]) ) {
 	$query = "
 		UPDATE list__PackingPallet
 		SET shipment_time = NOW()
-		WHERE LPP_ID IN ({$LPP_IDs})
+		WHERE LPP_ID IN ({$LPP_IDs}) AND shipment_time IS NULL
 	";
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
-	// Сообщение в телеграм об отгрузке машины
-	$message = "🚛";
-	$query = "
-		SELECT CW.item
-			,SUM(1) cnt
-		FROM list__PackingPallet LPP
-		JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID
-		WHERE LPP.LPP_ID IN ({$LPP_IDs})
-		GROUP BY LPP.CW_ID
-		ORDER BY LPP.CW_ID
-	";
-	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-	while( $row = mysqli_fetch_array($res) ) {
-		$message .= "\n{$row["item"]} x {$row["cnt"]}";
+	if( mysqli_affected_rows($mysqli) ) {
+		// Сообщение в телеграм об отгрузке машины
+		$message = "🚛";
+		$query = "
+			SELECT CW.item
+				,SUM(1) cnt
+			FROM list__PackingPallet LPP
+			JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID
+			WHERE LPP.LPP_ID IN ({$LPP_IDs})
+			GROUP BY LPP.CW_ID
+			ORDER BY LPP.CW_ID
+		";
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		while( $row = mysqli_fetch_array($res) ) {
+			$message .= "\n{$row["item"]} x {$row["cnt"]}";
+		}
+		message_to_telegram($message, TELEGRAM_CHATID);
 	}
-	message_to_telegram($message, TELEGRAM_CHATID);
 
 	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php">');
 }
