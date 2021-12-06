@@ -171,12 +171,14 @@ if( isset($_POST["pd_cnt"]) ) {
 	session_start();
 	$pd_date = $_POST["pd_date"];
 	$PN_ID = $_POST["PN_ID"];
+	$CB_ID = $_POST["CB_ID"] ? $_POST["CB_ID"] : "NULL";
 	$pd_cnt = $_POST["pd_cnt"];
 
 	if( $_POST["PD_ID"] ) { // Редактируем
 		$query = "
 			UPDATE pallet__Disposal
 			SET PN_ID = {$PN_ID}
+				,CB_ID = {$CB_ID}
 				,pd_date = '{$pd_date}'
 				,pd_cnt = {$pd_cnt}
 			WHERE PD_ID = {$_POST["PD_ID"]}
@@ -190,6 +192,7 @@ if( isset($_POST["pd_cnt"]) ) {
 		$query = "
 			INSERT INTO pallet__Disposal
 			SET PN_ID = {$PN_ID}
+				,CB_ID = {$CB_ID}
 				,pd_date = '{$pd_date}'
 				,pd_cnt = {$pd_cnt}
 		";
@@ -327,6 +330,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th>Дата</th>
 						<th>Поддон</th>
+						<th>Субъект, ответственный за испорченные поддоны</th>
 						<th>Кол-во поддонов</th>
 					</tr>
 				</thead>
@@ -345,6 +349,22 @@ this.subbut.value='Подождите, пожалуйста!';">
 								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 								while( $row = mysqli_fetch_array($res) ) {
 									echo "<option value='{$row["PN_ID"]}'>{$row["pallet_name"]}</option>";
+								}
+								?>
+							</select>
+						</td>
+						<td>
+							<select name="CB_ID" style="width: 200px;">
+								<option value=""></option>
+								<?
+								$query = "
+									SELECT CB.CB_ID, CB.brand
+									FROM ClientBrand CB
+									ORDER BY CB.CB_ID
+								";
+								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+								while( $row = mysqli_fetch_array($res) ) {
+									echo "<option value='{$row["CB_ID"]}'>{$row["brand"]}</option>";
 								}
 								?>
 							</select>
@@ -470,6 +490,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 				$('#pallet_disposal_form input[name="PD_ID"]').val(PD_ID);
 				$('#pallet_disposal_form select[name="PN_ID"]').val(PD_data['PN_ID']);
+				$('#pallet_disposal_form select[name="CB_ID"]').val(PD_data['CB_ID']);
 				$('#pallet_disposal_form input[name="pd_date"]').val(PD_data['pd_date']);
 				$('#pallet_disposal_form input[name="pd_cnt"]').val(PD_data['pd_cnt']);
 			}

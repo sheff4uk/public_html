@@ -236,7 +236,7 @@ $query = "
 	SELECT 'D'
 		,PD.PD_ID
 		,DATE_FORMAT(PD.pd_date, '%d.%m.%Y')
-		,NULL
+		,CB.brand
 		,PN.pallet_name
 		,NULL pallets_shipment
 		,PD.pd_cnt
@@ -250,6 +250,7 @@ $query = "
 		,NULL
 	FROM pallet__Disposal PD
 	JOIN pallet__Name PN ON PN.PN_ID = PD.PN_ID
+	LEFT JOIN ClientBrand CB ON CB.CB_ID = PD.CB_ID
 	WHERE PD.pd_cnt > 0
 		".($_GET["date_from"] ? "AND PD.pd_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND PD.pd_date <= '{$_GET["date_to"]}'" : "")."

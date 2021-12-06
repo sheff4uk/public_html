@@ -3,6 +3,8 @@ include_once "../config.php";
 $ip = $_SERVER['REMOTE_ADDR'];
 if( $ip != $from_ip ) die("Access denied");
 
+define('LIMIT_PALLETS', 22);
+
 //ID поддона введен вручную
 if( isset($_POST["barcode"]) ) {
 	$WT_ID = substr($_POST["barcode"], 0, 8);
@@ -281,13 +283,13 @@ if( isset($_POST["lpp_id"]) ) {
 				</tbody>
 			</table>
 		";
-		if( $i == 22 ) {
+		if( $i == LIMIT_PALLETS ) {
 			echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
 			echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
 			if( $status ) { // Если поддон не был в списке
 				echo "
 					<script>
-						$('#do').html('<h2 style=\'color: red;\'>В списке 22 поддона. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
+						$('#do').html('<h2 style=\'color: red;\'>В списке ".LIMIT_PALLETS." поддона. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
 					</script>
 				";
 			}

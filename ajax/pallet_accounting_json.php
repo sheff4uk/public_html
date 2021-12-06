@@ -62,6 +62,7 @@ elseif( $_GET["type"] == "D" ) {
 
 	$query = "
 		SELECT PD.PN_ID
+			,PD.CB_ID
 			,PD.pd_date
 			,PD.pd_cnt
 		FROM pallet__Disposal PD
@@ -69,7 +70,7 @@ elseif( $_GET["type"] == "D" ) {
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$PD_data = array( "PN_ID"=>$row["PN_ID"], "pd_date"=>$row["pd_date"], "pd_cnt"=>$row["pd_cnt"] );
+	$PD_data = array( "PN_ID"=>$row["PN_ID"], "CB_ID"=>$row["CB_ID"], "pd_date"=>$row["pd_date"], "pd_cnt"=>$row["pd_cnt"] );
 
 	echo json_encode($PD_data);
 }
