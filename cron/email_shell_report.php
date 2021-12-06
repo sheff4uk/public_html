@@ -111,8 +111,7 @@ $message .= "
 			<tr>
 				<th>Number of pallets shipped today</th>
 				<th>Pallets returned today</th>
-				<th>Broken pallets</th>
-				<th>Usable pallets returned today</th>
+				<th>Broken pallets found today</th>
 				<th>Debt in pallets (Vesta)</th>
 				<th>Debt in rubles</th>
 			</tr>
@@ -134,12 +133,10 @@ $message .= "
 	<td>{$row["shipped"]}</td>
 ";
 
+// Возвращенные поддоны
 $query = "
 	SELECT SUM(PR.pr_cnt) pr_cnt
-		,SUM(PR.pr_reject) pr_reject
-		,SUM(PR.pr_cnt - PR.pr_reject) pr_good
 	FROM pallet__Return PR
-	JOIN ClientBrand CB ON CB.CB_ID = PR.CB_ID
 	WHERE PR.pr_date = CURDATE()
 		AND PR.CB_ID = {$CB_ID}
 ";
@@ -147,8 +144,19 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 $row = mysqli_fetch_array($res);
 $message .= "
 	<td>{$row["pr_cnt"]}</td>
-	<td>{$row["pr_reject"]}</td>
-	<td>{$row["pr_good"]}</td>
+";
+
+// Сломанные поддоны
+$query = "
+	SELECT SUM(PD.pd_cnt) pd_cnt
+	FROM pallet__Disposal PD
+	WHERE PD.pd_date = CURDATE()
+		AND PD.CB_ID = {$CB_ID}
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$message .= "
+	<td>{$row["pd_cnt"]}</td>
 ";
 
 // Узнаем актуальную стоимость поддона (дерево)
