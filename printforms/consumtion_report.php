@@ -120,7 +120,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 			$iron_oxide += $row["iron_oxide"];
 			$sand += $row["sand"];
 			$crushed_stone += $row["crushed_stone"];
-			$cement += $row["cement"] + 0.01 * $row["details"];
+			$cement += $row["cement"] + 0.1 * $row["details"];
 			$plasticizer += $row["plasticizer"];
 			$calcium += $row["calcium"] * $row["details"];
 			$reinforcement += $row["reinforcement"] * $row["details"];
@@ -134,8 +134,8 @@ echo "<title>Расход сырья {$date_format}</title>";
 				<td><?=number_format($row["sand"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["crushed_stone"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["crushed_stone"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td><?=number_format($row["cement"] + 0.01 * $row["details"], 0, ',', ' ')?></td>
-				<td><?=number_format($row["cement"] * 1000/$row["details"] + 10, 0, ',', ' ')?></td>
+				<td><?=number_format($row["cement"] + 0.1 * $row["details"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["cement"] * 1000/$row["details"] + 100, 0, ',', ' ')?></td>
 				<td><?=number_format($row["plasticizer"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["plasticizer"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["calcium"] * $row["details"] / 1000, 0, ',', ' ')?></td>
