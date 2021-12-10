@@ -12,7 +12,10 @@ $date = date_create('-1 month');
 $year = date_format($date, 'Y');
 $month = date_format($date, 'm');
 
-echo "<title>Shells report on {$sr_date_format}</title>";
+$date = date_create();
+$date_format = date_format($date, 'd.m.Y');
+
+echo "<title>Журнал учета дизельного топлива {$date_format}</title>";
 ?>
 	<style type="text/css" media="print">
 		@page { size: portrait; }

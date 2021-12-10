@@ -14,6 +14,28 @@ if( !$_GET["date_to"] ) {
 }
 ?>
 
+<style>
+	#consumption_report_btn {
+		text-align: center;
+		line-height: 68px;
+		color: #fff;
+		bottom: 250px;
+		cursor: pointer;
+		width: 56px;
+		height: 56px;
+		opacity: .4;
+		position: fixed;
+		right: 20px;
+		z-index: 9;
+		border-radius: 50%;
+		background-color: #db4437;
+		box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+	}
+	#consumption_report_btn:hover {
+		opacity: 1;
+	}
+</style>
+
 <!--Фильтр-->
 <div id="filter">
 	<h3>Фильтр</h3>
@@ -200,6 +222,14 @@ foreach ($_GET as &$value) {
 		</tr>
 	</tbody>
 </table>
+
+<div id="consumption_report_btn" title="Распечатать отчет за выбранный период"><a href="/printforms/consumtion_report.php?date_from=<?=$_GET["date_from"]?>&date_to=<?=$_GET["date_to"]?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
+
+<script>
+	$(function() {
+		$(".print").printPage();
+	});
+</script>
 
 <?
 include "footer.php";
