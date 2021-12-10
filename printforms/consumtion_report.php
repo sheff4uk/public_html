@@ -17,7 +17,7 @@ $date_format = date_format($date, 'd.m.Y');
 echo "<title>Расход сырья {$date_format}</title>";
 ?>
 	<style type="text/css" media="print">
-		@page { size: portrait; }
+		@page { size: landscape; }
 	</style>
 
 	<style>
