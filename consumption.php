@@ -19,7 +19,7 @@ if( !$_GET["date_to"] ) {
 		text-align: center;
 		line-height: 68px;
 		color: #fff;
-		bottom: 250px;
+		bottom: 100px;
 		cursor: pointer;
 		width: 56px;
 		height: 56px;
