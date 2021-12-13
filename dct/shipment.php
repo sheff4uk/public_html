@@ -65,7 +65,7 @@ if( isset($_POST["lpp_id"]) ) {
 		while( $row = mysqli_fetch_array($res) ) {
 			$message .= "\n{$row["item"]} x {$row["cnt"]}";
 		}
-		message_to_telegram($message, TELEGRAM_CHATID);
+		message_to_telegram($message, '-647915518');
 	}
 
 	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php">');
