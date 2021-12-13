@@ -50,6 +50,8 @@ echo "<title>Расход сырья {$date_format}</title>";
 </head>
 <body>
 
+<br>
+<br>
 <table>
 	<thead>
 		<tr>
@@ -130,17 +132,17 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<tr>
 				<td colspan="2"><b><?=$row["item"]?></b></td>
 				<td><?=number_format($row["details"], 0, '', ' ')?></td>
-				<td><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["iron_oxide"], 3, ',', ' ')?></td>
 				<td><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td><?=number_format($row["sand"] ? ($row["sand"] + 0.05 * $row["details"]) : 0, 0, ',', ' ')?></td>
+				<td><?=number_format($row["sand"] ? ($row["sand"] + 0.05 * $row["details"]) : 0, 3, ',', ' ')?></td>
 				<td><?=number_format($row["sand"] ? ($row["sand"] * 1000/$row["details"] + 50) : 0, 0, ',', ' ')?></td>
-				<td><?=number_format($row["crushed_stone"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["crushed_stone"], 3, ',', ' ')?></td>
 				<td><?=number_format($row["crushed_stone"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td><?=number_format($row["cement"] ? ($row["cement"] + 0.1 * $row["details"]) : 0, 0, ',', ' ')?></td>
+				<td><?=number_format($row["cement"] ? ($row["cement"] + 0.1 * $row["details"]) : 0, 3, ',', ' ')?></td>
 				<td><?=number_format($row["cement"] ? ($row["cement"] * 1000/$row["details"] + 100) : 0, 0, ',', ' ')?></td>
-				<td><?=number_format($row["plasticizer"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["plasticizer"], 3, ',', ' ')?></td>
 				<td><?=number_format($row["plasticizer"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td><?=number_format($row["calcium"] * $row["details"] / 1000, 0, ',', ' ')?></td>
+				<td><?=number_format($row["calcium"] * $row["details"] / 1000, 3, ',', ' ')?></td>
 				<td><?=number_format($row["calcium"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["reinforcement"] * $row["details"] / 1000, 3, ',', ' ')?></td>
 				<td><?=number_format($row["reinforcement"], 0, ',', ' ')?></td>
@@ -152,17 +154,17 @@ echo "<title>Расход сырья {$date_format}</title>";
 		<tr class="total">
 			<td colspan="2">Итог:</td>
 			<td><?=number_format($details, 0, '', ' ')?></td>
-			<td><?=number_format($iron_oxide, 0, ',', ' ')?></td>
+			<td><?=number_format($iron_oxide, 3, ',', ' ')?></td>
 			<td></td>
-			<td><?=number_format($sand, 0, ',', ' ')?></td>
+			<td><?=number_format($sand, 3, ',', ' ')?></td>
 			<td></td>
-			<td><?=number_format($crushed_stone, 0, ',', ' ')?></td>
+			<td><?=number_format($crushed_stone, 3, ',', ' ')?></td>
 			<td></td>
-			<td><?=number_format($cement, 0, ',', ' ')?></td>
+			<td><?=number_format($cement, 3, ',', ' ')?></td>
 			<td></td>
-			<td><?=number_format($plasticizer, 0, ',', ' ')?></td>
+			<td><?=number_format($plasticizer, 3, ',', ' ')?></td>
 			<td></td>
-			<td><?=number_format($calcium/1000, 0, ',', ' ')?></td>
+			<td><?=number_format($calcium/1000, 3, ',', ' ')?></td>
 			<td></td>
 			<td><?=number_format($reinforcement/1000, 3, ',', ' ')?></td>
 			<td></td>
