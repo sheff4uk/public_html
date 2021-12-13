@@ -53,13 +53,15 @@ echo "<title>Расход сырья {$date_format}</title>";
 <table>
 	<thead>
 		<tr>
-			<th rowspan="2"><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
-			<th rowspan="2" style="font-size: 2em;">Расход сырья на производство продукции</th>
+			<th rowspan="1"><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
+			<th rowspan="1" style="font-size: 2em;">Расход сырья на производство продукции</th>
 			<th>Период: <n style="font-size: 1.5em;"><?=$date_from?> - <?=$date_to?></n></th>
 		</tr>
+<!--
 		<tr>
 			<th>Дата документа: <n style="font-size: 1.5em;"><?=$date_format?></n></th>
 		</tr>
+-->
 	</thead>
 </table>
 
@@ -140,7 +142,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 				<td><?=number_format($row["plasticizer"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["calcium"] * $row["details"] / 1000, 0, ',', ' ')?></td>
 				<td><?=number_format($row["calcium"], 0, ',', ' ')?></td>
-				<td><?=number_format($row["reinforcement"] * $row["details"] / 1000, 0, ',', ' ')?></td>
+				<td><?=number_format($row["reinforcement"] * $row["details"] / 1000, 3, ',', ' ')?></td>
 				<td><?=number_format($row["reinforcement"], 0, ',', ' ')?></td>
 			</tr>
 			<?
@@ -162,7 +164,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<td></td>
 			<td><?=number_format($calcium/1000, 0, ',', ' ')?></td>
 			<td></td>
-			<td><?=number_format($reinforcement/1000, 0, ',', ' ')?></td>
+			<td><?=number_format($reinforcement/1000, 3, ',', ' ')?></td>
 			<td></td>
 		</tr>
 	</tbody>
