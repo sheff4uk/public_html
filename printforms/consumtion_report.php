@@ -52,6 +52,9 @@ echo "<title>Расход сырья {$date_format}</title>";
 
 <br>
 <br>
+<br>
+<br>
+<br>
 <table>
 	<thead>
 		<tr>
