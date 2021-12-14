@@ -124,12 +124,16 @@ while( $row = mysqli_fetch_array($res) ) {
 
 // Данные рецепта
 $query = "
-	SELECT IFNULL(CONCAT(MF.iron_oxide, ' ±5 кг'), 0) iron_oxide
+	SELECT IFNULL(CONCAT(MF.s_fraction, ' ±5 кг'), 0) s_fraction
+		,IFNULL(CONCAT(MF.l_fraction, ' ±5 кг'), 0) l_fraction
+		,IFNULL(CONCAT(MF.iron_oxide, ' ±5 кг'), 0) iron_oxide
 		,IFNULL(CONCAT(MF.sand, ' ±5 кг'), 0) sand
 		,IFNULL(CONCAT(MF.crushed_stone, ' ±5 кг'), 0) crushed_stone
 		,IFNULL(CONCAT(MF.cement, ' ±2 кг'), 0) cement
 		,IFNULL(CONCAT(MF.plasticizer, ' ±0.1 кг'), 0) plasticizer
 		,IFNULL(CONCAT('min ', MF.water, ' л'), 0) water
+		,COUNT(MF.s_fraction) sf_cnt
+		,COUNT(MF.l_fraction) lf_cnt
 		,COUNT(MF.iron_oxide) io_cnt
 		,COUNT(MF.sand) sn_cnt
 		,COUNT(MF.crushed_stone) cs_cnt
@@ -150,6 +154,8 @@ $row = mysqli_fetch_array($res);
 			<th rowspan="3">Время замеса</th>
 			<th  rowspan="2">Масса куба раствора</th>
 			<th rowspan="3" width="30" style="border-right: 4px solid;">t, ℃ 22±8</th>
+			<?=($row["sf_cnt"] ? "<th>Мелкая дробь</th>" : "")?>
+			<?=($row["lf_cnt"] ? "<th>Крупная дробь</th>" : "")?>
 			<?=($row["io_cnt"] ? "<th>Окалина</th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th>КМП</th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th>Отсев</th>" : "")?>
@@ -162,12 +168,16 @@ $row = mysqli_fetch_array($res);
 			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
 		</tr>
 		<tr>
+			<?=($row["sf_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
+			<?=($row["lf_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 			<?=($row["io_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 		</tr>
 		<tr>
 			<th class="nowrap"><?=$spec?> кг</th>
+			<?=($row["sf_cnt"] ? "<th class='nowrap'>{$row["s_fraction"]}</th>" : "")?>
+			<?=($row["lf_cnt"] ? "<th class='nowrap'>{$row["l_fraction"]}</th>" : "")?>
 			<?=($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")?>
@@ -190,6 +200,8 @@ for ($i = 1; $i <= $batches; $i++) {
 			<td style='text-align: center;'>__:__</td>
 			<td></td>
 			<td style='border-right: 4px solid;'></td>
+			".($row["sf_cnt"] ? "<td></td>" : "")."
+			".($row["lf_cnt"] ? "<td></td>" : "")."
 			".($row["io_cnt"] ? "<td></td>" : "")."
 			".($row["sn_cnt"] ? "<td></td>" : "")."
 			".($row["cs_cnt"] ? "<td></td>" : "")."
