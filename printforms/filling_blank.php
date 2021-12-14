@@ -96,7 +96,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 	<thead>
 		<tr>
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
-			<th width="200" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">код</span><n style="font-size: 3em;"><?=$item?></n></th>
+			<th width="250" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;" class="nowrap">код</span><n style="font-size: 3em;"><?=$item?></n></th>
 			<th width="100" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">год</span><n style="font-size: 3em;"><?=$year?></n></th>
 			<th width="75" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">цикл</span><n style="font-size: 3em;"><?=$cycle?></n></th>
 			<th width="200" style="position: relative;">
