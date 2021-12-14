@@ -162,7 +162,7 @@ $row = mysqli_fetch_array($res);
 			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент</th>" : "")?>
 			<?=($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор</th>" : "")?>
 			<?=($row["wt_cnt"] ? "<th rowspan='2'>Вода</th>" : "")?>
-			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>" style="border-left: 4px solid;">№ кассеты<br>Пожалуйста указывайте номера разборчиво</th>
+			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>" style="border-left: 4px solid;">№ кассеты<br>(разборчиво)</th>
 			<th rowspan="3" width="75">Вероятные номера кассет</th>
 			<th rowspan="3" width="40">Недолив</th>
 			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
