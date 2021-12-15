@@ -14,6 +14,8 @@ $query = "
 		,IFNULL(PB.in_cassette, CW.in_cassette) in_cassette
 		,CONCAT(ROUND(CW.min_density/1000, 2), '&ndash;', ROUND(CW.max_density/1000, 2)) spec
 		,MIN(LB.batch_date) batch_date
+		,PB.sf_density
+		,PB.lf_density
 		,PB.io_density
 		,PB.sn_density
 		,PB.cs_density
@@ -35,6 +37,8 @@ $in_cassette = $row["in_cassette"];
 $CW_ID = $row["CW_ID"];
 $spec = $row["spec"];
 $batch_date = $row["batch_date"];
+$sf_density = $row["sf_density"];
+$lf_density = $row["lf_density"];
 $io_density = $row["io_density"];
 $sn_density = $row["sn_density"];
 $cs_density = $row["cs_density"];
@@ -71,12 +75,16 @@ $html .= "<div style='width: 100%; border: 1px solid; padding: 10px;'><span>Ве
 
 // Данные рецепта
 $query = "
-	SELECT IFNULL(CONCAT(MF.iron_oxide, ' ±5'), 0) iron_oxide
+	SELECT IFNULL(CONCAT(MF.s_fraction, ' ±5'), 0) s_fraction
+		,IFNULL(CONCAT(MF.l_fraction, ' ±5'), 0) l_fraction
+		,IFNULL(CONCAT(MF.iron_oxide, ' ±5'), 0) iron_oxide
 		,IFNULL(CONCAT(MF.sand, ' ±5'), 0) sand
 		,IFNULL(CONCAT(MF.crushed_stone, ' ±5'), 0) crushed_stone
 		,IFNULL(CONCAT(MF.cement, ' ±2'), 0) cement
 		,IFNULL(CONCAT(MF.plasticizer, ' ±0.1'), 0) plasticizer
 		,IFNULL(CONCAT('min ', MF.water), 0) water
+		,COUNT(MF.s_fraction) sf_cnt
+		,COUNT(MF.l_fraction) lf_cnt
 		,COUNT(MF.iron_oxide) io_cnt
 		,COUNT(MF.sand) sn_cnt
 		,COUNT(MF.crushed_stone) cs_cnt
@@ -97,6 +105,8 @@ $html .= "
 				<th rowspan='3' width='180'>Дата и время замеса</th>
 				<th rowspan='2'>Масса куба раствора, кг</th>
 				<th rowspan='3' width='50'>t, ℃ 22±8</th>
+				".($row["sf_cnt"] ? "<th>Мел. дробь, кг</th>" : "")."
+				".($row["lf_cnt"] ? "<th>Круп. дробь, кг</th>" : "")."
 				".($row["io_cnt"] ? "<th>Окалина, кг</th>" : "")."
 				".($row["sn_cnt"] ? "<th>КМП, кг</th>" : "")."
 				".($row["cs_cnt"] ? "<th>Отсев, кг</th>" : "")."
@@ -108,12 +118,16 @@ $html .= "
 				<th rowspan='3' width='30'><i class='fas fa-cube' title='Испытание куба'></i></th>
 			</tr>
 			<tr>
+				".($row["sf_cnt"] ? "<th><input type='number' min='2' max='7' step='0.01' value='".($sf_density/1000)."' name='sf_density' style='width: 100%; background-color: ;' ></th>" : "")."
+				".($row["lf_cnt"] ? "<th><input type='number' min='2' max='7' step='0.01' value='".($lf_density/1000)."' name='lf_density' style='width: 100%; background-color: ;' ></th>" : "")."
 				".($row["io_cnt"] ? "<th><input type='number' min='2' max='3' step='0.01' value='".($io_density/1000)."' name='io_density' style='width: 100%; background-color: #a52a2a80;' ></th>" : "")."
 				".($row["sn_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($sn_density/1000)."' name='sn_density' style='width: 100%; background-color: #f4a46082;' ></th>" : "")."
 				".($row["cs_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($cs_density/1000)."' name='cs_density' style='width: 100%; background-color: #8b45137a;' ></th>" : "")."
 			</tr>
 			<tr>
 				<th class='nowrap'>{$spec}</th>
+				".($row["sf_cnt"] ? "<th class='nowrap'>{$row["s_fraction"]}</th>" : "")."
+				".($row["lf_cnt"] ? "<th class='nowrap'>{$row["l_fraction"]}</th>" : "")."
 				".($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")."
 				".($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")."
 				".($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")."
@@ -133,6 +147,8 @@ if( $fact_batches ) {
 			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 			,LB.mix_density
 			,LB.temp
+			,IFNULL(LB.s_fraction, 0) s_fraction
+			,IFNULL(LB.l_fraction, 0) l_fraction
 			,IFNULL(LB.iron_oxide, 0) iron_oxide
 			,IFNULL(LB.sand, 0) sand
 			,IFNULL(LB.crushed_stone, 0) crushed_stone
@@ -172,6 +188,8 @@ if( $fact_batches ) {
 				<td><input type='datetime-local' name='batch_time[{$subrow["LB_ID"]}]' style='width: 100%;' value='{$subrow["batch_date"]}T{$subrow["batch_time_format"]}' required></td>
 				<td><input type='number' min='2' max='4' step='0.01' name='mix_density[{$subrow["LB_ID"]}]' value='".($subrow["mix_density"]/1000)."' style='width: 100%;' required></td>
 				<td><input type='number' min='5' max='45' name='temp[{$subrow["LB_ID"]}]' value='{$subrow["temp"]}' style='width: 100%;' required></td>
+				".($row["sf_cnt"] ? "<td style='background: ;'><input type='number' min='0' name='s_fraction[{$subrow["LB_ID"]}]' value='{$subrow["s_fraction"]}' style='width: 100%;' required></td>" : "")."
+				".($row["lf_cnt"] ? "<td style='background: ;'><input type='number' min='0' name='l_fraction[{$subrow["LB_ID"]}]' value='{$subrow["l_fraction"]}' style='width: 100%;' required></td>" : "")."
 				".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[{$subrow["LB_ID"]}]' value='{$subrow["iron_oxide"]}' style='width: 100%;' required></td>" : "")."
 				".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[{$subrow["LB_ID"]}]' value='{$subrow["sand"]}' style='width: 100%;' required></td>" : "")."
 				".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone"]}' style='width: 100%;' required></td>" : "")."
@@ -199,6 +217,8 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 			<td><input type='datetime-local' name='batch_time[n_{$i}]' style='width: 100%;' required></td>
 			<td><input type='number' min='2' max='4' step='0.01' name='mix_density[n_{$i}]' style='width: 100%;' required></td>
 			<td><input type='number' min='5' max='45' name='temp[n_{$i}]' style='width: 100%;' required></td>
+			".($row["sf_cnt"] ? "<td style='background: ;'><input type='number' min='0' name='s_fraction[n_{$i}]' style='width: 100%;' required></td>" : "")."
+			".($row["lf_cnt"] ? "<td style='background: ;'><input type='number' min='0' name='l_fraction[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[n_{$i}]' style='width: 100%;' required></td>" : "")."

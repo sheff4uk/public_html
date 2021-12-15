@@ -23,6 +23,8 @@ if( isset($_POST["PB_ID"]) ) {
 			$batch_time = substr($value, -5);
 			$mix_density = $_POST["mix_density"][$key]*1000;
 			$temp = $_POST["temp"][$key] ? $_POST["temp"][$key] : "NULL";
+			$s_fraction = $_POST["s_fraction"][$key] ? $_POST["s_fraction"][$key] : "NULL";
+			$l_fraction = $_POST["l_fraction"][$key] ? $_POST["l_fraction"][$key] : "NULL";
 			$iron_oxide = $_POST["iron_oxide"][$key] ? $_POST["iron_oxide"][$key] : "NULL";
 			$sand = $_POST["sand"][$key] ? $_POST["sand"][$key] : "NULL";
 			$crushed_stone = $_POST["crushed_stone"][$key] ? $_POST["crushed_stone"][$key] : "NULL";
@@ -40,6 +42,8 @@ if( isset($_POST["PB_ID"]) ) {
 						,batch_time = '{$batch_time}'
 						,mix_density = {$mix_density}
 						,temp = {$temp}
+						,s_fraction = {$s_fraction}
+						,l_fraction = {$l_fraction}
 						,iron_oxide = {$iron_oxide}
 						,sand = {$sand}
 						,crushed_stone = {$crushed_stone}
@@ -79,6 +83,8 @@ if( isset($_POST["PB_ID"]) ) {
 						,batch_time = '{$batch_time}'
 						,mix_density = {$mix_density}
 						,temp = {$temp}
+						,s_fraction = {$s_fraction}
+						,l_fraction = {$l_fraction}
 						,iron_oxide = {$iron_oxide}
 						,sand = {$sand}
 						,crushed_stone = {$crushed_stone}
@@ -113,6 +119,8 @@ if( isset($_POST["PB_ID"]) ) {
 			}
 		}
 		// Обновляем фактическое число замесов и число заливок на замес
+		$sf_density = $_POST["sf_density"] ? $_POST["sf_density"]*1000 : "NULL";
+		$lf_density = $_POST["lf_density"] ? $_POST["lf_density"]*1000 : "NULL";
 		$io_density = $_POST["io_density"] ? $_POST["io_density"]*1000 : "NULL";
 		$sn_density = $_POST["sn_density"] ? $_POST["sn_density"]*1000 : "NULL";
 		$cs_density = $_POST["cs_density"] ? $_POST["cs_density"]*1000 : "NULL";
@@ -122,6 +130,8 @@ if( isset($_POST["PB_ID"]) ) {
 			SET fact_batches = {$_POST["fact_batches"]}
 				,fillings_per_batch = {$_POST["fillings_per_batch"]}
 				,in_cassette = {$_POST["in_cassette"]}
+				,sf_density = {$sf_density}
+				,lf_density = {$lf_density}
 				,io_density = {$io_density}
 				,sn_density = {$sn_density}
 				,cs_density = {$cs_density}
