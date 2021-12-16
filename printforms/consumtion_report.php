@@ -75,7 +75,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 <table class="main_table">
 	<thead>
 		<tr>
-			<th rowspan="2" colspan="2">Противовес</th>
+			<th rowspan="2" colspan="3">Противовес</th>
 			<th rowspan="2">Кол-во залитых деталей</th>
 			<th colspan="2">Мелкая дробь</th>
 			<th colspan="2">Крупная дробь</th>
@@ -145,7 +145,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 			$reinforcement += $row["reinforcement"] * $row["details"];
 			?>
 			<tr>
-				<td colspan="2"><b><?=$row["drawing_item"]?></b></td>
+				<td colspan="3"><b><?=$row["drawing_item"]?></b></td>
 				<td><?=number_format($row["details"], 0, '', ' ')?></td>
 				<td><?=number_format($row["s_fraction"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["s_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
@@ -171,7 +171,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 		?>
 
 		<tr class="total">
-			<td colspan="2">Итог:</td>
+			<td colspan="3">Итог:</td>
 			<td><?=number_format($details, 0, '', ' ')?></td>
 			<td><?=number_format($s_fraction, 0, ',', ' ')?></td>
 			<td></td>
