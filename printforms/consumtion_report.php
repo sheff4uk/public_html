@@ -77,6 +77,8 @@ echo "<title>Расход сырья {$date_format}</title>";
 		<tr>
 			<th rowspan="2" colspan="2">Противовес</th>
 			<th rowspan="2">Кол-во залитых деталей</th>
+			<th colspan="2">Мелкая дробь</th>
+			<th colspan="2">Крупная дробь</th>
 			<th colspan="2">Окалина</th>
 			<th colspan="2">КМП</th>
 			<th colspan="2">Отсев</th>
@@ -86,6 +88,10 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<th colspan="2">Арматура</th>
 		</tr>
 		<tr>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
 			<th>Расход, кг</th>
 			<th>На деталь, г</th>
 			<th>Расход, кг</th>
@@ -107,6 +113,8 @@ echo "<title>Расход сырья {$date_format}</title>";
 		$query = "
 			SELECT CW.drawing_item
 				,SUM((SELECT SUM(PB.in_cassette - underfilling) FROM list__Filling WHERE LB_ID = LB.LB_ID)) details
+				,SUM(LB.s_fraction) s_fraction
+				,SUM(LB.l_fraction) l_fraction
 				,SUM(LB.iron_oxide) iron_oxide
 				,SUM(LB.sand) sand
 				,SUM(LB.crushed_stone) crushed_stone
@@ -126,6 +134,8 @@ echo "<title>Расход сырья {$date_format}</title>";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
 			$details += $row["details"];
+			$s_fraction += $row["s_fraction"];
+			$l_fraction += $row["l_fraction"];
 			$iron_oxide += $row["iron_oxide"];
 			$sand += $row["sand"] ? round($row["sand"] + 0.05 * $row["details"]) : 0;
 			$crushed_stone += $row["crushed_stone"];
@@ -137,6 +147,10 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<tr>
 				<td colspan="2"><b><?=$row["drawing_item"]?></b></td>
 				<td><?=number_format($row["details"], 0, '', ' ')?></td>
+				<td><?=number_format($row["s_fraction"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["s_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["l_fraction"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["l_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["sand"] ? round($row["sand"] + 0.05 * $row["details"]) : 0, 0, ',', ' ')?></td>
@@ -159,6 +173,10 @@ echo "<title>Расход сырья {$date_format}</title>";
 		<tr class="total">
 			<td colspan="2">Итог:</td>
 			<td><?=number_format($details, 0, '', ' ')?></td>
+			<td><?=number_format($s_fraction, 0, ',', ' ')?></td>
+			<td></td>
+			<td><?=number_format($l_fraction, 0, ',', ' ')?></td>
+			<td></td>
 			<td><?=number_format($iron_oxide, 0, ',', ' ')?></td>
 			<td></td>
 			<td><?=number_format($sand, 0, ',', ' ')?></td>

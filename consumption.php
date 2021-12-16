@@ -121,6 +121,8 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th rowspan="2" colspan = "2">Противовес</th>
 			<th rowspan="2">Кол-во залитых деталей</th>
+			<th colspan="2">Мелкая дробь</th>
+			<th colspan="2">Крупная дробь</th>
 			<th colspan="2">Окалина</th>
 			<th colspan="2">КМП</th>
 			<th colspan="2">Отсев</th>
@@ -130,6 +132,10 @@ foreach ($_GET as &$value) {
 			<th colspan="2">Арматура</th>
 		</tr>
 		<tr>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
 			<th>Расход, кг</th>
 			<th>На деталь, г</th>
 			<th>Расход, кг</th>
@@ -152,6 +158,8 @@ foreach ($_GET as &$value) {
 			SELECT CW.item
 				,CW.drawing_item
 				,SUM((SELECT SUM(PB.in_cassette - underfilling) FROM list__Filling WHERE LB_ID = LB.LB_ID)) details
+				,SUM(LB.s_fraction) s_fraction
+				,SUM(LB.l_fraction) l_fraction
 				,SUM(LB.iron_oxide) iron_oxide
 				,SUM(LB.sand) sand
 				,SUM(LB.crushed_stone) crushed_stone
@@ -173,6 +181,8 @@ foreach ($_GET as &$value) {
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
 			$details += $row["details"];
+			$s_fraction += $row["s_fraction"];
+			$l_fraction += $row["l_fraction"];
 			$iron_oxide += $row["iron_oxide"];
 			$sand += $row["sand"];
 			$crushed_stone += $row["crushed_stone"];
@@ -184,6 +194,10 @@ foreach ($_GET as &$value) {
 			<tr>
 				<td colspan="2" class="nowrap"><span style="font-size: 1.5em; font-weight: bold;"><?=$row["item"]?></span><br><i style="font-size: .8em;"><?=$row["drawing_item"]?></i></td>
 				<td><?=number_format($row["details"], 0, '', ' ')?></td>
+				<td style="background: #7952eb88;"><?=number_format($row["s_fraction"], 0, ',', ' ')?></td>
+				<td style="background: #7952eb88;"><?=number_format($row["s_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #51d5d788;"><?=number_format($row["l_fraction"], 0, ',', ' ')?></td>
+				<td style="background: #51d5d788;"><?=number_format($row["l_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #a52a2a88;"><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
 				<td style="background: #a52a2a88;"><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #f4a46088;"><?=number_format($row["sand"], 0, ',', ' ')?></td>
@@ -207,6 +221,10 @@ foreach ($_GET as &$value) {
 			<td></td>
 			<td>Итог:</td>
 			<td><?=number_format($details, 0, '', ' ')?></td>
+			<td><?=number_format($s_fraction, 0, ',', ' ')?></td>
+			<td></td>
+			<td><?=number_format($l_fraction, 0, ',', ' ')?></td>
+			<td></td>
 			<td><?=number_format($iron_oxide, 0, ',', ' ')?></td>
 			<td></td>
 			<td><?=number_format($sand, 0, ',', ' ')?></td>
