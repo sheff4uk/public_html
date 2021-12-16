@@ -179,7 +179,7 @@ $query = "
 		,DATE_FORMAT(LF.filling_time, '%d.%m.%y %H:%i') filling_time_format
 		,YEARWEEK(LB.batch_date, 1) lb_week
 		,LB.LB_ID
-		,SUBSTRING(CW.item, -3, 3) item
+		,CW.item
 		,LB.mix_density
 		,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
 		,USR_Icon(LB.operator) operator

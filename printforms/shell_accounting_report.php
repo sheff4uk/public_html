@@ -72,7 +72,7 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 	<tbody style="text-align: center;">
 		<?
 		$query = "
-			SELECT CW.item
+			SELECT CW.drawing_item
 				,CW.shell_balance
 				,ROUND((WB.fillings * PB.in_cassette) / WR.sr_cnt) `durability`
 				,ROUND(WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'), 1) `sr_avg`
@@ -120,7 +120,7 @@ echo "<title>Shells report on {$sr_date_format}</title>";
 			//$pallets += $row["pallets"];
 			?>
 				<tr>
-					<td><?=$row["item"]?></td>
+					<td><?=$row["drawing_item"]?></td>
 					<td><?=$row["shell_balance"]?></td>
 <!--					<td><?=$row["durability"]?></td>-->
 <!--					<td><?=$row["sr_avg"]?></td>-->

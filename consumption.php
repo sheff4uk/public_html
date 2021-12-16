@@ -55,14 +55,14 @@ if( !$_GET["date_to"] ) {
 				<option value=""></option>
 				<?
 				$query = "
-					SELECT CW.CW_ID, CW.item
+					SELECT CW.CW_ID, CW.item, CW.drawing_item
 					FROM CounterWeight CW
 					ORDER BY CW.CW_ID
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
 					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
-					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
+					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]} ({$row["drawing_item"]})</option>";
 				}
 				?>
 			</select>
@@ -150,6 +150,7 @@ foreach ($_GET as &$value) {
 		<?
 		$query = "
 			SELECT CW.item
+				,CW.drawing_item
 				,SUM((SELECT SUM(PB.in_cassette - underfilling) FROM list__Filling WHERE LB_ID = LB.LB_ID)) details
 				,SUM(LB.iron_oxide) iron_oxide
 				,SUM(LB.sand) sand
@@ -181,7 +182,7 @@ foreach ($_GET as &$value) {
 			$reinforcement += $row["reinforcement"] * $row["details"];
 			?>
 			<tr>
-				<td><span style="font-size: 1.5em; font-weight: bold;"><?=substr($row["item"], -3)?></span></td>
+				<td class="nowrap"><span style="font-size: 1.5em; font-weight: bold;"><?=$row["item"]?></span><br><i style="font-size: .8em;"><?=$row["drawing_item"]?></i></td>
 				<td><?=number_format($row["details"], 0, '', ' ')?></td>
 				<td style="background: #a52a2a88;"><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
 				<td style="background: #a52a2a88;"><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>

@@ -105,8 +105,8 @@ $html .= "
 				<th rowspan='3' width='180'>Дата и время замеса</th>
 				<th rowspan='2'>Масса куба раствора, кг</th>
 				<th rowspan='3' width='50'>t, ℃ 22±8</th>
-				".($row["sf_cnt"] ? "<th>Мел. дробь, кг</th>" : "")."
-				".($row["lf_cnt"] ? "<th>Круп. дробь, кг</th>" : "")."
+				".($row["sf_cnt"] ? "<th>Мелкая дробь, кг</th>" : "")."
+				".($row["lf_cnt"] ? "<th>Крупная дробь, кг</th>" : "")."
 				".($row["io_cnt"] ? "<th>Окалина, кг</th>" : "")."
 				".($row["sn_cnt"] ? "<th>КМП, кг</th>" : "")."
 				".($row["cs_cnt"] ? "<th>Отсев, кг</th>" : "")."
@@ -118,8 +118,8 @@ $html .= "
 				<th rowspan='3' width='30'><i class='fas fa-cube' title='Испытание куба'></i></th>
 			</tr>
 			<tr>
-				".($row["sf_cnt"] ? "<th><input type='number' min='2' max='7' step='0.01' value='".($sf_density/1000)."' name='sf_density' style='width: 100%; background-color: ;' ></th>" : "")."
-				".($row["lf_cnt"] ? "<th><input type='number' min='2' max='7' step='0.01' value='".($lf_density/1000)."' name='lf_density' style='width: 100%; background-color: ;' ></th>" : "")."
+				".($row["sf_cnt"] ? "<th><input type='number' min='3' max='6' step='0.01' value='".($sf_density/1000)."' name='sf_density' style='width: 100%; background-color: ;' ></th>" : "")."
+				".($row["lf_cnt"] ? "<th><input type='number' min='3' max='6' step='0.01' value='".($lf_density/1000)."' name='lf_density' style='width: 100%; background-color: ;' ></th>" : "")."
 				".($row["io_cnt"] ? "<th><input type='number' min='2' max='3' step='0.01' value='".($io_density/1000)."' name='io_density' style='width: 100%; background-color: #a52a2a80;' ></th>" : "")."
 				".($row["sn_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($sn_density/1000)."' name='sn_density' style='width: 100%; background-color: #f4a46082;' ></th>" : "")."
 				".($row["cs_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($cs_density/1000)."' name='cs_density' style='width: 100%; background-color: #8b45137a;' ></th>" : "")."

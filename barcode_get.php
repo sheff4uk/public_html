@@ -187,7 +187,7 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 				// Предупреждаем если долго нет данных по замесам
 				$query = "
 					SELECT PB.cycle
-						,SUBSTRING(CW.item, -3, 3) item
+						,CW.item
 					FROM plan__Batch PB
 					JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 					WHERE PB.print_time + INTERVAL 24 hour < NOW()

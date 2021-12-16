@@ -35,7 +35,7 @@ $message = "
 ";
 
 $query = "
-	SELECT CW.item
+	SELECT CW.drawing_item
 		,CW.shell_balance
 		,ROUND((WB.fillings * PB.in_cassette) / WR.sr_cnt) `durability`
 		,ROUND(WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'), 1) `sr_avg`
@@ -81,7 +81,7 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	$message .= "
 		<tr>
-			<td>{$row["item"]}</td>
+			<td>{$row["drawing_item"]}</td>
 			<td>{$row["shell_balance"]}</td>
 			<td>{$row["sr_cnt"]}</td>
 			<td>{$row["max"]}</td>
