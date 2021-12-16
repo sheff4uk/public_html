@@ -105,7 +105,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 	<tbody style="text-align: center;" class="nowrap">
 		<?
 		$query = "
-			SELECT CW.item
+			SELECT CW.drawing_item
 				,SUM((SELECT SUM(PB.in_cassette - underfilling) FROM list__Filling WHERE LB_ID = LB.LB_ID)) details
 				,SUM(LB.iron_oxide) iron_oxide
 				,SUM(LB.sand) sand
@@ -135,7 +135,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 			$reinforcement += $row["reinforcement"] * $row["details"];
 			?>
 			<tr>
-				<td colspan="2"><b><?=$row["item"]?></b></td>
+				<td colspan="2"><b><?=$row["drawing_item"]?></b></td>
 				<td><?=number_format($row["details"], 0, '', ' ')?></td>
 				<td><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>

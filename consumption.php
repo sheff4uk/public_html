@@ -119,7 +119,7 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th rowspan="2">Противовес</th>
+			<th rowspan="2" colspan = "2">Противовес</th>
 			<th rowspan="2">Кол-во залитых деталей</th>
 			<th colspan="2">Окалина</th>
 			<th colspan="2">КМП</th>
@@ -182,7 +182,7 @@ foreach ($_GET as &$value) {
 			$reinforcement += $row["reinforcement"] * $row["details"];
 			?>
 			<tr>
-				<td class="nowrap"><span style="font-size: 1.5em; font-weight: bold;"><?=$row["item"]?></span><br><i style="font-size: .8em;"><?=$row["drawing_item"]?></i></td>
+				<td colspan="2" class="nowrap"><span style="font-size: 1.5em; font-weight: bold;"><?=$row["item"]?></span><br><i style="font-size: .8em;"><?=$row["drawing_item"]?></i></td>
 				<td><?=number_format($row["details"], 0, '', ' ')?></td>
 				<td style="background: #a52a2a88;"><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
 				<td style="background: #a52a2a88;"><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>
@@ -204,6 +204,7 @@ foreach ($_GET as &$value) {
 		?>
 
 		<tr class="total">
+			<td></td>
 			<td>Итог:</td>
 			<td><?=number_format($details, 0, '', ' ')?></td>
 			<td><?=number_format($iron_oxide, 0, ',', ' ')?></td>
