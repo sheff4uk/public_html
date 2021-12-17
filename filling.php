@@ -132,6 +132,8 @@ foreach ($_GET as &$value) {
 			<th>Дата время замеса</th>
 			<th>Куб раствора, кг</th>
 			<th>t, ℃ 22±8</th>
+			<th>Мелкая дробь,<br>кг ±5</th>
+			<th>Крупная дробь,<br>кг ±5</th>
 			<th>Окалина,<br>кг ±5</th>
 			<th>КМП,<br>кг ±5</th>
 			<th>Отсев,<br>кг ±5</th>
@@ -159,6 +161,8 @@ $query = "
 		,MIN(TIMESTAMP(LB.batch_date, LB.batch_time)) time
 		,IF(COUNT(LCT24.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT24.LCT_ID) * 2 / 3), 0) `24tests`
 		,IF(COUNT(LCT72.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT72.LCT_ID) * 2 / 3), 0) `72tests`
+		,PB.sf_density
+		,PB.lf_density
 		,PB.io_density
 		,PB.sn_density
 		,PB.cs_density
@@ -216,6 +220,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.mix_density
 			,LB.temp
 			,IF(ABS(22 - LB.temp) <= 8, NULL, IF(LB.temp - 22 > 8, LB.temp - 30, LB.temp - 14)) temp_diff
+			,LB.s_fraction
+			,LB.l_fraction
 			,LB.iron_oxide
 			,LB.sand
 			,LB.crushed_stone
@@ -225,6 +231,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			,SUM(LF.underfilling) underfilling
 			,LB.test
 			,mix_diff({$row["CW_ID"]}, LB.mix_density) mix_diff
+			,mix_sf_diff({$row["MF_ID"]}, LB.s_fraction) sf_diff
+			,mix_lf_diff({$row["MF_ID"]}, LB.l_fraction) lf_diff
 			,mix_io_diff({$row["MF_ID"]}, LB.iron_oxide) io_diff
 			,mix_sn_diff({$row["MF_ID"]}, LB.sand) sn_diff
 			,mix_cs_diff({$row["MF_ID"]}, LB.crushed_stone) cs_diff
@@ -271,6 +279,8 @@ while( $row = mysqli_fetch_array($res) ) {
 					<b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>
 					<i class='fas fa-cube'></i>24: <b>{$test24}</b>МПа<br>
 					<i class='fas fa-cube'></i>72: <b>{$test72}</b>МПа<br>
+					".($sf_density ? "<span class='nowrap'>мел. дробь: <b>{$sf_density}</b> кг</span>" : "")."
+					".($lf_density ? "<span class='nowrap'>круп. дробь: <b>{$lf_density}</b> кг</span>" : "")."
 					".($io_density ? "<span class='nowrap'>окалина: <b>{$io_density}</b> кг</span>" : "")."
 					".($sn_density ? "<span class='nowrap'>КМП: <b>{$sn_density}</b> кг</span>" : "")."
 					".($cs_density ? "<span class='nowrap'>отсев: <b>{$cs_density}</b> кг</span>" : "")."
@@ -281,6 +291,8 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$subrow["batch_date_format"]?> <?=$subrow["batch_time_format"]?></td>
 				<td><?=$subrow["mix_density"]/1000?> <?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
 				<td><?=$subrow["temp"]?><?=($subrow["temp_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["temp_diff"] > 0 ? " +" : " ").($subrow["temp_diff"])."</font>" : "")?></td>
+				<td style="background: #7952eb88;"><?=$subrow["s_fraction"]?><?=($subrow["sf_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sf_diff"] > 0 ? " +" : " ").($subrow["sf_diff"])."</font>" : "")?></td>
+				<td style="background: #51d5d788;"><?=$subrow["l_fraction"]?><?=($subrow["lf_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["lf_diff"] > 0 ? " +" : " ").($subrow["lf_diff"])."</font>" : "")?></td>
 				<td style="background: #a52a2a80;"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
 				<td style="background: #f4a46082;"><?=$subrow["sand"]?><?=($subrow["sn_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sn_diff"] > 0 ? " +" : " ").($subrow["sn_diff"])."</font>" : "")?></td>
 				<td style="background: #8b45137a;"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>

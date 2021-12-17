@@ -47,8 +47,8 @@ while( $row = mysqli_fetch_array($res) ) {
 	?>
 	<tr id="<?=$row["MF_ID"]?>">
 		<td><b><?=$row["item"]?></b></td>
-		<td style="background: "><?=$row["s_fraction"]?></td>
-		<td style="background: "><?=$row["l_fraction"]?></td>
+		<td style="background: #7952eb88;"><?=$row["s_fraction"]?></td>
+		<td style="background: #51d5d788;"><?=$row["l_fraction"]?></td>
 		<td style="background: #a52a2a80;"><?=$row["iron_oxide"]?></td>
 		<td style="background: #f4a46082;"><?=$row["sand"]?></td>
 		<td style="background: #8b45137a;"><?=$row["crushed_stone"]?></td>
