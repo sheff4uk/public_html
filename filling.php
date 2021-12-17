@@ -281,11 +281,11 @@ while( $row = mysqli_fetch_array($res) ) {
 					<b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>
 					<i class='fas fa-cube'></i>24: <b>{$test24}</b>МПа<br>
 					<i class='fas fa-cube'></i>72: <b>{$test72}</b>МПа<br>
-					".($sf_density ? "<span class='nowrap'>мел. дробь: <b>{$sf_density}</b> кг</span>" : "")."
-					".($lf_density ? "<span class='nowrap'>круп. дробь: <b>{$lf_density}</b> кг</span>" : "")."
-					".($io_density ? "<span class='nowrap'>окалина: <b>{$io_density}</b> кг</span>" : "")."
-					".($sn_density ? "<span class='nowrap'>КМП: <b>{$sn_density}</b> кг</span>" : "")."
-					".($cs_density ? "<span class='nowrap'>отсев: <b>{$cs_density}</b> кг</span>" : "")."
+					".($sf_density ? "<span class='nowrap'><b>{$sf_density}</b>кг мел. дробь</span>" : "")."
+					".($lf_density ? "<span class='nowrap'><b>{$lf_density}</b>кг круп. дробь</span>" : "")."
+					".($io_density ? "<span class='nowrap'><b>{$io_density}</b>кг окалина</span>" : "")."
+					".($sn_density ? "<span class='nowrap'><b>{$sn_density}</b>кг КМП</span>" : "")."
+					".($cs_density ? "<span class='nowrap'><b>{$cs_density}</b>кг отсев</span>" : "")."
 				</td>
 			";
 		}
