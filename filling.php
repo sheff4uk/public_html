@@ -208,6 +208,8 @@ while( $row = mysqli_fetch_array($res) ) {
 	$cnt = $row["fact_batches"];
 	echo "<tbody id='PB{$row["PB_ID"]}' style='text-align: center; border-bottom: 2px solid #333; ".(($cycle and $cycle != $row["cycle"]) ? " border-top: 10px solid #333;" : "")."'>";
 	$cycle = $row["cycle"];
+	$sf_density = $row["sf_density"]/1000;
+	$lf_density = $row["lf_density"]/1000;
 	$io_density = $row["io_density"]/1000;
 	$sn_density = $row["sn_density"]/1000;
 	$cs_density = $row["cs_density"]/1000;
