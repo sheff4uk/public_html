@@ -142,17 +142,20 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th>Цикл</th>
-			<th>Противовес</th>
-			<th colspan="2">Замесов</th>
-			<th>Заливок</th>
+			<th rowspan="2">Цикл</th>
+			<th rowspan="2">Противовес</th>
+			<th rowspan="2" colspan="2">Замесов</th>
+			<th rowspan="2">Кассет</th>
+			<th colspan="2">Деталей</th>
+			<th rowspan="2">Недоливы</th>
+			<th rowspan="2">Расчетное время, ч</th>
+			<th rowspan="2">Бланк чек-листа</th>
+			<th rowspan="2">Распечатан</th>
+			<th rowspan="2"></th>
+		</tr>
+		<tr>
 			<th>План</th>
 			<th>Факт</th>
-			<th>Недоливы</th>
-			<th>Расчетное время, ч</th>
-			<th>Бланк чек-листа</th>
-			<th>Распечатан</th>
-			<th></th>
 		</tr>
 	</thead>
 
@@ -167,9 +170,9 @@ $query = "
 	SELECT SUM(1) + 1 cnt
 		,PB.cycle
 		,SUM(PB.batches) batches
-		,SUM(PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings)) fillings
-		,SUM(PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * IFNULL(PB.in_cassette, CW.in_cassette)) plan
-		,SUM(PB.fact_batches * PB.fillings_per_batch * PB.in_cassette) details
+		,SUM(ROUND(PB.batches * IFNULL(PB.fillings, CW.fillings) / IFNULL(PB.per_batch, CW.per_batch))) fillings
+		,SUM(ROUND(PB.batches * IFNULL(PB.fillings, CW.fillings) / IFNULL(PB.per_batch, CW.per_batch)) * IFNULL(PB.in_cassette, CW.in_cassette)) plan
+		,SUM(ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette) details
 		,IF(SUM(PB.batches) = SUM(PB.fact_batches), (SELECT TIMESTAMPDIFF(MINUTE, MIN(TIMESTAMP(batch_date, batch_time)), MAX(TIMESTAMP(batch_date, batch_time))) FROM list__Batch WHERE PB_ID IN (SELECT PB_ID FROM plan__Batch WHERE year = PB.year AND cycle = PB.cycle)), NULL) duration
 
 	FROM plan__Batch PB
@@ -195,9 +198,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			,USR_Icon(author) icon_author
 			,Friendly_date(change_time) friendly_date
 			,DATE_FORMAT(change_time, '%H:%i') friendly_time
-			,PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) fillings
-			,PB.batches * IFNULL(PB.fillings_per_batch, CW.fillings) * IFNULL(PB.in_cassette, CW.in_cassette) plan
-			,PB.fact_batches * PB.fillings_per_batch * PB.in_cassette details
+			,ROUND(PB.batches * IFNULL(PB.fillings, CW.fillings) / IFNULL(PB.per_batch, CW.per_batch)) fillings
+			,ROUND(PB.batches * IFNULL(PB.fillings, CW.fillings) / IFNULL(PB.per_batch, CW.per_batch)) * IFNULL(PB.in_cassette, CW.in_cassette) plan
+			,ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette details
 			,SUM(LF.underfilling) underfilling
 			,IF(PB.batches > 0 AND PB.fact_batches = 0, 1, 0) printable
 			,(SELECT PB_ID FROM plan__Batch WHERE CW_ID = PB.CW_ID AND fact_batches = 0 AND batches > 0 ORDER BY year, cycle LIMIT 1) current_PB_ID

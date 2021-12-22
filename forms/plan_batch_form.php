@@ -60,7 +60,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th>Противовес</th>
 						<th>Замесов</th>
-						<th>Заливок</th>
+						<th>Кассет</th>
 						<th>Деталей</th>
 					</tr>
 				</thead>
@@ -76,7 +76,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						?>
 						<tr class="data_row">
 							<td><b style="font-size: 1.5em;"><?=$row["item"]?></b><input type="hidden" name="CW_ID[<?=$row["CW_ID"]?>]" value="<?=$row["CW_ID"]?>"><input type="hidden" name="PB_ID[<?=$row["CW_ID"]?>]"></td>
-							<td><input type="number" name="batches[<?=$row["CW_ID"]?>]" class="batches" min="0" max="40" fillings="" in_cassette="" tabindex="<?=(++$index)?>" style="width: 70px;"><i class="fas fa-question-circle" title="Не редактируется. Заливки уже состоялись."></i></td>
+							<td><input type="number" name="batches[<?=$row["CW_ID"]?>]" class="batches" min="0" max="40" fillings="" per_batch="" in_cassette="" tabindex="<?=(++$index)?>" style="width: 70px;"><i class="fas fa-question-circle" title="Не редактируется. Заливки уже состоялись."></i></td>
 							<td><input type="number" name="fillings" class="fillings" style="width: 70px;" readonly></td>
 							<td><input type="number" name="details" class="details" style="width: 70px;" readonly></td>
 						</tr>
@@ -126,7 +126,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#plan_batch_form .total span').html('');
 
 			for (let sub_pb_data of pb_data) {
+				$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('step', sub_pb_data['per_batch']);
 				$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('fillings', sub_pb_data['fillings']);
+				$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('per_batch', sub_pb_data['per_batch']);
 				$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('in_cassette', sub_pb_data['in_cassette']);
 				$('#plan_batch_form input[name="batches[' + sub_pb_data['CW_ID'] + ']"]').attr('placeholder', sub_pb_data['placeholder']);
 
@@ -163,14 +165,15 @@ this.subbut.value='Подождите, пожалуйста!';">
 		// При изменении кол-ва замесов пересчитываем заливки и детали
 		$('#plan_batch_form input.batches').change(function() {
 			var fillings = $(this).attr('fillings'),
+				per_batch = $(this).attr('per_batch'),
 				in_cassette = $(this).attr('in_cassette'),
 				batches = $(this).val(),
 				total_batches = 0,
 				total_fillings = 0,
 				total_details = 0;
 
-			$(this).parents('tr').children().children('input.fillings').val(batches * fillings);
-			$(this).parents('tr').children().children('input.details').val(batches * fillings * in_cassette);
+			$(this).parents('tr').children().children('input.fillings').val(batches * fillings / per_batch);
+			$(this).parents('tr').children().children('input.details').val(batches * fillings / per_batch * in_cassette);
 
 			// Вычисляем сумму
 			$('.data_row').each(function(){

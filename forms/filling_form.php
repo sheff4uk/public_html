@@ -67,13 +67,15 @@ if( isset($_POST["PB_ID"]) ) {
 					// ID последней залитой кассеты
 					$LF_ID = mysqli_insert_id( $mysqli );
 				}
-				// Записываем недоливы в последнюю кассету
-				$query = "
-					UPDATE list__Filling
-					SET underfilling = {$underfilling}
-					WHERE LF_ID = {$LF_ID}
-				";
-				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				if( $underfilling > 0 ) {
+					// Записываем недоливы в последнюю кассету
+					$query = "
+						UPDATE list__Filling
+						SET underfilling = {$underfilling}
+						WHERE LF_ID = {$LF_ID}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				}
 			}
 			else { // Редактируем замес
 				$query = "
@@ -109,13 +111,15 @@ if( isset($_POST["PB_ID"]) ) {
 					// ID последней залитой кассеты
 					$LF_ID = $k;
 				}
-				// Записываем недоливы в последнюю кассету
-				$query = "
-					UPDATE list__Filling
-					SET underfilling = {$underfilling}
-					WHERE LF_ID = {$LF_ID}
-				";
-				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				if( isset($_POST["underfilling"][$key]) ) {
+					// Записываем недоливы в последнюю кассету
+					$query = "
+						UPDATE list__Filling
+						SET underfilling = {$underfilling}
+						WHERE LF_ID = {$LF_ID}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				}
 			}
 		}
 		// Обновляем фактическое число замесов и число заливок на замес
@@ -128,7 +132,8 @@ if( isset($_POST["PB_ID"]) ) {
 		$query = "
 			UPDATE plan__Batch
 			SET fact_batches = {$_POST["fact_batches"]}
-				,fillings_per_batch = {$_POST["fillings_per_batch"]}
+				,fillings = {$_POST["fillings"]}
+				,per_batch = {$_POST["per_batch"]}
 				,in_cassette = {$_POST["in_cassette"]}
 				,sf_density = {$sf_density}
 				,lf_density = {$lf_density}
@@ -281,7 +286,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			var cnt = 0;
 			$('input.cassette').each(function (index, el){
 				var v = $(el).val();
-				if( v == current ) {
+				if( v == current && v > 0 ) {
 					cnt = cnt + 1;
 				}
 			});

@@ -18,6 +18,7 @@ $query = "
 		,PB.batches
 		,CW.item
 		,CW.fillings
+		,CW.per_batch
 		,CW.cubetests
 		,CONCAT(ROUND(CW.min_density/1000, 2), '&ndash;', ROUND(CW.max_density/1000, 2)) spec
 	FROM plan__Batch PB
@@ -32,6 +33,7 @@ $item = $row["item"];
 $year = $row["year"];
 $cycle = $row["cycle"];
 $fillings = $row["fillings"];
+$per_batch = $row["per_batch"];
 $cubetests = $row["cubetests"];
 $CW_ID = $row["CW_ID"];
 $spec = $row["spec"];
@@ -96,7 +98,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 	<thead>
 		<tr>
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
-			<th width="250" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;" class="nowrap">код</span><n style="font-size: 3em;"><?=$item?></n></th>
+			<th width="250" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;" class="nowrap">деталь</span><n style="font-size: 3em;"><?=$item?></n></th>
 			<th width="100" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">год</span><n style="font-size: 3em;"><?=$year?></n></th>
 			<th width="75" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">цикл</span><n style="font-size: 3em;"><?=$cycle?></n></th>
 			<th width="200" style="position: relative;">
@@ -120,8 +122,6 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	$cassettes .= "<b style='border: 1px solid #333; border-radius: 5px; margin: 0 2px; padding: 2px; display: inline-block;'>{$row["cassette"]}</b>";
 }
-//echo "<div style='border: 1px solid; padding: 10px;'><span>Вероятные номера кассет:</span> {$cassettes}<br><b>Пожалуйста указывайте номера кассет разборчиво.</b></div>";
-
 // Данные рецепта
 $query = "
 	SELECT IFNULL(CONCAT(MF.s_fraction, ' ±5 кг'), 0) s_fraction
@@ -162,8 +162,8 @@ $row = mysqli_fetch_array($res);
 			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент</th>" : "")?>
 			<?=($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор</th>" : "")?>
 			<?=($row["wt_cnt"] ? "<th rowspan='2'>Вода</th>" : "")?>
-			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>" style="border-left: 4px solid;">№ кассеты<br>(разборчиво)</th>
-			<th rowspan="3" width="75">Вероятные номера кассет</th>
+			<th rowspan="3" width="75" style="border-left: 4px solid;">Вероятные номера кассет</th>
+			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>">№ кассеты<br>(разборчиво)</th>
 			<th rowspan="3" width="40">Недолив</th>
 			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
 		</tr>
@@ -188,10 +188,12 @@ $row = mysqli_fetch_array($res);
 	</thead>
 	<tbody>
 <?
-$fillings_cell = "<td style='border-left: 4px solid;'></td>";
-for ($i = 2; $i <= $fillings; $i++) {
-	$fillings_cell .= "<td></td>";
+$fillings_cell = "";
+for ($i = 1; $i <= $fillings; $i++) {
+	$fillings_cell .= "<td rowspan='{$per_batch}'></td><td rowspan='{$per_batch}'></td>";
 }
+
+$j = 0;
 
 for ($i = 1; $i <= $batches; $i++) {
 	echo "
@@ -208,12 +210,13 @@ for ($i = 1; $i <= $batches; $i++) {
 			".($row["cm_cnt"] ? "<td></td>" : "")."
 			".($row["pl_cnt"] ? "<td></td>" : "")."
 			".($row["wt_cnt"] ? "<td></td>" : "")."
-			{$fillings_cell}
-			".($i == 1 ? "<td rowspan='{$batches}'>{$cassettes}</td>" : "")."
-			<td></td>
+			".($i == 1 ? "<td rowspan='{$batches}' style='border-left: 4px solid;'>{$cassettes}</td>" : "")."
+			".($j == 0 ? $fillings_cell : "")."
 			<td style='text-align: center;'>".(in_array($i, $tests) ? "<b style='font-size: 1.4em;'>&#10065;</b>" : "&#10065;")."</td>
 		</tr>
 	";
+	$j++;
+	$j = ($j == $per_batch ? 0 : $j);
 }
 ?>
 	</tbody>

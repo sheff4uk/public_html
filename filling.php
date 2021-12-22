@@ -213,6 +213,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$io_density = $row["io_density"]/1000;
 	$sn_density = $row["sn_density"]/1000;
 	$cs_density = $row["cs_density"]/1000;
+	$j = 0;
 
 	$query = "
 		SELECT LB.LB_ID
@@ -222,6 +223,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.mix_density
 			,LB.temp
 			,IF(ABS(22 - LB.temp) <= 8, NULL, IF(LB.temp - 22 > 8, LB.temp - 30, LB.temp - 14)) temp_diff
+			,PB.per_batch
 			,LB.s_fraction
 			,LB.l_fraction
 			,LB.iron_oxide
@@ -241,8 +243,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			,mix_cm_diff({$row["MF_ID"]}, LB.cement) cm_diff
 			,mix_pl_diff({$row["MF_ID"]}, LB.plasticizer) pl_diff
 			,mix_wt_diff({$row["MF_ID"]}, LB.water) wt_diff
-		FROM list__Batch LB
-		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+		FROM plan__Batch PB
+		JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
+		LEFT JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		WHERE LB.PB_ID = {$row["PB_ID"]}
 		GROUP BY LB.LB_ID
 		ORDER BY LB.batch_date, LB.batch_time
@@ -260,7 +263,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			ORDER BY LF.LF_ID
 		";
 		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		$cassette = "";
+		$cassette = "<td colspan='2' rowspan='{$subrow["per_batch"]}' class='nowrap'>";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
 			if( $subsubrow["LO_ID"] ) {
 				$cassette .= "<a href='opening.php?week={$subsubrow["o_week"]}#{$subsubrow["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette'>{$subsubrow["cassette"]}</b></a>";
@@ -269,6 +272,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				$cassette .= "<b class='cassette'>{$subsubrow["cassette"]}</b>";
 			}
 		}
+		$cassette .= "</td><td rowspan='{$subrow["per_batch"]}'>{$subrow["underfilling"]}</td>";
 
 		echo "<tr id='{$subrow["LB_ID"]}'>";
 
@@ -301,8 +305,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td style="background: #7080906b;"><?=$subrow["cement"]?><?=($subrow["cm_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cm_diff"] > 0 ? " +" : " ").($subrow["cm_diff"])."</font>" : "")?></td>
 				<td style="background: #80800080;"><?=$subrow["plasticizer"]?><?=($subrow["pl_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["pl_diff"] > 0 ? " +" : " ").($subrow["pl_diff"])."</font>" : "")?></td>
 				<td style="background: #1e90ff85;"><?=$subrow["water"]?><?=($subrow["wt_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["wt_diff"])."</font>" : "")?></td>
-				<td colspan="2" class="nowrap"><?=$cassette?></td>
-				<td><?=$subrow["underfilling"]?></td>
+				<?=($j == 0 ? $cassette : "")?>
 				<td><?=$subrow["name"]?></td>
 				<?
 				// Выводим общую ячейку с кнопкой редактирования
@@ -313,6 +316,8 @@ while( $row = mysqli_fetch_array($res) ) {
 				?>
 			</tr>
 		<?
+		$j++;
+		$j = ($j == $subrow["per_batch"] ? 0 : $j);
 	}
 	echo "</tbody>";
 }
