@@ -68,10 +68,11 @@ switch( $_GET["do"] ) {
 		if( count($_SESSION["error"] ) == 0) {
 			// Если звонок поступил - активируем сессию и заходим в систему
 			if( $check_status == 401 ) {
-				$query = "SELECT USR_ID, last_url FROM Users WHERE phone='{$_SESSION['mtel']}'";
+				$query = "SELECT USR_ID, F_ID, last_url FROM Users WHERE phone='{$_SESSION['mtel']}'";
 				$result = mysqli_query( $mysqli, $query );
 				$myrow = mysqli_fetch_array($result);
 				$_SESSION["id"] = $myrow["USR_ID"];
+				$_SESSION['F_ID'] = $myrow['F_ID'];
 				unset($_SESSION['mtel']);
 				echo "location.href = '{$myrow["last_url"]}';";
 			}
@@ -141,10 +142,11 @@ switch( $_GET["do"] ) {
 		if( isset($_GET["sms"]) ) {
 			// Если код верный - сохраняем в сессию пользователя и покидаем экран
 			if( $_POST["sms_code"] == $_SESSION["sms_code"] ) {
-				$query = "SELECT USR_ID, last_url FROM Users WHERE phone='{$_SESSION['mtel']}'";
+				$query = "SELECT USR_ID, F_ID, last_url FROM Users WHERE phone='{$_SESSION['mtel']}'";
 				$result = mysqli_query( $mysqli, $query );
 				$myrow = mysqli_fetch_array($result);
 				$_SESSION['id'] = $myrow['USR_ID'];
+				$_SESSION['F_ID'] = $myrow['F_ID'];
 				unset($_SESSION['sms_code']);
 				unset($_SESSION['mtel']);
 

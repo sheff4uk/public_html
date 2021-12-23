@@ -6,6 +6,7 @@ if( isset($_POST["cycle"]) ) {
 	session_start();
 	$year = $_POST["year"];
 	$cycle = $_POST["cycle"];
+	$F_ID = $_POST["F_ID"];
 
 	foreach ($_POST["CW_ID"] as $key => $value) {
 		// Редактируем
@@ -23,6 +24,7 @@ if( isset($_POST["cycle"]) ) {
 				INSERT INTO plan__Batch
 				SET year = {$year}
 					,cycle = {$cycle}
+					,F_ID = {$F_ID}
 					,CW_ID = {$value}
 					,batches = {$_POST["batches"][$key]}
 					,author = {$_SESSION['id']}
@@ -36,7 +38,7 @@ if( isset($_POST["cycle"]) ) {
 	}
 
 	// Перенаправление в план
-	exit ('<meta http-equiv="refresh" content="0; url=/plan_batch.php?year='.$year.'&#C'.$year.$cycle.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/plan_batch.php?year='.$year.'&F_ID='.$F_ID.'&#C'.$year.$cycle.'">');
 }
 ?>
 
@@ -53,6 +55,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="year">
 			<input type="hidden" name="cycle">
+			<input type="hidden" name="F_ID">
 
 			<h3>Год/цикл: <span style="font-size: 2em;" id="year_cycle"></span></h3>
 			<table style="width: 100%; table-layout: fixed;">
@@ -69,6 +72,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					$query = "
 						SELECT CW.CW_ID, CW.item
 						FROM CounterWeight CW
+						JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = {$_GET["F_ID"]}
 						ORDER BY CW.CW_ID
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -107,15 +111,17 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
 			var cycle = $(this).attr("cycle"),
-				year = $(this).attr("year");
+				year = $(this).attr("year"),
+				F_ID = $(this).attr("f_id");
 
 			$('#plan_batch_form input[name="year"]').val(year);
 			$('#plan_batch_form input[name="cycle"]').val(cycle);
+			$('#plan_batch_form input[name="F_ID"]').val(F_ID);
 			$('#year_cycle').html(year + "/" + cycle);
 
 			// Данные аяксом
 			$.ajax({
-				url: "/ajax/plan_batch_json.php?year=" + year + "&cycle=" + cycle,
+				url: "/ajax/plan_batch_json.php?year=" + year + "&cycle=" + cycle + "&F_ID=" + F_ID,
 				success: function(msg) { pb_data = msg; },
 				dataType: "json",
 				async: false

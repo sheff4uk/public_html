@@ -10,9 +10,9 @@ $query = "
 		,PB.batches
 		,PB.fact_batches
 		,CW.item
-		,IFNULL(PB.fillings, CW.fillings) fillings
-		,IFNULL(PB.per_batch, CW.per_batch) per_batch
-		,IFNULL(PB.in_cassette, CW.in_cassette) in_cassette
+		,IFNULL(PB.fillings, MF.fillings) fillings
+		,IFNULL(PB.per_batch, MF.per_batch) per_batch
+		,IFNULL(PB.in_cassette, MF.in_cassette) in_cassette
 		,CONCAT(ROUND(CW.min_density/1000, 2), '&ndash;', ROUND(CW.max_density/1000, 2)) spec
 		,MIN(LB.batch_date) batch_date
 		,PB.sf_density
@@ -22,6 +22,7 @@ $query = "
 		,PB.cs_density
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID
 	LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 	WHERE PB.PB_ID = {$PB_ID}
 ";

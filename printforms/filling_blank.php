@@ -17,12 +17,13 @@ $query = "
 		,PB.CW_ID
 		,PB.batches
 		,CW.item
-		,CW.fillings
-		,CW.per_batch
-		,CW.cubetests
+		,MF.fillings
+		,MF.per_batch
+		,MF.cubetests
 		,CONCAT(ROUND(CW.min_density/1000, 2), '&ndash;', ROUND(CW.max_density/1000, 2)) spec
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID
 	WHERE PB_ID = {$PB_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -190,8 +191,9 @@ $row = mysqli_fetch_array($res);
 <?
 $fillings_cell = "";
 for ($i = 1; $i <= $fillings; $i++) {
-	$fillings_cell .= "<td rowspan='{$per_batch}'></td><td rowspan='{$per_batch}'></td>";
+	$fillings_cell .= "<td rowspan='{$per_batch}'></td>";
 }
+$fillings_cell .= "<td rowspan='{$per_batch}'></td>";
 
 $j = 0;
 

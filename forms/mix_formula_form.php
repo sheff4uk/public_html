@@ -1,7 +1,7 @@
 <?
 include_once "../config.php";
 
-// Сохранение/редактирование расформовки
+// Сохранение/редактирование рецепта
 if( isset($_POST["CW_ID"]) ) {
 	session_start();
 	$s_fraction = ($_POST["s_fraction"] != '') ? $_POST["s_fraction"] : "NULL";
@@ -30,6 +30,7 @@ if( isset($_POST["CW_ID"]) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 		}
 		$MF_ID = $_POST["MF_ID"];
+		$F_ID = $_POST["F_ID"];
 	}
 
 	if( count($_SESSION["error"]) == 0) {
@@ -37,7 +38,7 @@ if( isset($_POST["CW_ID"]) ) {
 	}
 
 	// Перенаправление в журнал
-	exit ('<meta http-equiv="refresh" content="0; url=/mix_formula.php#'.$MF_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/mix_formula.php?F_ID='.$F_ID.'#'.$MF_ID.'">');
 }
 ?>
 
@@ -53,6 +54,7 @@ if( isset($_POST["CW_ID"]) ) {
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="MF_ID">
+			<input type="hidden" name="F_ID">
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
@@ -101,7 +103,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
 			var MF_ID = $(this).attr("MF_ID"),
-				item = $(this).attr("item");
+				item = $(this).attr("item"),
+				F_ID = $(this).attr("F_ID");
 
 			// Заполняем форму
 			// Данные аяксом
@@ -113,6 +116,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			});
 
 			$('#formula_form input[name="MF_ID"]').val(MF_ID);
+			$('#formula_form input[name="F_ID"]').val(F_ID);
 			$('#formula_form #item').text(item);
 			$('#formula_form input[name="s_fraction"]').val(mf_data['s_fraction']);
 			$('#formula_form input[name="l_fraction"]').val(mf_data['l_fraction']);

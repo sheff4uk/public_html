@@ -2,7 +2,6 @@
 include "config.php";
 $title = 'План заливки';
 include "header.php";
-include "./forms/plan_batch_form.php";
 
 $page = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 
@@ -32,11 +31,19 @@ if( !$_GET["year"] ) {
 	$_GET["year"] = $row["year"];
 }
 
+// Если не выбран участок, берем из сессии
+if( !$_GET["F_ID"] ) {
+	$_GET["F_ID"] = $_SESSION['F_ID'];
+}
+
+include "./forms/plan_batch_form.php";
+
 // Находим очередной цикл в этом году, чтобы создать новый план
 $query = "
 	SELECT IFNULL(MAX(cycle), 0) + 1 next_cycle
 	FROM plan__Batch
 	WHERE year = {$_GET["year"]}
+		AND F_ID = {$_GET["F_ID"]}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
@@ -50,6 +57,25 @@ $next_cycle = $row["next_cycle"];
 		<a href="/plan_batch.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Участок:</span>
+			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT F_ID
+						,f_name
+					FROM factory
+					ORDER BY F_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["F_ID"] == $_GET["F_ID"]) ? "selected" : "";
+					echo "<option value='{$row["F_ID"]}' {$selected}>{$row["f_name"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Год:</span>
 			<select name="year" class="<?=$_GET["year"] ? "filtered" : ""?>" onchange="this.form.submit()">
 				<?
@@ -69,44 +95,6 @@ $next_cycle = $row["next_cycle"];
 				?>
 			</select>
 			<i class="fas fa-question-circle" title="По умолчанию устанавливается текущий год."></i>
-		</div>
-
-		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Код противовеса:</span>
-			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
-				<option value=""></option>
-				<?
-				$query = "
-					SELECT CW.CW_ID, CW.item
-					FROM CounterWeight CW
-					ORDER BY CW.CW_ID
-				";
-				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-				while( $row = mysqli_fetch_array($res) ) {
-					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
-					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
-				}
-				?>
-			</select>
-		</div>
-
-		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Бренд:</span>
-			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
-				<option value=""></option>
-				<?
-				$query = "
-					SELECT CB.CB_ID, CB.brand
-					FROM ClientBrand CB
-					ORDER BY CB.CB_ID
-				";
-				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-				while( $row = mysqli_fetch_array($res) ) {
-					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
-					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
-				}
-				?>
-			</select>
 		</div>
 
 		<button style="float: right;">Фильтр</button>
@@ -170,16 +158,15 @@ $query = "
 	SELECT SUM(1) + 1 cnt
 		,PB.cycle
 		,SUM(PB.batches) batches
-		,SUM(ROUND(PB.batches * IFNULL(PB.fillings, CW.fillings) / IFNULL(PB.per_batch, CW.per_batch))) fillings
-		,SUM(ROUND(PB.batches * IFNULL(PB.fillings, CW.fillings) / IFNULL(PB.per_batch, CW.per_batch)) * IFNULL(PB.in_cassette, CW.in_cassette)) plan
+		,SUM(ROUND(PB.batches * IFNULL(PB.fillings, MF.fillings) / IFNULL(PB.per_batch, MF.per_batch))) fillings
+		,SUM(ROUND(PB.batches * IFNULL(PB.fillings, MF.fillings) / IFNULL(PB.per_batch, MF.per_batch)) * IFNULL(PB.in_cassette, MF.in_cassette)) plan
 		,SUM(ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette) details
 		,IF(SUM(PB.batches) = SUM(PB.fact_batches), (SELECT TIMESTAMPDIFF(MINUTE, MIN(TIMESTAMP(batch_date, batch_time)), MAX(TIMESTAMP(batch_date, batch_time))) FROM list__Batch WHERE PB_ID IN (SELECT PB_ID FROM plan__Batch WHERE year = PB.year AND cycle = PB.cycle)), NULL) duration
 
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	WHERE PB.year = {$_GET["year"]}
-		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID
+	WHERE PB.year = {$_GET["year"]} AND PB.F_ID = {$_GET["F_ID"]}
 	GROUP BY PB.cycle
 	ORDER BY PB.cycle DESC
 ";
@@ -198,23 +185,23 @@ while( $row = mysqli_fetch_array($res) ) {
 			,USR_Icon(author) icon_author
 			,Friendly_date(change_time) friendly_date
 			,DATE_FORMAT(change_time, '%H:%i') friendly_time
-			,ROUND(PB.batches * IFNULL(PB.fillings, CW.fillings) / IFNULL(PB.per_batch, CW.per_batch)) fillings
-			,ROUND(PB.batches * IFNULL(PB.fillings, CW.fillings) / IFNULL(PB.per_batch, CW.per_batch)) * IFNULL(PB.in_cassette, CW.in_cassette) plan
+			,ROUND(PB.batches * IFNULL(PB.fillings, MF.fillings) / IFNULL(PB.per_batch, MF.per_batch)) fillings
+			,ROUND(PB.batches * IFNULL(PB.fillings, MF.fillings) / IFNULL(PB.per_batch, MF.per_batch)) * IFNULL(PB.in_cassette, MF.in_cassette) plan
 			,ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette details
 			,SUM(LF.underfilling) underfilling
 			,IF(PB.batches > 0 AND PB.fact_batches = 0, 1, 0) printable
-			,(SELECT PB_ID FROM plan__Batch WHERE CW_ID = PB.CW_ID AND fact_batches = 0 AND batches > 0 ORDER BY year, cycle LIMIT 1) current_PB_ID
+			,(SELECT PB_ID FROM plan__Batch WHERE F_ID = {$_GET["F_ID"]} AND CW_ID = PB.CW_ID AND fact_batches = 0 AND batches > 0 ORDER BY year, cycle LIMIT 1) current_PB_ID
 			,Friendly_date(PB.print_time) friendly_print_date
 			,DATE_FORMAT(PB.print_time, '%H:%i') friendly_print_time
 			,USR_Icon(PB.print_author) icon_print_author
 		FROM plan__Batch PB
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID
 		LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 		LEFT JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		WHERE PB.year = {$_GET["year"]}
 			AND PB.cycle = '{$row["cycle"]}'
-			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+			AND PB.F_ID = {$_GET["F_ID"]}
 		GROUP BY PB.PB_ID
 		ORDER BY PB.CW_ID
 	";
@@ -287,7 +274,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<?
 			// Выводим общую ячейку с кнопками действий
 			if( $last_cycle != $row["cycle"] ) {
-				echo "<td rowspan='{$cnt}'><a href='#' class='add_pb' cycle='{$row["cycle"]}' year='{$_GET["year"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a></td>";
+				echo "<td rowspan='{$cnt}'><a href='#' class='add_pb' cycle='{$row["cycle"]}' year='{$_GET["year"]}' f_id='{$_GET["F_ID"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a></td>";
 			}
 			?>
 		</tr>
@@ -344,7 +331,7 @@ else {
 	</tbody>
 </table>
 
-<div id="add_btn" class="add_pb" cycle="<?=$next_cycle?>" year="<?=$_GET["year"]?>" title="Внести данные очередного плана заливки"></div>
+<div id="add_btn" class="add_pb" cycle="<?=$next_cycle?>" year="<?=$_GET["year"]?>" f_id="<?=$_GET["F_ID"]?>" title="Внести данные очередного плана заливки"></div>
 
 <script>
 	$(function() {
