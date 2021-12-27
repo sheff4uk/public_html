@@ -164,7 +164,7 @@ if( isset($_POST["PB_ID"]) ) {
 	$week = $row["week"];
 
 	// Перенаправление в журнал чек листов оператора
-	exit ('<meta http-equiv="refresh" content="0; url=/filling.php?week='.$week.'&#PB'.$_POST["PB_ID"].'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/filling.php?F_ID='.$_POST["F_ID"].'&week='.$week.'&#PB'.$_POST["PB_ID"].'">');
 }
 ///////////////////////////////////////////////////////
 ?>

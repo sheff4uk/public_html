@@ -12,6 +12,11 @@ if( !$_GET["week"] ) {
 	$row = mysqli_fetch_array($res);
 	$_GET["week"] = $row["week"];
 }
+
+// Если не выбран участок, берем из сессии
+if( !$_GET["F_ID"] ) {
+	$_GET["F_ID"] = $_SESSION['F_ID'];
+}
 ?>
 
 <!--Фильтр-->
@@ -19,6 +24,25 @@ if( !$_GET["week"] ) {
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
 		<a href="/filling.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Участок:</span>
+			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT F_ID
+						,f_name
+					FROM factory
+					ORDER BY F_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["F_ID"] == $_GET["F_ID"]) ? "selected" : "";
+					echo "<option value='{$row["F_ID"]}' {$selected}>{$row["f_name"]}</option>";
+				}
+				?>
+			</select>
+		</div>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Неделя:</span>
@@ -172,7 +196,8 @@ $query = "
 	JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 	LEFT JOIN list__CubeTest LCT24 ON LCT24.LB_ID = LB.LB_ID AND LCT24.delay = 24
 	LEFT JOIN list__CubeTest LCT72 ON LCT72.LB_ID = LB.LB_ID AND LCT72.delay = 72
-	WHERE PB.PB_ID IN (SELECT PB_ID FROM list__Batch WHERE YEARWEEK(batch_date, 1) LIKE '{$_GET["week"]}' GROUP BY PB_ID)
+	WHERE PB.F_ID = {$_GET["F_ID"]}
+		AND PB.PB_ID IN (SELECT PB_ID FROM list__Batch WHERE YEARWEEK(batch_date, 1) LIKE '{$_GET["week"]}' GROUP BY PB_ID)
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 	GROUP BY PB.PB_ID
 	ORDER BY PB.cycle, time

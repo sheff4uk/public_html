@@ -4,7 +4,8 @@ include_once "../checkrights.php";
 $max_batches = 40; // Максимально возможное число замесов
 $PB_ID = $_GET["PB_ID"];
 $query = "
-	SELECT PB.year
+	SELECT PB.F_ID
+		,PB.year
 		,PB.cycle
 		,PB.CW_ID
 		,PB.batches
@@ -29,6 +30,7 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
 
+$F_ID = $row["F_ID"];
 $year = $row["year"];
 $cycle = $row["cycle"];
 $batches = $row["batches"];
@@ -47,8 +49,8 @@ $sn_density = $row["sn_density"];
 $cs_density = $row["cs_density"];
 
 $html = "
-	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
 	<p style='display: none; text-align: center; font-size: 2em;'>Число замесов: <input type='number' name='fact_batches' id='rows' min='".($fact_batches ? $fact_batches : "1")."' max='{$max_batches}' value='".($fact_batches ? $fact_batches : $batches)."'></p>
+	<input type='hidden' name='F_ID' value='{$F_ID}'>
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
 	<input type='hidden' name='fillings' value='{$fillings}'>
 	<input type='hidden' name='per_batch' value='{$per_batch}'>
@@ -68,7 +70,16 @@ $query = "
 	SELECT LF.cassette
 	FROM list__Batch LB
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-	WHERE LB.PB_ID = (SELECT PB_ID FROM plan__Batch WHERE CW_ID = {$CW_ID} AND fact_batches > 0 AND PB_ID < {$PB_ID} ORDER BY PB_ID DESC LIMIT 1)
+	WHERE LB.PB_ID = (
+		SELECT PB_ID
+		FROM plan__Batch
+		WHERE CW_ID = {$CW_ID}
+			AND F_ID = {$F_ID}
+			AND fact_batches > 0
+			AND PB_ID < {$PB_ID}
+		ORDER BY PB_ID DESC
+		LIMIT 1
+	)
 	ORDER BY LF.cassette
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -97,6 +108,7 @@ $query = "
 		,COUNT(MF.water) wt_cnt
 	FROM MixFormula MF
 	WHERE MF.CW_ID = {$CW_ID}
+		AND MF.F_ID = {$F_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
@@ -215,7 +227,7 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 	// Номера кассет
 	$fillings_cell = '';
 	for ($j = 1; $j <= $fillings; $j++) {
-		$fillings_cell .= "<td rowspan='{$per_batch}'><input type='number' class='cassette' min='1' max='{$cassetts}' name='cassette[n_{$i}][{$j}]' style='width: 100%; background-color: coral;' required></td>";
+		$fillings_cell .= "<td rowspan='{$per_batch}'><input type='number' class='cassette' min='1' max='{$cassetts}' name='cassette[n_{$i}][{$j}]' style='width: 50px;' required></td>";
 	}
 	$fillings_cell .= "<td rowspan='{$per_batch}'><input type='number' min='0' max='{$in_cassette}' name='underfilling[n_{$i}]' style='width: 100%;' required></td>";
 

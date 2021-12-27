@@ -12,7 +12,8 @@ include "../config.php";
 $PB_ID = $_GET["PB_ID"];
 
 $query = "
-	SELECT PB.year
+	SELECT PB.F_ID
+		,PB.year
 		,PB.cycle
 		,PB.CW_ID
 		,PB.batches
@@ -29,6 +30,7 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
 
+$F_ID = $row["F_ID"];
 $batches = $row["batches"];
 $item = $row["item"];
 $year = $row["year"];
@@ -116,7 +118,16 @@ $query = "
 	SELECT LF.cassette
 	FROM list__Batch LB
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-	WHERE LB.PB_ID = (SELECT PB_ID FROM plan__Batch WHERE CW_ID = {$CW_ID} AND fact_batches > 0 AND PB_ID < {$PB_ID} ORDER BY PB_ID DESC LIMIT 1)
+	WHERE LB.PB_ID = (
+		SELECT PB_ID
+		FROM plan__Batch
+		WHERE CW_ID = {$CW_ID}
+			AND F_ID = {$F_ID}
+			AND fact_batches > 0
+			AND PB_ID < {$PB_ID}
+		ORDER BY PB_ID DESC
+		LIMIT 1
+	)
 	ORDER BY LF.cassette
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
