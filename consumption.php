@@ -66,13 +66,14 @@ if( !$_GET["date_to"] ) {
 			</select>
 		</div>
 
-		<div class="nowrap" style="margin-bottom: 10px;">
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
 			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
 			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
 			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
 		</div>
 
+<!--
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Код противовеса:</span>
 			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
@@ -110,6 +111,7 @@ if( !$_GET["date_to"] ) {
 				?>
 			</select>
 		</div>
+-->
 
 		<button style="float: right;">Фильтр</button>
 	</form>
