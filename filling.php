@@ -192,7 +192,7 @@ $query = "
 		,PB.cs_density
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID
+	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID
 	JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 	LEFT JOIN list__CubeTest LCT24 ON LCT24.LB_ID = LB.LB_ID AND LCT24.delay = 24
 	LEFT JOIN list__CubeTest LCT72 ON LCT72.LB_ID = LB.LB_ID AND LCT72.delay = 72
