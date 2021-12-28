@@ -1,8 +1,12 @@
 <?
 include "config.php";
-$title = 'План заливки';
+$title = 'Факт заливок';
 include "header.php";
-include "./forms/plan_batch_form.php";
+
+// Если не выбран участок, берем из сессии
+if( !$_GET["F_ID"] ) {
+	$_GET["F_ID"] = $_SESSION['F_ID'];
+}
 
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["date_from"] ) {
@@ -22,6 +26,25 @@ if( !$_GET["date_to"] ) {
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
 		<a href="/consumption.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Участок:</span>
+			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT F_ID
+						,f_name
+					FROM factory
+					ORDER BY F_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["F_ID"] == $_GET["F_ID"]) ? "selected" : "";
+					echo "<option value='{$row["F_ID"]}' {$selected}>{$row["f_name"]}</option>";
+				}
+				?>
+			</select>
+		</div>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
@@ -44,25 +67,6 @@ if( !$_GET["date_to"] ) {
 				while( $row = mysqli_fetch_array($res) ) {
 					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
 					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
-				}
-				?>
-			</select>
-		</div>
-
-		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Бренд:</span>
-			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
-				<option value=""></option>
-				<?
-				$query = "
-					SELECT CB.CB_ID, CB.brand
-					FROM ClientBrand CB
-					ORDER BY CB.CB_ID
-				";
-				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-				while( $row = mysqli_fetch_array($res) ) {
-					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
-					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
 				}
 				?>
 			</select>
@@ -130,7 +134,7 @@ $query = "
 		,SUM(PB.in_cassette) details
 	FROM list__Batch LB
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID AND PB.F_ID = {$_GET["F_ID"]}
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	WHERE LB.prod_day BETWEEN '{$_GET["date_from"]}' AND '{$_GET["date_to"]}'
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
