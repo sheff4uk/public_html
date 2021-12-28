@@ -14,6 +14,12 @@ $date_to = date("d.m.Y", strtotime($_GET["date_to"]));
 $date = date_create();
 $date_format = date_format($date, 'd.m.Y');
 
+// Название участка
+$query = "SELECT f_name FROM factory WHERE F_ID = {$_GET["F_ID"]}";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$f_name = $row["f_name"];
+
 echo "<title>Расход сырья {$date_format}</title>";
 ?>
 	<style type="text/css" media="print">
@@ -62,7 +68,13 @@ echo "<title>Расход сырья {$date_format}</title>";
 		<tr>
 			<th rowspan="1"><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
 			<th rowspan="1" style="font-size: 2em;">Расход сырья на производство продукции</th>
-			<th>Период: <n style="font-size: 1.5em;"><?=$date_from?> - <?=$date_to?></n></th>
+			<th style="position: relative;">
+				<span style="position: absolute; top: 0px; left: 5px;" class="nowrap">участок</span>
+				<n style="font-size: 2em;"><?=$f_name?></n></th>
+			<th style="position: relative;">
+				<span style="position: absolute; top: 0px; left: 5px;" class="nowrap">период</span>
+				<n style="font-size: 2em;"><?=$date_from?> - <?=$date_to?></n>
+			</th>
 		</tr>
 <!--
 		<tr>
@@ -125,7 +137,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 			FROM plan__Batch PB
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
-			WHERE 1
+			WHERE PB.F_ID = {$_GET["F_ID"]}
 				".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
 				".($_GET["date_to"] ? "AND LB.batch_date <= '{$_GET["date_to"]}'" : "")."
 			GROUP BY PB.CW_ID

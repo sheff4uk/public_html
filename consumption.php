@@ -3,6 +3,11 @@ include "config.php";
 $title = 'Расход сырья';
 include "header.php";
 
+// Если не выбран участок, берем из сессии
+if( !$_GET["F_ID"] ) {
+	$_GET["F_ID"] = $_SESSION['F_ID'];
+}
+
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["date_from"] ) {
 	$date = date_create('-6 days');
@@ -41,6 +46,25 @@ if( !$_GET["date_to"] ) {
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
 		<a href="/consumption.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Участок:</span>
+			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT F_ID
+						,f_name
+					FROM factory
+					ORDER BY F_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["F_ID"] == $_GET["F_ID"]) ? "selected" : "";
+					echo "<option value='{$row["F_ID"]}' {$selected}>{$row["f_name"]}</option>";
+				}
+				?>
+			</select>
+		</div>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
@@ -170,7 +194,7 @@ foreach ($_GET as &$value) {
 			FROM plan__Batch PB
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
-			WHERE 1
+			WHERE PB.F_ID = {$_GET["F_ID"]}
 				".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
 				".($_GET["date_to"] ? "AND LB.batch_date <= '{$_GET["date_to"]}'" : "")."
 				".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
@@ -243,7 +267,7 @@ foreach ($_GET as &$value) {
 	</tbody>
 </table>
 
-<div id="consumption_report_btn" title="Распечатать отчет за выбранный период"><a href="/printforms/consumtion_report.php?date_from=<?=$_GET["date_from"]?>&date_to=<?=$_GET["date_to"]?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
+<div id="consumption_report_btn" title="Распечатать отчет за выбранный период"><a href="/printforms/consumtion_report.php?F_ID=<?=$_GET["F_ID"]?>&date_from=<?=$_GET["date_from"]?>&date_to=<?=$_GET["date_to"]?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
 
 <script>
 	$(function() {
