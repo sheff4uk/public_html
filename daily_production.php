@@ -158,7 +158,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,PB.cycle
 		FROM list__Batch LB
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID AND PB.F_ID = {$_GET["F_ID"]}
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		WHERE 1
 			AND LB.prod_day = '{$row["prod_day"]}'
