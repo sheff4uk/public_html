@@ -161,7 +161,7 @@ $query = "
 		,SUM(ROUND(PB.batches * IFNULL(PB.fillings, MF.fillings) / IFNULL(PB.per_batch, MF.per_batch))) fillings
 		,SUM(ROUND(PB.batches * IFNULL(PB.fillings, MF.fillings) / IFNULL(PB.per_batch, MF.per_batch)) * IFNULL(PB.in_cassette, MF.in_cassette)) plan
 		,SUM(ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette) details
-		,IF(SUM(PB.batches) = SUM(PB.fact_batches), (SELECT TIMESTAMPDIFF(MINUTE, MIN(TIMESTAMP(batch_date, batch_time)), MAX(TIMESTAMP(batch_date, batch_time))) FROM list__Batch WHERE PB_ID IN (SELECT PB_ID FROM plan__Batch WHERE year = PB.year AND cycle = PB.cycle)), NULL) duration
+		,IF(SUM(PB.batches) = SUM(PB.fact_batches), (SELECT TIMESTAMPDIFF(MINUTE, MIN(TIMESTAMP(batch_date, batch_time)), MAX(TIMESTAMP(batch_date, batch_time))) FROM list__Batch WHERE PB_ID IN (SELECT PB_ID FROM plan__Batch WHERE F_ID = PB.F_ID AND year = PB.year AND cycle = PB.cycle)), NULL) duration
 
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
