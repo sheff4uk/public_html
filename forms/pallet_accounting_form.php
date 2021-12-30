@@ -17,8 +17,7 @@ if( isset($_POST["cnt"]) ) {
 		if( $_POST["incoming_ID"] ) { // Редактируем
 			$query = "
 				UPDATE pallet__Return
-				SET pr_date = '{$pr_date}'
-					,CB_ID = {$CB_ID}
+				SET CB_ID = {$CB_ID}
 					,PN_ID = {$PN_ID}
 					,pr_cnt = {$pr_cnt}
 					,pr_reject = {$pr_reject}
@@ -32,7 +31,8 @@ if( isset($_POST["cnt"]) ) {
 		else { // Добавляем
 			$query = "
 				INSERT INTO pallet__Return
-				SET pr_date = '{$pr_date}'
+				#SET pr_date = '{$pr_date}'
+				SET pr_date = CURRENT_DATE()
 					,CB_ID = {$CB_ID}
 					,PN_ID = {$PN_ID}
 					,pr_cnt = {$pr_cnt}
@@ -71,8 +71,7 @@ if( isset($_POST["cnt"]) ) {
 		if( $_POST["incoming_ID"] ) { // Редактируем
 			$query = "
 				UPDATE pallet__Arrival
-				SET pa_date = '{$pa_date}'
-					,PS_ID = {$PS_ID}
+				SET PS_ID = {$PS_ID}
 					,pa_cnt = {$pa_cnt}
 					,pa_reject = {$pa_reject}
 					,pallet_cost = {$pallet_cost}
@@ -86,7 +85,8 @@ if( isset($_POST["cnt"]) ) {
 		else { // Добавляем
 			$query = "
 				INSERT INTO pallet__Arrival
-				SET pa_date = '{$pa_date}'
+				#SET pa_date = '{$pa_date}'
+				SET pa_date = CURRENT_DATE()
 					,PS_ID = {$PS_ID}
 					,pa_cnt = {$pa_cnt}
 					,pa_reject = {$pa_reject}
@@ -125,7 +125,7 @@ if( isset($_POST["cnt"]) ) {
 			$query = "
 				UPDATE pallet__Disposal
 				SET PN_ID = {$PN_ID}
-					,pd_date = '{$pd_date}'
+					#,pd_date = '{$pd_date}'
 					,pd_cnt = -{$pd_cnt}
 				WHERE PD_ID = {$_POST["incoming_ID"]}
 			";
@@ -138,7 +138,8 @@ if( isset($_POST["cnt"]) ) {
 			$query = "
 				INSERT INTO pallet__Disposal
 				SET PN_ID = {$PN_ID}
-					,pd_date = '{$pd_date}'
+					#,pd_date = '{$pd_date}'
+					,pd_date = CURRENT_DATE()
 					,pd_cnt = -{$pd_cnt}
 			";
 			if( !mysqli_query( $mysqli, $query ) ) {
@@ -179,7 +180,7 @@ if( isset($_POST["pd_cnt"]) ) {
 			UPDATE pallet__Disposal
 			SET PN_ID = {$PN_ID}
 				,CB_ID = {$CB_ID}
-				,pd_date = '{$pd_date}'
+				#,pd_date = '{$pd_date}'
 				,pd_cnt = {$pd_cnt}
 			WHERE PD_ID = {$_POST["PD_ID"]}
 		";
@@ -193,7 +194,8 @@ if( isset($_POST["pd_cnt"]) ) {
 			INSERT INTO pallet__Disposal
 			SET PN_ID = {$PN_ID}
 				,CB_ID = {$CB_ID}
-				,pd_date = '{$pd_date}'
+				#,pd_date = '{$pd_date}'
+				,pd_date = CURRENT_DATE()
 				,pd_cnt = {$pd_cnt}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -241,7 +243,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
-						<th>Дата</th>
+<!--						<th>Дата</th>-->
 						<th>Источник</th>
 						<th class="pallet">Поддон</th>
 						<th>Кол-во поддонов</th>
@@ -251,7 +253,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td><input type="date" name="date" max="<?=date('Y-m-d')?>" required></td>
+<!--						<td><input type="date" name="date" max="<?=date('Y-m-d')?>" required></td>-->
 						<td>
 							<select name="source" style="width: 150px;" required>
 								<option value=""></option>
@@ -328,7 +330,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
-						<th>Дата</th>
+<!--						<th>Дата</th>-->
 						<th>Поддон</th>
 						<th>Субъект, ответственный за испорченные поддоны</th>
 						<th>Кол-во поддонов</th>
@@ -336,7 +338,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td><input type="date" max="<?=date('Y-m-d')?>" name="pd_date" required></td>
+<!--						<td><input type="date" max="<?=date('Y-m-d')?>" name="pd_date" required></td>-->
 						<td>
 							<select name="PN_ID" style="width: 200px;" required>
 								<option value=""></option>
@@ -405,7 +407,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				});
 
 				$('#pallet_incoming_form input[name="incoming_ID"]').val(incoming_ID);
-				$('#pallet_incoming_form input[name="date"]').val(incoming_data['date']);
+//				$('#pallet_incoming_form input[name="date"]').val(incoming_data['date']);
 				$('#pallet_incoming_form select[name="source"]').val(type + incoming_data['source']).trigger('change');
 				$('#pallet_incoming_form select[name="PN_ID"]').val(incoming_data['PN_ID']);
 				$('#pallet_incoming_form input[name="cnt"]').val(incoming_data['cnt']);
@@ -491,7 +493,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#pallet_disposal_form input[name="PD_ID"]').val(PD_ID);
 				$('#pallet_disposal_form select[name="PN_ID"]').val(PD_data['PN_ID']);
 				$('#pallet_disposal_form select[name="CB_ID"]').val(PD_data['CB_ID']);
-				$('#pallet_disposal_form input[name="pd_date"]').val(PD_data['pd_date']);
+//				$('#pallet_disposal_form input[name="pd_date"]').val(PD_data['pd_date']);
 				$('#pallet_disposal_form input[name="pd_cnt"]').val(PD_data['pd_cnt']);
 			}
 			// Иначе очищаем форму
