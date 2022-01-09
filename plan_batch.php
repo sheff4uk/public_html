@@ -216,8 +216,9 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		// Выводим общую ячейку с датой заливки
 		if( $last_cycle != $row["cycle"] ) {
-			$duration_div = intdiv(round($row["duration"] / 15), 4);
-			$duration_mod = round($row["duration"] / 15) % 4;
+			$duration = ($row["duration"] < 15 ? 15 : $row["duration"]);
+			$duration_div = intdiv(round($duration / 15), 4);
+			$duration_mod = round($duration / 15) % 4;
 
 			echo "<tr id='{$subrow["PB_ID"]}' item='{$subrow["item"]}' style='border-top: 2px solid #333;'>";
 			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h3>{$row["cycle"]}</h3><span class='nowrap'>{$row["week_range"]}</span><br>".($row["duration"] ? "Продолжительность: <b>".($duration_div > 0 ? $duration_div : "").($duration_mod == 1 ? "&frac14;" : ($duration_mod == 2 ? "&frac12;" : ($duration_mod == 3 ? "&frac34;" : "")))."</b>ч" : "")."</td>";
