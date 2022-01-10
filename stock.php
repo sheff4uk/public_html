@@ -3,11 +3,26 @@ include "config.php";
 $title = 'Склад противовесов';
 include "header.php";
 
+// Отсчитываем 30 рабочих дней назад
+$query = "
+	SELECT MIN(SUB.packed_date) date_from
+	FROM (
+		SELECT DATE(packed_time) packed_date
+		FROM list__PackingPallet
+		GROUP BY packed_date
+		ORDER BY packed_date DESC
+		LIMIT 30
+	) SUB
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$date_from = $row["date_from"];
+
 // Получаем список отгрузок и сохраняем в массив
 $query = "
 	SELECT shipment_time
 	FROM list__PackingPallet
-	WHERE packed_time > NOW() - INTERVAL 4 WEEK AND shipment_time IS NOT NULL
+	WHERE DATE(packed_time) >= '{$date_from}' AND shipment_time IS NOT NULL
 	GROUP BY shipment_time
 	ORDER BY shipment_time DESC
 ";
@@ -75,7 +90,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<tbody>
 		<?
 			$query = "
-				SELECT substr(CW.item, -3, 3) short_item
+				SELECT CW.item
 					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 18 HOUR AND NOW() - INTERVAL 0 HOUR, 1, 0)) day4
 					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 42 HOUR AND NOW() - INTERVAL 18 HOUR, 1, 0)) day3
 					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 66 HOUR AND NOW() - INTERVAL 42 HOUR, 1, 0)) day2
@@ -84,14 +99,14 @@ while( $row = mysqli_fetch_array($res) ) {
 					,SUM(1) total
 				FROM list__PackingPallet LPP
 				JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID AND CW.CB_ID = 2
-				WHERE LPP.packed_time > NOW() - INTERVAL 4 WEEK AND LPP.shipment_time IS NULL
+				WHERE DATE(LPP.packed_time) >= '{$date_from}' AND LPP.shipment_time IS NULL
 				GROUP BY LPP.CW_ID
 				ORDER BY LPP.CW_ID ASC
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
 				echo "<tr>";
-				echo "<td><b style='font-size: 1.5em; width: 60px; display: inline-block;'>{$row["short_item"]}</b></td>";
+				echo "<td><b style='font-size: 1.5em; width: 60px; display: inline-block;'>{$row["item"]}</b></td>";
 				echo "<td style='color: rgb(100,0,0);'>{$row["day4"]}</td>";
 				echo "<td style='color: rgb(150,0,0);'>{$row["day3"]}</td>";
 				echo "<td style='color: rgb(200,0,0);'>{$row["day2"]}</td>";
@@ -156,7 +171,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<?
 			$query = "
 				SELECT CW_ID
-					,substr(item,-3, 3) short_item
+					,item
 				FROM CounterWeight
 				WHERE CB_ID = 2
 				ORDER BY CW_ID
@@ -164,7 +179,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			$cw_arr = array();
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
-				echo "<th>{$row["short_item"]}</th>";
+				echo "<th>{$row["item"]}</th>";
 				$cw_arr[] = $row["CW_ID"];
 			}
 			?>
@@ -182,7 +197,7 @@ $query = "
 		,IF(IFNULL(LPP.shipment_time, NOW()) - INTERVAL 90 HOUR < LPP.packed_time, 0, 1) ready
 	FROM list__PackingPallet LPP
 	JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID AND CW.CB_ID = 2
-	WHERE LPP.packed_time > NOW() - INTERVAL 4 WEEK
+	WHERE DATE(LPP.packed_time) >= '{$date_from}'
 	ORDER BY LPP.packed_time DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
