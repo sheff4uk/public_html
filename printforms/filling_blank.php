@@ -153,7 +153,8 @@ $query = "
 		,COUNT(MF.plasticizer) pl_cnt
 		,COUNT(MF.water) wt_cnt
 	FROM MixFormula MF
-	WHERE MF.CW_ID = {$CW_ID}
+	WHERE MF.F_ID = {$F_ID}
+		AND MF.CW_ID = {$CW_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
