@@ -156,7 +156,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["reject_date_format"]?></td>
 		<td><?=$row["item"]?></td>
 		<td><?=($row["o_details"] > 0 ? $row["o_reject"] : "")?></td>
-		<td><?=($row["o_details"] > 0 ? round($row["o_reject"] / $row["o_details"] * 100, 1) : "")?></td>
+		<td><?=($row["o_details"] > 0 ? round($row["o_reject"] / $row["o_details"] * 100, 2) : "")?></td>
 		<td><?=($row["o_reject"] * $row["CBD"])?></td>
 	</tr>
 	<?
@@ -166,7 +166,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td></td>
 			<td>Итог:</td>
 			<td><?=($o_details > 0 ? $o_reject : "")?></td>
-			<td><?=($o_details > 0 ? round($o_reject / $o_details * 100, 1) : "")?></td>
+			<td><?=($o_details > 0 ? round($o_reject / $o_details * 100, 2) : "")?></td>
 			<td><?=$CBD?></td>
 		</tr>
 	</tbody>
