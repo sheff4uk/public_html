@@ -135,7 +135,7 @@ $query = "
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-	LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+	JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
@@ -166,7 +166,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 		WHERE LB.batch_date LIKE '{$row["batch_date"]}'
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
@@ -244,7 +244,7 @@ if( $filter ) {
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 		WHERE 1
 			".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
@@ -273,7 +273,7 @@ if( $filter ) {
 			JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-			LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+			JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 			LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 			WHERE 1
 				".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
