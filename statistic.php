@@ -138,8 +138,8 @@ $query = "
 	JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	WHERE 1
-		".($_GET["date_from"] ? "AND LO.opening_time >= '{$_GET["date_from"]}'" : "")."
-		".($_GET["date_to"] ? "AND LO.opening_time <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["date_from"] ? "AND DATE(LO.opening_time) >= '{$_GET["date_from"]}'" : "")."
+		".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	GROUP BY DATE(LO.opening_time)
@@ -259,12 +259,12 @@ if( $filter ) {
 		$query = "
 			SELECT CW.item
 				,PB.CW_ID
-				,IFNULL(SUM(LOD.not_spill), '-') not_spill
-				,IFNULL(SUM(LOD.crack), '-') crack
-				,IFNULL(SUM(LOD.crack_drying), '-') crack_drying
-				,IFNULL(SUM(LOD.chipped), '-') chipped
-				,IFNULL(SUM(LOD.def_form), '-') def_form
-				,IFNULL(SUM(LOD.def_assembly), '-') def_assembly
+				,IFNULL(SUM(LOD.not_spill), 0) not_spill
+				,IFNULL(SUM(LOD.crack), 0) crack
+				,IFNULL(SUM(LOD.crack_drying), 0) crack_drying
+				,IFNULL(SUM(LOD.chipped), 0) chipped
+				,IFNULL(SUM(LOD.def_form), 0) def_form
+				,IFNULL(SUM(LOD.def_assembly), 0) def_assembly
 				,SUM(1) cnt
 				,SUM(IF(o_interval(LO.LO_ID) < 24, (PB.in_cassette - LF.underfilling), NULL)) o_interval
 				#,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
