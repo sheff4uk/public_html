@@ -15,6 +15,12 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 		$_GET["date_to"] = date_format($date, 'Y-m-d');
 	}
 }
+
+// Если не выбран участок, берем из сессии
+if( !$_GET["F_ID"] ) {
+	$_GET["F_ID"] = $_SESSION['F_ID'];
+}
+
 //// Если в фильтре не установлена неделя, показываем текущую
 //if( !$_GET["week"] ) {
 //	$query = "SELECT YEARWEEK(CURDATE(), 1) week";
@@ -88,7 +94,7 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 				,24 delay
 				,CAST(CONCAT(LB.batch_date + INTERVAL 1 DAY, ' ', LB.batch_time) as datetime) test_date_time
 			FROM list__Batch LB
-			JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+			JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID AND PB.F_ID = {$_GET["F_ID"]}
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 24
 			WHERE LB.test = 1
@@ -107,7 +113,7 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 				,72 delay
 				,CAST(CONCAT(LB.batch_date + INTERVAL 3 DAY, ' ', LB.batch_time) as datetime) test_date_time
 			FROM list__Batch LB
-			JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+			JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID AND PB.F_ID = {$_GET["F_ID"]}
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			LEFT JOIN list__CubeTest LCT ON LCT.LB_ID = LB.LB_ID AND LCT.delay = 72
 			WHERE LB.test = 1
@@ -145,6 +151,25 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 		<a href="/cubetest.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Участок:</span>
+			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT F_ID
+						,f_name
+					FROM factory
+					ORDER BY F_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["F_ID"] == $_GET["F_ID"]) ? "selected" : "";
+					echo "<option value='{$row["F_ID"]}' {$selected}>{$row["f_name"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 200px;">Дата испытания между:</span>
 			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
 			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
@@ -169,25 +194,6 @@ if( !$_GET["batch_date_from"] and !$_GET["batch_date_to"] ) {
 				while( $row = mysqli_fetch_array($res) ) {
 					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
 					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
-				}
-				?>
-			</select>
-		</div>
-
-		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Бренд:</span>
-			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
-				<option value=""></option>
-				<?
-				$query = "
-					SELECT CB.CB_ID, CB.brand
-					FROM ClientBrand CB
-					ORDER BY CB.CB_ID
-				";
-				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-				while( $row = mysqli_fetch_array($res) ) {
-					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
-					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
 				}
 				?>
 			</select>
@@ -277,7 +283,7 @@ $query = "
 		,DATE_FORMAT(LCT.last_edit, '%d.%m.%Y в %H:%i:%s') last_edit
 	FROM list__CubeTest LCT
 	JOIN list__Batch LB ON LB.LB_ID = LCT.LB_ID
-	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID AND PB.F_ID = {$_GET["F_ID"]}
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND LCT.test_date >= '{$_GET["date_from"]}'" : "")."
