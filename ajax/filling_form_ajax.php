@@ -235,7 +235,7 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 		<tr class='batch_row' num='{$i}'>
 			<td style='text-align: center; font-size: 1.2em;'>{$i}</td>
 			<td><input type='datetime-local' name='batch_time[n_{$i}]' style='width: 100%;' required></td>
-			<td><input type='number' min='2' max='4' step='0.01' name='mix_density[n_{$i}]' style='width: 100%;' required></td>
+			<td><input type='number' min='2' max='5.5' step='0.01' name='mix_density[n_{$i}]' style='width: 100%;' required></td>
 			<td><input type='number' min='5' max='45' name='temp[n_{$i}]' style='width: 100%;' required></td>
 			".($row["sf_cnt"] ? "<td style='background: #7952eb88;'><input type='number' min='0' name='s_fraction[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["lf_cnt"] ? "<td style='background: #51d5d788;'><input type='number' min='0' name='l_fraction[n_{$i}]' style='width: 100%;' required></td>" : "")."
