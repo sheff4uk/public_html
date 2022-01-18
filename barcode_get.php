@@ -184,7 +184,7 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 				}
 				////////////////////////////////////////////////////////////
 
-				// Предупреждаем если долго нет данных по замесам
+				// Предупреждаем если долго нет данных по заливкам
 				$query = "
 					SELECT PB.cycle
 						,CW.item
@@ -193,6 +193,7 @@ if( $ip == $from_ip and strlen($bc) >= 8 ) {
 					WHERE PB.print_time + INTERVAL 24 hour < NOW()
 						AND PB.batches > 0
 						AND PB.fact_batches = 0
+						AND PB.F_ID = 1
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
