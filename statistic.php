@@ -21,7 +21,7 @@ if( !$_GET["date_to"] ) {
 		<a href="/statistic.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
-			<span style="display: inline-block; width: 200px;">Дата между:</span>
+			<span style="display: inline-block; width: 200px;">Дата заливки между:</span>
 			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
 			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
 			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
@@ -97,9 +97,9 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th>Дата расформовки</th>
+			<th>Дата заливки</th>
 			<th>Код противовеса</th>
-			<th>Кол-во кассет</th>
+			<th>Кол-во заливок</th>
 			<th>Ранняя расформовка</th>
 <!--			<th>Несоответствие по весу</th>-->
 			<th>Непролив</th>
@@ -116,10 +116,10 @@ foreach ($_GET as &$value) {
 	<tbody style="text-align: center;">
 
 <?
-// Получаем список дат и список расформованных деталей на эти даты
+// Получаем список дат и список залитых деталей на эти даты
 $query = "
-	SELECT DATE(LO.opening_time) opening_date
-		,DATE_FORMAT(LO.opening_time, '%d.%m.%Y') date
+	SELECT LB.batch_date
+		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') date
 		,COUNT(distinct(PB.CW_ID)) item_cnt
 		,SUM(IFNULL(LOD.not_spill,0)) not_spill
 		,SUM(IFNULL(LOD.crack,0)) crack
@@ -138,12 +138,12 @@ $query = "
 	JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	WHERE 1
-		".($_GET["date_from"] ? "AND DATE(LO.opening_time) >= '{$_GET["date_from"]}'" : "")."
-		".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
+		".($_GET["date_to"] ? "AND LB.batch_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-	GROUP BY DATE(LO.opening_time)
-	ORDER BY DATE(LO.opening_time) DESC
+	GROUP BY LB.batch_date
+	ORDER BY LB.batch_date DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -168,15 +168,15 @@ while( $row = mysqli_fetch_array($res) ) {
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
-		WHERE DATE(LO.opening_time) LIKE '{$row["opening_date"]}'
+		WHERE LB.batch_date LIKE '{$row["batch_date"]}'
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-		GROUP BY PB.CW_ID
-		ORDER BY PB.CW_ID
+		GROUP BY LB.batch_date, PB.CW_ID
+		ORDER BY LB.batch_date DESC, PB.CW_ID
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
-		// Выводим общую ячейку с датой расформовки
+		// Выводим общую ячейку с датой заливки
 		if( $item_cnt ) {
 			$item_cnt++;
 			echo "<tr style='border-top: 2px solid #333;'>";
@@ -247,8 +247,8 @@ if( $filter ) {
 		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 		WHERE 1
-			".($_GET["date_from"] ? "AND DATE(LO.opening_time) >= '{$_GET["date_from"]}'" : "")."
-			".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."
+			".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
+			".($_GET["date_to"] ? "AND LB.batch_date <= '{$_GET["date_to"]}'" : "")."
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	";
@@ -259,12 +259,12 @@ if( $filter ) {
 		$query = "
 			SELECT CW.item
 				,PB.CW_ID
-				,IFNULL(SUM(LOD.not_spill), 0) not_spill
-				,IFNULL(SUM(LOD.crack), 0) crack
-				,IFNULL(SUM(LOD.crack_drying), 0) crack_drying
-				,IFNULL(SUM(LOD.chipped), 0) chipped
-				,IFNULL(SUM(LOD.def_form), 0) def_form
-				,IFNULL(SUM(LOD.def_assembly), 0) def_assembly
+				,IFNULL(SUM(LOD.not_spill), '-') not_spill
+				,IFNULL(SUM(LOD.crack), '-') crack
+				,IFNULL(SUM(LOD.crack_drying), '-') crack_drying
+				,IFNULL(SUM(LOD.chipped), '-') chipped
+				,IFNULL(SUM(LOD.def_form), '-') def_form
+				,IFNULL(SUM(LOD.def_assembly), '-') def_assembly
 				,SUM(1) cnt
 				,SUM(IF(o_interval(LO.LO_ID) < 24, (PB.in_cassette - LF.underfilling), NULL)) o_interval
 				#,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -276,8 +276,8 @@ if( $filter ) {
 			JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 			LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 			WHERE 1
-				".($_GET["date_from"] ? "AND DATE(LO.opening_time) >= '{$_GET["date_from"]}'" : "")."
-				".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."
+				".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
+				".($_GET["date_to"] ? "AND LB.batch_date <= '{$_GET["date_to"]}'" : "")."
 				".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 				".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 			GROUP BY PB.CW_ID
