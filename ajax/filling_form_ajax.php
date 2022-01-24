@@ -21,6 +21,7 @@ $query = "
 		,PB.io_density
 		,PB.sn_density
 		,PB.cs_density
+		,PB.calcium
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID
@@ -47,6 +48,7 @@ $lf_density = $row["lf_density"];
 $io_density = $row["io_density"];
 $sn_density = $row["sn_density"];
 $cs_density = $row["cs_density"];
+$calcium = $row["calcium"];
 
 $html = "
 	<p style='display: none; text-align: center; font-size: 2em;'>Число замесов: <input type='number' name='fact_batches' id='rows' min='".($fact_batches ? $fact_batches : "1")."' max='{$max_batches}' value='".($fact_batches ? $fact_batches : $batches)."'></p>
@@ -128,7 +130,7 @@ $html .= "
 				".($row["cs_cnt"] ? "<th>Отсев, кг</th>" : "")."
 				".($row["cm_cnt"] ? "<th rowspan='2'>Цемент, кг</th>" : "")."
 				".($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор, кг</th>" : "")."
-				".($row["wt_cnt"] ? "<th rowspan='2'>Вода, кг</th>" : "")."
+				".($row["wt_cnt"] ? "<th>Вода, кг</th>" : "")."
 				<th rowspan='3' colspan='{$fillings}' width='".($fillings * 50)."'>№ кассеты</th>
 				<th rowspan='3' width='50'>Недолив</th>
 				<th rowspan='3' width='30'><i class='fas fa-cube' title='Испытание куба'></i></th>
@@ -139,6 +141,7 @@ $html .= "
 				".($row["io_cnt"] ? "<th><input type='number' min='2' max='3' step='0.01' value='".($io_density/1000)."' name='io_density' style='width: 100%; background-color: #a52a2a80;' ></th>" : "")."
 				".($row["sn_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($sn_density/1000)."' name='sn_density' style='width: 100%; background-color: #f4a46082;' ></th>" : "")."
 				".($row["cs_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($cs_density/1000)."' name='cs_density' style='width: 100%; background-color: #8b45137a;' ></th>" : "")."
+				<th><input type='number' min='0' max='100' value='".($calcium)."' name='calcium' style='width: 100%; background-color: #1e90ff85;' required></th>
 			</tr>
 			<tr>
 				<th class='nowrap'>{$spec}</th>

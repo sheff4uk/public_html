@@ -128,6 +128,7 @@ if( isset($_POST["PB_ID"]) ) {
 		$io_density = $_POST["io_density"] ? $_POST["io_density"]*1000 : "NULL";
 		$sn_density = $_POST["sn_density"] ? $_POST["sn_density"]*1000 : "NULL";
 		$cs_density = $_POST["cs_density"] ? $_POST["cs_density"]*1000 : "NULL";
+		$calcium = $_POST["calcium"];
 
 		$query = "
 			UPDATE plan__Batch
@@ -140,6 +141,7 @@ if( isset($_POST["PB_ID"]) ) {
 				,io_density = {$io_density}
 				,sn_density = {$sn_density}
 				,cs_density = {$cs_density}
+				,calcium = {$calcium}
 			WHERE PB_ID = {$_POST["PB_ID"]}
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
