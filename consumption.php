@@ -191,7 +191,7 @@ foreach ($_GET as &$value) {
 				,SUM(LB.crushed_stone) crushed_stone
 				,SUM(LB.cement) cement
 				,SUM(LB.plasticizer) * 1000 / 10 plasticizer
-				,CW.drawing_volume * CW.calcium calcium
+				,SUM(LB.water * PB.calcium) calcium
 				,CW.reinforcement
 			FROM plan__Batch PB
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -214,7 +214,7 @@ foreach ($_GET as &$value) {
 			$crushed_stone += $row["crushed_stone"];
 			$cement += $row["cement"];
 			$plasticizer += $row["plasticizer"];
-			$calcium += $row["calcium"] * $row["details"];
+			$calcium += $row["calcium"];
 			$reinforcement += $row["reinforcement"] * $row["details"];
 			?>
 			<tr>
@@ -234,8 +234,8 @@ foreach ($_GET as &$value) {
 				<td style="background: #70809088;"><?=number_format($row["cement"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #80800080;"><?=number_format($row["plasticizer"], 0, ',', ' ')?></td>
 				<td style="background: #80800080;"><?=number_format($row["plasticizer"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #c0c0c088;"><?=number_format($row["calcium"] * $row["details"] / 1000, 0, ',', ' ')?></td>
 				<td style="background: #c0c0c088;"><?=number_format($row["calcium"], 0, ',', ' ')?></td>
+				<td style="background: #c0c0c088;"><?=number_format($row["calcium"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #ffff6688;"><?=number_format($row["reinforcement"] * $row["details"] / 1000, 0, ',', ' ')?></td>
 				<td style="background: #ffff6688;"><?=number_format($row["reinforcement"], 0, ',', ' ')?></td>
 			</tr>
@@ -261,7 +261,7 @@ foreach ($_GET as &$value) {
 			<td></td>
 			<td><?=number_format($plasticizer, 0, ',', ' ')?></td>
 			<td></td>
-			<td><?=number_format($calcium/1000, 0, ',', ' ')?></td>
+			<td><?=number_format($calcium, 0, ',', ' ')?></td>
 			<td></td>
 			<td><?=number_format($reinforcement/1000, 0, ',', ' ')?></td>
 			<td></td>
