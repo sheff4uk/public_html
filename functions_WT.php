@@ -369,8 +369,16 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 					}
 					else {
 						// Иначе сторнируем
+//						$query = "
+//							DELETE FROM list__PackingPallet
+//							WHERE CW_ID = {$goodsID}
+//								AND WT_ID = {$deviceID}
+//							ORDER BY nextID DESC
+//							LIMIT 1
+//						";
 						$query = "
-							DELETE FROM list__PackingPallet
+							UPDATE list__PackingPallet
+							SET removal_time = '{$transactionDate}'
 							WHERE CW_ID = {$goodsID}
 								AND WT_ID = {$deviceID}
 							ORDER BY nextID DESC

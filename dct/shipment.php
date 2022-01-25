@@ -45,6 +45,7 @@ if( isset($_POST["lpp_id"]) ) {
 	$query = "
 		UPDATE list__PackingPallet
 		SET shipment_time = NOW()
+			,removal_time = NULL
 		WHERE LPP_ID IN ({$LPP_IDs}) AND shipment_time IS NULL
 	";
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

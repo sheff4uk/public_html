@@ -113,6 +113,35 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 					echo $goodsID." ";
 					echo $ReceiptNumber." ";
 					echo $AddrGoods."\r\n";
+//
+//					// Игнорируем недопустимый вес
+//					if( abs($netWeight) >= 7000 and abs($netWeight) <= 14000 ) {
+//						// Отмена регистрации
+//						if( $netWeight < 0 ) {
+//							$query = "
+//								DELETE FROM list__Weight_NBC
+//								WHERE weight = ABS({$netWeight})
+//									AND goodsID = {$goodsID}
+//									AND RN = {$ReceiptNumber}
+//								ORDER BY LW_ID DESC
+//								LIMIT 1
+//							";
+//							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//						}
+//						else {
+//							// Записываем в базу регистрацию
+//							$query = "
+//								INSERT INTO list__Weight_NBC
+//								SET weight = {$netWeight}
+//									,nextID = {$nextID}
+//									,WT_ID = {$deviceID}
+//									,weighing_time = '{$transactionDate}'
+//									,goodsID = {$goodsID}
+//									,RN = {$ReceiptNumber}
+//							";
+//							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//						}
+//					}
 				}
 				//Закрытие партии
 				elseif( $data[$i+10] == 71 ) {
@@ -165,21 +194,21 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 //	socket_close($socket);
 
 // Записываем текст терминала
-if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5020)) ) {
-	$in = "\xF8\x55\xCE\x19\x00\xAA".hex2bin(bin2hex("31/08/21 (1)            "));
-	$crc = crc16(byteStr2byteArray($in));
-	$in .= hex2bin($crc);
-
-	socket_write($socket, $in);
-
-	$result = socket_read($socket, 5);
-	$result = socket_read($socket, 1);
-	$result = bin2hex($result);
-	echo $result."\r\n";
-
-	socket_close($socket);
-}
-die();
+//if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5020)) ) {
+//	$in = "\xF8\x55\xCE\x19\x00\xAA".hex2bin(bin2hex("31/08/21 (1)            "));
+//	$crc = crc16(byteStr2byteArray($in));
+//	$in .= hex2bin($crc);
+//
+//	socket_write($socket, $in);
+//
+//	$result = socket_read($socket, 5);
+//	$result = socket_read($socket, 1);
+//	$result = bin2hex($result);
+//	echo $result."\r\n";
+//
+//	socket_close($socket);
+//}
+//die();
 /////////////////////////////
 
 if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5020)) ) {
@@ -196,7 +225,8 @@ if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect
 //	echo dechex($data[5])."\r\n";
 //	//echo $result;
 ////////////////////////////////////////
-	read_transaction(700, 1, $socket, $mysqli);
+	read_transaction(11200, 1, $socket, $mysqli);
+	//read_transaction(114735, 1, $socket, $mysqli);
 	socket_close($socket);
 }
 
