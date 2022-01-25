@@ -92,14 +92,14 @@ $html .= "<div style='width: 100%; border: 1px solid; padding: 10px;'><span>Ве
 
 // Данные рецепта
 $query = "
-	SELECT IFNULL(CONCAT(MF.s_fraction, ' ±5'), 0) s_fraction
-		,IFNULL(CONCAT(MF.l_fraction, ' ±5'), 0) l_fraction
-		,IFNULL(CONCAT(MF.iron_oxide, ' ±5'), 0) iron_oxide
-		,IFNULL(CONCAT(MF.sand, ' ±5'), 0) sand
-		,IFNULL(CONCAT(MF.crushed_stone, ' ±5'), 0) crushed_stone
-		,IFNULL(CONCAT(MF.cement, ' ±2'), 0) cement
-		,IFNULL(CONCAT(MF.plasticizer, ' ±0.1'), 0) plasticizer
-		,IFNULL(CONCAT('min ', MF.water), 0) water
+	SELECT IFNULL(MF.s_fraction, 0) s_fraction
+		,IFNULL(MF.l_fraction, 0) l_fraction
+		,IFNULL(MF.iron_oxide, 0) iron_oxide
+		,IFNULL(MF.sand, 0) sand
+		,IFNULL(MF.crushed_stone, 0) crushed_stone
+		,IFNULL(MF.cement, 0) cement
+		,IFNULL(MF.plasticizer, 0) plasticizer
+		,IFNULL(MF.water, 0) water
 		,COUNT(MF.s_fraction) sf_cnt
 		,COUNT(MF.l_fraction) lf_cnt
 		,COUNT(MF.iron_oxide) io_cnt

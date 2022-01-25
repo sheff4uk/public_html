@@ -136,13 +136,13 @@ while( $row = mysqli_fetch_array($res) ) {
 }
 // Данные рецепта
 $query = "
-	SELECT IFNULL(CONCAT(MF.s_fraction, ' ±5 кг'), 0) s_fraction
-		,IFNULL(CONCAT(MF.l_fraction, ' ±5 кг'), 0) l_fraction
-		,IFNULL(CONCAT(MF.iron_oxide, ' ±5 кг'), 0) iron_oxide
-		,IFNULL(CONCAT(MF.sand, ' ±5 кг'), 0) sand
-		,IFNULL(CONCAT(MF.crushed_stone, ' ±5 кг'), 0) crushed_stone
-		,IFNULL(CONCAT(MF.cement, ' ±2 кг'), 0) cement
-		,IFNULL(CONCAT(MF.plasticizer, ' ±0.1 кг'), 0) plasticizer
+	SELECT IFNULL(CONCAT(MF.s_fraction, ' кг'), 0) s_fraction
+		,IFNULL(CONCAT(MF.l_fraction, ' кг'), 0) l_fraction
+		,IFNULL(CONCAT(MF.iron_oxide, ' кг'), 0) iron_oxide
+		,IFNULL(CONCAT(MF.sand, ' кг'), 0) sand
+		,IFNULL(CONCAT(MF.crushed_stone, ' кг'), 0) crushed_stone
+		,IFNULL(CONCAT(MF.cement, ' кг'), 0) cement
+		,IFNULL(CONCAT(MF.plasticizer, ' кг'), 0) plasticizer
 		,IFNULL(CONCAT('min ', MF.water, ' л'), 0) water
 		,COUNT(MF.s_fraction) sf_cnt
 		,COUNT(MF.l_fraction) lf_cnt

@@ -156,13 +156,13 @@ foreach ($_GET as &$value) {
 			<th>Дата время замеса</th>
 			<th>Куб раствора, кг</th>
 			<th>t, ℃ 22±8</th>
-			<th>Мелкая дробь,<br>кг ±5</th>
-			<th>Крупная дробь,<br>кг ±5</th>
-			<th>Окалина,<br>кг ±5</th>
-			<th>КМП,<br>кг ±5</th>
-			<th>Отсев,<br>кг ±5</th>
-			<th>Цемент,<br>кг ±2</th>
-			<th>Пластификатор,<br>кг ±0.1</th>
+			<th>Мелкая дробь,<br>кг</th>
+			<th>Крупная дробь,<br>кг</th>
+			<th>Окалина,<br>кг</th>
+			<th>КМП,<br>кг</th>
+			<th>Отсев,<br>кг</th>
+			<th>Цемент,<br>кг</th>
+			<th>Пластификатор,<br>кг</th>
 			<th>Вода, л</th>
 			<th colspan="2">№ кассеты</th>
 			<th>Недолив</th>
@@ -260,14 +260,14 @@ while( $row = mysqli_fetch_array($res) ) {
 			,SUM(LF.underfilling) underfilling
 			,LB.test
 			,mix_diff({$row["CW_ID"]}, LB.mix_density) mix_diff
-			,mix_sf_diff({$row["MF_ID"]}, LB.s_fraction) sf_diff
-			,mix_lf_diff({$row["MF_ID"]}, LB.l_fraction) lf_diff
-			,mix_io_diff({$row["MF_ID"]}, LB.iron_oxide) io_diff
-			,mix_sn_diff({$row["MF_ID"]}, LB.sand) sn_diff
-			,mix_cs_diff({$row["MF_ID"]}, LB.crushed_stone) cs_diff
-			,mix_cm_diff({$row["MF_ID"]}, LB.cement) cm_diff
-			,mix_pl_diff({$row["MF_ID"]}, LB.plasticizer) pl_diff
-			,mix_wt_diff({$row["MF_ID"]}, LB.water) wt_diff
+			#,mix_sf_diff({$row["MF_ID"]}, LB.s_fraction) sf_diff
+			#,mix_lf_diff({$row["MF_ID"]}, LB.l_fraction) lf_diff
+			#,mix_io_diff({$row["MF_ID"]}, LB.iron_oxide) io_diff
+			#,mix_sn_diff({$row["MF_ID"]}, LB.sand) sn_diff
+			#,mix_cs_diff({$row["MF_ID"]}, LB.crushed_stone) cs_diff
+			#,mix_cm_diff({$row["MF_ID"]}, LB.cement) cm_diff
+			#,mix_pl_diff({$row["MF_ID"]}, LB.plasticizer) pl_diff
+			#,mix_wt_diff({$row["MF_ID"]}, LB.water) wt_diff
 		FROM plan__Batch PB
 		JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 		LEFT JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
