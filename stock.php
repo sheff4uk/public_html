@@ -99,7 +99,9 @@ while( $row = mysqli_fetch_array($res) ) {
 					,SUM(1) total
 				FROM list__PackingPallet LPP
 				JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID AND CW.CB_ID = 2
-				WHERE DATE(LPP.packed_time) >= '{$date_from}' AND LPP.shipment_time IS NULL
+				WHERE DATE(LPP.packed_time) >= '{$date_from}'
+					AND LPP.shipment_time IS NULL
+					AND LPP.removal_time IS NULL
 				GROUP BY LPP.CW_ID
 				ORDER BY LPP.CW_ID ASC
 			";
@@ -140,9 +142,11 @@ while( $row = mysqli_fetch_array($res) ) {
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
+				$diff = (strtotime($last_shipment_time) - strtotime($row["shipment_time"])) / 1000;
 				echo "<tr>";
-				echo "<td class='shipment'>{$row["shipment_time_format"]}</td>";
+				echo "<td class='shipment' style='border-top: {$diff}px solid #bbb;'>{$row["shipment_time_format"]} {$diff}</td>";
 				echo "<tr>";
+				$last_shipment_time = $row["shipment_time"];
 			}
 		?>
 		</tbody>
@@ -191,6 +195,7 @@ while( $row = mysqli_fetch_array($res) ) {
 $query = "
 	SELECT DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i') packed_time_format
 		,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
+		,DATE_FORMAT(LPP.removal_time, '%d.%m.%Y %H:%i') removal_time_format
 		,LPP.nextID
 		,LPP.CW_ID
 		,LPP.shipment_time
@@ -202,11 +207,11 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	echo "<tr class='pallet_row' shipment_time='{$row["shipment_time_format"]}'>";
+	echo "<tr id='{$row["nextID"]}' class='pallet_row' ".($row["removal_time_format"] ? "style='text-decoration: line-through;'" : "")." shipment_time='{$row["shipment_time_format"]}'>";
 	echo "<td>{$row["packed_time_format"]}</td>";
 	foreach ( $cw_arr as $value ) {
 		if( $value == $row["CW_ID"] ) {
-			echo "<td style='background-color: ".($row["shipment_time"] ? "rgb(0,128,0,.{$shipment_arr[$row["shipment_time"]]});" : "orange;").($row["ready"] ? "" : "border-left: 6px solid red;")."'><b>{$row["nextID"]}</b><br>{$row["shipment_time_format"]}</td>";
+			echo "<td style='background-color: ".($row["shipment_time"] ? "rgb(0,128,0,.{$shipment_arr[$row["shipment_time"]]});" : ($row["removal_time_format"] ? "gray;" : "orange;")).($row["ready"] || $row["removal_time_format"] ? "" : "border-left: 6px solid red;")."'><b>{$row["nextID"]}</b>&nbsp;".($row["removal_time_format"] ? "<font color='red'><i class='fa fa-undo'></i></font>" : "<font color='red'><i class='fa fa-times'></i></font>")."<br>{$row["shipment_time_format"]}</td>";
 		}
 		else {
 			echo "<td></td>";
