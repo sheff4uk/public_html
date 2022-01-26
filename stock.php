@@ -142,9 +142,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
-				$diff = (strtotime($last_shipment_time) - strtotime($row["shipment_time"])) / 10000;
+				$diff = strtotime($last_shipment_time) - strtotime($row["shipment_time"]);
 				echo "<tr>";
-				echo "<td class='shipment' style='border-top: {$diff}px solid #bbb;'>{$row["shipment_time_format"]}</td>";
+				echo "<td class='shipment' ".($diff > 36000 ? "style='border-top: 2px solid #000;'" : "").">{$row["shipment_time_format"]}</td>";
 				echo "<tr>";
 				$last_shipment_time = $row["shipment_time"];
 			}
