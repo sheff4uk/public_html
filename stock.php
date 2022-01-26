@@ -3,6 +3,42 @@ include "config.php";
 $title = 'Склад противовесов';
 include "header.php";
 
+$page = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+
+//Удаление регистрации поддона
+if( isset($_GET["remove"]) ) {
+	session_start();
+	$LPP_ID = $_GET["remove"];
+
+	$query = "
+		UPDATE list__PackingPallet
+		SET removal_time = NOW()
+		WHERE LPP_ID = {$LPP_ID}
+			AND scan_time IS NULL
+			AND shipment_time IS NULL
+	";
+	mysqli_query( $mysqli, $query );
+
+	// Перенаправление в план
+	exit ('<meta http-equiv="refresh" content="0; url='.$page.'#'.$LPP_ID.'">');
+}
+
+//Удаление регистрации поддона
+if( isset($_GET["undo"]) ) {
+	session_start();
+	$LPP_ID = $_GET["undo"];
+
+	$query = "
+		UPDATE list__PackingPallet
+		SET removal_time = NULL
+		WHERE LPP_ID = {$LPP_ID}
+	";
+	mysqli_query( $mysqli, $query );
+
+	// Перенаправление в план
+	exit ('<meta http-equiv="refresh" content="0; url='.$page.'#'.$LPP_ID.'">');
+}
+
 // Отсчитываем 30 рабочих дней назад
 $query = "
 	SELECT MIN(SUB.packed_date) date_from
@@ -155,6 +191,31 @@ while( $row = mysqli_fetch_array($res) ) {
 
 <script>
 	$(function() {
+		// Подтверждение удаления регистрации поддона
+		$(".fa-times")
+			.click(function(){
+				var id = $(this).parents("tr").attr("id"),
+					nextID = $(this).parents("td").attr("nextID");
+					item = $(this).parents("td").attr("item");
+				confirm(
+					"<span style='font-size: 1.2em;'>Подтвердите <font color='red'>удаление</font> регистрации с номером <b>" + nextID + "</b> (протевовес <b>" + item + "</b>).</span>",
+					"<?=$page?>?remove=" + id
+				);
+			});
+
+		// Подтверждение восстановления регистрации поддона
+		$(".fa-undo")
+			.click(function(){
+				var id = $(this).parents("tr").attr("id"),
+					nextID = $(this).parents("td").attr("nextID");
+					item = $(this).parents("td").attr("item");
+				confirm(
+					"<span style='font-size: 1.2em;'>Подтвердите <font color='green'>восстановление</font> регистрации с номером <b>" + nextID + "</b> (протевовес <b>" + item + "</b>).</span>",
+					"<?=$page?>?undo=" + id
+				);
+			});
+
+		// При наведении строка раскрывается
 		$('.shipment').hover(
 			function() {
 				var shipment_time = $(this).html();
@@ -193,11 +254,13 @@ while( $row = mysqli_fetch_array($res) ) {
 
 <?
 $query = "
-	SELECT DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i') packed_time_format
+	SELECT LPP.LPP_ID
+		,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i') packed_time_format
 		,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
 		,DATE_FORMAT(LPP.removal_time, '%d.%m.%Y %H:%i') removal_time_format
 		,LPP.nextID
 		,LPP.CW_ID
+		,CW.item
 		,LPP.shipment_time
 		,IF(IFNULL(LPP.shipment_time, NOW()) - INTERVAL 90 HOUR < LPP.packed_time, 0, 1) ready
 	FROM list__PackingPallet LPP
@@ -207,11 +270,11 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
-	echo "<tr id='{$row["nextID"]}' class='pallet_row' ".($row["removal_time_format"] ? "style='text-decoration: line-through;'" : "")." shipment_time='{$row["shipment_time_format"]}'>";
+	echo "<tr id='{$row["LPP_ID"]}' class='pallet_row' ".($row["removal_time_format"] ? "style='text-decoration: line-through;'" : "")." shipment_time='{$row["shipment_time_format"]}'>";
 	echo "<td>{$row["packed_time_format"]}</td>";
 	foreach ( $cw_arr as $value ) {
 		if( $value == $row["CW_ID"] ) {
-			echo "<td style='background-color: ".($row["shipment_time"] ? "rgb(0,128,0,.{$shipment_arr[$row["shipment_time"]]});" : ($row["removal_time_format"] ? "gray;" : "orange;")).($row["ready"] || $row["removal_time_format"] ? "" : "border-left: 6px solid red;")."'><b>{$row["nextID"]}</b>&nbsp;".($row["removal_time_format"] ? "<font color='red'><i class='fa fa-undo'></i></font>" : "<font color='red'><i class='fa fa-times'></i></font>")."<br>{$row["shipment_time_format"]}</td>";
+			echo "<td nextID='{$row["nextID"]}' item='{$row["item"]}' style='background-color: ".($row["shipment_time"] ? "rgb(0,128,0,.{$shipment_arr[$row["shipment_time"]]});" : ($row["removal_time_format"] ? "gray;" : "orange;")).($row["ready"] || $row["removal_time_format"] ? "" : "border-left: 6px solid red;")."'><b>{$row["nextID"]}</b>&nbsp;".($row["shipment_time_format"] ? "" : ($row["removal_time_format"] ? "<font color='red'><i class='fa fa-undo'></i></font>" : "<font color='red'><i class='fa fa-times'></i></font>"))."<br>{$row["shipment_time_format"]}</td>";
 		}
 		else {
 			echo "<td></td>";
