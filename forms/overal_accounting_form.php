@@ -11,6 +11,7 @@ if( isset($_POST["oa_cnt"]) ) {
 			SET oa_date = '{$_POST["oa_date"]}'
 				,OI_ID = {$_POST["OI_ID"]}
 				,oa_cnt = {$_POST["oa_cnt"]} * {$_POST["sign"]}
+				,correction = ".($_POST["correction"] ? "1" : "NULL")."
 			WHERE OA_ID = {$_POST["OA_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -24,6 +25,7 @@ if( isset($_POST["oa_cnt"]) ) {
 			SET oa_date = '{$_POST["oa_date"]}'
 				,OI_ID = {$_POST["OI_ID"]}
 				,oa_cnt = {$_POST["oa_cnt"]} * {$_POST["sign"]}
+				,correction = ".($_POST["correction"] ? "1" : "NULL")."
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -65,6 +67,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Дата выдачи</th>
 						<th>Наименование СИЗ</th>
 						<th>Количество</th>
+						<th>Корректировка</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -88,6 +91,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							</select>
 						</td>
 						<td><input type="number" name="oa_cnt" min="1" style="width: 70px;" required></td>
+						<td><input type="checkbox" name="correction" value="1"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -114,6 +118,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Дата поступления</th>
 						<th>Наименование СИЗ</th>
 						<th>Количество</th>
+						<th>Корректировка</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -137,6 +142,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							</select>
 						</td>
 						<td><input type="number" name="oa_cnt" min="1" style="width: 70px;" required></td>
+						<td><input type="checkbox" name="correction" value="1"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -171,12 +177,15 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#outcoming_form input[name="oa_date"]').val(OA_data['oa_date']);
 				$('#outcoming_form select[name="OI_ID"]').val(OA_data['OI_ID']);
 				$('#outcoming_form input[name="oa_cnt"]').val(OA_data['oa_cnt']);
+				$('#outcoming_form input[name="correction"]').prop('checked', Number(OA_data['correction']));
 			}
 			// Иначе очищаем форму
 			else {
 				$('#outcoming_form input[name="OA_ID"]').val('');
-				$('#outcoming_form table input').val('');
+				$('#outcoming_form table input[name="oa_date"]').val('');
+				$('#outcoming_form table input[name="oa_cnt"]').val('');
 				$('#outcoming_form table select').val('');
+				$('#outcoming_form input[name="correction"]').prop('checked', 0);
 			}
 
 			$('#outcoming_form').dialog({
@@ -210,12 +219,15 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#incoming_form input[name="oa_date"]').val(OA_data['oa_date']);
 				$('#incoming_form select[name="OI_ID"]').val(OA_data['OI_ID']);
 				$('#incoming_form input[name="oa_cnt"]').val(OA_data['oa_cnt']);
+				$('#incoming_form input[name="correction"]').prop('checked', Number(OA_data['correction']));
 			}
 			// Иначе очищаем форму
 			else {
 				$('#incoming_form input[name="OA_ID"]').val('');
-				$('#incoming_form table input').val('');
+				$('#incoming_form table input[name="oa_date"]').val('');
+				$('#incoming_form table input[name="oa_cnt"]').val('');
 				$('#incoming_form table select').val('');
+				$('#incoming_form input[name="correction"]').prop('checked', 0);
 			}
 
 			$('#incoming_form').dialog({

@@ -137,8 +137,8 @@ $query = "
 	SELECT OA.OA_ID
 		,DATE_FORMAT(OA.oa_date, '%d.%m.%Y') date_format
 		,OI.overal
-		,IF(OA.oa_cnt > 0, OA.oa_cnt, NULL) incoming
-		,IF(OA.oa_cnt < 0, ABS(OA.oa_cnt), NULL) outcoming
+		,IF(OA.oa_cnt > 0, IF(OA.correction, CONCAT(OA.oa_cnt, ' (корректировка)'), OA.oa_cnt), NULL) incoming
+		,IF(OA.oa_cnt < 0, IF(OA.correction, CONCAT(ABS(OA.oa_cnt), ' (корректировка)'), ABS(OA.oa_cnt)), NULL) outcoming
 	FROM overal__Accounting OA
 	JOIN overal__Item OI ON OI.OI_ID = OA.OI_ID
 	WHERE 1
