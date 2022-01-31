@@ -158,7 +158,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 			$reinforcement += $row["reinforcement"] * $row["details"];
 			?>
 			<tr>
-				<td colspan="3"><b><?=$row["drawing_item"]?></b></td>
+				<td colspan="3"><b><?=$row["drawing_item"]?></b><br><i style="font-size: .8em;"><?=$row["item"]?></i></td>
 				<td><?=number_format($row["details"], 0, '', ' ')?></td>
 				<td><?=number_format($row["s_fraction"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["s_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
