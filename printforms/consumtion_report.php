@@ -132,8 +132,9 @@ echo "<title>Расход сырья {$date_format}</title>";
 				,SUM(LB.crushed_stone) crushed_stone
 				,SUM(LB.cement) cement
 				,SUM(LB.plasticizer) * 1000 / 10 plasticizer
-				,CW.drawing_volume * CW.calcium calcium
+				,SUM(LB.water * PB.calcium) calcium
 				,CW.reinforcement
+				,IF(PB.F_ID = 1, 1, 0) krv
 			FROM plan__Batch PB
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 			JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
@@ -153,7 +154,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 			$crushed_stone += $row["crushed_stone"];
 			$cement += $row["cement"] ? round($row["cement"] + 0.1 * $row["details"]) : 0;
 			$plasticizer += $row["plasticizer"];
-			$calcium += $row["calcium"] * $row["details"];
+			$calcium += $row["calcium"];
 			$reinforcement += $row["reinforcement"] * $row["details"];
 			?>
 			<tr>
@@ -165,16 +166,16 @@ echo "<title>Расход сырья {$date_format}</title>";
 				<td><?=number_format($row["l_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td><?=number_format($row["sand"] ? round($row["sand"] + 0.05 * $row["details"]) : 0, 0, ',', ' ')?></td>
-				<td><?=number_format($row["sand"] ? ($row["sand"] * 1000/$row["details"] + 50) : 0, 0, ',', ' ')?></td>
+				<td><?=number_format($row["sand"] ? round($row["sand"] + (0.05 * $row["krv"]) * $row["details"]) : 0, 0, ',', ' ')?></td>
+				<td><?=number_format($row["sand"] ? ($row["sand"] * 1000/$row["details"] + (50 * $row["krv"])) : 0, 0, ',', ' ')?></td>
 				<td><?=number_format($row["crushed_stone"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["crushed_stone"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td><?=number_format($row["cement"] ? round($row["cement"] + 0.1 * $row["details"]) : 0, 0, ',', ' ')?></td>
-				<td><?=number_format($row["cement"] ? ($row["cement"] * 1000/$row["details"] + 100) : 0, 0, ',', ' ')?></td>
+				<td><?=number_format($row["cement"] ? round($row["cement"] + (0.1 * $row["krv"]) * $row["details"]) : 0, 0, ',', ' ')?></td>
+				<td><?=number_format($row["cement"] ? ($row["cement"] * 1000/$row["details"] + (100 * $row["krv"])) : 0, 0, ',', ' ')?></td>
 				<td><?=number_format($row["plasticizer"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["plasticizer"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td><?=number_format($row["calcium"] * $row["details"] / 1000, 0, ',', ' ')?></td>
 				<td><?=number_format($row["calcium"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["calcium"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["reinforcement"] * $row["details"] / 1000, 3, ',', ' ')?></td>
 				<td><?=number_format($row["reinforcement"], 0, ',', ' ')?></td>
 			</tr>
@@ -199,7 +200,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<td></td>
 			<td><?=number_format($plasticizer, 0, ',', ' ')?></td>
 			<td></td>
-			<td><?=number_format($calcium/1000, 0, ',', ' ')?></td>
+			<td><?=number_format($calcium, 0, ',', ' ')?></td>
 			<td></td>
 			<td><?=number_format($reinforcement/1000, 3, ',', ' ')?></td>
 			<td></td>
