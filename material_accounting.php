@@ -22,11 +22,31 @@ if( !$_GET["date_to"] ) {
 	<form method="get" style="position: relative;">
 		<a href="/material_accounting.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
-		<div class="nowrap" style="margin-bottom: 10px;">
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span style="display: inline-block; width: 200px;">Дата приемки между:</span>
 			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
 			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
 			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
+		</div>
+
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>Участок:</span>
+			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT F_ID
+						,f_name
+					FROM factory
+					ORDER BY F_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["F_ID"] == $_GET["F_ID"]) ? "selected" : "";
+					echo "<option value='{$row["F_ID"]}' {$selected}>{$row["f_name"]}</option>";
+				}
+				?>
+			</select>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
@@ -139,6 +159,7 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th>Дата приемки</th>
+			<th>Участок</th>
 			<th>Наименование продукции</th>
 			<th>Поставщик</th>
 			<th>Перевозчик</th>
@@ -156,6 +177,7 @@ foreach ($_GET as &$value) {
 		$query = "
 			SELECT MA.MA_ID
 				,DATE_FORMAT(MA.ma_date,'%d.%m.%Y') ma_date_format
+				,F.f_name
 				,MN.material_name
 				,MS.supplier
 				,MC.carrier
@@ -166,10 +188,12 @@ foreach ($_GET as &$value) {
 				,MA.ma_cnt
 				,MA.ma_cost
 			FROM material__Arrival MA
+			JOIN factory F ON F.F_ID = MA.F_ID
 			JOIN material__Name MN ON MN.MN_ID = MA.MN_ID
 			JOIN material__Supplier MS ON MS.MS_ID = MA.MS_ID
 			LEFT JOIN material__Carrier MC ON MC.MC_ID = MA.MC_ID
 			WHERE 1
+				".($_GET["F_ID"] ? "AND MA.F_ID = '{$_GET["F_ID"]}'" : "")."
 				".($_GET["date_from"] ? "AND MA.ma_date >= '{$_GET["date_from"]}'" : "")."
 				".($_GET["date_to"] ? "AND MA.ma_date <= '{$_GET["date_to"]}'" : "")."
 				".($_GET["MN"] ? "AND MA.MN_ID = {$_GET["MN"]}" : "")."
@@ -188,6 +212,7 @@ foreach ($_GET as &$value) {
 			?>
 			<tr id="<?=$row["MA_ID"]?>">
 				<td><?=$row["ma_date_format"]?></td>
+				<td><?=$row["f_name"]?></td>
 				<td><span class="nowrap"><?=$row["material_name"]?></span></td>
 				<td><span class="nowrap"><?=$row["supplier"]?></span></td>
 				<td><span class="nowrap"><?=$row["carrier"]?></span></td>
@@ -204,6 +229,7 @@ foreach ($_GET as &$value) {
 		?>
 
 		<tr class="total">
+			<td></td>
 			<td></td>
 			<td></td>
 			<td></td>

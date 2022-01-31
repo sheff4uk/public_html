@@ -5,6 +5,7 @@ $MA_ID = $_GET["MA_ID"];
 
 $query = "
 	SELECT MA.ma_date
+		,MA.F_ID
 		,MA.MN_ID
 		,MA.MS_ID
 		,MA.MC_ID
@@ -19,7 +20,7 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
-$ma_data = array( "ma_date"=>$row["ma_date"], "MN_ID"=>$row["MN_ID"], "MS_ID"=>$row["MS_ID"], "MC_ID"=>$row["MC_ID"], "invoice_number"=>$row["invoice_number"], "car_number"=>$row["car_number"], "batch_number"=>$row["batch_number"], "certificate_number"=>$row["certificate_number"], "ma_cnt"=>$row["ma_cnt"], "ma_cost"=>$row["ma_cost"] );
+$ma_data = array( "ma_date"=>$row["ma_date"], "F_ID"=>$row["F_ID"], "MN_ID"=>$row["MN_ID"], "MS_ID"=>$row["MS_ID"], "MC_ID"=>$row["MC_ID"], "invoice_number"=>$row["invoice_number"], "car_number"=>$row["car_number"], "batch_number"=>$row["batch_number"], "certificate_number"=>$row["certificate_number"], "ma_cnt"=>$row["ma_cnt"], "ma_cost"=>$row["ma_cost"] );
 
 echo json_encode($ma_data);
 ?>

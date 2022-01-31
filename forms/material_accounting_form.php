@@ -6,6 +6,7 @@ include_once "../checkrights.php";
 if( isset($_POST["ma_date"]) ) {
 	session_start();
 	$ma_date = $_POST["ma_date"];
+	$F_ID = $_POST["F_ID"];
 	$MN_ID = $_POST["MN_ID"];
 	$MS_ID = $_POST["MS_ID"];
 	$MC_ID = $_POST["MC_ID"] ? $_POST["MC_ID"] : "NULL";
@@ -20,6 +21,7 @@ if( isset($_POST["ma_date"]) ) {
 		$query = "
 			UPDATE material__Arrival
 			SET ma_date = '{$ma_date}'
+				,F_ID = {$F_ID}
 				,MN_ID = {$MN_ID}
 				,MS_ID = {$MS_ID}
 				,MC_ID = {$MC_ID}
@@ -40,6 +42,7 @@ if( isset($_POST["ma_date"]) ) {
 		$query = "
 			INSERT INTO material__Arrival
 			SET ma_date = '{$ma_date}'
+				,F_ID = {$F_ID}
 				,MN_ID = {$MN_ID}
 				,MS_ID = {$MS_ID}
 				,MC_ID = {$MC_ID}
@@ -154,6 +157,25 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 				<span>Дата приемки:</span>
 				<input type="date" name="ma_date" required>
+			</div>
+
+			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+				<span>Участок:</span>
+				<select name="F_ID" required>
+					<option value=""></option>
+					<?
+					$query = "
+						SELECT F_ID
+							,f_name
+						FROM factory
+						ORDER BY F_ID
+					";
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $row = mysqli_fetch_array($res) ) {
+						echo "<option value='{$row["F_ID"]}'>{$row["f_name"]}</option>";
+					}
+					?>
+				</select>
 			</div>
 
 			<table style="width: 100%; table-layout: fixed;">
@@ -374,6 +396,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				});
 				$('#material_arrival_form input[name="MA_ID"]').val(MA_ID);
 				$('#material_arrival_form input[name="ma_date"]').val(ma_data['ma_date']);
+				$('#material_arrival_form select[name="F_ID"]').val(ma_data['F_ID']);
 				$('#material_arrival_form select[name="MN_ID"]').val(ma_data['MN_ID']);
 				$('#material_arrival_form select[name="MS_ID"]').val(ma_data['MS_ID']);
 				$('#material_arrival_form select[name="MC_ID"]').val(ma_data['MC_ID']);
@@ -388,6 +411,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			else {
 				$('#material_arrival_form input[name="MA_ID"]').val('');
 				$('#material_arrival_form input[name="ma_date"]').val('');
+				$('#material_arrival_form select[name="F_ID"]').val('');
 				$('#material_arrival_form table input').val('');
 				$('#material_arrival_form table select').val('');
 			}
