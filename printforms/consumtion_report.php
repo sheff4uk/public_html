@@ -124,6 +124,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 		<?
 		$query = "
 			SELECT CW.drawing_item
+				,CW.item
 				,SUM((SELECT SUM(PB.in_cassette - underfilling) FROM list__Filling WHERE LB_ID = LB.LB_ID)) details
 				,SUM(LB.s_fraction) s_fraction
 				,SUM(LB.l_fraction) l_fraction
