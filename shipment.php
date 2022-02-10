@@ -161,9 +161,8 @@ $query = "
 		,DATE_FORMAT(LS.ls_date, '%W') ls_date_weekday
 		,LS.ls_date
 		,SUM(LS.pallets) pallets
-		,SUM(LS.pallets * CW.in_pallet) details
+		,SUM(LS.pallets * LS.in_pallet) details
 	FROM list__Shipment LS
-	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
 	WHERE 1
 		".($_GET["week"] ? "AND YEARWEEK(LS.ls_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND LS.CW_ID={$_GET["CW_ID"]}" : "")."
@@ -181,7 +180,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,CW.item
 			,LS.CW_ID
 			,LS.pallets
-			,LS.pallets * CW.in_pallet details
+			,LS.pallets * LS.in_pallet details
 			,PN.pallet_name
 		FROM list__Shipment LS
 		JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
