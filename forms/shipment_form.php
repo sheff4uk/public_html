@@ -7,6 +7,7 @@ if( isset($_POST["CW_ID"]) ) {
 	$ls_date = $_POST["ls_date"];
 	$CW_ID = $_POST["CW_ID"];
 	$pallets = $_POST["pallets"];
+	$in_pallet = $_POST["in_pallet"];
 	$PN_ID = $_POST["PN_ID"];
 
 	if( $_POST["LS_ID"] ) { // Редактируем
@@ -15,6 +16,7 @@ if( isset($_POST["CW_ID"]) ) {
 			SET ls_date = '{$ls_date}'
 				,CW_ID = {$CW_ID}
 				,pallets = {$pallets}
+				,in_pallet = {$in_pallet}
 				,PN_ID = {$PN_ID}
 			WHERE LS_ID = {$_POST["LS_ID"]}
 		";
@@ -29,6 +31,7 @@ if( isset($_POST["CW_ID"]) ) {
 			SET ls_date = '{$ls_date}'
 				,CW_ID = {$CW_ID}
 				,pallets = {$pallets}
+				,in_pallet = {$in_pallet}
 				,PN_ID = {$PN_ID}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -79,8 +82,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Дата</th>
 						<th>Противовес</th>
 						<th>Поддон</th>
-						<th>Кол-во</th>
-						<th>Деталей</th>
+						<th>Паллетов</th>
+						<th>Деталей паллете</th>
+						<th>Всего деталей</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -119,6 +123,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							</select>
 						</td>
 						<td><input type="number" name="pallets" min="0" max="132" style="width: 70px;" required></td>
+						<td><input type="number" name="in_pallet" min="0" max="100" style="width: 70px;" required></td>
 						<td><input type="number" name="amount" style="width: 70px;" readonly></td>
 					</tr>
 				</tbody>
@@ -154,16 +159,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#shipment_form select[name="CW_ID"]').val(ps_data['CW_ID']);
 				$('#shipment_form select[name="PN_ID"]').val(ps_data['PN_ID']);
 				$('#shipment_form input[name="pallets"]').val(ps_data['pallets']);
+				$('#shipment_form input[name="in_pallet"]').val(ps_data['in_pallet']);
 				$('#shipment_form input[name="amount"]').val(ps_data['amount']);
-				// В случае клонирования очищаем идентификатор и дату
-				if( $(this).hasClass('clone') ) {
-					$('#shipment_form input[name="LS_ID"]').val('');
-					$('#shipment_form table input[name="ls_date"]').val(ls_date);
-				}
-				else {
-					$('#shipment_form input[name="LS_ID"]').val(LS_ID);
-					$('#shipment_form input[name="ls_date"]').val(ps_data['ls_date']);
-				}
+				$('#shipment_form input[name="LS_ID"]').val(LS_ID);
+				$('#shipment_form input[name="ls_date"]').val(ps_data['ls_date']);
 			}
 			// Иначе очищаем форму
 			else {
@@ -183,9 +182,16 @@ this.subbut.value='Подождите, пожалуйста!';">
 			return false;
 		});
 
-		// При изменении противовеса или поддонов пересчитываем детали
-		$('#shipment_form select[name="CW_ID"], #shipment_form input[name="pallets"]').change(function() {
-			var in_pallet = $('#shipment_form select[name="CW_ID"] option:selected').attr('in_pallet'),
+		// При изменении противовеса обновляем число деталей в поддоне
+		$('#shipment_form select[name="CW_ID"]').change(function() {
+			var in_pallet = $('#shipment_form select[name="CW_ID"] option:selected').attr('in_pallet');
+
+			$('#shipment_form input[name="in_pallet"]').val(in_pallet).change();
+		});
+
+		// При изменении в паллете или паллетов пересчитываем детали
+		$('#shipment_form input[name="in_pallet"], #shipment_form input[name="pallets"]').change(function() {
+			var in_pallet = $('#shipment_form input[name="in_pallet"]').val(),
 				pallets = $('#shipment_form input[name="pallets"]').val();
 
 			$('#shipment_form input[name="amount"]').val(pallets * in_pallet);

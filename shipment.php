@@ -147,8 +147,9 @@ foreach ($_GET as &$value) {
 			<th>Дата</th>
 			<th>Противовес</th>
 			<th>Поддон</th>
-			<th>Кол-во</th>
-			<th>Деталей</th>
+			<th>Паллетов</th>
+			<th>Деталей в паллете</th>
+			<th>Всего деталей</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -180,6 +181,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,CW.item
 			,LS.CW_ID
 			,LS.pallets
+			,LS.in_pallet
 			,LS.pallets * LS.in_pallet details
 			,PN.pallet_name
 		FROM list__Shipment LS
@@ -211,6 +213,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$subrow["item"]?></td>
 			<td><?=$subrow["pallet_name"]?></td>
 			<td><?=$subrow["pallets"]?></td>
+			<td><?=$subrow["in_pallet"]?></td>
 			<td><?=$subrow["details"]?></td>
 			<td>
 				<a href='#' class='add_ps' LS_ID='<?=$subrow["LS_ID"]?>' title='Изменить данные плана отгрузки'><i class='fa fa-pencil-alt fa-lg'></i></a>
@@ -224,6 +227,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td></td>
 			<td>Итог:</td>
 			<td><?=$row["pallets"]?></td>
+			<td></td>
 			<td><?=$row["details"]?></td>
 			<td></td>
 		</tr>
@@ -235,6 +239,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td></td>
 			<td>Итог:</td>
 			<td><?=$pallets?></td>
+			<td></td>
 			<td><?=$details?></td>
 			<td></td>
 		</tr>
