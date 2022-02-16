@@ -456,10 +456,10 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 
 	//Сравниваем CRC
 	if( crc16($data) == bin2hex($crc) ) {
-	echo "!!!";
 
 		//Если ответ 0x52 CMD_TCP_ACK_TRANSACTION
 		if( $data[5] == 0x52 ) {
+	echo "0x52";
 
 			//Число частей в файле
 			$nums = $data[7] + ($data[8] << 8);
