@@ -470,9 +470,8 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 			$curlen = $data[11] + ($data[12] << 8);
 
 			for( $i=13; $i < $curlen; $i=$i+104) {
-				// Регистрация кассеты на карусели
-				if( $data[$i+10] == 1 ) {
-	echo "!!!_";
+				// Регистрация кассеты на карусели (прием товара)
+				if( $data[$i+10] == 2 ) {
 					//Идентификатор
 					$nextID = $data[$i] + ($data[$i+1] << 8) + ($data[$i+2] << 16) + ($data[$i+3] << 24);
 					//Номер терминала
