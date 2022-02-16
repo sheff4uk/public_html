@@ -3,8 +3,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
 
 // Проверка доступа и корректность кода (не менее 8 символов)
-//if( $ip == $from_ip ) {
-if( $ip == $ip ) {
+if( $ip == $from_ip ) {
 	////////////////////////////////////////////////////////
 	// функции сбора данных с весовых терминалов
 	include "functions_WT.php";
@@ -49,7 +48,7 @@ if( $ip == $ip ) {
 			socket_close($socket);
 		}
 	}
-die();
+
 	// Список весов на конвейере
 	$query = "
 		SELECT GROUP_CONCAT(WT.WT_ID) WT_IDs
