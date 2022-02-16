@@ -459,7 +459,6 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 
 		//Если ответ 0x52 CMD_TCP_ACK_TRANSACTION
 		if( $data[5] == 0x52 ) {
-	echo "0x52";
 
 			//Число частей в файле
 			$nums = $data[7] + ($data[8] << 8);
@@ -471,6 +470,7 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 			$curlen = $data[11] + ($data[12] << 8);
 
 			for( $i=13; $i < $curlen; $i=$i+104) {
+	echo "!!!";
 				// Регистрация кассеты на карусели
 				if( $data[$i+10] == 1 ) {
 					//Идентификатор
