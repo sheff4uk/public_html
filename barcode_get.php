@@ -49,7 +49,7 @@ if( $ip == $ip ) {
 			socket_close($socket);
 		}
 	}
-
+die();
 	// Список весов на конвейере
 	$query = "
 		SELECT GROUP_CONCAT(WT.WT_ID) WT_IDs
