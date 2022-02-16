@@ -495,6 +495,7 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 							SET assembling_time = '{$transactionDate}'
 								,cassette = {$goodsID}
 						";
+						echo $query;
 						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					}
 
