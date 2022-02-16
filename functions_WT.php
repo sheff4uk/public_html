@@ -428,6 +428,7 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 
 // Функция читает регистрации кассет на карусели
 function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
+	echo "!!!";
 	$hexID = sprintf("%02x%02x%02x%02x", ($ID & 0xFF), (($ID >> 8) & 0xFF), (($ID >> 16) & 0xFF), (($ID >> 24) & 0xFF));
 	$hexcurnum = sprintf("%02x%02x", ($curnum & 0xFF), (($curnum >> 8) & 0xFF));
 	$in = "\xF8\x55\xCE\x0C\x00\x92\x03\x00\x00".hex2bin($hexcurnum).hex2bin($hexID)."\x00\x00";
@@ -495,7 +496,6 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 							SET assembling_time = '{$transactionDate}'
 								,cassette = {$goodsID}
 						";
-						echo $query;
 						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					}
 
