@@ -57,7 +57,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="cycle">
 			<input type="hidden" name="F_ID">
 
-			<h3>Год/цикл: <span style="font-size: 2em;" id="year_cycle"></span></h3>
+			<h3>Цикл: <span style="font-size: 2em;" id="year_cycle"></span></h3>
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
@@ -117,7 +117,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#plan_batch_form input[name="year"]').val(year);
 			$('#plan_batch_form input[name="cycle"]').val(cycle);
 			$('#plan_batch_form input[name="F_ID"]').val(F_ID);
-			$('#year_cycle').html(year + "/" + cycle);
+			$('#year_cycle').html(year + "-" + cycle);
 
 			// Данные аяксом
 			$.ajax({

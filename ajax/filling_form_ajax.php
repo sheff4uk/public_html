@@ -59,10 +59,17 @@ $html = "
 	<input type='hidden' name='in_cassette' value='{$in_cassette}'>
 	<table style='table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
 		<tr>
-			<td style='border: 1px solid black; line-height: 1em;'><img src='/img/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></td>
-			<td style='font-size: 2em; border: 1px solid black; line-height: 1em;'>{$item}</td>
-			<td style='border: 1px solid black; line-height: 1em;'><n style='font-size: 2em;'>{$year}</n> год</td>
-			<td style='border: 1px solid black; line-height: 1em;' width='140'><n style='font-size: 2em;'>{$cycle}</n> цикл</td>
+			<td style='border: 1px solid black;'>
+				<img src='/img/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'>
+			</td>
+			<td style='border: 1px solid black; line-height: 1em; position: relative;'>
+				<span style='position: absolute; top: 0px; left: 5px;' class='nowrap'>деталь</span>
+				<n style='font-size: 2em;'>{$item}</n>
+			</td>
+			<td style='border: 1px solid black; line-height: 1em; position: relative;' width='170'>
+				<span style='position: absolute; top: 0px; left: 5px;' class='nowrap'>цикл</span>
+				<n style='font-size: 2em;'>{$year}-{$cycle}</n>
+			</td>
 		</tr>
 	</table>
 ";

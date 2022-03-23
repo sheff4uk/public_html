@@ -102,8 +102,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 		<tr>
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
 			<th width="250" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;" class="nowrap">деталь</span><n style="font-size: 3em;"><?=$item?></n></th>
-			<th width="100" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">год</span><n style="font-size: 3em;"><?=$year?></n></th>
-			<th width="75" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">цикл</span><n style="font-size: 3em;"><?=$cycle?></n></th>
+			<th width="175" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">цикл</span><n style="font-size: 3em;"><?=$year?>-<?=$cycle?></n></th>
 			<th width="200" style="position: relative;">
 				<img src="../barcode.php?code=<?=$PB_ID?>&w=200&h=60" alt="barcode">
 				<span style="position: absolute; background: white; left: calc(50% - 40px); top: 48px; width: 80px;"><?=str_pad($PB_ID, 8, "0", STR_PAD_LEFT)?></span>

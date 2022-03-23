@@ -136,7 +136,7 @@ foreach ($_GET as &$value) {
 			<th rowspan="2">Кассет</th>
 			<th colspan="2">Деталей</th>
 			<th rowspan="2">Недоливы</th>
-			<th rowspan="2">Расчетное время, ч</th>
+<!--			<th rowspan="2">Расчетное время, ч</th>-->
 			<th rowspan="2">Бланк чек-листа</th>
 			<th rowspan="2">Распечатан</th>
 			<th rowspan="2"></th>
@@ -182,9 +182,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			,CW.item
 			,PB.CW_ID
 			,PB.batches
-			,USR_Icon(author) icon_author
-			,Friendly_date(change_time) friendly_date
-			,DATE_FORMAT(change_time, '%H:%i') friendly_time
+			,USR_Icon(PB.author) icon_author
+			,Friendly_date(PB.change_time) friendly_date
+			,DATE_FORMAT(PB.change_time, '%H:%i') friendly_time
 			,ROUND(PB.batches * IFNULL(PB.fillings, MF.fillings) / IFNULL(PB.per_batch, MF.per_batch)) fillings
 			,ROUND(PB.batches * IFNULL(PB.fillings, MF.fillings) / IFNULL(PB.per_batch, MF.per_batch)) * IFNULL(PB.in_cassette, MF.in_cassette) plan
 			,ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette details
@@ -221,7 +221,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			$duration_mod = round($duration / 15) % 4;
 
 			echo "<tr id='{$subrow["PB_ID"]}' item='{$subrow["item"]}' style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h3>{$row["cycle"]}</h3><span class='nowrap'>{$row["week_range"]}</span><br>".($row["duration"] ? "Продолжительность: <b>".($duration_div > 0 ? $duration_div : "").($duration_mod == 1 ? "&frac14;" : ($duration_mod == 2 ? "&frac12;" : ($duration_mod == 3 ? "&frac34;" : "")))."</b>ч" : "")."</td>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h2 class='nowrap'>{$_GET["year"]}-{$row["cycle"]}</h2><span class='nowrap'>{$row["week_range"]}</span><br>".($row["duration"] ? "Длительность: <b>".($duration_div > 0 ? $duration_div : "").($duration_mod == 1 ? "&frac14;" : ($duration_mod == 2 ? "&frac12;" : ($duration_mod == 3 ? "&frac34;" : "")))."</b>ч" : "")."</td>";
 		}
 		else {
 			echo "<tr id='{$subrow["PB_ID"]}' item='{$subrow["item"]}'>";
@@ -261,7 +261,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$subrow["plan"]?></td>
 			<td class='bg-gray'><?=($subrow["details"] - $subrow["underfilling"])?></td>
 			<td class='bg-gray'><?=$subrow["underfilling"]?></td>
-			<td class='bg-gray'><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
+<!--			<td class='bg-gray'><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>-->
 			<td>
 				<?
 				if($subrow["printable"]) {
@@ -302,7 +302,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["plan"]?></td>
 			<td><?=($row["details"] - $d_underfilling)?></td>
 			<td><?=$d_underfilling?></td>
-			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
+<!--			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>-->
 			<td></td>
 			<td></td>
 		</tr>
@@ -327,7 +327,7 @@ else {
 			<td><?=$plan?></td>
 			<td><?=($details - $underfilling)?></td>
 			<td><?=$underfilling?></td>
-			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>
+<!--			<td><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>-->
 			<td></td>
 			<td></td>
 			<td></td>

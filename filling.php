@@ -152,7 +152,7 @@ foreach ($_GET as &$value) {
 <table class="main_table">
 	<thead>
 		<tr>
-			<th>Год/Цикл</th>
+			<th>Цикл</th>
 			<th>Дата время замеса</th>
 			<th>Куб раствора, кг</th>
 			<th>t, ℃ 22±8</th>
@@ -305,8 +305,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		if( $cnt ) {
 			echo "
 				<td rowspan='{$cnt}' class='bg-gray'>
-					{$row["year"]}
-					<h1>{$row["cycle"]}</h1>
+					<h2 class='nowrap'>{$row["year"]}-{$row["cycle"]}</h2>
 					<b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>
 					<i class='fas fa-cube'></i>24: <b>{$test24}</b>МПа<br>
 					<i class='fas fa-cube'></i>72: <b>{$test72}</b>МПа<br>
