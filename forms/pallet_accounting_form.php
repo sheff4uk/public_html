@@ -1,5 +1,6 @@
 <?
 include_once "../config.php";
+include_once "../checkrights.php";
 
 // Сохранение/редактирование поступления поддонов
 if( isset($_POST["cnt"]) ) {
@@ -13,6 +14,7 @@ if( isset($_POST["cnt"]) ) {
 		$PN_ID = $_POST["PN_ID"];
 		$pr_cnt = $_POST["cnt"];
 		$pr_reject = $_POST["broken"];
+		$comment = mysqli_real_escape_string($mysqli, convert_str($_POST["comment"]));
 
 		if( $_POST["incoming_ID"] ) { // Редактируем
 			$query = "
@@ -21,6 +23,7 @@ if( isset($_POST["cnt"]) ) {
 					,PN_ID = {$PN_ID}
 					,pr_cnt = {$pr_cnt}
 					,pr_reject = {$pr_reject}
+					,comment = '{$comment}'
 				WHERE PR_ID = {$_POST["incoming_ID"]}
 			";
 			if( !mysqli_query( $mysqli, $query ) ) {
@@ -37,6 +40,7 @@ if( isset($_POST["cnt"]) ) {
 					,PN_ID = {$PN_ID}
 					,pr_cnt = {$pr_cnt}
 					,pr_reject = {$pr_reject}
+					,comment = '{$comment}'
 			";
 			if( !mysqli_query( $mysqli, $query ) ) {
 				$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -67,6 +71,7 @@ if( isset($_POST["cnt"]) ) {
 		$pa_cnt = $_POST["cnt"];
 		$pa_reject = $_POST["broken"];
 		$pallet_cost = $_POST["cost"];
+		$comment = mysqli_real_escape_string($mysqli, convert_str($_POST["comment"]));
 
 		if( $_POST["incoming_ID"] ) { // Редактируем
 			$query = "
@@ -75,6 +80,7 @@ if( isset($_POST["cnt"]) ) {
 					,pa_cnt = {$pa_cnt}
 					,pa_reject = {$pa_reject}
 					,pallet_cost = {$pallet_cost}
+					,comment = '{$comment}'
 				WHERE PA_ID = {$_POST["incoming_ID"]}
 			";
 			if( !mysqli_query( $mysqli, $query ) ) {
@@ -91,6 +97,7 @@ if( isset($_POST["cnt"]) ) {
 					,pa_cnt = {$pa_cnt}
 					,pa_reject = {$pa_reject}
 					,pallet_cost = {$pallet_cost}
+					,comment = '{$comment}'
 			";
 			if( !mysqli_query( $mysqli, $query ) ) {
 				$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -120,6 +127,7 @@ if( isset($_POST["cnt"]) ) {
 		$PN_ID = $_POST["PN_ID"];
 		$pd_date = $_POST["date"];
 		$pd_cnt = $_POST["cnt"];
+		$comment = mysqli_real_escape_string($mysqli, convert_str($_POST["comment"]));
 
 		if( $_POST["incoming_ID"] ) { // Редактируем
 			$query = "
@@ -127,6 +135,7 @@ if( isset($_POST["cnt"]) ) {
 				SET PN_ID = {$PN_ID}
 					#,pd_date = '{$pd_date}'
 					,pd_cnt = -{$pd_cnt}
+					,comment = '{$comment}'
 				WHERE PD_ID = {$_POST["incoming_ID"]}
 			";
 			if( !mysqli_query( $mysqli, $query ) ) {
@@ -141,6 +150,7 @@ if( isset($_POST["cnt"]) ) {
 					#,pd_date = '{$pd_date}'
 					,pd_date = CURRENT_DATE()
 					,pd_cnt = -{$pd_cnt}
+					,comment = '{$comment}'
 			";
 			if( !mysqli_query( $mysqli, $query ) ) {
 				$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -174,6 +184,7 @@ if( isset($_POST["pd_cnt"]) ) {
 	$PN_ID = $_POST["PN_ID"];
 	$CB_ID = $_POST["CB_ID"] ? $_POST["CB_ID"] : "NULL";
 	$pd_cnt = $_POST["pd_cnt"];
+	$comment = mysqli_real_escape_string($mysqli, convert_str($_POST["comment"]));
 
 	if( $_POST["PD_ID"] ) { // Редактируем
 		$query = "
@@ -182,6 +193,7 @@ if( isset($_POST["pd_cnt"]) ) {
 				,CB_ID = {$CB_ID}
 				#,pd_date = '{$pd_date}'
 				,pd_cnt = {$pd_cnt}
+				,comment = '{$comment}'
 			WHERE PD_ID = {$_POST["PD_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -197,6 +209,7 @@ if( isset($_POST["pd_cnt"]) ) {
 				#,pd_date = '{$pd_date}'
 				,pd_date = CURRENT_DATE()
 				,pd_cnt = {$pd_cnt}
+				,comment = '{$comment}'
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -249,6 +262,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Кол-во поддонов</th>
 						<th class="broken">Из них бракованных</th>
 						<th class="cost">Стоимость поддона, руб</th>
+						<th>Примечание</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -308,6 +322,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td><input type="number" name="cnt" min="0" style="width: 70px;" required></td>
 						<td class="broken"><input type="number" name="broken" min="0" style="width: 70px;"></td>
 						<td class="cost"><input type="number" name="cost" min="0" style="width: 120px;"></td>
+<!--						<td><textarea name="comment" cols="18" rows="5"></textarea></td>-->
+						<td><input type="text" name="comment" style="width: 200px;" autocomplete="off"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -334,6 +350,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Поддон</th>
 						<th>Субъект, ответственный за испорченные поддоны</th>
 						<th>Кол-во поддонов</th>
+						<th>Примечание</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -372,6 +389,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							</select>
 						</td>
 						<td><input type="number" name="pd_cnt" min="0" style="width: 70px;" required></td>
+						<td><input type="text" name="comment" style="width: 200px;" autocomplete="off"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -413,6 +431,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#pallet_incoming_form input[name="cnt"]').val(incoming_data['cnt']);
 				$('#pallet_incoming_form input[name="broken"]').val(incoming_data['broken']);
 				$('#pallet_incoming_form input[name="cost"]').val(incoming_data['cost']);
+				$('#pallet_incoming_form input[name="comment"]').val(incoming_data['comment']);
 				// Доступны только элементы в группе
 				if( type == "R" ) {
 					$('#pallet_incoming_form select[name="source"] option:not(.rtrn)').prop('disabled', true);
@@ -495,6 +514,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#pallet_disposal_form select[name="CB_ID"]').val(PD_data['CB_ID']);
 //				$('#pallet_disposal_form input[name="pd_date"]').val(PD_data['pd_date']);
 				$('#pallet_disposal_form input[name="pd_cnt"]').val(PD_data['pd_cnt']);
+				$('#pallet_disposal_form input[name="comment"]').val(PD_data['comment']);
 			}
 			// Иначе очищаем форму
 			else {
