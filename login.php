@@ -39,18 +39,16 @@ switch( $_GET["do"] ) {
 						if( $json->status == "OK" ) { // Запрос выполнился
 							// Сохраняем код в сессию для дальнейшей проверки
 							$_SESSION["code"] = $json->code;
-							message_to_telegram($myrow["Surname"]." ".$_SESSION["code"], '217756119');
 						}
 						else{
 							$_SESSION["error"][] = "Звонок не может быть выполнен. Текст ошибки: $json->status_text";
 							$_SESSION["code"] = rand(1000,9999);
-							message_to_telegram($myrow["Surname"]." ".$_SESSION["code"], '217756119');
+							message_to_telegram($myrow["Surname"]." ".$myrow["Name"]." ".$_SESSION["code"], '217756119');
 						}
 					} else {
 						$_SESSION["error"][] = "Запрос не выполнился Не удалось установить связь с сервером.";
-						// Здесь будет отправка кода в телеграм
 						$_SESSION["code"] = rand(1000,9999);
-						message_to_telegram($myrow["Surname"]." ".$_SESSION["code"], '217756119');
+						message_to_telegram($myrow["Surname"]." ".$myrow["Name"]." ".$_SESSION["code"], '217756119');
 					}
 				}
 				else $_SESSION["error"][] = "Ваша учетная запись не активна! Свяжитесь с администрацией.";
