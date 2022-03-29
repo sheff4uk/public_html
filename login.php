@@ -60,7 +60,6 @@ switch( $_GET["do"] ) {
 		else $_SESSION["error"][] = "Вы не ввели номер телефона!";
 
 		// Если не было ошибок, показываем форму для ввода кода
-//		if( count($_SESSION["error"]) == 0 ) {
 		if( $_SESSION["code"] > 0 ) {
 			$_SESSION['mtel'] = $mtel;
 			echo "
@@ -77,6 +76,11 @@ switch( $_GET["do"] ) {
 				echo "noty({text: '<h1>Поступит звонок со случайного номера.<br><br>Введите последние 4 цифры определившегося номера.</h1>', type: 'alert'});";
 			}
 			else {
+				foreach ($_SESSION["error"] as $value) {
+					$value = str_replace("\n", "", addslashes($value));
+					echo "noty({text: '{$value}', type: 'error'});";
+				}
+				unset($_SESSION["error"]);
 				echo "noty({text: '<h1>Чтобы узнать код, свяжитесь с администратором.</h1>', type: 'alert'});";
 			}
 		}
