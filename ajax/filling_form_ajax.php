@@ -19,6 +19,7 @@ $query = "
 		,PB.sf_density
 		,PB.lf_density
 		,PB.io_density
+		,PB.sl_density
 		,PB.sn_density
 		,PB.cs_density
 		,PB.calcium
@@ -46,6 +47,7 @@ $batch_date = $row["batch_date"];
 $sf_density = $row["sf_density"];
 $lf_density = $row["lf_density"];
 $io_density = $row["io_density"];
+$sl_density = $row["sl_density"];
 $sn_density = $row["sn_density"];
 $cs_density = $row["cs_density"];
 $calcium = $row["calcium"];
@@ -102,6 +104,7 @@ $query = "
 	SELECT IFNULL(MF.s_fraction, 0) s_fraction
 		,IFNULL(MF.l_fraction, 0) l_fraction
 		,IFNULL(MF.iron_oxide, 0) iron_oxide
+		,IFNULL(MF.slag, 0) slag
 		,IFNULL(MF.sand, 0) sand
 		,IFNULL(MF.crushed_stone, 0) crushed_stone
 		,IFNULL(MF.cement, 0) cement
@@ -110,6 +113,7 @@ $query = "
 		,COUNT(MF.s_fraction) sf_cnt
 		,COUNT(MF.l_fraction) lf_cnt
 		,COUNT(MF.iron_oxide) io_cnt
+		,COUNT(MF.slag) sl_cnt
 		,COUNT(MF.sand) sn_cnt
 		,COUNT(MF.crushed_stone) cs_cnt
 		,COUNT(MF.cement) cm_cnt
@@ -133,6 +137,7 @@ $html .= "
 				".($row["sf_cnt"] ? "<th>Мелкая дробь, кг</th>" : "")."
 				".($row["lf_cnt"] ? "<th>Крупная дробь, кг</th>" : "")."
 				".($row["io_cnt"] ? "<th>Окалина, кг</th>" : "")."
+				".($row["sl_cnt"] ? "<th>Шлак, кг</th>" : "")."
 				".($row["sn_cnt"] ? "<th>КМП, кг</th>" : "")."
 				".($row["cs_cnt"] ? "<th>Отсев, кг</th>" : "")."
 				".($row["cm_cnt"] ? "<th rowspan='2'>Цемент, кг</th>" : "")."
@@ -146,6 +151,7 @@ $html .= "
 				".($row["sf_cnt"] ? "<th><input type='number' min='3' max='6' step='0.01' value='".($sf_density/1000)."' name='sf_density' style='width: 100%; background-color: #7952eb88;' ></th>" : "")."
 				".($row["lf_cnt"] ? "<th><input type='number' min='3' max='6' step='0.01' value='".($lf_density/1000)."' name='lf_density' style='width: 100%; background-color: #51d5d788;' ></th>" : "")."
 				".($row["io_cnt"] ? "<th><input type='number' min='2' max='3' step='0.01' value='".($io_density/1000)."' name='io_density' style='width: 100%; background-color: #a52a2a80;' ></th>" : "")."
+				".($row["sl_cnt"] ? "<th><input type='number' min='2' max='3' step='0.01' value='".($sl_density/1000)."' name='sl_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
 				".($row["sn_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($sn_density/1000)."' name='sn_density' style='width: 100%; background-color: #f4a46082;' ></th>" : "")."
 				".($row["cs_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($cs_density/1000)."' name='cs_density' style='width: 100%; background-color: #8b45137a;' ></th>" : "")."
 				<th><input type='number' min='0' max='100' value='".($calcium)."' name='calcium' style='width: 100%; background-color: #1e90ff85;' required></th>
@@ -155,6 +161,7 @@ $html .= "
 				".($row["sf_cnt"] ? "<th class='nowrap'>{$row["s_fraction"]}</th>" : "")."
 				".($row["lf_cnt"] ? "<th class='nowrap'>{$row["l_fraction"]}</th>" : "")."
 				".($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")."
+				".($row["sl_cnt"] ? "<th class='nowrap'>{$row["slag"]}</th>" : "")."
 				".($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")."
 				".($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")."
 				".($row["cm_cnt"] ? "<th class='nowrap'>{$row["cement"]}</th>" : "")."
@@ -177,6 +184,7 @@ if( $fact_batches ) {
 			,IFNULL(LB.s_fraction, 0) s_fraction
 			,IFNULL(LB.l_fraction, 0) l_fraction
 			,IFNULL(LB.iron_oxide, 0) iron_oxide
+			,IFNULL(LB.slag, 0) slag
 			,IFNULL(LB.sand, 0) sand
 			,IFNULL(LB.crushed_stone, 0) crushed_stone
 			,IFNULL(LB.cement, 0) cement
@@ -219,6 +227,7 @@ if( $fact_batches ) {
 				".($row["sf_cnt"] ? "<td style='background: #7952eb88;'><input type='number' min='0' name='s_fraction[{$subrow["LB_ID"]}]' value='{$subrow["s_fraction"]}' style='width: 100%;' required></td>" : "")."
 				".($row["lf_cnt"] ? "<td style='background: #51d5d788;'><input type='number' min='0' name='l_fraction[{$subrow["LB_ID"]}]' value='{$subrow["l_fraction"]}' style='width: 100%;' required></td>" : "")."
 				".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[{$subrow["LB_ID"]}]' value='{$subrow["iron_oxide"]}' style='width: 100%;' required></td>" : "")."
+				".($row["sl_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag[{$subrow["LB_ID"]}]' value='{$subrow["slag"]}' style='width: 100%;' required></td>" : "")."
 				".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[{$subrow["LB_ID"]}]' value='{$subrow["sand"]}' style='width: 100%;' required></td>" : "")."
 				".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone"]}' style='width: 100%;' required></td>" : "")."
 				".($row["cm_cnt"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[{$subrow["LB_ID"]}]' value='{$subrow["cement"]}' style='width: 100%;' required></td>" : "")."
@@ -250,6 +259,7 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 			".($row["sf_cnt"] ? "<td style='background: #7952eb88;'><input type='number' min='0' name='s_fraction[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["lf_cnt"] ? "<td style='background: #51d5d788;'><input type='number' min='0' name='l_fraction[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[n_{$i}]' style='width: 100%;' required></td>" : "")."
+			".($row["sl_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["cm_cnt"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[n_{$i}]' style='width: 100%;' required></td>" : "")."

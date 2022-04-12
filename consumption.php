@@ -150,6 +150,7 @@ foreach ($_GET as &$value) {
 			<th colspan="2">Мелкая дробь</th>
 			<th colspan="2">Крупная дробь</th>
 			<th colspan="2">Окалина</th>
+			<th colspan="2">Шлак</th>
 			<th colspan="2">КМП</th>
 			<th colspan="2">Отсев</th>
 			<th colspan="2">Цемент</th>
@@ -158,6 +159,8 @@ foreach ($_GET as &$value) {
 			<th colspan="2">Арматура</th>
 		</tr>
 		<tr>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
 			<th>Расход, кг</th>
 			<th>На деталь, г</th>
 			<th>Расход, кг</th>
@@ -187,6 +190,7 @@ foreach ($_GET as &$value) {
 				,SUM(LB.s_fraction) s_fraction
 				,SUM(LB.l_fraction) l_fraction
 				,SUM(LB.iron_oxide) iron_oxide
+				,SUM(LB.slag) slag
 				,SUM(LB.sand) sand
 				,SUM(LB.crushed_stone) crushed_stone
 				,SUM(LB.cement) cement
@@ -210,6 +214,7 @@ foreach ($_GET as &$value) {
 			$s_fraction += $row["s_fraction"];
 			$l_fraction += $row["l_fraction"];
 			$iron_oxide += $row["iron_oxide"];
+			$slag += $row["slag"];
 			$sand += $row["sand"];
 			$crushed_stone += $row["crushed_stone"];
 			$cement += $row["cement"];
@@ -226,6 +231,8 @@ foreach ($_GET as &$value) {
 				<td style="background: #51d5d788;"><?=number_format($row["l_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #a52a2a88;"><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
 				<td style="background: #a52a2a88;"><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #33333388;"><?=number_format($row["slag"], 0, ',', ' ')?></td>
+				<td style="background: #33333388;"><?=number_format($row["slag"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #f4a46088;"><?=number_format($row["sand"], 0, ',', ' ')?></td>
 				<td style="background: #f4a46088;"><?=number_format($row["sand"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #8b451388;"><?=number_format($row["crushed_stone"], 0, ',', ' ')?></td>
@@ -252,6 +259,8 @@ foreach ($_GET as &$value) {
 			<td><?=number_format($l_fraction, 0, ',', ' ')?></td>
 			<td></td>
 			<td><?=number_format($iron_oxide, 0, ',', ' ')?></td>
+			<td></td>
+			<td><?=number_format($slag, 0, ',', ' ')?></td>
 			<td></td>
 			<td><?=number_format($sand, 0, ',', ' ')?></td>
 			<td></td>

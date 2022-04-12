@@ -67,13 +67,14 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th rowspan="2">Противовес</th>
-			<th colspan="8">Ингредиенты</th>
+			<th colspan="9">Ингредиенты</th>
 			<th rowspan="2"></th>
 		</tr>
 		<tr>
 			<th>Мелкая дробь, кг</th>
 			<th>Крупная дробь, кг</th>
 			<th>Окалина, кг</th>
+			<th>Шлак, кг</th>
 			<th>КМП, кг</th>
 			<th>Отсев, кг</th>
 			<th>Цемент, кг</th>
@@ -91,6 +92,7 @@ $query = "
 		,MF.s_fraction
 		,MF.l_fraction
 		,MF.iron_oxide
+		,MF.slag
 		,MF.sand
 		,MF.crushed_stone
 		,MF.cement
@@ -108,6 +110,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td style="background: #7952eb88;"><?=$row["s_fraction"]?></td>
 		<td style="background: #51d5d788;"><?=$row["l_fraction"]?></td>
 		<td style="background: #a52a2a80;"><?=$row["iron_oxide"]?></td>
+		<td style="background: #33333380;"><?=$row["slag"]?></td>
 		<td style="background: #f4a46082;"><?=$row["sand"]?></td>
 		<td style="background: #8b45137a;"><?=$row["crushed_stone"]?></td>
 		<td style="background: #7080906b;"><?=$row["cement"]?></td>
