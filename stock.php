@@ -23,7 +23,7 @@ if( isset($_GET["remove"]) ) {
 	exit ('<meta http-equiv="refresh" content="0; url='.$page.'#'.$LPP_ID.'">');
 }
 
-//Удаление регистрации поддона
+//Восстановление регистрации поддона
 if( isset($_GET["undo"]) ) {
 	session_start();
 	$LPP_ID = $_GET["undo"];
@@ -39,16 +39,26 @@ if( isset($_GET["undo"]) ) {
 	exit ('<meta http-equiv="refresh" content="0; url='.$page.'#'.$LPP_ID.'">');
 }
 
-// Отсчитываем 30 рабочих дней назад
+//// Отсчитываем 30 рабочих дней назад
+//$query = "
+//	SELECT MIN(SUB.packed_date) date_from
+//	FROM (
+//		SELECT DATE(packed_time) packed_date
+//		FROM list__PackingPallet
+//		GROUP BY packed_date
+//		ORDER BY packed_date DESC
+//		LIMIT 30
+//	) SUB
+//";
+//$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//$row = mysqli_fetch_array($res);
+//$date_from = $row["date_from"];
+
+// Узнаем время упаковки самого старого поддона на складе
 $query = "
-	SELECT MIN(SUB.packed_date) date_from
-	FROM (
-		SELECT DATE(packed_time) packed_date
-		FROM list__PackingPallet
-		GROUP BY packed_date
-		ORDER BY packed_date DESC
-		LIMIT 30
-	) SUB
+	SELECT MIN(packed_time) date_from
+	FROM list__PackingPallet
+	WHERE shipment_time IS NULL AND removal_time IS NULL
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
