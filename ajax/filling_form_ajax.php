@@ -53,6 +53,14 @@ $cs_density = $row["cs_density"];
 $calcium = $row["calcium"];
 
 $html = "
+	<style>
+		.cassette::-webkit-inner-spin-button,
+		.cassette::-webkit-outer-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
+	</style>
+
 	<p style='display: none; text-align: center; font-size: 2em;'>Число замесов: <input type='number' name='fact_batches' id='rows' min='".($fact_batches ? $fact_batches : "1")."' max='{$max_batches}' value='".($fact_batches ? $fact_batches : $batches)."'></p>
 	<input type='hidden' name='F_ID' value='{$F_ID}'>
 	<input type='hidden' name='PB_ID' value='{$PB_ID}'>
@@ -214,7 +222,11 @@ if( $fact_batches ) {
 		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$fillings_cell = "";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
-			$fillings_cell .= "<td rowspan='{$per_batch}'><input type='number' class='cassette' min='1' max='{$cassetts}' name='cassette[{$subrow["LB_ID"]}][{$subsubrow["LF_ID"]}]' value='{$subsubrow["cassette"]}' style='width: 50px;' required ".($subsubrow["is_link"] ? "readonly" : "")."></td>";
+			$fillings_cell .= "
+				<td rowspan='{$per_batch}'>
+					<input type='number' class='cassette' min='1' max='{$cassetts}' name='cassette[{$subrow["LB_ID"]}][{$subsubrow["LF_ID"]}]' value='{$subsubrow["cassette"]}' style='width: 50px;' required ".($subsubrow["is_link"] ? "readonly" : "")." list='defaultNumbers'>
+				</td>
+			";
 		}
 		$fillings_cell .= "<td rowspan='{$per_batch}'><input type='number' min='0' max='{$in_cassette}' name='underfilling[{$subrow["LB_ID"]}]' value='{$subrow["underfilling"]}' style='width: 100%;' required></td>";
 
@@ -246,7 +258,11 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 	// Номера кассет
 	$fillings_cell = '';
 	for ($j = 1; $j <= $fillings; $j++) {
-		$fillings_cell .= "<td rowspan='{$per_batch}'><input type='number' class='cassette' min='1' max='{$cassetts}' name='cassette[n_{$i}][{$j}]' style='width: 50px;' required></td>";
+		$fillings_cell .= "
+			<td rowspan='{$per_batch}'>
+				<input type='number' class='cassette' min='1' max='{$cassetts}' name='cassette[n_{$i}][{$j}]' style='width: 50px;' required list='defaultNumbers'>
+			</td>
+		";
 	}
 	$fillings_cell .= "<td rowspan='{$per_batch}'><input type='number' min='0' max='{$in_cassette}' name='underfilling[n_{$i}]' style='width: 100%;' required></td>";
 
@@ -276,7 +292,18 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 $html .= "
 		</tbody>
 	</table>
+	<datalist id='defaultNumbers'>
 ";
+
+	$query = "
+		SELECT cassette FROM Cassettes WHERE F_ID = {$F_ID}
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		$html .= "<option value='{$row["cassette"]}'>";
+	}
+
+$html .= "</datalist>";
 
 $html = str_replace("\n", "", addslashes($html));
 echo "$('#filling_form fieldset').html('{$html}');";
