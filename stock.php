@@ -68,7 +68,7 @@ $date_from = $row["date_from"];
 $query = "
 	SELECT shipment_time
 	FROM list__PackingPallet
-	WHERE DATE(packed_time) >= '{$date_from}' AND shipment_time IS NOT NULL
+	WHERE DATE(packed_time) >= DATE('{$date_from}') AND shipment_time IS NOT NULL
 	GROUP BY shipment_time
 	ORDER BY shipment_time DESC
 ";
@@ -145,7 +145,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					,SUM(1) total
 				FROM list__PackingPallet LPP
 				JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID AND CW.CB_ID = 2
-				WHERE DATE(LPP.packed_time) >= '{$date_from}'
+				WHERE DATE(LPP.packed_time) >= DATE('{$date_from}')
 					AND LPP.shipment_time IS NULL
 					AND LPP.removal_time IS NULL
 				GROUP BY LPP.CW_ID
@@ -275,7 +275,7 @@ $query = "
 		,IF(IFNULL(LPP.shipment_time, NOW()) - INTERVAL 90 HOUR < LPP.packed_time, 0, 1) ready
 	FROM list__PackingPallet LPP
 	JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID AND CW.CB_ID = 2
-	WHERE DATE(LPP.packed_time) >= '{$date_from}'
+	WHERE DATE(LPP.packed_time) >= DATE('{$date_from}')
 	ORDER BY LPP.packed_time DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
