@@ -77,6 +77,7 @@ $i = 100;
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$i--;
+	$i = ($i < 1) ? 1 : $i;
 	$shipment_arr["{$row["shipment_time"]}"] = $i;
 }
 ?>
