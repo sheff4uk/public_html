@@ -156,14 +156,14 @@ foreach ($_GET as &$value) {
 			<th>Дата время замеса</th>
 			<th>Куб раствора, кг</th>
 			<th>t, ℃ 22±8</th>
-			<th>Мелкая дробь,<br>кг</th>
-			<th>Крупная дробь,<br>кг</th>
-			<th>Окалина,<br>кг</th>
-			<th>Шлак,<br>кг</th>
-			<th>КМП,<br>кг</th>
-			<th>Отсев,<br>кг</th>
+			<th class="s_fraction">Мелкая дробь,<br>кг</th>
+			<th class="l_fraction">Крупная дробь,<br>кг</th>
+			<th class="iron_oxide">Окалина,<br>кг</th>
+			<th class="slag">Шлак,<br>кг</th>
+			<th class="sand">КМП,<br>кг</th>
+			<th class="crushed_stone">Отсев,<br>кг</th>
 			<th>Цемент,<br>кг</th>
-			<th>Пластификатор,<br>кг</th>
+			<th class="plasticizer">Пластификатор,<br>кг</th>
 			<th>Вода, л</th>
 			<th colspan="2">№ кассеты</th>
 			<th>Недолив</th>
@@ -282,6 +282,14 @@ while( $row = mysqli_fetch_array($res) ) {
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
+		$s_fraction += $subrow["s_fraction"];
+		$l_fraction += $subrow["l_fraction"];
+		$iron_oxide += $subrow["iron_oxide"];
+		$slag += $subrow["slag"];
+		$sand += $subrow["sand"];
+		$crushed_stone += $subrow["crushed_stone"];
+		$plasticizer += $subrow["plasticizer"];
+
 		// Получаем список кассет
 		$query = "
 			SELECT LF.cassette
@@ -327,14 +335,14 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$subrow["batch_date_format"]?> <?=$subrow["batch_time_format"]?></td>
 				<td><?=$subrow["mix_density"]/1000?> <?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?><?=($subrow["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
 				<td><?=$subrow["temp"]?><?=($subrow["temp_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["temp_diff"] > 0 ? " +" : " ").($subrow["temp_diff"])."</font>" : "")?></td>
-				<td style="background: #7952eb88;"><?=$subrow["s_fraction"]?><?=($subrow["sf_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sf_diff"] > 0 ? " +" : " ").($subrow["sf_diff"])."</font>" : "")?></td>
-				<td style="background: #51d5d788;"><?=$subrow["l_fraction"]?><?=($subrow["lf_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["lf_diff"] > 0 ? " +" : " ").($subrow["lf_diff"])."</font>" : "")?></td>
-				<td style="background: #a52a2a80;"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
-				<td style="background: #33333380;"><?=$subrow["slag"]?><?=($subrow["sl_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sl_diff"] > 0 ? " +" : " ").($subrow["sl_diff"])."</font>" : "")?></td>
-				<td style="background: #f4a46082;"><?=$subrow["sand"]?><?=($subrow["sn_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sn_diff"] > 0 ? " +" : " ").($subrow["sn_diff"])."</font>" : "")?></td>
-				<td style="background: #8b45137a;"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
+				<td class="s_fraction" style="background: #7952eb88;"><?=$subrow["s_fraction"]?><?=($subrow["sf_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sf_diff"] > 0 ? " +" : " ").($subrow["sf_diff"])."</font>" : "")?></td>
+				<td class="l_fraction" style="background: #51d5d788;"><?=$subrow["l_fraction"]?><?=($subrow["lf_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["lf_diff"] > 0 ? " +" : " ").($subrow["lf_diff"])."</font>" : "")?></td>
+				<td class="iron_oxide" style="background: #a52a2a80;"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
+				<td class="slag" style="background: #33333380;"><?=$subrow["slag"]?><?=($subrow["sl_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sl_diff"] > 0 ? " +" : " ").($subrow["sl_diff"])."</font>" : "")?></td>
+				<td class="sand" style="background: #f4a46082;"><?=$subrow["sand"]?><?=($subrow["sn_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sn_diff"] > 0 ? " +" : " ").($subrow["sn_diff"])."</font>" : "")?></td>
+				<td class="crushed_stone" style="background: #8b45137a;"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
 				<td style="background: #7080906b;"><?=$subrow["cement"]?><?=($subrow["cm_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cm_diff"] > 0 ? " +" : " ").($subrow["cm_diff"])."</font>" : "")?></td>
-				<td style="background: #80800080;"><?=$subrow["plasticizer"]?><?=($subrow["pl_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["pl_diff"] > 0 ? " +" : " ").($subrow["pl_diff"])."</font>" : "")?></td>
+				<td class="plasticizer" style="background: #80800080;"><?=$subrow["plasticizer"]?><?=($subrow["pl_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["pl_diff"] > 0 ? " +" : " ").($subrow["pl_diff"])."</font>" : "")?></td>
 				<td style="background: #1e90ff85;"><?=$subrow["water"]?><?=($subrow["wt_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["wt_diff"])."</font>" : "")?></td>
 				<?=($j == 0 ? $cassette : "")?>
 				<td><?=$subrow["name"]?></td>
@@ -354,6 +362,16 @@ while( $row = mysqli_fetch_array($res) ) {
 }
 ?>
 </table>
+
+<style>
+	<?=($s_fraction ? "" : ".s_fraction{ display: none; }")?>
+	<?=($l_fraction ? "" : ".l_fraction{ display: none; }")?>
+	<?=($iron_oxide ? "" : ".iron_oxide{ display: none; }")?>
+	<?=($slag ? "" : ".slag{ display: none; }")?>
+	<?=($sand ? "" : ".sand{ display: none; }")?>
+	<?=($crushed_stone ? "" : ".crushed_stone{ display: none; }")?>
+	<?=($plasticizer ? "" : ".plasticizer{ display: none; }")?>
+</style>
 
 <?
 include "footer.php";
