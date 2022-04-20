@@ -42,6 +42,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		ORDER BY time
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$text = "";
 	while( $subrow = mysqli_fetch_array($subres) ) {
 		$text .= "<b>{$subrow["item"]}</b> {$subrow["time"]} [{$subrow["delay"]}]\n";
 	}
