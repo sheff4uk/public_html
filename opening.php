@@ -15,6 +15,11 @@ if( !$_GET["week"] ) {
 $CAS = isset($_GET["CAS"]) ? $_GET["CAS"] : array();
 $CASs = implode(",", $CAS);
 
+// Если не выбран участок, берем из сессии
+if( !$_GET["F_ID"] ) {
+	$_GET["F_ID"] = $_SESSION['F_ID'];
+}
+
 // Начинаем собирать ошибки
 //$query = "
 //	SELECT LB.LB_ID
@@ -46,6 +51,25 @@ $CASs = implode(",", $CAS);
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
 		<a href="/opening.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Участок:</span>
+			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT F_ID
+						,f_name
+					FROM factory
+					ORDER BY F_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["F_ID"] == $_GET["F_ID"]) ? "selected" : "";
+					echo "<option value='{$row["F_ID"]}' {$selected}>{$row["f_name"]}</option>";
+				}
+				?>
+			</select>
+		</div>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Неделя:</span>
@@ -157,15 +181,18 @@ $CASs = implode(",", $CAS);
 					</label>
 				</div>
 
+<!--
 				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 					<label style="text-decoration: underline;" class="<?=$_GET["not_spec"] ? "filtered" : ""?>">
 						Несоответствие по весу:
 						<input type="checkbox" name="not_spec" value="1" <?=$_GET["not_spec"] ? "checked" : ""?>>
 					</label>
 				</div>
+-->
 			</fieldset>
 		</div>
 
+<!--
 		<div style="margin-bottom: 10px;">
 			<fieldset>
 				<legend>Брак: (условие ИЛИ)</legend>
@@ -214,6 +241,7 @@ $CASs = implode(",", $CAS);
 
 			</fieldset>
 		</div>
+-->
 
 		<button style="float: right;">Фильтр</button>
 	</form>
@@ -311,7 +339,7 @@ $query = "
 	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	LEFT JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
-	WHERE 1
+	WHERE PB.F_ID = {$_GET["F_ID"]}
 		".($_GET["week"] ? "AND YEARWEEK(LO.opening_time, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
