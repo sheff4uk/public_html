@@ -159,7 +159,7 @@ $html .= "
 				".($row["sf_cnt"] ? "<th><input type='number' min='3' max='6' step='0.01' value='".($sf_density/1000)."' name='sf_density' style='width: 100%; background-color: #7952eb88;' ></th>" : "")."
 				".($row["lf_cnt"] ? "<th><input type='number' min='3' max='6' step='0.01' value='".($lf_density/1000)."' name='lf_density' style='width: 100%; background-color: #51d5d788;' ></th>" : "")."
 				".($row["io_cnt"] ? "<th><input type='number' min='2' max='3' step='0.01' value='".($io_density/1000)."' name='io_density' style='width: 100%; background-color: #a52a2a80;' ></th>" : "")."
-				".($row["sl_cnt"] ? "<th><input type='number' min='2' max='3' step='0.01' value='".($sl_density/1000)."' name='sl_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
+				".($row["sl_cnt"] ? "<th><input type='number' min='1' max='3' step='0.01' value='".($sl_density/1000)."' name='sl_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
 				".($row["sn_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($sn_density/1000)."' name='sn_density' style='width: 100%; background-color: #f4a46082;' ></th>" : "")."
 				".($row["cs_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($cs_density/1000)."' name='cs_density' style='width: 100%; background-color: #8b45137a;' ></th>" : "")."
 				<th><input type='number' min='0' max='100' value='".($calcium)."' name='calcium' style='width: 100%; background-color: #1e90ff85;' required></th>
