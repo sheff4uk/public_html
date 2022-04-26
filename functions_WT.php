@@ -150,15 +150,17 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 					//Дата/время совершения регистрации
 					$receipt_end = sprintf("20%02d-%02d-%02d %02d:%02d:%02d", $data[$i+11], $data[$i+12], $data[$i+13], $data[$i+14], $data[$i+15], $data[$i+16]);
 
-					// Узнаем время предыдущего закрытия
+					// Узнаем время предыдущего закрытия и участок терминала
 					$query = "
 						SELECT last_receiptDate receipt_start
+							,F_ID
 						FROM WeighingTerminal
 						WHERE WT_ID = {$deviceID}
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					$row = mysqli_fetch_array($res);
 					$receipt_start = $row["receipt_start"];
+					$F_ID = $row["F_ID"];
 
 					// Узнаем номер закрытой партии
 					$query = "
@@ -189,11 +191,12 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 									WHERE LO.LO_ID = SUB.LO_ID
 								) item
 							FROM (
-								SELECT (SELECT LO_ID FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) LO_ID
+								SELECT (SELECT LO_ID FROM list__Opening WHERE F_ID = {$F_ID} AND opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) LO_ID
 									,LO.opening_time end_time
 								FROM list__Opening LO
-								WHERE LO.opening_time > '{$receipt_start}'
-									AND (SELECT opening_time FROM list__Opening WHERE opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) <= '{$receipt_end}'
+								WHERE F_ID = {$F_ID}
+									AND LO.opening_time > '{$receipt_start}'
+									AND (SELECT opening_time FROM list__Opening WHERE F_ID = {$F_ID} AND opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) <= '{$receipt_end}'
 									AND '{$receipt_start}' <= LO.opening_time
 								) SUB
 							ORDER BY CW_cnt DESC
@@ -426,7 +429,7 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 	}
 }
 
-// Функция читает регистрации кассет на карусели
+// Функция читает регистрации кассет на расформовке
 function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 	$hexID = sprintf("%02x%02x%02x%02x", ($ID & 0xFF), (($ID >> 8) & 0xFF), (($ID >> 16) & 0xFF), (($ID >> 24) & 0xFF));
 	$hexcurnum = sprintf("%02x%02x", ($curnum & 0xFF), (($curnum >> 8) & 0xFF));
@@ -489,6 +492,24 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 
 					// Если количество положительное
 					if( $quantity > 0 ) {
+						// Узнаем участок терминала
+						$query = "
+							SELECT F_ID
+							FROM WeighingTerminal
+							WHERE WT_ID = {$deviceID}
+						";
+						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						$row = mysqli_fetch_array($res);
+						$F_ID = $row["F_ID"];
+
+						// Актуализируем участок у кассеты
+						$query = "
+							UPDATE Cassettes
+							SET F_ID = {$F_ID}
+							WHERE cassette = {$goodsID}
+						";
+						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
 						// Делаем запись в таблицу сборки кассет (расформовка триггером)
 						$query = "
 							INSERT INTO list__Assembling
