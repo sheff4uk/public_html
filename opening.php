@@ -171,6 +171,7 @@ if( !$_GET["F_ID"] ) {
 			</select>
 		</div>
 
+<!--
 		<div style="margin-bottom: 10px;">
 			<fieldset>
 				<legend>Нарушение тех. процесса: (условие ИЛИ)</legend>
@@ -181,16 +182,15 @@ if( !$_GET["F_ID"] ) {
 					</label>
 				</div>
 
-<!--
 				<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 					<label style="text-decoration: underline;" class="<?=$_GET["not_spec"] ? "filtered" : ""?>">
 						Несоответствие по весу:
 						<input type="checkbox" name="not_spec" value="1" <?=$_GET["not_spec"] ? "checked" : ""?>>
 					</label>
 				</div>
--->
 			</fieldset>
 		</div>
+-->
 
 <!--
 		<div style="margin-bottom: 10px;">
