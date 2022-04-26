@@ -62,6 +62,7 @@ if( $ip == $from_ip ) {
 			,DATE_FORMAT(LF.filling_time - INTERVAL 7 HOUR, '%d/%m/%y') filling_time_format
 			,IF(TIME(LF.filling_time) BETWEEN '07:00:00' AND '18:59:59', 1, 2) shift
 		FROM list__Opening LO
+		JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 		WHERE LO.F_ID = {$F_ID}
 		ORDER BY LO.opening_time DESC
 		LIMIT 1
