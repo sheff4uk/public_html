@@ -515,6 +515,7 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 							INSERT INTO list__Assembling
 							SET assembling_time = '{$transactionDate}'
 								,cassette = {$goodsID}
+								,F_ID = {$F_ID}
 						";
 						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					}
