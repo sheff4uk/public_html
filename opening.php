@@ -142,8 +142,8 @@ if( !$_GET["F_ID"] ) {
 			</select>
 		</div>
 
-		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 <!--
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Бренд:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
