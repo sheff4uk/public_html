@@ -129,6 +129,8 @@ if( !$_GET["F_ID"] ) {
 				$query = "
 					SELECT CW.CW_ID, CW.item
 					FROM CounterWeight CW
+					JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID
+						AND MF.F_ID = {$_GET["F_ID"]}
 					ORDER BY CW.CW_ID
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -141,6 +143,7 @@ if( !$_GET["F_ID"] ) {
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+<!--
 			<span>Бренд:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
@@ -158,6 +161,7 @@ if( !$_GET["F_ID"] ) {
 				?>
 			</select>
 		</div>
+-->
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>№№ Кассет:</span>
@@ -389,7 +393,7 @@ while( $row = mysqli_fetch_array($res) ) {
 <!--		<td><?=($row["max_weight"] ? $row["max_weight"]/1000 : "")?><?=($row["max_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["max_diff"] > 0 ? " +" : " ").($row["max_diff"]/1000)."</font>" : "")?></td>-->
 		<td class="bg-gray"><?=number_format($row["mix_density"], 0, ',', '&nbsp;')?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").number_format($row["mix_diff"], 0, ',', '&nbsp;')."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
-		<td class="bg-gray"><a href="filling.php?week=<?=$row["lb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
+		<td class="bg-gray"><a href="filling.php?F_ID=<?=$_GET["F_ID"]?>&week=<?=$row["lb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
 <!--
 		<td>
 			<a href="#" class="add_opening" LO_ID="<?=$row["LO_ID"]?>" title="Изменить данные расформовки"><i class="fa fa-pencil-alt fa-lg"></i></a>
