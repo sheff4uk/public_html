@@ -24,11 +24,8 @@ $notification_group = $row["notification_group"];
 	// Узнаем последний LO_ID
 	$query = "
 		SELECT LO.LO_ID
-		FROM plan__Batch PB
-		JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
-		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
-		WHERE PB.F_ID = {$F_ID}
+		FROM list__Opening LO
+		WHERE LO.F_ID = {$F_ID}
 		ORDER BY LO.opening_time DESC
 		LIMIT 1
 	";
@@ -36,7 +33,7 @@ $notification_group = $row["notification_group"];
 	$row = mysqli_fetch_array($res);
 	$LO_ID_before = $row["LO_ID"];
 
-	// Получаем штрихкод из весового терминала
+	// Получаем номер кассеты из весового терминала
 	$query = "
 		SELECT WT.WT_ID
 			,WT.port
@@ -48,7 +45,7 @@ $notification_group = $row["notification_group"];
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
+	// Открываем сокет и запускаем функцию чтения и записи в БД регистраций
 	$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 	if( socket_connect($socket, $from_ip, $row["port"]) ) {
 		// Чтение регистраций кассет
@@ -64,11 +61,8 @@ $notification_group = $row["notification_group"];
 		SELECT LO.LO_ID
 			,DATE_FORMAT(LF.filling_time - INTERVAL 7 HOUR, '%d/%m/%y') filling_time_format
 			,IF(TIME(LF.filling_time) BETWEEN '07:00:00' AND '18:59:59', 1, 2) shift
-		FROM plan__Batch PB
-		JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
-		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
-		WHERE PB.F_ID = {$F_ID}
+		FROM list__Opening LO
+		WHERE LO.F_ID = {$F_ID}
 		ORDER BY LO.opening_time DESC
 		LIMIT 1
 	";
