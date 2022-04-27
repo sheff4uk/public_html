@@ -62,7 +62,6 @@ $notification_group = $row["notification_group"];
 			,DATE_FORMAT(LF.filling_time - INTERVAL 7 HOUR, '%d/%m/%y') filling_time_format
 			,IF(TIME(LF.filling_time) BETWEEN '07:00:00' AND '18:59:59', 1, 2) shift
 			,LO.cassette
-			,DATE_FORMAT(LO.opening_time, '%H:%i') opening_time
 		FROM list__Opening LO
 		JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 		WHERE LO.F_ID = {$F_ID}
@@ -74,14 +73,13 @@ $notification_group = $row["notification_group"];
 	$LO_ID_after = $row["LO_ID"];
 	$filling_time_format = $row["filling_time_format"]." (".$row["shift"].")";
 	$cassette = $row["cassette"];
-	$opening_time = $row["opening_time"];
 
 	/////////////////////////////////////////////////////////////////////////////////
 	// Если расформована новая кассета, тогда собираем данные с весовых терминалов //
 	/////////////////////////////////////////////////////////////////////////////////
 	if( $LO_ID_before != $LO_ID_after ) {
 
-		message_to_telegram("Кассета <b>{$cassette}</b> расформована в <b>{$opening_time}</b>.", $notification_group);
+		message_to_telegram("Кассета <b>{$cassette}</b> расформована.", $notification_group);
 
 //		// Список активных весов на конвейере
 //		$query = "
