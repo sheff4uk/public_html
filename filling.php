@@ -304,7 +304,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		$cassette = "<td colspan='2' rowspan='{$subrow["per_batch"]}' class='nowrap'>";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
 			if( $subsubrow["LO_ID"] ) {
-				$cassette .= "<a href='opening.php?week={$subsubrow["o_week"]}#{$subsubrow["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette'>{$subsubrow["cassette"]}</b></a>";
+				$cassette .= "<a href='opening.php?F_ID={$_GET["F_ID"]}&week={$subsubrow["o_week"]}#{$subsubrow["LO_ID"]}' title='Расформовка' target='_blank'><b class='cassette'>{$subsubrow["cassette"]}</b></a>";
 			}
 			else {
 				$cassette .= "<b class='cassette'>{$subsubrow["cassette"]}</b>";
