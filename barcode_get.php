@@ -2,6 +2,11 @@
 $ip = $_SERVER['REMOTE_ADDR'];
 include "config.php";
 
+if( $ip == '78.138.173.64' ) {
+	message_to_telegram("NBC opening", '217756119');
+	die();
+}
+
 $F_ID = 1;
 $query = "
 	SELECT from_ip
