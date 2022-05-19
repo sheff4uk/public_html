@@ -92,7 +92,9 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<th colspan="2">Мелкая дробь</th>
 			<th colspan="2">Крупная дробь</th>
 			<th colspan="2">Окалина</th>
-			<th colspan="2">Шлак</th>
+			<th colspan="2">Шлак 0-10</th>
+			<th colspan="2">Шлак 10-20</th>
+			<th colspan="2">Шлак 5-30</th>
 			<th colspan="2">КМП</th>
 			<th colspan="2">Отсев</th>
 			<th colspan="2">Цемент</th>
@@ -121,6 +123,10 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<th>На деталь, мг</th>
 			<th>Расход, кг</th>
 			<th>На деталь, г</th>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;" class="nowrap">
@@ -132,7 +138,9 @@ echo "<title>Расход сырья {$date_format}</title>";
 				,SUM(LB.s_fraction) s_fraction
 				,SUM(LB.l_fraction) l_fraction
 				,SUM(LB.iron_oxide) iron_oxide
-				,SUM(LB.slag) slag
+				,SUM(LB.slag10) slag10
+				,SUM(LB.slag20) slag20
+				,SUM(LB.slag30) slag30
 				,SUM(LB.sand) sand
 				,SUM(LB.crushed_stone) crushed_stone
 				,SUM(LB.cement) cement
@@ -155,7 +163,9 @@ echo "<title>Расход сырья {$date_format}</title>";
 			$s_fraction += $row["s_fraction"];
 			$l_fraction += $row["l_fraction"];
 			$iron_oxide += $row["iron_oxide"];
-			$slag += $row["slag"];
+			$slag10 += $row["slag10"];
+			$slag20 += $row["slag20"];
+			$slag30 += $row["slag30"];
 			$sand += $row["sand"] ? round($row["sand"] + (0.05 * $row["krv"]) * $row["details"]) : 0;
 			$crushed_stone += $row["crushed_stone"];
 			$cement += $row["cement"] ? round($row["cement"] + (0.1 * $row["krv"]) * $row["details"]) : 0;
@@ -172,8 +182,12 @@ echo "<title>Расход сырья {$date_format}</title>";
 				<td><?=number_format($row["l_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td><?=number_format($row["slag"], 0, ',', ' ')?></td>
-				<td><?=number_format($row["slag"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["slag10"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["slag10"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["slag20"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["slag20"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["slag30"], 0, ',', ' ')?></td>
+				<td><?=number_format($row["slag30"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td><?=number_format($row["sand"] ? round($row["sand"] + (0.05 * $row["krv"]) * $row["details"]) : 0, 0, ',', ' ')?></td>
 				<td><?=number_format($row["sand"] ? ($row["sand"] * 1000/$row["details"] + (50 * $row["krv"])) : 0, 0, ',', ' ')?></td>
 				<td><?=number_format($row["crushed_stone"], 0, ',', ' ')?></td>
@@ -200,7 +214,11 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<td></td>
 			<td><?=number_format($iron_oxide, 0, ',', ' ')?></td>
 			<td></td>
-			<td><?=number_format($slag, 0, ',', ' ')?></td>
+			<td><?=number_format($slag10, 0, ',', ' ')?></td>
+			<td></td>
+			<td><?=number_format($slag20, 0, ',', ' ')?></td>
+			<td></td>
+			<td><?=number_format($slag30, 0, ',', ' ')?></td>
 			<td></td>
 			<td><?=number_format($sand, 0, ',', ' ')?></td>
 			<td></td>

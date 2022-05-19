@@ -159,7 +159,9 @@ foreach ($_GET as &$value) {
 			<th class="s_fraction">Мелкая дробь,<br>кг</th>
 			<th class="l_fraction">Крупная дробь,<br>кг</th>
 			<th class="iron_oxide">Окалина,<br>кг</th>
-			<th class="slag">Шлак,<br>кг</th>
+			<th class="slag10">Шлак 0-10,<br>кг</th>
+			<th class="slag20">Шлак 10-20,<br>кг</th>
+			<th class="slag30">Шлак 5-30,<br>кг</th>
 			<th class="sand">КМП,<br>кг</th>
 			<th class="crushed_stone">Отсев,<br>кг</th>
 			<th>Цемент,<br>кг</th>
@@ -189,7 +191,9 @@ $query = "
 		,PB.sf_density
 		,PB.lf_density
 		,PB.io_density
-		,PB.sl_density
+		,PB.sl10_density
+		,PB.sl20_density
+		,PB.sl30_density
 		,PB.sn_density
 		,PB.cs_density
 	FROM plan__Batch PB
@@ -238,7 +242,9 @@ while( $row = mysqli_fetch_array($res) ) {
 	$sf_density = $row["sf_density"]/1000;
 	$lf_density = $row["lf_density"]/1000;
 	$io_density = $row["io_density"]/1000;
-	$sl_density = $row["sl_density"]/1000;
+	$sl10_density = $row["sl10_density"]/1000;
+	$sl20_density = $row["sl20_density"]/1000;
+	$sl30_density = $row["sl30_density"]/1000;
 	$sn_density = $row["sn_density"]/1000;
 	$cs_density = $row["cs_density"]/1000;
 	$j = 0;
@@ -255,7 +261,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.s_fraction
 			,LB.l_fraction
 			,LB.iron_oxide
-			,LB.slag
+			,LB.slag10
+			,LB.slag20
+			,LB.slag30
 			,LB.sand
 			,LB.crushed_stone
 			,LB.cement
@@ -267,7 +275,9 @@ while( $row = mysqli_fetch_array($res) ) {
 			,mix_sf_diff({$row["MF_ID"]}, LB.s_fraction) sf_diff
 			,mix_lf_diff({$row["MF_ID"]}, LB.l_fraction) lf_diff
 			,mix_io_diff({$row["MF_ID"]}, LB.iron_oxide) io_diff
-			,mix_io_diff({$row["MF_ID"]}, LB.slag) sl_diff
+			,mix_sl10_diff({$row["MF_ID"]}, LB.slag10) sl10_diff
+			,mix_sl20_diff({$row["MF_ID"]}, LB.slag20) sl20_diff
+			,mix_sl30_diff({$row["MF_ID"]}, LB.slag30) sl30_diff
 			,mix_sn_diff({$row["MF_ID"]}, LB.sand) sn_diff
 			,mix_cs_diff({$row["MF_ID"]}, LB.crushed_stone) cs_diff
 			,mix_cm_diff({$row["MF_ID"]}, LB.cement) cm_diff
@@ -285,7 +295,9 @@ while( $row = mysqli_fetch_array($res) ) {
 		$s_fraction += $subrow["s_fraction"];
 		$l_fraction += $subrow["l_fraction"];
 		$iron_oxide += $subrow["iron_oxide"];
-		$slag += $subrow["slag"];
+		$slag10 += $subrow["slag10"];
+		$slag20 += $subrow["slag20"];
+		$slag30 += $subrow["slag30"];
 		$sand += $subrow["sand"];
 		$crushed_stone += $subrow["crushed_stone"];
 		$plasticizer += $subrow["plasticizer"];
@@ -325,7 +337,9 @@ while( $row = mysqli_fetch_array($res) ) {
 					".($sf_density ? "<span class='nowrap'><b>{$sf_density}</b>кг мел. дробь</span>" : "")."
 					".($lf_density ? "<span class='nowrap'><b>{$lf_density}</b>кг круп. дробь</span>" : "")."
 					".($io_density ? "<span class='nowrap'><b>{$io_density}</b>кг окалина</span>" : "")."
-					".($sl_density ? "<span class='nowrap'><b>{$sl_density}</b>кг шлак</span>" : "")."
+					".($sl10_density ? "<span class='nowrap'><b>{$sl10_density}</b>кг шлак 0-10</span>" : "")."
+					".($sl20_density ? "<span class='nowrap'><b>{$sl20_density}</b>кг шлак 10-20</span>" : "")."
+					".($sl30_density ? "<span class='nowrap'><b>{$sl30_density}</b>кг шлак 5-30</span>" : "")."
 					".($sn_density ? "<span class='nowrap'><b>{$sn_density}</b>кг КМП</span>" : "")."
 					".($cs_density ? "<span class='nowrap'><b>{$cs_density}</b>кг отсев</span>" : "")."
 				</td>
@@ -338,7 +352,9 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td class="s_fraction" style="background: #7952eb88;"><?=$subrow["s_fraction"]?><?=($subrow["sf_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sf_diff"] > 0 ? " +" : " ").($subrow["sf_diff"])."</font>" : "")?></td>
 				<td class="l_fraction" style="background: #51d5d788;"><?=$subrow["l_fraction"]?><?=($subrow["lf_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["lf_diff"] > 0 ? " +" : " ").($subrow["lf_diff"])."</font>" : "")?></td>
 				<td class="iron_oxide" style="background: #a52a2a80;"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
-				<td class="slag" style="background: #33333380;"><?=$subrow["slag"]?><?=($subrow["sl_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sl_diff"] > 0 ? " +" : " ").($subrow["sl_diff"])."</font>" : "")?></td>
+				<td class="slag10" style="background: #33333380;"><?=$subrow["slag10"]?><?=($subrow["sl10_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sl10_diff"] > 0 ? " +" : " ").($subrow["sl10_diff"])."</font>" : "")?></td>
+				<td class="slag20" style="background: #33333380;"><?=$subrow["slag20"]?><?=($subrow["sl20_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sl20_diff"] > 0 ? " +" : " ").($subrow["sl20_diff"])."</font>" : "")?></td>
+				<td class="slag30" style="background: #33333380;"><?=$subrow["slag30"]?><?=($subrow["sl30_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sl30_diff"] > 0 ? " +" : " ").($subrow["sl30_diff"])."</font>" : "")?></td>
 				<td class="sand" style="background: #f4a46082;"><?=$subrow["sand"]?><?=($subrow["sn_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["sn_diff"] > 0 ? " +" : " ").($subrow["sn_diff"])."</font>" : "")?></td>
 				<td class="crushed_stone" style="background: #8b45137a;"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
 				<td style="background: #7080906b;"><?=$subrow["cement"]?><?=($subrow["cm_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($subrow["cm_diff"] > 0 ? " +" : " ").($subrow["cm_diff"])."</font>" : "")?></td>
@@ -367,7 +383,9 @@ while( $row = mysqli_fetch_array($res) ) {
 	<?=($s_fraction ? "" : ".s_fraction{ display: none; }")?>
 	<?=($l_fraction ? "" : ".l_fraction{ display: none; }")?>
 	<?=($iron_oxide ? "" : ".iron_oxide{ display: none; }")?>
-	<?=($slag ? "" : ".slag{ display: none; }")?>
+	<?=($slag10 ? "" : ".slag10{ display: none; }")?>
+	<?=($slag20 ? "" : ".slag20{ display: none; }")?>
+	<?=($slag30 ? "" : ".slag30{ display: none; }")?>
 	<?=($sand ? "" : ".sand{ display: none; }")?>
 	<?=($crushed_stone ? "" : ".crushed_stone{ display: none; }")?>
 	<?=($plasticizer ? "" : ".plasticizer{ display: none; }")?>

@@ -26,7 +26,9 @@ if( isset($_POST["PB_ID"]) ) {
 			$s_fraction = $_POST["s_fraction"][$key] ? $_POST["s_fraction"][$key] : "NULL";
 			$l_fraction = $_POST["l_fraction"][$key] ? $_POST["l_fraction"][$key] : "NULL";
 			$iron_oxide = $_POST["iron_oxide"][$key] ? $_POST["iron_oxide"][$key] : "NULL";
-			$slag = $_POST["slag"][$key] ? $_POST["slag"][$key] : "NULL";
+			$slag10 = $_POST["slag10"][$key] ? $_POST["slag10"][$key] : "NULL";
+			$slag20 = $_POST["slag20"][$key] ? $_POST["slag20"][$key] : "NULL";
+			$slag30 = $_POST["slag30"][$key] ? $_POST["slag30"][$key] : "NULL";
 			$sand = $_POST["sand"][$key] ? $_POST["sand"][$key] : "NULL";
 			$crushed_stone = $_POST["crushed_stone"][$key] ? $_POST["crushed_stone"][$key] : "NULL";
 			$cement = $_POST["cement"][$key];
@@ -46,7 +48,9 @@ if( isset($_POST["PB_ID"]) ) {
 						,s_fraction = {$s_fraction}
 						,l_fraction = {$l_fraction}
 						,iron_oxide = {$iron_oxide}
-						,slag = {$slag}
+						,slag10 = {$slag10}
+						,slag20 = {$slag20}
+						,slag30 = {$slag30}
 						,sand = {$sand}
 						,crushed_stone = {$crushed_stone}
 						,cement = {$cement}
@@ -90,7 +94,9 @@ if( isset($_POST["PB_ID"]) ) {
 						,s_fraction = {$s_fraction}
 						,l_fraction = {$l_fraction}
 						,iron_oxide = {$iron_oxide}
-						,slag = {$slag}
+						,slag10 = {$slag10}
+						,slag20 = {$slag20}
+						,slag30 = {$slag30}
 						,sand = {$sand}
 						,crushed_stone = {$crushed_stone}
 						,cement = {$cement}
@@ -129,7 +135,9 @@ if( isset($_POST["PB_ID"]) ) {
 		$sf_density = $_POST["sf_density"] ? $_POST["sf_density"]*1000 : "NULL";
 		$lf_density = $_POST["lf_density"] ? $_POST["lf_density"]*1000 : "NULL";
 		$io_density = $_POST["io_density"] ? $_POST["io_density"]*1000 : "NULL";
-		$sl_density = $_POST["sl_density"] ? $_POST["sl_density"]*1000 : "NULL";
+		$sl10_density = $_POST["sl10_density"] ? $_POST["sl10_density"]*1000 : "NULL";
+		$sl20_density = $_POST["sl20_density"] ? $_POST["sl20_density"]*1000 : "NULL";
+		$sl30_density = $_POST["sl30_density"] ? $_POST["sl30_density"]*1000 : "NULL";
 		$sn_density = $_POST["sn_density"] ? $_POST["sn_density"]*1000 : "NULL";
 		$cs_density = $_POST["cs_density"] ? $_POST["cs_density"]*1000 : "NULL";
 		$calcium = $_POST["calcium"];
@@ -143,7 +151,9 @@ if( isset($_POST["PB_ID"]) ) {
 				,sf_density = {$sf_density}
 				,lf_density = {$lf_density}
 				,io_density = {$io_density}
-				,sl_density = {$sl_density}
+				,sl10_density = {$sl10_density}
+				,sl20_density = {$sl20_density}
+				,sl30_density = {$sl30_density}
 				,sn_density = {$sn_density}
 				,cs_density = {$cs_density}
 				,calcium = {$calcium}

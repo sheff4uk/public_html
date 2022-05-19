@@ -138,7 +138,9 @@ $query = "
 	SELECT IFNULL(CONCAT(MF.s_fraction, ' кг'), 0) s_fraction
 		,IFNULL(CONCAT(MF.l_fraction, ' кг'), 0) l_fraction
 		,IFNULL(CONCAT(MF.iron_oxide, ' кг'), 0) iron_oxide
-		,IFNULL(CONCAT(MF.slag, ' кг'), 0) slag
+		,IFNULL(CONCAT(MF.slag10, ' кг'), 0) slag10
+		,IFNULL(CONCAT(MF.slag20, ' кг'), 0) slag20
+		,IFNULL(CONCAT(MF.slag30, ' кг'), 0) slag30
 		,IFNULL(CONCAT(MF.sand, ' кг'), 0) sand
 		,IFNULL(CONCAT(MF.crushed_stone, ' кг'), 0) crushed_stone
 		,IFNULL(CONCAT(MF.cement, ' кг'), 0) cement
@@ -147,7 +149,9 @@ $query = "
 		,COUNT(MF.s_fraction) sf_cnt
 		,COUNT(MF.l_fraction) lf_cnt
 		,COUNT(MF.iron_oxide) io_cnt
-		,COUNT(MF.slag) sl_cnt
+		,COUNT(MF.slag10) sl10_cnt
+		,COUNT(MF.slag20) sl20_cnt
+		,COUNT(MF.slag30) sl30_cnt
 		,COUNT(MF.sand) sn_cnt
 		,COUNT(MF.crushed_stone) cs_cnt
 		,COUNT(MF.cement) cm_cnt
@@ -171,7 +175,9 @@ $row = mysqli_fetch_array($res);
 			<?=($row["sf_cnt"] ? "<th>Мелкая дробь</th>" : "")?>
 			<?=($row["lf_cnt"] ? "<th>Крупная дробь</th>" : "")?>
 			<?=($row["io_cnt"] ? "<th>Окалина</th>" : "")?>
-			<?=($row["sl_cnt"] ? "<th>Шлак</th>" : "")?>
+			<?=($row["sl10_cnt"] ? "<th>Шлак 0-10</th>" : "")?>
+			<?=($row["sl20_cnt"] ? "<th>Шлак 10-20</th>" : "")?>
+			<?=($row["sl30_cnt"] ? "<th>Шлак 5-30</th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th>КМП</th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th>Отсев</th>" : "")?>
 			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент</th>" : "")?>
@@ -186,7 +192,9 @@ $row = mysqli_fetch_array($res);
 			<?=($row["sf_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 			<?=($row["lf_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 			<?=($row["io_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
-			<?=($row["sl_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
+			<?=($row["sl10_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
+			<?=($row["sl20_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
+			<?=($row["sl30_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 		</tr>
@@ -195,7 +203,9 @@ $row = mysqli_fetch_array($res);
 			<?=($row["sf_cnt"] ? "<th class='nowrap'>{$row["s_fraction"]}</th>" : "")?>
 			<?=($row["lf_cnt"] ? "<th class='nowrap'>{$row["l_fraction"]}</th>" : "")?>
 			<?=($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")?>
-			<?=($row["sl_cnt"] ? "<th class='nowrap'>{$row["slag"]}</th>" : "")?>
+			<?=($row["sl10_cnt"] ? "<th class='nowrap'>{$row["slag10"]}</th>" : "")?>
+			<?=($row["sl20_cnt"] ? "<th class='nowrap'>{$row["slag20"]}</th>" : "")?>
+			<?=($row["sl30_cnt"] ? "<th class='nowrap'>{$row["slag30"]}</th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")?>
 			<?=($row["cm_cnt"] ? "<th class='nowrap'>{$row["cement"]}</th>" : "")?>
@@ -223,7 +233,9 @@ for ($i = 1; $i <= $batches; $i++) {
 			".($row["sf_cnt"] ? "<td></td>" : "")."
 			".($row["lf_cnt"] ? "<td></td>" : "")."
 			".($row["io_cnt"] ? "<td></td>" : "")."
-			".($row["sl_cnt"] ? "<td></td>" : "")."
+			".($row["sl10_cnt"] ? "<td></td>" : "")."
+			".($row["sl20_cnt"] ? "<td></td>" : "")."
+			".($row["sl30_cnt"] ? "<td></td>" : "")."
 			".($row["sn_cnt"] ? "<td></td>" : "")."
 			".($row["cs_cnt"] ? "<td></td>" : "")."
 			".($row["cm_cnt"] ? "<td></td>" : "")."

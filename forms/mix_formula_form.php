@@ -7,7 +7,9 @@ if( isset($_POST["CW_ID"]) ) {
 	$s_fraction = ($_POST["s_fraction"] != '') ? $_POST["s_fraction"] : "NULL";
 	$l_fraction = ($_POST["l_fraction"] != '') ? $_POST["l_fraction"] : "NULL";
 	$iron_oxide = ($_POST["iron_oxide"] != '') ? $_POST["iron_oxide"] : "NULL";
-	$slag = ($_POST["slag"] != '') ? $_POST["slag"] : "NULL";
+	$slag10 = ($_POST["slag10"] != '') ? $_POST["slag10"] : "NULL";
+	$slag20 = ($_POST["slag20"] != '') ? $_POST["slag20"] : "NULL";
+	$slag30 = ($_POST["slag30"] != '') ? $_POST["slag30"] : "NULL";
 	$sand = ($_POST["sand"] != '') ? $_POST["sand"] : "NULL";
 	$crushed_stone = ($_POST["crushed_stone"] != '') ? $_POST["crushed_stone"] : "NULL";
 	$cement = ($_POST["cement"] != '') ? $_POST["cement"] : "NULL";
@@ -20,7 +22,9 @@ if( isset($_POST["CW_ID"]) ) {
 			SET s_fraction = {$s_fraction}
 				,l_fraction = {$l_fraction}
 				,iron_oxide = {$iron_oxide}
-				,slag = {$slag}
+				,slag10 = {$slag10}
+				,slag20 = {$slag20}
+				,slag30 = {$slag30}
 				,sand = {$sand}
 				,crushed_stone = {$crushed_stone}
 				,cement = {$cement}
@@ -61,14 +65,13 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
-						<th rowspan="2">Противовес</th>
-						<th colspan="9">Ингредиенты</th>
-					</tr>
-					<tr>
+						<th>Противовес</th>
 						<th>Мелкая дробь, кг</th>
 						<th>Крупная дробь, кг</th>
 						<th>Окалина, кг</th>
-						<th>Шлак, кг</th>
+						<th>Шлак 0-10, кг</th>
+						<th>Шлак 10-20, кг</th>
+						<th>Шлак 5-30, кг</th>
 						<th>КМП, кг</th>
 						<th>Отсев, кг</th>
 						<th>Цемент, кг</th>
@@ -82,7 +85,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td style="background: "><input type="number" name="s_fraction" min="0" style="width: 80px;"></td>
 						<td style="background: "><input type="number" name="l_fraction" min="0" style="width: 80px;"></td>
 						<td style="background: #a52a2a80;"><input type="number" name="iron_oxide" min="0" style="width: 80px;"></td>
-						<td style="background: #33333380;"><input type="number" name="slag" min="0" style="width: 80px;"></td>
+						<td style="background: #33333380;"><input type="number" name="slag10" min="0" style="width: 80px;"></td>
+						<td style="background: #33333380;"><input type="number" name="slag20" min="0" style="width: 80px;"></td>
+						<td style="background: #33333380;"><input type="number" name="slag30" min="0" style="width: 80px;"></td>
 						<td style="background: #f4a46082;"><input type="number" name="sand" min="0" style="width: 80px;"></td>
 						<td style="background: #8b45137a;"><input type="number" name="crushed_stone" min="0" style="width: 80px;"></td>
 						<td style="background: #7080906b;"><input type="number" name="cement" min="0" style="width: 80px;" required></td>
@@ -125,7 +130,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#formula_form input[name="s_fraction"]').val(mf_data['s_fraction']);
 			$('#formula_form input[name="l_fraction"]').val(mf_data['l_fraction']);
 			$('#formula_form input[name="iron_oxide"]').val(mf_data['iron_oxide']);
-			$('#formula_form input[name="slag"]').val(mf_data['slag']);
+			$('#formula_form input[name="slag10"]').val(mf_data['slag10']);
+			$('#formula_form input[name="slag20"]').val(mf_data['slag20']);
+			$('#formula_form input[name="slag30"]').val(mf_data['slag30']);
 			$('#formula_form input[name="sand"]').val(mf_data['sand']);
 			$('#formula_form input[name="crushed_stone"]').val(mf_data['crushed_stone']);
 			$('#formula_form input[name="cement"]').val(mf_data['cement']);
