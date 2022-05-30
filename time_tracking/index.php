@@ -244,6 +244,7 @@ if( isset($_POST["id"]) ) {
 							$query = "
 								SELECT IF(TT.stop IS NULL, 0, 1) `status`
 									,TIMESTAMPDIFF(MINUTE, TT.start, TT.stop) `interval`
+									,USR_Name({$_GET["id"]}) `name`
 								FROM TimeTracking TT
 								WHERE TT.USR_ID = {$_GET["id"]}
 								ORDER BY TT.TT_ID DESC
@@ -254,6 +255,8 @@ if( isset($_POST["id"]) ) {
 							$interval = $row["interval"];
 							$hours = intdiv($interval, 60);
 							$minutes = fmod($interval, 60);
+							$name = $row["name"];
+							echo "<h1>{$name}</h1>";
 							if( $status ) {
 								echo "<p class='title'>Рабочая смена завершена</p>";
 								echo "<p>Продолжительность: <b>{$hours}</b> ч. <b>{$minutes}</b> мин.</p>";
