@@ -141,7 +141,7 @@ $query = "
 		,IF(OA.oa_cnt < 0, IF(OA.correction, CONCAT(ABS(OA.oa_cnt), ' (корректировка)'), ABS(OA.oa_cnt)), NULL) outcoming
 	FROM overal__Accounting OA
 	JOIN overal__Item OI ON OI.OI_ID = OA.OI_ID
-	WHERE 1
+	WHERE OA.oa_cnt <> 0
 		".($_GET["date_from"] ? "AND OA.oa_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND OA.oa_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["OI_ID"] ? "AND OA.OI_ID = {$_GET["OI_ID"]}" : "")."
