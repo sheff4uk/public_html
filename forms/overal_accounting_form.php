@@ -90,7 +90,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 								?>
 							</select>
 						</td>
-						<td><input type="number" name="oa_cnt" min="1" style="width: 70px;" required></td>
+						<td><input type="number" name="oa_cnt" min="0" style="width: 70px;" required></td>
 						<td><input type="checkbox" name="correction" value="1"></td>
 					</tr>
 				</tbody>
@@ -141,7 +141,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 								?>
 							</select>
 						</td>
-						<td><input type="number" name="oa_cnt" min="1" style="width: 70px;" required></td>
+						<td><input type="number" name="oa_cnt" min="0" style="width: 70px;" required></td>
 						<td><input type="checkbox" name="correction" value="1"></td>
 					</tr>
 				</tbody>
