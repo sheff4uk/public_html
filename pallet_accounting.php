@@ -302,7 +302,6 @@ $query = "
 		,CW.CB_ID
 		,YEARWEEK(LS.ls_date, 1)
 		,LS.LS_ID
-		,NULL
 	FROM list__Shipment LS
 	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
 	JOIN ClientBrand CB ON CB.CB_ID = CW.CB_ID
