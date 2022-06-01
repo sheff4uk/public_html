@@ -11,13 +11,12 @@ if( $_GET["type"] == "R" ) {
 			,PR.pr_cnt
 			,PR.pr_reject
 			,PR.PN_ID
-			,PR.comment
 		FROM pallet__Return PR
 		WHERE PR.PR_ID = {$PR_ID}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$PR_data = array( "date"=>$row["pr_date"], "source"=>$row["CB_ID"], "cnt"=>$row["pr_cnt"], "broken"=>$row["pr_reject"], "PN_ID"=>$row["PN_ID"], "comment"=>$row["comment"] );
+	$PR_data = array( "date"=>$row["pr_date"], "source"=>$row["CB_ID"], "cnt"=>$row["pr_cnt"], "broken"=>$row["pr_reject"], "PN_ID"=>$row["PN_ID"] );
 
 	echo json_encode($PR_data);
 }
@@ -31,13 +30,12 @@ elseif( $_GET["type"] == "A" ) {
 			,PA.pa_cnt
 			,PA.pa_reject
 			,PA.pallet_cost
-			,PA.comment
 		FROM pallet__Arrival PA
 		WHERE PA.PA_ID = {$PA_ID}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$PA_data = array( "date"=>$row["pa_date"], "source"=>$row["PS_ID"], "cnt"=>$row["pa_cnt"], "broken"=>$row["pa_reject"], "cost"=>$row["pallet_cost"], "comment"=>$row["comment"] );
+	$PA_data = array( "date"=>$row["pa_date"], "source"=>$row["PS_ID"], "cnt"=>$row["pa_cnt"], "broken"=>$row["pa_reject"], "cost"=>$row["pallet_cost"] );
 
 	echo json_encode($PA_data);
 }
@@ -49,13 +47,12 @@ elseif( $_GET["type"] == "F" ) {
 		SELECT PF.PN_ID
 			,PF.pd_date
 			,PF.pd_cnt * -1 pd_cnt
-			,PF.comment
 		FROM pallet__Disposal PF
 		WHERE PF.PD_ID = {$PF_ID}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$PF_data = array( "PN_ID"=>$row["PN_ID"], "date"=>$row["pd_date"], "source"=>"", "cnt"=>$row["pd_cnt"], "comment"=>$row["comment"] );
+	$PF_data = array( "PN_ID"=>$row["PN_ID"], "date"=>$row["pd_date"], "source"=>"", "cnt"=>$row["pd_cnt"] );
 
 	echo json_encode($PF_data);
 }
@@ -68,13 +65,12 @@ elseif( $_GET["type"] == "D" ) {
 			,PD.CB_ID
 			,PD.pd_date
 			,PD.pd_cnt
-			,PD.comment
 		FROM pallet__Disposal PD
 		WHERE PD.PD_ID = {$PD_ID}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$PD_data = array( "PN_ID"=>$row["PN_ID"], "CB_ID"=>$row["CB_ID"], "pd_date"=>$row["pd_date"], "pd_cnt"=>$row["pd_cnt"], "comment"=>$row["comment"] );
+	$PD_data = array( "PN_ID"=>$row["PN_ID"], "CB_ID"=>$row["CB_ID"], "pd_date"=>$row["pd_date"], "pd_cnt"=>$row["pd_cnt"] );
 
 	echo json_encode($PD_data);
 }
