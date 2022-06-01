@@ -21,7 +21,7 @@ $month = $row["month"];
 $format_month = $row["format_month"];
 /////////////////////////////////////////
 
-$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Дефекты за {$format_month} {$year}"). "?=";
+$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Дефекты {$format_month} {$year}"). "?=";
 
 $message = "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
