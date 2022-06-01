@@ -108,9 +108,9 @@ $message .= "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 		<thead style='word-wrap: break-word;'>
 			<tr>
-				<th>Number of pallets shipped today</th>
-				<th>Pallets returned today</th>
-				<th>Broken pallets found today</th>
+				<!--<th>Number of pallets shipped today</th>-->
+				<!--<th>Pallets returned today</th>-->
+				<!--<th>Broken pallets found today</th>-->
 				<th>Debt in pallets (Vesta)</th>
 				<th>Debt in rubles</th>
 			</tr>
@@ -119,44 +119,44 @@ $message .= "
 			<tr>
 ";
 
-$query = "
-	SELECT SUM(pallets) shipped
-	FROM list__Shipment LS
-	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
-	WHERE LS.ls_date = CURDATE()
-		AND CW.CB_ID = {$CB_ID}
-";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-$row = mysqli_fetch_array($res);
-$message .= "
-	<td>{$row["shipped"]}</td>
-";
-
-// Возвращенные поддоны
-$query = "
-	SELECT SUM(PR.pr_cnt) pr_cnt
-	FROM pallet__Return PR
-	WHERE PR.pr_date = CURDATE()
-		AND PR.CB_ID = {$CB_ID}
-";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-$row = mysqli_fetch_array($res);
-$message .= "
-	<td>{$row["pr_cnt"]}</td>
-";
-
-// Сломанные поддоны
-$query = "
-	SELECT SUM(PD.pd_cnt) pd_cnt
-	FROM pallet__Disposal PD
-	WHERE PD.pd_date = CURDATE()
-		AND PD.CB_ID = {$CB_ID}
-";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-$row = mysqli_fetch_array($res);
-$message .= "
-	<td>{$row["pd_cnt"]}</td>
-";
+//$query = "
+//	SELECT SUM(pallets) shipped
+//	FROM list__Shipment LS
+//	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
+//	WHERE LS.ls_date = CURDATE()
+//		AND CW.CB_ID = {$CB_ID}
+//";
+//$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//$row = mysqli_fetch_array($res);
+//$message .= "
+//	<td>{$row["shipped"]}</td>
+//";
+//
+//// Возвращенные поддоны
+//$query = "
+//	SELECT SUM(PR.pr_cnt) pr_cnt
+//	FROM pallet__Return PR
+//	WHERE PR.pr_date = CURDATE()
+//		AND PR.CB_ID = {$CB_ID}
+//";
+//$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//$row = mysqli_fetch_array($res);
+//$message .= "
+//	<td>{$row["pr_cnt"]}</td>
+//";
+//
+//// Сломанные поддоны
+//$query = "
+//	SELECT SUM(PD.pd_cnt) pd_cnt
+//	FROM pallet__Disposal PD
+//	WHERE PD.pd_date = CURDATE()
+//		AND PD.CB_ID = {$CB_ID}
+//";
+//$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//$row = mysqli_fetch_array($res);
+//$message .= "
+//	<td>{$row["pd_cnt"]}</td>
+//";
 
 // Узнаем актуальную стоимость поддона (дерево)
 $query = "
