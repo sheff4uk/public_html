@@ -171,7 +171,6 @@ foreach ($_GET as &$value) {
 			<th>Из них бракованных</th>
 			<th>Стоимость поддона, руб</th>
 			<th>Сумма, руб</th>
-			<th>Примечание</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -349,7 +348,6 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><b><?=$pr_reject?></b></td>
 			<td></td>
 			<td><?=(isset($sum_cost) ? number_format($sum_cost, 0, '', ' ') : "")?></td>
-			<td></td>
 			<td></td>
 		</tr>
 	</tbody>
