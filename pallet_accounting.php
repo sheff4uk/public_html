@@ -194,7 +194,6 @@ $query = "
 		,PR.CB_ID
 		,NULL week
 		,NULL LS_ID
-		,PR.comment
 	FROM pallet__Return PR
 	JOIN ClientBrand CB ON CB.CB_ID = PR.CB_ID
 	JOIN pallet__Name PN ON PN.PN_ID = PR.PN_ID
@@ -222,7 +221,6 @@ $query = "
 		,NULL
 		,NULL
 		,NULL
-		,PA.comment
 	FROM pallet__Arrival PA
 	JOIN pallet__Supplier PS ON PS.PS_ID = PA.PS_ID
 	JOIN pallet__Name PN ON PN.PN_ID = PS.PN_ID
@@ -251,7 +249,6 @@ $query = "
 		,NULL
 		,NULL
 		,NULL
-		,PD.comment
 	FROM pallet__Disposal PD
 	JOIN pallet__Name PN ON PN.PN_ID = PD.PN_ID
 	LEFT JOIN ClientBrand CB ON CB.CB_ID = PD.CB_ID
@@ -279,7 +276,6 @@ $query = "
 		,NULL
 		,NULL
 		,NULL
-		,PD.comment
 	FROM pallet__Disposal PD
 	JOIN pallet__Name PN ON PN.PN_ID = PD.PN_ID
 	WHERE PD.pd_cnt < 0
@@ -339,7 +335,6 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><b style="color: red;"><?=$row["pr_reject"]?></b></td>
 		<td><?=(isset($row["pallet_cost"]) ? number_format($row["pallet_cost"], 0, '', ' ') : "")?></td>
 		<td><?=(isset($row["sum_cost"]) ? number_format($row["sum_cost"], 0, '', ' ') : "")?></td>
-		<td><?=$row["comment"]?></td>
 		<td><?=($row["type"] ? "<a href='#' ".($row["type"] == "D" ? "class='add_disposal' PD_ID='{$row["ID"]}'" : "class='add_incoming' incoming_ID='{$row["ID"]}' type='{$row["type"]}'")."><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?></td>
 	</tr>
 	<?
