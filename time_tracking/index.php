@@ -243,6 +243,7 @@ if( isset($_POST["id"]) ) {
 							?>
 							<div id="my_camera" style=""></div>
 							<div id="results"></div>
+							<input type=button value="Take Snapshot" onClick="take_snapshot()">
 
 							<script src="../js/webcam.min.js"></script>
 
@@ -256,6 +257,7 @@ if( isset($_POST["id"]) ) {
 									});
 									Webcam.attach( '#my_camera' );
 
+								function take_snapshot() {
 									// preload shutter audio clip
 									var shutter = new Audio();
 									shutter.autoplay = false;
@@ -272,14 +274,15 @@ if( isset($_POST["id"]) ) {
 									});
 
 									Webcam.reset();
+								}
 
-									// Get base64 value from <img id='imageprev'> source
-									var base64image = document.getElementById("imageprev").src;
-
-									Webcam.upload( base64image, 'upload.php', function(code, text) {
-										console.log('Save successfully');
-										console.log(text);
-									});
+//									// Get base64 value from <img id='imageprev'> source
+//									var base64image = document.getElementById("imageprev").src;
+//
+//									Webcam.upload( base64image, 'upload.php', function(code, text) {
+//										console.log('Save successfully');
+//										console.log(text);
+//									});
 							</script>
 
 							<?
