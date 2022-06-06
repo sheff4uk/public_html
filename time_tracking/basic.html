@@ -23,7 +23,7 @@
 </style>
 
 <!-- -->
-<!-- <div id="my_camera"></div>-->
+ <div id="my_camera" style="display: none;"></div>
 <!-- <input type=button value="Configure" onClick="configure()">-->
  <input type=button value="Take Snapshot" onClick="take_snapshot()">
  <input type=button value="Save Snapshot" onClick="saveSnap()">
@@ -43,7 +43,7 @@
        image_format: 'jpeg',
        jpeg_quality: 90
     });
-//    Webcam.attach( '#my_camera' );
+    Webcam.attach( '#my_camera' );
 
  // preload shutter audio clip
  var shutter = new Audio();
