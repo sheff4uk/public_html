@@ -305,11 +305,11 @@ if( isset($_POST["id"]) ) {
 							if( $status ) {
 								echo "<p class='title'>Рабочая смена завершена</p>";
 								echo "<p>Продолжительность: <b>{$hours}</b> ч. <b>{$minutes}</b> мин.</p>";
-								echo "<i class='fas fa-door-closed fa-lg'></i>";
+								echo "<i class='fas fa-door-closed fa-4x'></i>";
 							}
 							else {
 								echo "<p class='title'>Рабочая смена начата</p>";
-								echo "<i class='fas fa-door-open fa-lg'></i>";
+								echo "<i class='fas fa-door-open fa-4x'></i>";
 							}
 						}
 						else {
