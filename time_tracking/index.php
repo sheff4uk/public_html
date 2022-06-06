@@ -242,7 +242,7 @@ if( isset($_POST["id"]) ) {
 						if( $_GET["id"] > 0 ) {
 							?>
 							<input type=button value="Configure" onClick="configure()">
-							<div id="my_camera" style=""></div>
+							<div id="my_camera" style="display: none;"></div>
 							<div id="results" style="float:right; margin:20px; padding:20px; border:1px solid; background:#ccc;"></div>
 
 							<script src="../js/webcam.min.js"></script>
@@ -258,24 +258,31 @@ if( isset($_POST["id"]) ) {
 								Webcam.attach( '#my_camera' );
 
 								setTimeout(function(){
+									// preload shutter audio clip
+									var shutter = new Audio();
+									shutter.autoplay = false;
+									shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
 
-								// preload shutter audio clip
-								var shutter = new Audio();
-								shutter.autoplay = false;
-								shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
+									// play sound effect
+									shutter.play();
 
-								// play sound effect
-								shutter.play();
+									// take snapshot and get image data
+									Webcam.snap( function(data_uri) {
+										// display results in page
+										document.getElementById('results').innerHTML =
+											'<img id="imageprev" src="'+data_uri+'"/>';
+									});
 
-								// take snapshot and get image data
-								Webcam.snap( function(data_uri) {
-									// display results in page
-									document.getElementById('results').innerHTML =
-										'<img id="imageprev" src="'+data_uri+'"/>';
-								});
+									Webcam.reset();
 
-								Webcam.reset();
-								},5000);
+									// Get base64 value from <img id='imageprev'> source
+									var base64image = document.getElementById("imageprev").src;
+
+									Webcam.upload( base64image, 'upload.php', function(code, text) {
+										console.log('Save successfully');
+										console.log(text);
+									});
+								}, 1000);
 
 							</script>
 
