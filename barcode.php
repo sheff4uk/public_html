@@ -1143,7 +1143,7 @@ $black  = ImageColorAllocate($im,0x00,0x00,0x00);
 $white  = ImageColorAllocate($im,0xff,0xff,0xff);
 imagefilledrectangle($im, 0, 0, $w, $h, $white);
 $code = str_pad($_GET["code"], 8, "0", STR_PAD_LEFT);
-$data = Barcode::gd($im, $black, $w/2, $h/2, 0, "code128", $code, 2, $h-10);
+$data = Barcode::gd($im, $black, $w/2, $h/2, 0, "code128", $code, 15, $h-100);
 header('Content-type: image/gif');
 imagegif($im);
 imagedestroy($im);
