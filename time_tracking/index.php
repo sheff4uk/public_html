@@ -241,23 +241,23 @@ if( isset($_POST["id"]) ) {
 					<?
 						if( $_GET["id"] > 0 ) {
 							?>
-							<div id="my_camera" style=""></div>
+							<div id="my_camera" style="display: none;"></div>
 							<div id="results"></div>
 							<input type=button value="Take Snapshot" onClick="take_snapshot()">
 
 							<script src="../js/webcam.min.js"></script>
 
 							<script>
-									// Configure a few settings and attach camera
-									Webcam.set({
-										width: 320,
-										height: 240,
-										image_format: 'jpeg',
-										jpeg_quality: 90
-									});
-									Webcam.attach( '#my_camera' );
+								// Configure a few settings and attach camera
+								Webcam.set({
+									width: 320,
+									height: 240,
+									image_format: 'jpeg',
+									jpeg_quality: 90
+								});
+								Webcam.attach( '#my_camera' );
 
-								function take_snapshot() {
+								Webcam.on( 'load', function() {
 									// preload shutter audio clip
 									var shutter = new Audio();
 									shutter.autoplay = false;
@@ -274,7 +274,7 @@ if( isset($_POST["id"]) ) {
 									});
 
 									Webcam.reset();
-								}
+								});
 
 //									// Get base64 value from <img id='imageprev'> source
 //									var base64image = document.getElementById("imageprev").src;
