@@ -249,7 +249,7 @@ if( isset($_POST["id"]) ) {
 
 							<script>
 								// Configure a few settings and attach camera
-								function configure(){
+								setTimeout(function(){
 								Webcam.set({
 									width: 320,
 									height: 240,
@@ -257,6 +257,7 @@ if( isset($_POST["id"]) ) {
 									jpeg_quality: 90
 								});
 								Webcam.attach( '#my_camera' );
+								},5000);
 
 								// preload shutter audio clip
 								var shutter = new Audio();
@@ -274,7 +275,6 @@ if( isset($_POST["id"]) ) {
 								});
 
 								Webcam.reset();
-								}
 
 							</script>
 
