@@ -243,7 +243,6 @@ if( isset($_POST["id"]) ) {
 							?>
 							<div id="my_camera" style="display: none;"></div>
 							<div id="results"></div>
-							<input type=button value="Take Snapshot" onClick="take_snapshot()">
 
 							<script src="../js/webcam.min.js"></script>
 
@@ -255,7 +254,7 @@ if( isset($_POST["id"]) ) {
 									image_format: 'jpeg',
 									jpeg_quality: 90
 								});
-								Webcam.attach( '#my_camera' );
+								//Webcam.attach( '#my_camera' );
 
 								Webcam.on( 'load', function() {
 									// preload shutter audio clip
