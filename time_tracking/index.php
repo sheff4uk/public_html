@@ -301,15 +301,15 @@ if( isset($_POST["id"]) ) {
 							$hours = intdiv($interval, 60);
 							$minutes = fmod($interval, 60);
 							$name = $row["name"];
-							echo "<h1>{$name}</h11>";
+							echo "<h1>{$name}</h1>";
 							if( $status ) {
 								echo "<p class='title'>Рабочая смена завершена</p>";
 								echo "<p>Продолжительность: <b>{$hours}</b> ч. <b>{$minutes}</b> мин.</p>";
-								echo "<i class='fas fa-door-closed fa-8x'></i>";
+								echo "<i class='fas fa-door-closed fa-lg'></i>";
 							}
 							else {
 								echo "<p class='title'>Рабочая смена начата</p>";
-								echo "<i class='fas fa-door-open fa-8x'></i>";
+								echo "<i class='fas fa-door-open fa-lg'></i>";
 							}
 						}
 						else {
