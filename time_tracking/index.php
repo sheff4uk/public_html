@@ -243,7 +243,7 @@ if( isset($_POST["id"]) ) {
 							?>
 							<input type=button value="Configure" onClick="configure()">
 							<div id="my_camera" style="display: none;"></div>
-							<div id="results" style="float:right; margin:20px; padding:20px; border:1px solid; background:#ccc;"></div>
+							<div id="results"></div>
 
 							<script src="../js/webcam.min.js"></script>
 
