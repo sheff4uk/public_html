@@ -240,6 +240,24 @@ if( isset($_POST["id"]) ) {
 				<form method="post">
 					<?
 						if( $_GET["id"] > 0 ) {
+							// Узнаем статус смены
+							$query = "
+								SELECT TT.TT_ID
+									,IF(TT.stop IS NULL, 0, 1) `status`
+									,TIMESTAMPDIFF(MINUTE, TT.start, TT.stop) `interval`
+									,USR_Name({$_GET["id"]}) `name`
+								FROM TimeTracking TT
+								WHERE TT.USR_ID = {$_GET["id"]}
+								ORDER BY TT.TT_ID DESC
+							";
+							$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+							$row = mysqli_fetch_array($res);
+							$TT_ID = $row["TT_ID"];
+							$status = $row["status"];
+							$interval = $row["interval"];
+							$hours = intdiv($interval, 60);
+							$minutes = fmod($interval, 60);
+							$name = $row["name"];
 							?>
 							<div id="my_camera" style="display: none;"></div>
 							<div id="results" style="width: 320px; height: 240px; margin: auto;"></div>
@@ -277,7 +295,7 @@ if( isset($_POST["id"]) ) {
 									// Get base64 value from <img id='imageprev'> source
 									var base64image = document.getElementById("imageprev").src;
 
-									Webcam.upload( base64image, 'upload.php', function(code, text) {
+									Webcam.upload( base64image, 'upload.php?tt_id=<?=$TT_ID?>&status=<?=$status?>', function(code, text) {
 										console.log('Save successfully');
 										console.log(text);
 									});
@@ -285,22 +303,6 @@ if( isset($_POST["id"]) ) {
 							</script>
 
 							<?
-							// Узнаем статус смены
-							$query = "
-								SELECT IF(TT.stop IS NULL, 0, 1) `status`
-									,TIMESTAMPDIFF(MINUTE, TT.start, TT.stop) `interval`
-									,USR_Name({$_GET["id"]}) `name`
-								FROM TimeTracking TT
-								WHERE TT.USR_ID = {$_GET["id"]}
-								ORDER BY TT.TT_ID DESC
-							";
-							$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-							$row = mysqli_fetch_array($res);
-							$status = $row["status"];
-							$interval = $row["interval"];
-							$hours = intdiv($interval, 60);
-							$minutes = fmod($interval, 60);
-							$name = $row["name"];
 							echo "<h1>{$name}</h1>";
 							if( $status ) {
 								echo "<p class='title'>Рабочая смена завершена</p>";
