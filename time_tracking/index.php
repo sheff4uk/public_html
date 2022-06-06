@@ -241,23 +241,22 @@ if( isset($_POST["id"]) ) {
 					<?
 						if( $_GET["id"] > 0 ) {
 							?>
-							<input type=button value="Configure" onClick="configure()">
 							<div id="my_camera" style="display: none;"></div>
 							<div id="results"></div>
 
 							<script src="../js/webcam.min.js"></script>
 
 							<script>
-								// Configure a few settings and attach camera
-								Webcam.set({
-									width: 320,
-									height: 240,
-									image_format: 'jpeg',
-									jpeg_quality: 90
-								});
-								Webcam.attach( '#my_camera' );
-
-								setTimeout(function(){
+								new Promise(function (resolve) {
+									// Configure a few settings and attach camera
+									Webcam.set({
+										width: 320,
+										height: 240,
+										image_format: 'jpeg',
+										jpeg_quality: 90
+									});
+									Webcam.attach( '#my_camera' );
+								}).then(function (value) {
 									// preload shutter audio clip
 									var shutter = new Audio();
 									shutter.autoplay = false;
@@ -282,8 +281,7 @@ if( isset($_POST["id"]) ) {
 										console.log('Save successfully');
 										console.log(text);
 									});
-								}, 1000);
-
+								});
 							</script>
 
 							<?
