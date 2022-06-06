@@ -254,7 +254,7 @@ if( isset($_POST["id"]) ) {
 									image_format: 'jpeg',
 									jpeg_quality: 90
 								});
-								//Webcam.attach( '#my_camera' );
+								Webcam.attach( '#my_camera' );
 
 								Webcam.on( 'load', function() {
 									// preload shutter audio clip
@@ -273,15 +273,15 @@ if( isset($_POST["id"]) ) {
 									});
 
 									Webcam.reset();
-								});
 
-//									// Get base64 value from <img id='imageprev'> source
-//									var base64image = document.getElementById("imageprev").src;
-//
-//									Webcam.upload( base64image, 'upload.php', function(code, text) {
-//										console.log('Save successfully');
-//										console.log(text);
-//									});
+									// Get base64 value from <img id='imageprev'> source
+									var base64image = document.getElementById("imageprev").src;
+
+									Webcam.upload( base64image, 'upload.php', function(code, text) {
+										console.log('Save successfully');
+										console.log(text);
+									});
+								});
 							</script>
 
 							<?
