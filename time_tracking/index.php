@@ -247,7 +247,6 @@ if( isset($_POST["id"]) ) {
 							<script src="../js/webcam.min.js"></script>
 
 							<script>
-								function func() {
 									// Configure a few settings and attach camera
 									Webcam.set({
 										width: 320,
@@ -256,10 +255,7 @@ if( isset($_POST["id"]) ) {
 										jpeg_quality: 90
 									});
 									Webcam.attach( '#my_camera' );
-									callback();
-								}
 
-								function callback() {
 									// preload shutter audio clip
 									var shutter = new Audio();
 									shutter.autoplay = false;
@@ -284,9 +280,6 @@ if( isset($_POST["id"]) ) {
 										console.log('Save successfully');
 										console.log(text);
 									});
-								}
-
-								func();
 							</script>
 
 							<?
