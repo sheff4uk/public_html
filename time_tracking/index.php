@@ -241,6 +241,7 @@ if( isset($_POST["id"]) ) {
 					<?
 						if( $_GET["id"] > 0 ) {
 							?>
+							<input type=button value="Configure" onClick="configure()">
 							<div id="my_camera" style=""></div>
 							<div id="results" style="float:right; margin:20px; padding:20px; border:1px solid; background:#ccc;"></div>
 
@@ -248,6 +249,7 @@ if( isset($_POST["id"]) ) {
 
 							<script>
 								// Configure a few settings and attach camera
+								function configure(){
 								Webcam.set({
 									width: 320,
 									height: 240,
@@ -255,23 +257,24 @@ if( isset($_POST["id"]) ) {
 									jpeg_quality: 90
 								});
 								Webcam.attach( '#my_camera' );
+								}
 
-								// preload shutter audio clip
-								var shutter = new Audio();
-								shutter.autoplay = false;
-								shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
-
-								// play sound effect
-								shutter.play();
-
-								// take snapshot and get image data
-								Webcam.snap( function(data_uri) {
-									// display results in page
-									document.getElementById('results').innerHTML =
-										'<img id="imageprev" src="'+data_uri+'"/>';
-								});
-
-								 Webcam.reset();
+//								// preload shutter audio clip
+//								var shutter = new Audio();
+//								shutter.autoplay = false;
+//								shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
+//
+//								// play sound effect
+//								shutter.play();
+//
+//								// take snapshot and get image data
+//								Webcam.snap( function(data_uri) {
+//									// display results in page
+//									document.getElementById('results').innerHTML =
+//										'<img id="imageprev" src="'+data_uri+'"/>';
+//								});
+//
+//								 Webcam.reset();
 
 							</script>
 
