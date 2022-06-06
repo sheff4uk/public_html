@@ -242,7 +242,7 @@ if( isset($_POST["id"]) ) {
 						if( $_GET["id"] > 0 ) {
 							?>
 							<div id="my_camera" style="display: none;"></div>
-							<div id="results" style="width: 320px; height: 240px;"></div>
+							<div id="results" style="width: 320px; height: 240px; margin: auto;"></div>
 
 							<script src="../js/webcam.min.js"></script>
 
