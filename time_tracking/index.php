@@ -240,6 +240,42 @@ if( isset($_POST["id"]) ) {
 				<form method="post">
 					<?
 						if( $_GET["id"] > 0 ) {
+							?>
+							<div id="my_camera" style="display: none;"></div>
+							<div id="results" style="float:right; margin:20px; padding:20px; border:1px solid; background:#ccc;"></div>
+
+							<script src="../js/webcam.min.js"></script>
+
+							<script>
+								// Configure a few settings and attach camera
+								Webcam.set({
+									width: 320,
+									height: 240,
+									image_format: 'jpeg',
+									jpeg_quality: 90
+								});
+								Webcam.attach( '#my_camera' );
+
+								// preload shutter audio clip
+								var shutter = new Audio();
+								shutter.autoplay = false;
+								shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
+
+								// play sound effect
+								shutter.play();
+
+								// take snapshot and get image data
+								Webcam.snap( function(data_uri) {
+									// display results in page
+									document.getElementById('results').innerHTML =
+										'<img id="imageprev" src="'+data_uri+'"/>';
+								});
+
+								 Webcam.reset();
+
+							</script>
+
+							<?
 							// Узнаем статус смены
 							$query = "
 								SELECT IF(TT.stop IS NULL, 0, 1) `status`
@@ -256,7 +292,7 @@ if( isset($_POST["id"]) ) {
 							$hours = intdiv($interval, 60);
 							$minutes = fmod($interval, 60);
 							$name = $row["name"];
-							echo "<h1>{$name}</h1>";
+							echo "<h1>{$name}</h11>";
 							if( $status ) {
 								echo "<p class='title'>Рабочая смена завершена</p>";
 								echo "<p>Продолжительность: <b>{$hours}</b> ч. <b>{$minutes}</b> мин.</p>";
