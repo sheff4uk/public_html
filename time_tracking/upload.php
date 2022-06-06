@@ -9,7 +9,7 @@ if( move_uploaded_file($_FILES['webcam']['tmp_name'],'upload/'.$filename) ){
 	include_once "../config.php";
 	$query = "
 		UPDATE TimeTracking
-		SET ".($_GET["status"] ? "photo_start" : "photo_stop")." = '{$filename}'
+		SET ".($_GET["status"] ? "photo_stop" : "photo_start")." = '{$filename}'
 		WHERE TT_ID = {$_GET["tt_id"]}
 	";
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
