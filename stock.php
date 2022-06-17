@@ -209,7 +209,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					nextID = $(this).parents("td").attr("nextID");
 					item = $(this).parents("td").attr("item");
 				confirm(
-					"<span style='font-size: 1.2em;'>Подтвердите <font color='red'>удаление</font> регистрации с номером <b>" + nextID + "</b> (протевовес <b>" + item + "</b>).</span>",
+					"<span style='font-size: 1.2em;'>Подтвердите <font color='red'>удаление</font> регистрации с номером <b>" + nextID + "</b> (противовес <b>" + item + "</b>).</span>",
 					"<?=$page?>?remove=" + id
 				);
 			});
@@ -221,7 +221,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					nextID = $(this).parents("td").attr("nextID");
 					item = $(this).parents("td").attr("item");
 				confirm(
-					"<span style='font-size: 1.2em;'>Подтвердите <font color='green'>восстановление</font> регистрации с номером <b>" + nextID + "</b> (протевовес <b>" + item + "</b>).</span>",
+					"<span style='font-size: 1.2em;'>Подтвердите <font color='green'>восстановление</font> регистрации с номером <b>" + nextID + "</b> (противовес <b>" + item + "</b>).</span>",
 					"<?=$page?>?undo=" + id
 				);
 			});
