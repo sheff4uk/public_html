@@ -52,7 +52,7 @@ $notification_group = $row["notification_group"];
 		read_transaction_LA($row["last_transaction"]+1, 1, $socket, $mysqli);
 	}
 	else {
-		message_to_telegram("<b>Нет связи с терминалом расформовки!</b>", $notification_group);
+		//message_to_telegram("<b>Нет связи с терминалом расформовки!</b>", $notification_group);
 	}
 	socket_close($socket);
 
