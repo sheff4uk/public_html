@@ -211,7 +211,7 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 //die();
 /////////////////////////////
 
-if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5002)) ) {
+if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5021)) ) {
 //if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, "192.168.0.20", 5001)) ) {
 	//read_transaction(52445, 1, $socket, 0, $mysqli);
 //////////////////////////////
@@ -225,7 +225,7 @@ if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect
 //	echo dechex($data[5])."\r\n";
 //	//echo $result;
 ////////////////////////////////////////
-	read_transaction(64000, 1, $socket, $mysqli);
+	read_transaction(64, 1, $socket, $mysqli);
 	//read_transaction(114735, 1, $socket, $mysqli);
 	socket_close($socket);
 }

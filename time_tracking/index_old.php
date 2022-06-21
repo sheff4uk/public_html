@@ -3,12 +3,13 @@ include_once "../config.php";
 $ip = $_SERVER['REMOTE_ADDR'];
 //if( $ip != $from_ip ) die("Access denied");
 
-if( isset($_POST["cardcode"]) ) {
+if( isset($_POST["id"]) ) {
 	// Верифицируем работника
 	$query = "
 		SELECT USR.USR_ID
 		FROM Users USR
-		WHERE USR.cardcode LIKE '{$_POST["cardcode"]}'
+		WHERE USR.USR_ID = {$_POST["id"]}
+			AND USR.PIN LIKE '{$_POST["pin"]}'
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
@@ -67,32 +68,6 @@ if( isset($_POST["cardcode"]) ) {
 		<script src="../js/ui/jquery-ui.js"></script>
 		<script>
 			$(function() {
-				// Считывание карточки
-				var cardcode="";
-				$(document).keydown(function(e)
-				{
-					var code = (e.keyCode ? e.keyCode : e.which);
-					if (code==0) cardcode="";
-					if( code==13 || code==9 )// Enter key hit. Tab key hit.
-					{
-						console.log(cardcode);
-						if( cardcode.length == 10 ) {
-							$("input[name=cardcode]").val(cardcode);
-							$( "#target" ).submit();
-							cardcode="";
-							return false;
-						}
-						cardcode="";
-					}
-					else
-					{
-						if (code >= 48 && code <= 57) {
-							cardcode=cardcode+String.fromCharCode(code);
-						}
-					}
-				});
-
-
 				//disable input from typing
 				$("#user_id").keypress(function () {
 					return false;
@@ -162,24 +137,101 @@ if( isset($_POST["cardcode"]) ) {
 			}
 
 			form {
-				width: 390px;
-				margin: 50px auto;
-				background: #fdce46bf;
-				padding: 35px 25px;
-				text-align: center;
-				box-shadow: 0px 5px 5px -0px rgba(0, 0, 0, 0.3);
-				border-radius: 5px;
+			  width: 390px;
+			  margin: 50px auto;
+			  background: #fdce46bf;
+			  padding: 35px 25px;
+			  text-align: center;
+			  box-shadow: 0px 5px 5px -0px rgba(0, 0, 0, 0.3);
+			  border-radius: 5px;
 				position: relative;
 			}
 
 			.title {
-				font-size: 1.5em;
+			  font-size: 1.5em;
+			}
+
+			#user_id,
+			#password{
+			  border-radius: 5px;
+			  width: 350px;
+			  margin: auto;
+			  border: 1px solid rgb(228, 220, 220);
+			  outline: none;
+			  font-size: 60px;
+			  text-align: center;
+			}
+
+			input:focus {
+			  outline: none;
+			}
+
+			.pinButton {
+			  border: none;
+			  background: none;
+			  font-size: 1.5em;
+			  border-radius: 50%;
+			  height: 60px;
+			  font-weight: 550;
+			  width: 60px;
+			  margin: 7px 20px;
+			}
+
+			.clear,
+			.enter {
+			  font-size: 1em !important;
+			}
+
+			.pinButton:hover {
+			  box-shadow: #fdce46 0 0 2px 2px;
+			}
+			.pinButton:active {
+			  background: #fdce46;
+			  color: #fff;
+			}
+
+			.clear:hover {
+			  box-shadow: #ff3c41 0 0 2px 2px;
+			}
+
+			.clear:active {
+			  background: #ff3c41;
+			  color: #fff;
+			}
+
+			.enter:hover {
+			  box-shadow: #47cf73 0 0 2px 2px;
+			}
+
+			.enter:active {
+			  background: #47cf73;
+			  color: #fff;
+			}
+
+			.back {
+				position: absolute;
+				left: 0px;
+				top: -50px
+			}
+
+			.btn {
+				background-color: #fff;
+			  border: none;
+			  font-size: 1.5em;
+			  border-radius: 5px;
+			  height: 40px;
+			  font-weight: 550;
+			}
+
+			.btn:hover {
+				box-shadow: #fdce46 0 0 2px 2px;
+			}
+
+			.btn:active {
+			  background: #fdce46;
+			  color: #fff;
 			}
 		</style>
-
-		<form method="post" id="target" style="display: none;">
-			<input type="hidden" name="cardcode">
-		</form>
 
 		<?
 		if( isset($_GET["id"]) ) {
@@ -249,6 +301,10 @@ if( isset($_POST["cardcode"]) ) {
 										console.log(text);
 									});
 								});
+
+								setTimeout(function(){
+									$(location).attr('href', "/time_tracking");
+								}, 15000);
 							</script>
 
 							<?
@@ -264,27 +320,53 @@ if( isset($_POST["cardcode"]) ) {
 							}
 						}
 						else {
-							echo "<p class='title' style='color: #911;'>Карта не действительна!</p>";
+							echo "<p class='title'>Не верные данные!</p>";
 						}
-						//echo "<p><a href='/time_tracking/' class='btn' style='padding: 5px 20px;'>На главную</a></p>";
+						echo "<p><a href='/time_tracking/' class='btn' style='padding: 5px 20px;'>На главную</a></p>";
 					?>
-					<script>
-						setTimeout(function(){
-							$(location).attr('href', "/time_tracking");
-						}, 5000);
-					</script>
 				</form>
 			</div>
 			<?
 		}
 		else {
 			?>
-			<div>
-				<form>
-					<h1>Здравствуйте!</h1>
-					<br>
-					<br>
-					<h2>Приложите карту к считывателю</h2>
+			<div id="pinpad_id" style="width: 100%; position: fixed;">
+				<form >
+					<p class="title"><b>1</b> Введите Ваш ID</p>
+					<input type="text" id="user_id" class="input_value" placeholder="ID"/><br>
+					<input type="button" value="1" class="pinButton calc"/>
+					<input type="button" value="2" class="pinButton calc"/>
+					<input type="button" value="3" class="pinButton calc"/><br>
+					<input type="button" value="4" class="pinButton calc"/>
+					<input type="button" value="5" class="pinButton calc"/>
+					<input type="button" value="6" class="pinButton calc"/><br>
+					<input type="button" value="7" class="pinButton calc"/>
+					<input type="button" value="8" class="pinButton calc"/>
+					<input type="button" value="9" class="pinButton calc"/><br>
+					<input type="button" value="CLEAR" class="pinButton clear"/>
+					<input type="button" value="0" class="pinButton calc"/>
+					<input type="button" value="ENTER" id="enter_id" class="pinButton enter"/>
+				</form>
+			</div>
+
+			<div id="pinpad_pin" style="width: 100%; position: fixed; display: none;">
+				<form method="post">
+					<input type="button" value="❮ назад" class="back btn"/>
+					<p class="title"><b>2</b> Введите пин-код</p>
+					<input type="hidden" name="id">
+					<input type="password" id="password" name="pin" class="input_value" placeholder="PIN"/><br>
+					<input type="button" value="1" class="pinButton calc"/>
+					<input type="button" value="2" class="pinButton calc"/>
+					<input type="button" value="3" class="pinButton calc"/><br>
+					<input type="button" value="4" class="pinButton calc"/>
+					<input type="button" value="5" class="pinButton calc"/>
+					<input type="button" value="6" class="pinButton calc"/><br>
+					<input type="button" value="7" class="pinButton calc"/>
+					<input type="button" value="8" class="pinButton calc"/>
+					<input type="button" value="9" class="pinButton calc"/><br>
+					<input type="button" value="CLEAR" class="pinButton clear"/>
+					<input type="button" value="0" class="pinButton calc"/>
+					<input type="button" value="ENTER" id="enter_pin" class="pinButton enter"/>
 				</form>
 			</div>
 			<?
