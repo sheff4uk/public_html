@@ -76,7 +76,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 					$duration = ($row["duration"] < 8 ? 0 : $row["duration"]);
 					$duration_div = intdiv(round($duration / 15), 4);
 					$duration_mod = round($duration / 15) % 4;
-					echo "<div style='display:flex; width: 160px; height: 60px; justify-content: flex-end;'><span style='align-self: center; font-size: 3em;'>".($duration ? "<b style='color:green;'>".($duration_div > 0 ? $duration_div : "").($duration_mod == 1 ? "&frac14;" : ($duration_mod == 2 ? "&frac12;" : ($duration_mod == 3 ? "&frac34;" : "")))."</b> ч" : "")."</span></div>";
+					echo "<div style='display:flex; width: 160px; height: 60px; justify-content: flex-end;'><span style='align-self: center;'>".($row["stop_time"] ? "<b style='color:green; font-size: 3em;'>".($duration_div > 0 ? $duration_div : ($duration_mod == 0 ? "0" : "")).($duration_mod == 1 ? "&frac14;" : ($duration_mod == 2 ? "&frac12;" : ($duration_mod == 3 ? "&frac34;" : "")))."</b> <span style='font-size:1.5em;'>ч<span>" : "")."</span></div>";
 					echo "</div>";
 				}
 				?>
