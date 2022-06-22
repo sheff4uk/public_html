@@ -81,6 +81,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 					$duration = ($row["duration"] < 60 ? 0 : $row["duration"] - 60);
 					$duration_hrs = intdiv($duration, 60);
 					$duration_min = $duration % 60;
+					$duration_min = str_pad($duration_min, 2, "0", STR_PAD_LEFT);
 					echo "<div style='display:flex; width: 160px; height: 60px; justify-content: flex-end;'><span style='align-self: center;'>".($row["stop_time"] ? "<b style='color:green; font-size: 3em;'>{$duration_hrs}:{$duration_min}</b>" : "")."</span></div>";
 
 					echo "</div>";
