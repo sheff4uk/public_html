@@ -66,6 +66,10 @@ if( isset($_POST["cardcode"]) ) {
 		<script src="../js/jquery-1.11.3.min.js"></script>
 		<script src="../js/ui/jquery-ui.js"></script>
 		<script>
+			setTimeout(function(){
+				$(location).attr('href', "/time_tracking");
+			}, 60000);
+
 			$(function() {
 				// Считывание карточки
 				var cardcode="";
@@ -90,56 +94,6 @@ if( isset($_POST["cardcode"]) ) {
 							cardcode=cardcode+String.fromCharCode(code);
 						}
 					}
-				});
-
-
-				//disable input from typing
-				$("#user_id").keypress(function () {
-					return false;
-				});
-				$("#password").keypress(function () {
-					return false;
-				});
-
-				//add password
-				$(".calc").click(function () {
-					let value = $(this).val(),
-						input_value = $(this).parent('form').children('.input_value');
-					field(value, input_value);
-				});
-
-				function field(value, input_value) {
-					input_value.val(input_value.val() + value);
-				}
-
-				$(".clear").click(function () {
-					$(this).parent('form').children('.input_value').val("");
-				});
-
-				$("#enter_id").click(function () {
-					if( $("#user_id").val() != "" ) {
-						$('#pinpad_id').hide( "drop", "slow" );
-						$('#pinpad_pin').show( "fade", "slow" );
-						$('#pinpad_pin input[type=hidden]').val($('#user_id').val());
-					}
-					else {
-						$("#user_id").effect( 'highlight', {color: 'red'}, 1000 );
-					}
-				});
-
-				$("#enter_pin").click(function () {
-					if( $("#password").val() != "" ) {
-						//$('#pinpad_pin').hide( "drop", "slow" );
-						$('#pinpad_pin form').submit();
-					}
-					else {
-						$("#password").effect( 'highlight', {color: 'red'}, 1000 );
-					}
-				});
-
-				$('.back').click(function() {
-					$('#pinpad_pin').hide( "fade", "slow" );
-					$('#pinpad_id').show( "drop", "slow" );
 				});
 			});
 		</script>
