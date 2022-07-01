@@ -80,6 +80,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 //					echo "<div style='display:flex; width: 160px; height: 60px; justify-content: flex-end;'><span style='align-self: center;'>".($row["stop_time"] ? "<b style='color:green; font-size: 3em;'>".($duration_div > 0 ? $duration_div : ($duration_mod == 0 ? "0" : "")).($duration_mod == 1 ? "&frac14;" : ($duration_mod == 2 ? "&frac12;" : ($duration_mod == 3 ? "&frac34;" : "")))."</b> <span style='font-size:1.5em;'>ч<span>" : "")."</span></div>";
 
 					$duration = ($row["duration"] < 60 ? 0 : $row["duration"] - 60);
+					$duration = ceil($duration / 15) * 15; //Продолжительность с шагом в 15 минут в пользу работника
 					$duration_hrs = intdiv($duration, 60);
 					$duration_min = $duration % 60;
 					$duration_min = str_pad($duration_min, 2, "0", STR_PAD_LEFT);
