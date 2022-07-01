@@ -58,7 +58,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 						,TT.photo_start
 						,TT.photo_stop
 						#,TIMESTAMPDIFF(MINUTE, TT.start, TT.stop) duration
-						,TIMESTAMPDIFF(MINUTE, IF(TT.TT_ID = 30, TT.start, TIMESTAMP(DATE(TT.start)), '08:00:00'), TT.stop) duration
+						,TIMESTAMPDIFF(MINUTE, IF(TT.USR_ID = 30, TT.start, TIMESTAMP(DATE(TT.start), '08:00:00')), TT.stop) duration
 					FROM TimeTracking TT
 					ORDER BY TT.TT_ID DESC
 					LIMIT 200
