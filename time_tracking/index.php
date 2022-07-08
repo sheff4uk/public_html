@@ -15,35 +15,52 @@ if( isset($_POST["cardcode"]) ) {
 	$USR_ID = $row["USR_ID"];
 	// Если работник верифицирован
 	if( $USR_ID ) {
-		// Узнаем есть ли начатая смена
+		// Узнаем сколько секунд прошло с последнего считывания
 		$query = "
-			SELECT TT.TT_ID
+			SELECT TIMESTAMPDIFF(SECOND, IFNULL(TT.stop, TT.start), NOW()) seconds
 			FROM TimeTracking TT
-			WHERE TT.stop IS NULL
-				AND TT.USR_ID = {$USR_ID}
+			WHERE TT.USR_ID = {$USR_ID}
 			ORDER BY TT.TT_ID DESC
+			LIMIT 1
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$row = mysqli_fetch_array($res);
-		$TT_ID = $row["TT_ID"];
+		$seconds = $row["seconds"];
 
-		// Если смена начата, завершаем её
-		if( $TT_ID ) {
+		// Если прошла минута с последнего считывания
+		if( $seconds > 60 ) {
+
+			// Узнаем есть ли начатая смена
 			$query = "
-				UPDATE TimeTracking
-				SET stop = NOW()
-				WHERE TT_ID = {$TT_ID}
+				SELECT TT.TT_ID
+				FROM TimeTracking TT
+				WHERE TT.stop IS NULL
+					AND TT.USR_ID = {$USR_ID}
+				ORDER BY TT.TT_ID DESC
+				LIMIT 1
 			";
-			mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		}
-		// Иначе начинаем новую смену
-		else {
-			$query = "
-				INSERT INTO TimeTracking
-				SET USR_ID = {$USR_ID}
-					,start = NOW()
-			";
-			mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			$row = mysqli_fetch_array($res);
+			$TT_ID = $row["TT_ID"];
+
+			// Если смена начата, завершаем её
+			if( $TT_ID ) {
+				$query = "
+					UPDATE TimeTracking
+					SET stop = NOW()
+					WHERE TT_ID = {$TT_ID}
+				";
+				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			}
+			// Иначе начинаем новую смену
+			else {
+				$query = "
+					INSERT INTO TimeTracking
+					SET USR_ID = {$USR_ID}
+						,start = NOW()
+				";
+				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			}
 		}
 
 		exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/?id='.$USR_ID.'">');

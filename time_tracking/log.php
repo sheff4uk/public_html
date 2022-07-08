@@ -44,6 +44,13 @@ $ip = $_SERVER['REMOTE_ADDR'];
 			.title {
 				font-size: 1.5em;
 			}
+
+			.time {
+				align-self: flex-end;
+				margin:5px;
+				-webkit-filter: drop-shadow(0px 0px 2px #000);
+				filter: drop-shadow(0px 0px 2px #000);
+			}
 		</style>
 
 		<div>
@@ -58,9 +65,11 @@ $ip = $_SERVER['REMOTE_ADDR'];
 						,TT.photo_start
 						,TT.photo_stop
 						#,TIMESTAMPDIFF(MINUTE, TT.start, TT.stop) duration
-						,TIMESTAMPDIFF(MINUTE, IF(TT.USR_ID = 30, TT.start, TIMESTAMP(DATE(TT.start), '08:00:00')), TT.stop) duration
+						#,TIMESTAMPDIFF(MINUTE, IF(TT.USR_ID = 30, TT.start, TIMESTAMP(DATE(TT.start), '08:00:00')), TT.stop) duration
+						,TIMESTAMPDIFF(MINUTE, TT.start, TIMESTAMP(DATE(TT.start), '12:00:00')) + TIMESTAMPDIFF(MINUTE, TIMESTAMP(DATE(TT.start), '13:00:00'), TT.stop) duration
 					FROM TimeTracking TT
-					ORDER BY TT.TT_ID DESC
+					#ORDER BY TT.TT_ID DESC
+					ORDER BY DATE(TT.start) DESC, Worker, TT.start DESC
 					LIMIT 200
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -71,15 +80,15 @@ $ip = $_SERVER['REMOTE_ADDR'];
 					}
 					echo "<div style='display:flex; flex-direction: row; justify-content: space-around; padding: 5px; margin: 5px; border: 1px dotted;'>";
 					echo "<div style='display:flex; width: 300px; height: 60px; font-size: 1.6em;'><span style='align-self: center'>{$row["Worker"]}</span></div>";
-					echo "<div style='display:flex; width: 80px; height: 60px; color: #fff; background-image: url(/time_tracking/upload/{$row["photo_start"]}); background-size: contain;'><span style='align-self: flex-end; margin:5px;'>{$row["start_time"]}</span></div>";
-					echo "<div style='display:flex; width: 80px; height: 60px; color: #fff; background-image: url(/time_tracking/upload/{$row["photo_stop"]}); background-size: contain;'><span style='align-self: flex-end; margin:5px;'>{$row["stop_time"]}</span></div>";
+					echo "<div style='display:flex; width: 80px; height: 60px; color: #fff; background-image: url(/time_tracking/upload/{$row["photo_start"]}); background-size: contain;'><span class='time'>{$row["start_time"]}</span></div>";
+					echo "<div style='display:flex; width: 80px; height: 60px; color: #fff; background-image: url(/time_tracking/upload/{$row["photo_stop"]}); background-size: contain;'><span class='time'>{$row["stop_time"]}</span></div>";
 
 //					$duration = ($row["duration"] < 60 ? 0 : $row["duration"] - 60);
 //					$duration_div = intdiv(round($duration / 15), 4);
 //					$duration_mod = round($duration / 15) % 4;
 //					echo "<div style='display:flex; width: 160px; height: 60px; justify-content: flex-end;'><span style='align-self: center;'>".($row["stop_time"] ? "<b style='color:green; font-size: 3em;'>".($duration_div > 0 ? $duration_div : ($duration_mod == 0 ? "0" : "")).($duration_mod == 1 ? "&frac14;" : ($duration_mod == 2 ? "&frac12;" : ($duration_mod == 3 ? "&frac34;" : "")))."</b> <span style='font-size:1.5em;'>ч<span>" : "")."</span></div>";
 
-					$duration = ($row["duration"] < 60 ? 0 : $row["duration"] - 60);
+					$duration = ($row["duration"] < 0 ? $row["duration"] + 60 : $row["duration"]);
 					$duration = ceil($duration / 15) * 15; //Продолжительность с шагом в 15 минут в пользу работника
 					$duration_hrs = intdiv($duration, 60);
 					$duration_min = $duration % 60;
