@@ -134,9 +134,11 @@ if( isset($_POST["cardcode"]) ) {
 
 			form {
 				width: 390px;
-				margin: 50px auto;
+/*				margin: 50px auto;*/
+				margin: 20px auto;
 				background: #fdce46bf;
-				padding: 35px 25px;
+/*				padding: 35px 25px;*/
+				padding: 20px
 				text-align: center;
 				box-shadow: 0px 5px 5px -0px rgba(0, 0, 0, 0.3);
 				border-radius: 5px;
@@ -257,9 +259,9 @@ if( isset($_POST["cardcode"]) ) {
 				SELECT USR_Name(TT.USR_ID) `name`
 					,TT.photo_start
 				FROM TimeTracking TT
-				WHERE TT.start >= CURDATE()
-					AND TT.stop IS NULL
-				ORDER BY `name`
+				#WHERE TT.start >= CURDATE()
+				#	AND TT.stop IS NULL
+				#ORDER BY `name`
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
@@ -272,11 +274,13 @@ if( isset($_POST["cardcode"]) ) {
 			}
 			?>
 			</div>
-			<div style="display: none;">
+			<div>
 				<form>
+<!--
 					<h1>Здравствуйте!</h1>
 					<br>
 					<br>
+-->
 					<h2>Приложите карту к считывателю</h2>
 				</form>
 			</div>
