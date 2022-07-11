@@ -25,7 +25,7 @@ if( isset($_POST["cardcode"]) ) {
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$row = mysqli_fetch_array($res);
-		$seconds = $row["seconds"];
+		$seconds = ($row["seconds"] > 0 ? $row["seconds"] : 100); // Если считывание первое
 
 		// Если прошла минута с последнего считывания
 		if( $seconds > 60 ) {
