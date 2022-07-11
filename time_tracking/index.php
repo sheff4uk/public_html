@@ -259,9 +259,9 @@ if( isset($_POST["cardcode"]) ) {
 				SELECT USR_Name(TT.USR_ID) `name`
 					,TT.photo_start
 				FROM TimeTracking TT
-				#WHERE TT.start >= CURDATE()
-				#	AND TT.stop IS NULL
-				#ORDER BY `name`
+				WHERE TT.start >= CURDATE()
+					AND TT.stop IS NULL
+				ORDER BY `name`
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
