@@ -138,7 +138,7 @@ if( isset($_POST["cardcode"]) ) {
 				margin: 20px auto;
 				background: #fdce46bf;
 /*				padding: 35px 25px;*/
-				padding: 20px
+				padding: 20px;
 				text-align: center;
 				box-shadow: 0px 5px 5px -0px rgba(0, 0, 0, 0.3);
 				border-radius: 5px;
