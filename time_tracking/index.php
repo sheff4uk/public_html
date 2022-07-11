@@ -259,6 +259,7 @@ if( isset($_POST["cardcode"]) ) {
 				FROM TimeTracking TT
 				WHERE TT.start >= CURDATE()
 					AND TT.stop IS NULL
+				ORDER BY `name`
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
