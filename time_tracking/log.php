@@ -81,9 +81,9 @@ $ip = $_SERVER['REMOTE_ADDR'];
 						echo "<h3>{$date}</h3>";
 					}
 					echo "<div style='display:flex; flex-direction: row; justify-content: space-around; padding: 5px; margin: 5px; border: 1px dotted;'>";
-					echo "<div style='display:flex; width: 300px; height: 60px; font-size: 1.6em;'><span style='align-self: center'>{$row["Worker"]}</span></div>";
-					echo "<div style='display:flex; width: 80px; height: 60px; color: #fff; background-image: url(/time_tracking/upload/{$row["photo_start"]}); background-size: contain;'><span class='time'>{$row["start_time"]}</span></div>";
-					echo "<div style='display:flex; width: 80px; height: 60px; color: #fff; background-image: url(/time_tracking/upload/{$row["photo_stop"]}); background-size: contain;'><span class='time'>{$row["stop_time"]}</span></div>";
+					echo "<div style='display:flex; width: 160px; height: 120px; font-size: 1.6em;'><span style='align-self: center'>{$row["Worker"]}</span></div>";
+					echo "<div style='display:flex; width: 160px; height: 120px; color: #fff; background-image: url(/time_tracking/upload/{$row["photo_start"]}); background-size: contain;'><span class='time'>{$row["start_time"]}</span></div>";
+					echo "<div style='display:flex; width: 160px; height: 120px; color: #fff; background-image: url(/time_tracking/upload/{$row["photo_stop"]}); background-size: contain;'><span class='time'>{$row["stop_time"]}</span></div>";
 
 //					$duration = ($row["duration"] < 60 ? 0 : $row["duration"] - 60);
 //					$duration_div = intdiv(round($duration / 15), 4);
@@ -95,7 +95,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 					$duration_hrs = intdiv($duration, 60);
 					$duration_min = $duration % 60;
 					$duration_min = str_pad($duration_min, 2, "0", STR_PAD_LEFT);
-					echo "<div style='display:flex; width: 160px; height: 60px; justify-content: flex-end;'><span style='align-self: center;'>".($row["stop_time"] ? "<b style='color:green; font-size: 3em;'>".($row["RL_ID"] == 4 ? "{$duration_hrs}<span style='font-size: .5em;'>:{$duration_min}</span>" : "Смена")."</b>" : "")."</span></div>";
+					echo "<div style='display:flex; width: 160px; height: 120px; justify-content: flex-end;'><span style='align-self: center;'>".($row["stop_time"] ? "<b style='color:green; font-size: 3em;'>".($row["RL_ID"] == 4 ? "{$duration_hrs}<span style='font-size: .5em;'>:{$duration_min}</span>" : "Смена")."</b>" : "")."</span></div>";
 
 					echo "</div>";
 				}
