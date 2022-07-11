@@ -250,7 +250,29 @@ if( isset($_POST["cardcode"]) ) {
 		}
 		else {
 			?>
-			<div>
+			<div style="display: flex; flex-direction: row; flex-wrap: wrap; padding: 5px; margin: 5px;">
+			<?
+			// Выводим список открытых сегодня смен
+			$query = "
+				SELECT USR_Name(TT.USR_ID) `name`
+					,TT.photo_start
+				FROM TimeTracking TT
+				WHERE TT.start >= CURDATE()
+					AND TT.stop IS NULL
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $row = mysqli_fetch_array($res) ) {
+				echo "!!!!!!!!!!!!!!!!!!!!!";
+				?>
+				<div style="display: flex; width: 160px; height: 120px; font-size: 1.6em; background-color: #fdce46bf; background-image: url(/time_tracking/upload/<?=$row["photo_start"]?>); background-size: contain; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px; overflow: hidden;">
+					<div style=" width: 20px; height: 20px; display: inline-block; margin: 15px; border-radius: 50%; background: green; box-shadow: 0 0 3px 3px green; position: absolute;"></div>
+					<span style="align-self: flex-end; margin: 10px; -webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff;"><?=$row["name"]?></span>
+				</div>
+				<?
+			}
+			?>
+			</div>
+			<div style="display: none;">
 				<form>
 					<h1>Здравствуйте!</h1>
 					<br>
