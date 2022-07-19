@@ -66,7 +66,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 						,TT.photo_stop
 						#,TIMESTAMPDIFF(MINUTE, TT.start, TT.stop) duration
 						#,TIMESTAMPDIFF(MINUTE, IF(TT.USR_ID = 30, TT.start, TIMESTAMP(DATE(TT.start), '08:00:00')), TT.stop) duration
-						,GREATEST(TIMESTAMPDIFF(MINUTE, GREATEST(TIMESTAMP(DATE(TT.start), '08:00:00'), TT.start), LEAST(TIMESTAMP(DATE(TT.start), '12:00:00'), TT.stop)), 0) + GREATEST(TIMESTAMPDIFF(MINUTE, GREATEST(TIMESTAMP(DATE(TT.start), '13:00:00'), TT.start), TT.stop), 0) duration
+						,GREATEST(TIMESTAMPDIFF(MINUTE, GREATEST(TIMESTAMP(DATE(TT.start), IF(USR.RL_ID = 6, TIME(TT.start), '08:00:00')), TT.start), LEAST(TIMESTAMP(DATE(TT.start), '12:00:00'), TT.stop)), 0) + GREATEST(TIMESTAMPDIFF(MINUTE, GREATEST(TIMESTAMP(DATE(TT.start), '13:00:00'), TT.start), TT.stop), 0) duration
 						,USR.RL_ID
 					FROM TimeTracking TT
 					JOIN Users USR ON USR.USR_ID = TT.USR_ID
@@ -95,7 +95,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 					$duration_hrs = intdiv($duration, 60);
 					$duration_min = $duration % 60;
 					$duration_min = str_pad($duration_min, 2, "0", STR_PAD_LEFT);
-					echo "<div style='display:flex; width: 160px; height: 120px; justify-content: flex-end;'><span style='align-self: center;'>".($row["stop_time"] ? "<b style='color:green; font-size: 3em;'>".($row["RL_ID"] == 4 ? "{$duration_hrs}<span style='font-size: .5em;'>:{$duration_min}</span>" : "Смена")."</b>" : "")."</span></div>";
+					echo "<div style='display:flex; width: 160px; height: 120px; justify-content: flex-end;'><span style='align-self: center;'>".($row["stop_time"] ? "<b style='color:green; font-size: 3em;'>".($row["RL_ID"] == 5 ? "Смена" : "{$duration_hrs}<span style='font-size: .5em;'>:{$duration_min}</span>")."</b>" : "")."</span></div>";
 
 					echo "</div>";
 				}

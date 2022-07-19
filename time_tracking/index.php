@@ -239,7 +239,6 @@ if( isset($_POST["cardcode"]) ) {
 						else {
 							echo "<p class='title' style='color: #911;'>Карта не действительна!</p>";
 						}
-						//echo "<p><a href='/time_tracking/' class='btn' style='padding: 5px 20px;'>На главную</a></p>";
 					?>
 					<script>
 						setTimeout(function(){
@@ -276,11 +275,6 @@ if( isset($_POST["cardcode"]) ) {
 			</div>
 			<div>
 				<form>
-<!--
-					<h1>Здравствуйте!</h1>
-					<br>
-					<br>
--->
 					<h2>Приложите карту к считывателю</h2>
 				</form>
 			</div>
