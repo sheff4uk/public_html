@@ -241,9 +241,9 @@ if( isset($_POST["cardcode"]) ) {
 						}
 					?>
 					<script>
-						setTimeout(function(){
-							$(location).attr('href', "/time_tracking");
-						}, 5000);
+//						setTimeout(function(){
+//							$(location).attr('href', "/time_tracking");
+//						}, 5000);
 					</script>
 				</form>
 			</div>
