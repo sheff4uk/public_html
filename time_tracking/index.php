@@ -83,9 +83,9 @@ if( isset($_POST["cardcode"]) ) {
 		<script src="../js/jquery-1.11.3.min.js"></script>
 		<script src="../js/ui/jquery-ui.js"></script>
 		<script>
-			setTimeout(function(){
-				$(location).attr('href', "/time_tracking");
-			}, 60000);
+//			setTimeout(function(){
+//				$(location).attr('href', "/time_tracking");
+//			}, 60000);
 
 			$(function() {
 				// Считывание карточки
@@ -241,9 +241,10 @@ if( isset($_POST["cardcode"]) ) {
 						}
 					?>
 					<script>
-//						setTimeout(function(){
-//							$(location).attr('href', "/time_tracking");
-//						}, 5000);
+						// Автоматический возврат на главный экран после авторизации
+						setTimeout(function(){
+							$(location).attr('href', "/time_tracking");
+						}, 5000);
 					</script>
 				</form>
 			</div>
