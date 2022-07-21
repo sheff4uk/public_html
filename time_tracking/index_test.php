@@ -197,34 +197,34 @@ if( isset($_POST["cardcode"]) ) {
 								});
 								Webcam.attach( '#my_camera' );
 
-								Webcam.on( 'load', function() {
-									// preload shutter audio clip
-									var shutter = new Audio();
-									shutter.autoplay = false;
-									shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
-
-									// play sound effect
-									shutter.play();
-
-									setTimeout(function(){
-										// take snapshot and get image data
-										Webcam.snap( function(data_uri) {
-											// display results in page
-											document.getElementById('results').innerHTML =
-												'<img id="imageprev" src="'+data_uri+'"/>';
-										});
-									}, 8000);
-
-									Webcam.reset();
-
-									// Get base64 value from <img id='imageprev'> source
-									var base64image = document.getElementById("imageprev").src;
-
-//									Webcam.upload( base64image, 'upload.php?tt_id=<?=$TT_ID?>&status=<?=$status?>', function(code, text) {
-//										console.log('Save successfully');
-//										console.log(text);
-//									});
-								});
+//								Webcam.on( 'load', function() {
+//									// preload shutter audio clip
+//									var shutter = new Audio();
+//									shutter.autoplay = false;
+//									shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
+//
+//									// play sound effect
+//									shutter.play();
+//
+//									setTimeout(function(){
+//										// take snapshot and get image data
+//										Webcam.snap( function(data_uri) {
+//											// display results in page
+//											document.getElementById('results').innerHTML =
+//												'<img id="imageprev" src="'+data_uri+'"/>';
+//										});
+//									}, 8000);
+//
+//									Webcam.reset();
+//
+//									// Get base64 value from <img id='imageprev'> source
+//									var base64image = document.getElementById("imageprev").src;
+//
+////									Webcam.upload( base64image, 'upload.php?tt_id=<?=$TT_ID?>&status=<?=$status?>', function(code, text) {
+////										console.log('Save successfully');
+////										console.log(text);
+////									});
+//								});
 							</script>
 
 							<?
