@@ -150,7 +150,7 @@ if( isset($_POST["cardcode"]) ) {
 			}
 		</style>
 
-		<form method="post" id="target" style="display: none;">
+		<form method="post" id="target">
 			<input type="hidden" name="cardcode">
 		</form>
 
@@ -212,7 +212,7 @@ if( isset($_POST["cardcode"]) ) {
 											document.getElementById('results').innerHTML =
 												'<img id="imageprev" src="'+data_uri+'"/>';
 										});
-									}, 3000);
+									}, 8000);
 
 									Webcam.reset();
 
@@ -245,8 +245,8 @@ if( isset($_POST["cardcode"]) ) {
 					<script>
 						// Автоматический возврат на главный экран после авторизации
 						setTimeout(function(){
-							$(location).attr('href', "/time_tracking");
-						}, 5000);
+							$(location).attr('href', "/time_tracking/index_test.php");
+						}, 10000);
 					</script>
 				</form>
 			</div>
