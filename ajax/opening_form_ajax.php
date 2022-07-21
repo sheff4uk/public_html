@@ -13,6 +13,7 @@ $html .= "
 				<th>Дефект</th>
 				<th>Партия</th>
 				<th>Пост</th>
+				<th>Штрих-код</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -26,6 +27,7 @@ $query = "
 		,LW.goodsID
 		,LW.RN
 		,WT.post
+		,CONCAT(LPAD(LW.WT_ID, 8, '0'), LPAD(LW.nextID, 8, '0')) barcode
 	FROM list__Weight LW
 	LEFT JOIN WeighingTerminal WT ON WT.WT_ID = LW.WT_ID
 	LEFT JOIN list__Opening LO ON LO.LO_ID = LW.LO_ID
@@ -72,6 +74,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>{$defect}</td>
 			<td>{$row["RN"]}</td>
 			<td>{$row["post"]}</td>
+			<td>{$row["barcode"]}</td>
 		</tr>
 	";
 }
