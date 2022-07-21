@@ -61,7 +61,7 @@ if( isset($_POST["cardcode"]) ) {
 //				";
 //				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 //			}
-//		}
+		}
 
 		exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/?id='.$USR_ID.'">');
 	}
