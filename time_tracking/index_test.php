@@ -150,7 +150,7 @@ if( isset($_POST["cardcode"]) ) {
 			}
 		</style>
 
-		<form method="post" id="target">
+		<form method="post" id="target" style="display: none;">
 			<input type="hidden" name="cardcode">
 		</form>
 
@@ -180,7 +180,8 @@ if( isset($_POST["cardcode"]) ) {
 							$minutes = fmod($interval, 60);
 							$name = $row["name"];
 							?>
-							<div id="my_camera" style="display: none;"></div>
+<!--							<div id="my_camera" style="display: none;"></div>-->
+							<div id="my_camera" style=""></div>
 							<div id="results" style="width: 320px; height: 240px; margin: auto;"></div>
 
 							<!--https://makitweb.com/how-to-capture-picture-from-webcam-with-webcam-js/-->
