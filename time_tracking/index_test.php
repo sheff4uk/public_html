@@ -43,25 +43,25 @@ if( isset($_POST["cardcode"]) ) {
 			$row = mysqli_fetch_array($res);
 			$TT_ID = $row["TT_ID"];
 
-			// Если смена начата, завершаем её
-			if( $TT_ID ) {
-				$query = "
-					UPDATE TimeTracking
-					SET stop = NOW()
-					WHERE TT_ID = {$TT_ID}
-				";
-				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-			}
-			// Иначе начинаем новую смену
-			else {
-				$query = "
-					INSERT INTO TimeTracking
-					SET USR_ID = {$USR_ID}
-						,start = NOW()
-				";
-				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-			}
-		}
+//			// Если смена начата, завершаем её
+//			if( $TT_ID ) {
+//				$query = "
+//					UPDATE TimeTracking
+//					SET stop = NOW()
+//					WHERE TT_ID = {$TT_ID}
+//				";
+//				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//			}
+//			// Иначе начинаем новую смену
+//			else {
+//				$query = "
+//					INSERT INTO TimeTracking
+//					SET USR_ID = {$USR_ID}
+//						,start = NOW()
+//				";
+//				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//			}
+//		}
 
 		exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/?id='.$USR_ID.'">');
 	}
