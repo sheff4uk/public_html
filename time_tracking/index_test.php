@@ -181,7 +181,7 @@ if( isset($_POST["cardcode"]) ) {
 							$name = $row["name"];
 							?>
 <!--							<div id="my_camera" style="display: none;"></div>-->
-							<div id="my_camera" style="margin: auto;"></div>
+							<div id="my_camera" style="margin: auto;">3</div>
 							<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
 
 							<!--https://makitweb.com/how-to-capture-picture-from-webcam-with-webcam-js/-->
