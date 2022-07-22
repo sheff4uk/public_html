@@ -182,14 +182,12 @@ if( isset($_POST["cardcode"]) ) {
 							?>
 <!--							<div id="my_camera" style="display: none;"></div>-->
 							<div id="my_camera" style="margin: auto;"></div>
-							<div id="results" style="width: 320px; height: 240px; margin: auto;"></div>
+							<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
 
 							<!--https://makitweb.com/how-to-capture-picture-from-webcam-with-webcam-js/-->
 							<script src="../js/webcam.min.js"></script>
 
 							<script>
-								$('#result').hide();
-
 								// Configure a few settings and attach camera
 								Webcam.set({
 									width: 320,
@@ -212,13 +210,13 @@ if( isset($_POST["cardcode"]) ) {
 										// take snapshot and get image data
 										Webcam.snap( function(data_uri) {
 											// display results in page
-											document.getElementById('results').innerHTML =
-												'<img id="imageprev" src="'+data_uri+'"/>';
-											//$('#result').html('<img id="imageprev" src="'+data_uri+'"/>');
+											//document.getElementById('results').innerHTML =
+											//	'<img id="imageprev" src="'+data_uri+'"/>';
+											$('#results').html('<img id="imageprev" src="'+data_uri+'"/>');
 										});
 
 										$('#my_camera').hide();
-										$('#result').show();
+										$('#results').show();
 										Webcam.reset();
 
 										// Get base64 value from <img id='imageprev'> source
@@ -228,7 +226,7 @@ if( isset($_POST["cardcode"]) ) {
 //											console.log('Save successfully');
 //											console.log(text);
 //										});
-									}, 5000);
+									}, 3000);
 								});
 							</script>
 
@@ -252,7 +250,7 @@ if( isset($_POST["cardcode"]) ) {
 						// Автоматический возврат на главный экран после авторизации
 						setTimeout(function(){
 							$(location).attr('href', "/time_tracking/index_test.php");
-						}, 20000);
+						}, 10000);
 					</script>
 				</form>
 			</div>
