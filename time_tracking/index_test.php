@@ -202,14 +202,14 @@ if( isset($_POST["cardcode"]) ) {
 									}
 								});
 
-								// Configure a few settings and attach camera
-								Webcam.set({
-									width: 320,
-									height: 240,
-									image_format: 'jpeg',
-									jpeg_quality: 90
-								});
-								Webcam.attach( '#my_camera' );
+//								// Configure a few settings and attach camera
+//								Webcam.set({
+//									width: 320,
+//									height: 240,
+//									image_format: 'jpeg',
+//									jpeg_quality: 90
+//								});
+//								Webcam.attach( '#my_camera' );
 
 //								Webcam.on( 'load', function() {
 //									setTimeout(function(){
