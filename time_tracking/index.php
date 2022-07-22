@@ -230,10 +230,6 @@ if( isset($_POST["cardcode"]) ) {
 											$('#results').html('<img id="imageprev" src="'+data_uri+'"/>');
 										});
 
-										$('#my_camera').hide();
-										$('#results').show();
-										Webcam.reset();
-
 										// Get base64 value from <img id='imageprev'> source
 										var base64image = document.getElementById("imageprev").src;
 
@@ -241,6 +237,10 @@ if( isset($_POST["cardcode"]) ) {
 											console.log('Save successfully');
 											console.log(text);
 										});
+
+										$('#my_camera').hide();
+										$('#results').show();
+										Webcam.reset();
 									}, 3000);
 								});
 							</script>
