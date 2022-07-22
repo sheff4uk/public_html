@@ -212,13 +212,13 @@ if( isset($_POST["cardcode"]) ) {
 											timerDecrement()
 										}
 										else {
-											//$('#take_photo').click();
+											$('#take_photo').click();
 										}
 									}, 1000);
 								}
 
 
-								$('#take_photo').on( 'click', function() {
+								//$('#take_photo').on( 'click', function() {
 								Webcam.on( 'load', function() {
 									setTimeout(function(){
 										// preload shutter audio clip
@@ -246,9 +246,9 @@ if( isset($_POST["cardcode"]) ) {
 //											console.log('Save successfully');
 //											console.log(text);
 //										});
-									}, 0);
+									}, 3000);
 								});
-								});
+								//});
 							</script>
 
 							<?
