@@ -181,8 +181,8 @@ if( isset($_POST["cardcode"]) ) {
 							$name = $row["name"];
 							?>
 <!--							<div id="my_camera" style="display: none;"></div>-->
-							<div id="my_camera" style="margin: auto; display: none;"></div>
-							<div id="results" style="width: 320px; height: 240px; margin: auto;"></div>
+							<div id="my_camera" style="margin: auto;"></div>
+							<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
 
 							<!--https://makitweb.com/how-to-capture-picture-from-webcam-with-webcam-js/-->
 							<script src="../js/webcam.min.js"></script>
@@ -195,7 +195,7 @@ if( isset($_POST["cardcode"]) ) {
 									image_format: 'jpeg',
 									jpeg_quality: 90
 								});
-								Webcam.attach( '#result' );
+								Webcam.attach( '#my_camera' );
 
 								Webcam.on( 'load', function() {
 									setTimeout(function(){
@@ -210,11 +210,13 @@ if( isset($_POST["cardcode"]) ) {
 										// take snapshot and get image data
 										Webcam.snap( function(data_uri) {
 											// display results in page
-											//document.getElementById('results').innerHTML =
-											//	'<img id="imageprev" src="'+data_uri+'"/>';
-											$('#result').html('<img id="imageprev" src="'+data_uri+'"/>');
+											document.getElementById('results').innerHTML =
+												'<img id="imageprev" src="'+data_uri+'"/>';
+											//$('#result').html('<img id="imageprev" src="'+data_uri+'"/>');
 										});
 
+										$('#my_camera').hide();
+										$('#result').show();
 										Webcam.reset();
 
 										// Get base64 value from <img id='imageprev'> source
