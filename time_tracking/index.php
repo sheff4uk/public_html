@@ -213,7 +213,7 @@ if( isset($_POST["cardcode"]) ) {
 
 								Webcam.on( 'load', function() {
 									// Обратный отсчет
-									timerDecrement();
+									//timerDecrement();
 
 									setTimeout(function(){
 										// preload shutter audio clip
@@ -243,7 +243,7 @@ if( isset($_POST["cardcode"]) ) {
 										});
 
 										Webcam.reset();
-									}, 3000);
+									}, 2000);
 								});
 							</script>
 
@@ -267,7 +267,7 @@ if( isset($_POST["cardcode"]) ) {
 						// Автоматический возврат на главный экран после авторизации
 						setTimeout(function(){
 							$(location).attr('href', "/time_tracking");
-						}, 6000);
+						}, 5000);
 					</script>
 				</form>
 			</div>
