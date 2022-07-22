@@ -180,8 +180,9 @@ if( isset($_POST["cardcode"]) ) {
 							$minutes = fmod($interval, 60);
 							$name = $row["name"];
 							?>
-							<div id="my_camera" style="display: none;"></div>
-							<div id="results" style="width: 320px; height: 240px; margin: auto;"></div>
+							<div id="seconds" style="position: absolute; width: 50%; font-size: 10em; color: #fff8; -webkit-filter: drop-shadow(0px 0px 10px #000); filter: drop-shadow(0px 0px 10px #000);">3</div>
+							<div id="my_camera" style="margin: auto;"></div>
+							<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
 
 							<!--https://makitweb.com/how-to-capture-picture-from-webcam-with-webcam-js/-->
 							<script src="../js/webcam.min.js"></script>
@@ -205,12 +206,14 @@ if( isset($_POST["cardcode"]) ) {
 									// play sound effect
 									shutter.play();
 
-									// take snapshot and get image data
-									Webcam.snap( function(data_uri) {
-										// display results in page
-										document.getElementById('results').innerHTML =
-											'<img id="imageprev" src="'+data_uri+'"/>';
-									});
+									setTimeout(function(){
+										// take snapshot and get image data
+										Webcam.snap( function(data_uri) {
+											// display results in page
+											document.getElementById('results').innerHTML =
+												'<img id="imageprev" src="'+data_uri+'"/>';
+										});
+									}, 3000);
 
 									Webcam.reset();
 
