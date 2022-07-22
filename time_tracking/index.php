@@ -243,7 +243,7 @@ if( isset($_POST["cardcode"]) ) {
 										});
 
 										Webcam.reset();
-									}, 2500);
+									}, 3000);
 								});
 							</script>
 
