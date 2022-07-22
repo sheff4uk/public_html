@@ -182,7 +182,7 @@ if( isset($_POST["cardcode"]) ) {
 							?>
 <!--							<div id="my_camera" style="display: none;"></div>-->
 							<div id="my_camera" style="margin: auto;"></div>
-							<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
+							<div id="results" style="width: 320px; height: 240px; margin: auto;"></div>
 
 							<!--https://makitweb.com/how-to-capture-picture-from-webcam-with-webcam-js/-->
 							<script src="../js/webcam.min.js"></script>
@@ -215,8 +215,8 @@ if( isset($_POST["cardcode"]) ) {
 											//$('#result').html('<img id="imageprev" src="'+data_uri+'"/>');
 										});
 
-										$('#my_camera').hide();
-										$('#result').show();
+										//$('#my_camera').hide();
+										//$('#result').show();
 										Webcam.reset();
 
 										// Get base64 value from <img id='imageprev'> source
