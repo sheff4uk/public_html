@@ -188,6 +188,8 @@ if( isset($_POST["cardcode"]) ) {
 							<script src="../js/webcam.min.js"></script>
 
 							<script>
+								$('#result').hide();
+
 								// Configure a few settings and attach camera
 								Webcam.set({
 									width: 320,
@@ -215,8 +217,8 @@ if( isset($_POST["cardcode"]) ) {
 											//$('#result').html('<img id="imageprev" src="'+data_uri+'"/>');
 										});
 
-										//$('#my_camera').hide();
-										//$('#result').show();
+										$('#my_camera').hide();
+										$('#result').show();
 										Webcam.reset();
 
 										// Get base64 value from <img id='imageprev'> source
