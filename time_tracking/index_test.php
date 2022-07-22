@@ -181,7 +181,7 @@ if( isset($_POST["cardcode"]) ) {
 							$name = $row["name"];
 							?>
 <!--							<div id="my_camera" style="display: none;"></div>-->
-							<div id="seconds" style="width: 320px; height: 240px; margin: auto; font-size: 5em;">3</div>
+							<div id="seconds" style="width: 50%; font-size: 10em; color: #fff; -webkit-filter: drop-shadow(0px 0px 10px #000); filter: drop-shadow(0px 0px 10px #000);">3</div>
 							<div id="my_camera" style="margin: auto;"></div>
 							<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
 
@@ -189,6 +189,20 @@ if( isset($_POST["cardcode"]) ) {
 							<script src="../js/webcam.min.js"></script>
 
 							<script>
+								$(function()
+								{
+									var _Seconds = $('#seconds').text();
+									if(_Seconds == 0)
+									{
+										alert('End!');
+									} else {
+										setTimeout(function()
+										{
+											$('#seconds').text(_Seconds - 1);
+										}, 1000);
+									}
+								});
+
 								// Configure a few settings and attach camera
 								Webcam.set({
 									width: 320,
