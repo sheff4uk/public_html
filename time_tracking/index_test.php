@@ -190,7 +190,7 @@ if( isset($_POST["cardcode"]) ) {
 							<script>
 								const time = $('#seconds');
 
-								timerDecrement();
+								//timerDecrement();
 
 								function timerDecrement() {
 									setTimeout(function() {
@@ -213,6 +213,8 @@ if( isset($_POST["cardcode"]) ) {
 								Webcam.attach( '#my_camera' );
 
 								Webcam.on( 'load', function() {
+									timerDecrement();
+
 									setTimeout(function(){
 										// preload shutter audio clip
 										var shutter = new Audio();
