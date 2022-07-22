@@ -180,7 +180,6 @@ if( isset($_POST["cardcode"]) ) {
 							$minutes = fmod($interval, 60);
 							$name = $row["name"];
 							?>
-							<button id="take_photo" style="display: none;"></button>
 							<div id="seconds" style="position: absolute; width: 50%; font-size: 10em; color: #fff8; -webkit-filter: drop-shadow(0px 0px 10px #000); filter: drop-shadow(0px 0px 10px #000);">3</div>
 							<div id="my_camera" style="margin: auto;"></div>
 							<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
@@ -189,15 +188,6 @@ if( isset($_POST["cardcode"]) ) {
 							<script src="../js/webcam.min.js"></script>
 
 							<script>
-								// Configure a few settings and attach camera
-								Webcam.set({
-									width: 320,
-									height: 240,
-									image_format: 'jpeg',
-									jpeg_quality: 90
-								});
-								Webcam.attach( '#my_camera' );
-
 								const time = $('#seconds');
 
 								timerDecrement();
@@ -208,17 +198,20 @@ if( isset($_POST["cardcode"]) ) {
 
 										time.text(newTime);
 
-										if(newTime > 0) {
-											timerDecrement()
-										}
-										else {
-											//$('#take_photo').click();
-										}
+										if(newTime > 0) timerDecrement()
+										else time.text('');
 									}, 1000);
 								}
 
+								// Configure a few settings and attach camera
+								Webcam.set({
+									width: 320,
+									height: 240,
+									image_format: 'jpeg',
+									jpeg_quality: 90
+								});
+								Webcam.attach( '#my_camera' );
 
-								//$('#take_photo').on( 'click', function() {
 								Webcam.on( 'load', function() {
 									setTimeout(function(){
 										// preload shutter audio clip
@@ -248,7 +241,6 @@ if( isset($_POST["cardcode"]) ) {
 //										});
 									}, 3000);
 								});
-								//});
 							</script>
 
 							<?
