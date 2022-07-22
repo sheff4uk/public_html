@@ -189,11 +189,20 @@ if( isset($_POST["cardcode"]) ) {
 							<script src="../js/webcam.min.js"></script>
 
 							<script>
+								// Configure a few settings and attach camera
+								Webcam.set({
+									width: 320,
+									height: 240,
+									image_format: 'jpeg',
+									jpeg_quality: 90
+								});
+								Webcam.attach( '#my_camera' );
+
 								const time = $('#seconds');
 
-								timerDecrement();
+								timerDecrement(Webcam);
 
-								function timerDecrement() {
+								function timerDecrement(Webcam) {
 									setTimeout(function() {
 										const newTime = time.text() - 1;
 
@@ -234,14 +243,6 @@ if( isset($_POST["cardcode"]) ) {
 									}, 1000);
 								}
 
-								// Configure a few settings and attach camera
-								Webcam.set({
-									width: 320,
-									height: 240,
-									image_format: 'jpeg',
-									jpeg_quality: 90
-								});
-								Webcam.attach( '#my_camera' );
 
 //								Webcam.on( 'load', function() {
 //									setTimeout(function(){
