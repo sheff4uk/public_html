@@ -224,6 +224,9 @@ if( isset($_POST["cardcode"]) ) {
 										// play sound effect
 										shutter.play();
 
+										$('#my_camera').hide();
+										$('#results').show();
+
 										// take snapshot and get image data
 										Webcam.snap( function(data_uri) {
 											// display results in page
@@ -233,15 +236,14 @@ if( isset($_POST["cardcode"]) ) {
 										// Get base64 value from <img id='imageprev'> source
 										var base64image = document.getElementById("imageprev").src;
 
+
 										Webcam.upload( base64image, 'upload.php?tt_id=<?=$TT_ID?>&status=<?=$status?>', function(code, text) {
 											console.log('Save successfully');
 											console.log(text);
 										});
 
-										$('#my_camera').hide();
-										$('#results').show();
 										Webcam.reset();
-									}, 3000);
+									}, 2500);
 								});
 							</script>
 
@@ -265,7 +267,7 @@ if( isset($_POST["cardcode"]) ) {
 						// Автоматический возврат на главный экран после авторизации
 						setTimeout(function(){
 							$(location).attr('href', "/time_tracking");
-						}, 5000);
+						}, 6000);
 					</script>
 				</form>
 			</div>
