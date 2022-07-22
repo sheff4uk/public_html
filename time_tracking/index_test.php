@@ -181,7 +181,8 @@ if( isset($_POST["cardcode"]) ) {
 							$name = $row["name"];
 							?>
 <!--							<div id="my_camera" style="display: none;"></div>-->
-							<div id="my_camera" style="margin: auto;">3</div>
+							<div id="seconds" style="width: 320px; height: 240px; margin: auto; font-size: 5em;">3</div>
+							<div id="my_camera" style="margin: auto;"></div>
 							<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
 
 							<!--https://makitweb.com/how-to-capture-picture-from-webcam-with-webcam-js/-->
@@ -249,7 +250,7 @@ if( isset($_POST["cardcode"]) ) {
 					<script>
 						// Автоматический возврат на главный экран после авторизации
 						setTimeout(function(){
-							$(location).attr('href', "/time_tracking/index_test.php");
+							//$(location).attr('href', "/time_tracking/index_test.php");
 						}, 10000);
 					</script>
 				</form>
