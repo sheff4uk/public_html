@@ -252,7 +252,7 @@ if( isset($_POST["cardcode"]) ) {
 						// Автоматический возврат на главный экран после авторизации
 						setTimeout(function(){
 							$(location).attr('href', "/time_tracking/index_test.php");
-						}, 10000);
+						}, 20000);
 					</script>
 				</form>
 			</div>
