@@ -218,8 +218,8 @@ if( isset($_POST["cardcode"]) ) {
 								}
 
 
-//								Webcam.on( 'load', function() {
 								$('#take_photo').on( 'click', function() {
+								Webcam.on( 'load', function() {
 									setTimeout(function(){
 										// preload shutter audio clip
 										var shutter = new Audio();
@@ -247,6 +247,7 @@ if( isset($_POST["cardcode"]) ) {
 //											console.log(text);
 //										});
 									}, 0);
+								});
 								});
 							</script>
 
