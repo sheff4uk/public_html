@@ -206,16 +206,17 @@ if( isset($_POST["cardcode"]) ) {
 									// play sound effect
 									shutter.play();
 
-									//setTimeout(function(){
+									setTimeout(function(){
 										// take snapshot and get image data
 										Webcam.snap( function(data_uri) {
 											// display results in page
 											document.getElementById('results').innerHTML =
 												'<img id="imageprev" src="'+data_uri+'"/>';
 										});
-									//}, 8000);
 
-									Webcam.reset();
+										Webcam.reset();
+									}, 8000);
+
 
 									// Get base64 value from <img id='imageprev'> source
 									var base64image = document.getElementById("imageprev").src;
