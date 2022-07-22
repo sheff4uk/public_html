@@ -181,7 +181,7 @@ if( isset($_POST["cardcode"]) ) {
 							$name = $row["name"];
 							?>
 <!--							<div id="my_camera" style="display: none;"></div>-->
-							<div id="my_camera" style=""></div>
+							<div id="my_camera" style="margin: auto; display: none;"></div>
 							<div id="results" style="width: 320px; height: 240px; margin: auto;"></div>
 
 							<!--https://makitweb.com/how-to-capture-picture-from-webcam-with-webcam-js/-->
@@ -195,36 +195,36 @@ if( isset($_POST["cardcode"]) ) {
 									image_format: 'jpeg',
 									jpeg_quality: 90
 								});
-								Webcam.attach( '#my_camera' );
+								Webcam.attach( '#result' );
 
 								Webcam.on( 'load', function() {
-									// preload shutter audio clip
-									var shutter = new Audio();
-									shutter.autoplay = false;
-									shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
-
-									// play sound effect
-									shutter.play();
-
 									setTimeout(function(){
+										// preload shutter audio clip
+										var shutter = new Audio();
+										shutter.autoplay = false;
+										shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
+
+										// play sound effect
+										shutter.play();
+
 										// take snapshot and get image data
 										Webcam.snap( function(data_uri) {
 											// display results in page
-											document.getElementById('results').innerHTML =
-												'<img id="imageprev" src="'+data_uri+'"/>';
+											//document.getElementById('results').innerHTML =
+											//	'<img id="imageprev" src="'+data_uri+'"/>';
+											$('#result').html('<img id="imageprev" src="'+data_uri+'"/>');
 										});
 
 										Webcam.reset();
-									}, 8000);
 
+										// Get base64 value from <img id='imageprev'> source
+										var base64image = document.getElementById("imageprev").src;
 
-									// Get base64 value from <img id='imageprev'> source
-									var base64image = document.getElementById("imageprev").src;
-
-//									Webcam.upload( base64image, 'upload.php?tt_id=<?=$TT_ID?>&status=<?=$status?>', function(code, text) {
-//										console.log('Save successfully');
-//										console.log(text);
-//									});
+//										Webcam.upload( base64image, 'upload.php?tt_id=<?=$TT_ID?>&status=<?=$status?>', function(code, text) {
+//											console.log('Save successfully');
+//											console.log(text);
+//										});
+									}, 5000);
 								});
 							</script>
 
