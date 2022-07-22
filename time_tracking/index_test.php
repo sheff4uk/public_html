@@ -212,7 +212,7 @@ if( isset($_POST["cardcode"]) ) {
 											timerDecrement()
 										}
 										else {
-											$('#take_photo').click();
+											//$('#take_photo').click();
 										}
 									}, 1000);
 								}
