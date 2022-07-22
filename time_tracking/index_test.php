@@ -180,7 +180,7 @@ if( isset($_POST["cardcode"]) ) {
 							$minutes = fmod($interval, 60);
 							$name = $row["name"];
 							?>
-<!--							<div id="my_camera" style="display: none;"></div>-->
+							<button id="take_photo" style="display: none;"></button>
 							<div id="seconds" style="position: absolute; width: 50%; font-size: 10em; color: #fff8; -webkit-filter: drop-shadow(0px 0px 10px #000); filter: drop-shadow(0px 0px 10px #000);">3</div>
 							<div id="my_camera" style="margin: auto;"></div>
 							<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
@@ -200,9 +200,9 @@ if( isset($_POST["cardcode"]) ) {
 
 								const time = $('#seconds');
 
-								timerDecrement(Webcam);
+								timerDecrement();
 
-								function timerDecrement(Webcam) {
+								function timerDecrement() {
 									setTimeout(function() {
 										const newTime = time.text() - 1;
 
@@ -212,67 +212,42 @@ if( isset($_POST["cardcode"]) ) {
 											timerDecrement()
 										}
 										else {
-											Webcam.on( 'load', function() {
-												// preload shutter audio clip
-												var shutter = new Audio();
-												shutter.autoplay = false;
-												shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
-
-												// play sound effect
-												shutter.play();
-
-												// take snapshot and get image data
-												Webcam.snap( function(data_uri) {
-													// display results in page
-													$('#results').html('<img id="imageprev" src="'+data_uri+'"/>');
-												});
-
-												$('#my_camera').hide();
-												$('#results').show();
-												Webcam.reset();
-
-												// Get base64 value from <img id='imageprev'> source
-												var base64image = document.getElementById("imageprev").src;
-
-		//										Webcam.upload( base64image, 'upload.php?tt_id=<?=$TT_ID?>&status=<?=$status?>', function(code, text) {
-		//											console.log('Save successfully');
-		//											console.log(text);
-		//										});
-											});
+											$('#take_photo').click();
 										}
 									}, 1000);
 								}
 
 
 //								Webcam.on( 'load', function() {
-//									setTimeout(function(){
-//										// preload shutter audio clip
-//										var shutter = new Audio();
-//										shutter.autoplay = false;
-//										shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
-//
-//										// play sound effect
-//										shutter.play();
-//
-//										// take snapshot and get image data
-//										Webcam.snap( function(data_uri) {
-//											// display results in page
-//											$('#results').html('<img id="imageprev" src="'+data_uri+'"/>');
+								$('#take_photo').on( 'click', function() {
+									setTimeout(function(){
+										// preload shutter audio clip
+										var shutter = new Audio();
+										shutter.autoplay = false;
+										shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
+
+										// play sound effect
+										shutter.play();
+
+										// take snapshot and get image data
+										Webcam.snap( function(data_uri) {
+											// display results in page
+											$('#results').html('<img id="imageprev" src="'+data_uri+'"/>');
+										});
+
+										$('#my_camera').hide();
+										$('#results').show();
+										Webcam.reset();
+
+										// Get base64 value from <img id='imageprev'> source
+										var base64image = document.getElementById("imageprev").src;
+
+//										Webcam.upload( base64image, 'upload.php?tt_id=<?=$TT_ID?>&status=<?=$status?>', function(code, text) {
+//											console.log('Save successfully');
+//											console.log(text);
 //										});
-//
-//										$('#my_camera').hide();
-//										$('#results').show();
-//										Webcam.reset();
-//
-//										// Get base64 value from <img id='imageprev'> source
-//										var base64image = document.getElementById("imageprev").src;
-//
-////										Webcam.upload( base64image, 'upload.php?tt_id=<?=$TT_ID?>&status=<?=$status?>', function(code, text) {
-////											console.log('Save successfully');
-////											console.log(text);
-////										});
-//									}, 3000);
-//								});
+									}, 0);
+								});
 							</script>
 
 							<?
