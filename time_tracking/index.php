@@ -228,8 +228,8 @@ if( isset($_POST["cardcode"]) ) {
 										// Автоматический возврат на главный экран после фотографирования
 										setTimeout(function(){
 											$(location).attr('href', "/time_tracking");
-										}, 2000);
-									}, 2000);
+										}, 1000);
+									}, 1000);
 								});
 							</script>
 
