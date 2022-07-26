@@ -1,7 +1,17 @@
 <?
 include_once "../config.php";
 $ip = $_SERVER['REMOTE_ADDR'];
-//if( $ip != $from_ip ) die("Access denied");
+// Узнаем участок
+$query = "
+	SELECT F_ID
+	FROM factory
+	WHERE from_ip = '{$ip}'
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$F_ID = $row["F_ID"];
+
+if( !$F_ID ) die("Access denied");
 
 if( isset($_POST["cardcode"]) ) {
 	// Верифицируем работника
@@ -15,55 +25,88 @@ if( isset($_POST["cardcode"]) ) {
 	$USR_ID = $row["USR_ID"];
 	// Если работник верифицирован
 	if( $USR_ID ) {
-		// Узнаем сколько секунд прошло с последнего считывания
+		// Добавляем запись в табель
 		$query = "
-			SELECT TIMESTAMPDIFF(SECOND, IFNULL(TT.stop, TT.start), NOW()) seconds
-			FROM TimeTracking TT
-			WHERE TT.USR_ID = {$USR_ID}
-			ORDER BY TT.TT_ID DESC
-			LIMIT 1
+			INSERT INTO Timesheet
+			SET ts_date = CURDATE()
+				,USR_ID = {$USR_ID}
+				,F_ID = {$F_ID}
+				,T_ID = (
+					SELECT T_ID
+					FROM Tariff
+					WHERE USR_ID = {$USR_ID}
+						AND from_date < CURDATE()
+					ORDER BY from_date DESC, T_ID ASC
+					LIMIT 1
+				)
+			ON DUPLICATE KEY UPDATE
+				T_ID = (
+					SELECT T_ID
+					FROM Tariff
+					WHERE USR_ID = {$USR_ID}
+						AND from_date < CURDATE()
+					ORDER BY from_date DESC, T_ID ASC
+					LIMIT 1
+				)
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+		// Узнаем TS_ID
+		$query = "
+			SELECT TS_ID
+			FROM Timesheet
+			WHERE ts_date = CURDATE()
+				AND USR_ID = {$USR_ID}
+				AND F_ID = {$F_ID}
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$row = mysqli_fetch_array($res);
-		$seconds = ($row["seconds"] > 0 ? $row["seconds"] : 100); // Если считывание первое
+		$TS_ID = $row["TS_ID"];
 
-		// Если прошла минута с последнего считывания
-		if( $seconds > 60 ) {
+		// Добавляем регистрацию работника
+		$query = "
+			INSERT INTO TimeReg
+			SET USR_ID = {$USR_ID}
+				,tr_time = TIME(NOW())
+				,TS_ID = {$TS_ID}
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		$TR_ID = mysqli_insert_id( $mysqli );
 
-			// Узнаем есть ли начатая смена
-			$query = "
-				SELECT TT.TT_ID
-				FROM TimeTracking TT
-				WHERE TT.stop IS NULL
-					AND TT.USR_ID = {$USR_ID}
-				ORDER BY TT.TT_ID DESC
-				LIMIT 1
-			";
-			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-			$row = mysqli_fetch_array($res);
-			$TT_ID = $row["TT_ID"];
 
-			// Если смена начата, завершаем её
-			if( $TT_ID ) {
-				$query = "
-					UPDATE TimeTracking
-					SET stop = NOW()
-					WHERE TT_ID = {$TT_ID}
-				";
-				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-			}
-			// Иначе начинаем новую смену
-			else {
-				$query = "
-					INSERT INTO TimeTracking
-					SET USR_ID = {$USR_ID}
-						,start = NOW()
-				";
-				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-			}
-		}
+//		// Узнаем есть ли начатая смена
+//		$query = "
+//			SELECT TT.TT_ID
+//			FROM TimeTracking TT
+//			WHERE TT.stop IS NULL
+//				AND TT.USR_ID = {$USR_ID}
+//			ORDER BY TT.TT_ID DESC
+//			LIMIT 1
+//		";
+//		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//		$row = mysqli_fetch_array($res);
+//		$TT_ID = $row["TT_ID"];
+//
+//		// Если смена начата, завершаем её
+//		if( $TT_ID ) {
+//			$query = "
+//				UPDATE TimeTracking
+//				SET stop = NOW()
+//				WHERE TT_ID = {$TT_ID}
+//			";
+//			mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//		}
+//		// Иначе начинаем новую смену
+//		else {
+//			$query = "
+//				INSERT INTO TimeTracking
+//				SET USR_ID = {$USR_ID}
+//					,start = NOW()
+//			";
+//			mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//		}
 
-		exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/?id='.$USR_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/?id='.$USR_ID.'&tr_id='.$TR_ID.'">');
 	}
 	// Не верифицирован
 	{
@@ -161,26 +204,33 @@ if( isset($_POST["cardcode"]) ) {
 				<form method="post">
 					<?
 						if( $_GET["id"] > 0 ) {
-							// Узнаем статус смены
+							// Узнаем имя работника
 							$query = "
-								SELECT TT.TT_ID
-									,IF(TT.stop IS NULL, 0, 1) `status`
-									,TIMESTAMPDIFF(MINUTE, TT.start, TT.stop) `interval`
-									,USR_Name({$_GET["id"]}) `name`
-								FROM TimeTracking TT
-								WHERE TT.USR_ID = {$_GET["id"]}
-								ORDER BY TT.TT_ID DESC
+								SELECT USR_Name({$_GET["id"]}) `name`
 							";
 							$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 							$row = mysqli_fetch_array($res);
-							$TT_ID = $row["TT_ID"];
-							$status = $row["status"];
-							$interval = $row["interval"];
-							$hours = intdiv($interval, 60);
-							$minutes = fmod($interval, 60);
 							$name = $row["name"];
+
+//							// Узнаем статус смены
+//							$query = "
+//								SELECT TT.TT_ID
+//									,IF(TT.stop IS NULL, 0, 1) `status`
+//									,TIMESTAMPDIFF(MINUTE, TT.start, TT.stop) `interval`
+//									,USR_Name({$_GET["id"]}) `name`
+//								FROM TimeTracking TT
+//								WHERE TT.USR_ID = {$_GET["id"]}
+//								ORDER BY TT.TT_ID DESC
+//							";
+//							$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//							$row = mysqli_fetch_array($res);
+//							$TT_ID = $row["TT_ID"];
+//							$status = $row["status"];
+//							$interval = $row["interval"];
+//							$hours = intdiv($interval, 60);
+//							$minutes = fmod($interval, 60);
+//							$name = $row["name"];
 							?>
-<!--							<div id="seconds" style="position: absolute; width: 50%; font-size: 10em; color: #fff8; -webkit-filter: drop-shadow(0px 0px 10px #000); filter: drop-shadow(0px 0px 10px #000);">3</div>-->
 							<div id="my_camera" style="margin: auto;"></div>
 							<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
 
@@ -188,20 +238,6 @@ if( isset($_POST["cardcode"]) ) {
 							<script src="../js/webcam.min.js"></script>
 
 							<script>
-//								const time = $('#seconds');
-//
-//								// Обратный отсчет
-//								function timerDecrement() {
-//									setTimeout(function() {
-//										const newTime = time.text() - 1;
-//
-//										time.text(newTime);
-//
-//										if(newTime > 0) timerDecrement()
-//										else time.text('');
-//									}, 1000);
-//								}
-
 								// Configure a few settings and attach camera
 								Webcam.set({
 									width: 320,
@@ -237,7 +273,7 @@ if( isset($_POST["cardcode"]) ) {
 										var base64image = document.getElementById("imageprev").src;
 
 
-										Webcam.upload( base64image, 'upload.php?tt_id=<?=$TT_ID?>&status=<?=$status?>', function(code, text) {
+										Webcam.upload( base64image, 'upload.php?tr_id=<?=$_GET["tr_id"]?>', function(code, text) {
 											console.log('Save successfully');
 											console.log(text);
 										});
@@ -249,15 +285,15 @@ if( isset($_POST["cardcode"]) ) {
 
 							<?
 							echo "<h1>{$name}</h1>";
-							if( $status ) {
-								echo "<p class='title'>Рабочая смена завершена</p>";
-								echo "<p>Продолжительность: <b>{$hours}</b> ч. <b>{$minutes}</b> мин.</p>";
-								echo "<i class='fas fa-door-closed fa-4x'></i>";
-							}
-							else {
-								echo "<p class='title'>Рабочая смена начата</p>";
-								echo "<i class='fas fa-door-open fa-4x'></i>";
-							}
+//							if( $status ) {
+//								echo "<p class='title'>Рабочая смена завершена</p>";
+//								echo "<p>Продолжительность: <b>{$hours}</b> ч. <b>{$minutes}</b> мин.</p>";
+//								echo "<i class='fas fa-door-closed fa-4x'></i>";
+//							}
+//							else {
+//								echo "<p class='title'>Рабочая смена начата</p>";
+//								echo "<i class='fas fa-door-open fa-4x'></i>";
+//							}
 						}
 						else {
 							echo "<p class='title' style='color: #911;'>Карта не действительна!</p>";
@@ -277,20 +313,19 @@ if( isset($_POST["cardcode"]) ) {
 			?>
 			<div style="display: flex; flex-direction: row; flex-wrap: wrap; padding: 5px; margin: 5px;">
 			<?
-			// Выводим список открытых сегодня смен
+			// Выводим список зарегистрированных сегодня работников
 			$query = "
-				SELECT USR_Name(TT.USR_ID) `name`
-					,TT.photo_start
-				FROM TimeTracking TT
-				WHERE TT.start >= CURDATE()
-					AND TT.stop IS NULL
-				ORDER BY `name`
+				SELECT USR_Name(TR.USR_ID) `name`
+					,TR.tr_photo
+				FROM TimeReg TR
+				JOIN Timesheet TS ON TS.TS_ID = TR.TS_ID AND TS.ts_date = CURDATE()
+				ORDER BY `name`, TR.tr_time
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
 				?>
-				<div style="display: flex; width: 160px; height: 120px; font-size: 1.0em; background-color: #fdce46bf; background-image: url(/time_tracking/upload/<?=$row["photo_start"]?>); background-size: contain; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px; overflow: hidden;">
-					<div style=" width: 20px; height: 20px; display: inline-block; margin: 15px; border-radius: 50%; background: green; box-shadow: 0 0 3px 3px green; position: absolute;"></div>
+				<div style="display: flex; width: 160px; height: 120px; font-size: 1.0em; background-color: #fdce46bf; background-image: url(/time_tracking/upload/<?=$row["tr_photo"]?>); background-size: contain; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px; overflow: hidden;">
+<!--					<div style=" width: 20px; height: 20px; display: inline-block; margin: 15px; border-radius: 50%; background: green; box-shadow: 0 0 3px 3px green; position: absolute;"></div>-->
 					<span style="align-self: flex-end; margin: 10px; -webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff;"><?=$row["name"]?></span>
 				</div>
 				<?
