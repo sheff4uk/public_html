@@ -11,7 +11,7 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 $row = mysqli_fetch_array($res);
 $F_ID = $row["F_ID"];
 
-if( !$F_ID ) die("Access denied");
+//if( !$F_ID ) die("Access denied");
 
 if( isset($_POST["cardcode"]) ) {
 	// Верифицируем работника
