@@ -20,16 +20,17 @@ while( $row = mysqli_fetch_array($res) ) {
 		FROM Timesheet TS
 		JOIN TimeReg TR ON TR.TS_ID = TS.TS_ID AND TR.del_time IS NULL
 		WHERE TS.ts_date = CURDATE()
+			AND TS.F_ID = {$row["F_ID"]}
 		GROUP BY TS.USR_ID
 		HAVING cnt = 1
 	";
-	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query1: " .mysqli_error( $mysqli ));
 	$text = "";
 	while( $subrow = mysqli_fetch_array($subres) ) {
 		$text .= "<b>Смена не закрыта!</b> {$subrow["name"]} ({$subrow["date"]})\n";
 	}
 	if( $text ) {
-		//message_to_telegram($text, $row["cube_test_group"]);
+		//message_to_telegram($text, $row["notification_group"]);
 		message_to_telegram($text, '217756119');
 	}
 }
