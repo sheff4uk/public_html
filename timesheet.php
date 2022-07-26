@@ -158,8 +158,8 @@ foreach ($_GET as &$value) {
 				}
 			?>
 
-			<th width="45">Часы</th>
-			<th width="55">Сумма</th>
+			<th width="45" colspan="2">Часы</th>
+			<th width="55" colspan="2">Сумма</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -239,42 +239,12 @@ foreach ($_GET as &$value) {
 			$whole = intval($sigmahours);
 			$frac = ($sigmahours - intval($sigmahours)) * 4;
 
-			echo "<td class='txtright'>".(round($sigmaduration / 60, 2))."</td>";	// Сумма часов
-			echo "<td class='txtright'>{$sigmamoney}</td>";								// Сумма денег
+			echo "<td class='txtright' colspan='2'>".(round($sigmaduration / 60, 2))."</td>";	// Сумма часов
+			echo "<td class='txtright' colspan='2'>{$sigmamoney}</td>";								// Сумма денег
 			echo "</tr>";
 		}
 	?>
 	</tbody>
-	<thead>
-		<tr class="nowrap">
-			<th></th>
-			<?
-				$i = 1;
-				while ($i <= $days) {
-					$date = $year.'-'.$month.'-'.$i;
-					$day_of_week = date('N', strtotime($date));	// День недели
-					$day = date('d', strtotime($date));			// День месяца
-
-					// Перебираем массив и если находим дату то проверяем ее тип (тип дня: 1 - выходной день, 2 - рабочий и сокращенный (может быть использован для любого дня недели), 3 - рабочий день (суббота/воскресенье))
-					$t = 0;
-					foreach( $data["days"]["day"] as $key=>$value ) {
-						if( $value["@attributes"]["d"] == $month.".".$day) {
-							$t = $value["@attributes"]["t"];
-						}
-					}
-
-					if ( (($day_of_week >= 6 and $t != "3" and $t != "2") or ($t == "1")) ) { // Выделяем цветом выходные дни
-						echo "<th style='background: chocolate;'>".$i++."</th>";
-					}
-					else {
-						echo "<th>".$i++."</th>";
-					}
-				}
-			?>
-			<th>Часы</th>
-			<th>Сумма</th>
-		</tr>
-	</thead>
 </table>
 
 <script>
