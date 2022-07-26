@@ -66,7 +66,30 @@ $ip = $_SERVER['REMOTE_ADDR'];
 						,TT.photo_stop
 						#,TIMESTAMPDIFF(MINUTE, TT.start, TT.stop) duration
 						#,TIMESTAMPDIFF(MINUTE, IF(TT.USR_ID = 30, TT.start, TIMESTAMP(DATE(TT.start), '08:00:00')), TT.stop) duration
-						,GREATEST(TIMESTAMPDIFF(MINUTE, GREATEST(TIMESTAMP(DATE(TT.start), IF(USR.RL_ID = 6, TIME(TT.start), '08:00:00')), TT.start), LEAST(TIMESTAMP(DATE(TT.start), '12:00:00'), TT.stop)), 0) + GREATEST(TIMESTAMPDIFF(MINUTE, GREATEST(TIMESTAMP(DATE(TT.start), '13:00:00'), TT.start), TT.stop), 0) duration
+						,GREATEST(
+							TIMESTAMPDIFF(
+								MINUTE
+								,GREATEST(
+									TIMESTAMP(DATE(TT.start), IF(USR.RL_ID = 6, TIME(TT.start), '08:00:00'))
+									,TT.start
+								)
+								,LEAST(
+									TIMESTAMP(DATE(TT.start), '12:00:00')
+									,TT.stop
+								)
+							)
+							,0
+						) + GREATEST(
+							TIMESTAMPDIFF(
+								MINUTE
+								,GREATEST(
+									TIMESTAMP(DATE(TT.start), '13:00:00')
+									,TT.start
+								)
+								,TT.stop
+							)
+							,0
+						) duration
 						,USR.RL_ID
 					FROM TimeTracking TT
 					JOIN Users USR ON USR.USR_ID = TT.USR_ID
