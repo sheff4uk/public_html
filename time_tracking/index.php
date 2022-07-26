@@ -224,6 +224,11 @@ if( isset($_POST["cardcode"]) ) {
 										});
 
 										Webcam.reset();
+
+										// Автоматический возврат на главный экран после фотографирования
+										setTimeout(function(){
+											$(location).attr('href', "/time_tracking");
+										}, 2000);
 									}, 2000);
 								});
 							</script>
@@ -239,7 +244,7 @@ if( isset($_POST["cardcode"]) ) {
 						// Автоматический возврат на главный экран после авторизации
 						setTimeout(function(){
 							$(location).attr('href', "/time_tracking");
-						}, 5000);
+						}, 10000);
 					</script>
 				</form>
 			</div>
