@@ -30,8 +30,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		$text .= "<b>Смена не закрыта!</b> {$subrow["name"]} ({$subrow["date"]})\n";
 	}
 	if( $text ) {
-		//message_to_telegram($text, $row["notification_group"]);
-		message_to_telegram($text, '217756119');
+		message_to_telegram($text, $row["notification_group"]);
 	}
 }
 
