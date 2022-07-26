@@ -18,6 +18,7 @@ if( !$_GET["month"] ) {
 if( !$_GET["F_ID"] ) {
 	$_GET["F_ID"] = $_SESSION['F_ID'];
 }
+$F_ID = $_GET["F_ID"];
 
 // Узнаем кол-во дней в выбранном месяце
 $strdate = '01.'.$month.'.'.$year;
@@ -182,9 +183,9 @@ foreach ($_GET as &$value) {
 			LEFT JOIN Timesheet TS ON TS.USR_ID = USR.USR_ID
 				AND YEAR(TS.ts_date) = {$year}
 				AND MONTH(TS.ts_date) = {$month}
-				AND TS.F_ID = {$_GET["F_ID"]}
+				AND TS.F_ID = {$F_ID}
 			GROUP BY USR.USR_ID
-			HAVING (act = 1 AND F_ID = {$_GET["F_ID"]}) OR duration > 0
+			HAVING (act = 1 AND F_ID = {$F_ID}) OR duration > 0
 			ORDER BY Name
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -200,7 +201,7 @@ foreach ($_GET as &$value) {
 				WHERE YEAR(ts_date) = {$year}
 					AND MONTH(ts_date) = {$month}
 					AND USR_ID = {$row["USR_ID"]}
-					AND F_ID = {$_GET["F_ID"]}
+					AND F_ID = {$F_ID}
 			";
 			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
