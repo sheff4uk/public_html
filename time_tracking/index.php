@@ -73,39 +73,6 @@ if( isset($_POST["cardcode"]) ) {
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$TR_ID = mysqli_insert_id( $mysqli );
 
-
-//		// Узнаем есть ли начатая смена
-//		$query = "
-//			SELECT TT.TT_ID
-//			FROM TimeTracking TT
-//			WHERE TT.stop IS NULL
-//				AND TT.USR_ID = {$USR_ID}
-//			ORDER BY TT.TT_ID DESC
-//			LIMIT 1
-//		";
-//		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//		$row = mysqli_fetch_array($res);
-//		$TT_ID = $row["TT_ID"];
-//
-//		// Если смена начата, завершаем её
-//		if( $TT_ID ) {
-//			$query = "
-//				UPDATE TimeTracking
-//				SET stop = NOW()
-//				WHERE TT_ID = {$TT_ID}
-//			";
-//			mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//		}
-//		// Иначе начинаем новую смену
-//		else {
-//			$query = "
-//				INSERT INTO TimeTracking
-//				SET USR_ID = {$USR_ID}
-//					,start = NOW()
-//			";
-//			mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//		}
-
 		exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/?id='.$USR_ID.'&tr_id='.$TR_ID.'">');
 	}
 	// Не верифицирован
@@ -126,10 +93,6 @@ if( isset($_POST["cardcode"]) ) {
 		<script src="../js/jquery-1.11.3.min.js"></script>
 		<script src="../js/ui/jquery-ui.js"></script>
 		<script>
-//			setTimeout(function(){
-//				$(location).attr('href', "/time_tracking");
-//			}, 60000);
-
 			$(function() {
 				// Считывание карточки
 				var cardcode="";
@@ -212,24 +175,6 @@ if( isset($_POST["cardcode"]) ) {
 							$row = mysqli_fetch_array($res);
 							$name = $row["name"];
 
-//							// Узнаем статус смены
-//							$query = "
-//								SELECT TT.TT_ID
-//									,IF(TT.stop IS NULL, 0, 1) `status`
-//									,TIMESTAMPDIFF(MINUTE, TT.start, TT.stop) `interval`
-//									,USR_Name({$_GET["id"]}) `name`
-//								FROM TimeTracking TT
-//								WHERE TT.USR_ID = {$_GET["id"]}
-//								ORDER BY TT.TT_ID DESC
-//							";
-//							$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//							$row = mysqli_fetch_array($res);
-//							$TT_ID = $row["TT_ID"];
-//							$status = $row["status"];
-//							$interval = $row["interval"];
-//							$hours = intdiv($interval, 60);
-//							$minutes = fmod($interval, 60);
-//							$name = $row["name"];
 							?>
 							<div id="my_camera" style="margin: auto;"></div>
 							<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
@@ -285,15 +230,6 @@ if( isset($_POST["cardcode"]) ) {
 
 							<?
 							echo "<h1>{$name}</h1>";
-//							if( $status ) {
-//								echo "<p class='title'>Рабочая смена завершена</p>";
-//								echo "<p>Продолжительность: <b>{$hours}</b> ч. <b>{$minutes}</b> мин.</p>";
-//								echo "<i class='fas fa-door-closed fa-4x'></i>";
-//							}
-//							else {
-//								echo "<p class='title'>Рабочая смена начата</p>";
-//								echo "<i class='fas fa-door-open fa-4x'></i>";
-//							}
 						}
 						else {
 							echo "<p class='title' style='color: #911;'>Карта не действительна!</p>";
@@ -317,6 +253,7 @@ if( isset($_POST["cardcode"]) ) {
 			$query = "
 				SELECT USR_Name(TR.USR_ID) `name`
 					,TR.tr_photo
+					,TR.tr_time
 				FROM TimeReg TR
 				JOIN Timesheet TS ON TS.TS_ID = TR.TS_ID AND TS.ts_date = CURDATE()
 				ORDER BY `name`, TR.tr_time
@@ -324,8 +261,9 @@ if( isset($_POST["cardcode"]) ) {
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
 				?>
-				<div style="display: flex; width: 160px; height: 120px; font-size: 1.0em; background-color: #fdce46bf; background-image: url(/time_tracking/upload/<?=$row["tr_photo"]?>); background-size: contain; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px; overflow: hidden;">
+				<div style="display: flex; width: 160px; height: 120px; font-size: 1.0em; background-color: #fdce46bf; background-image: url(/time_tracking/upload/<?=$row["tr_photo"]?>); background-size: contain; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px; overflow: hidden; position: relative;">
 <!--					<div style=" width: 20px; height: 20px; display: inline-block; margin: 15px; border-radius: 50%; background: green; box-shadow: 0 0 3px 3px green; position: absolute;"></div>-->
+					<span style="-webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff; position: absolute; top: 10px; right: 10px;"><?=$row["tr_time"]?></span>
 					<span style="align-self: flex-end; margin: 10px; -webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff;"><?=$row["name"]?></span>
 				</div>
 				<?
