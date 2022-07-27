@@ -158,12 +158,15 @@ foreach ($_GET as &$value) {
 				}
 			?>
 
-			<th colspan="2">Часы</th>
-			<th colspan="2">Сумма</th>
+			<th colspan="2" style="font-size: 1.5em;">Σ</th>
 		</tr>
 	</thead>
 	<tbody>
 	<?
+		// Суммарные результаты за день
+		$dayduration = array();
+		$daypay = array();
+
 		// Получаем список работников
 		$query = "
 			SELECT USR.USR_ID
@@ -190,7 +193,7 @@ foreach ($_GET as &$value) {
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
-			echo "<tr><td>{$row["Icon"]}</td>";
+			echo "<tr><td style='text-align: center;'>{$row["Icon"]}</td>";
 
 			// Получаем список часов по работнику за месяц
 			$query = "
@@ -206,7 +209,7 @@ foreach ($_GET as &$value) {
 			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
 			$sigmaduration = 0; // Сумма отработанных часов по работнику
-			$sigmamoney = 0; // Сумма заработанных денег по работнику
+			$sigmapay = 0; // Сумма заработанных денег по работнику
 			$day = 0;
 			if( $subrow = mysqli_fetch_array($subres) ) {
 				$day = $subrow["Day"];
@@ -215,15 +218,20 @@ foreach ($_GET as &$value) {
 			// Цикл по количеству дней в месяце
 			$i = 1;
 			while ($i <= $days) {
-				$date = date('d.m.Y', strtotime($year.'-'.$month.'-'.$i));
 				if( $i == $day ) {
 					echo "
-						<td style='overflow: visible; padding: 0px;' class='tscell nowrap'>
-							".(round($subrow["duration"] / 60, 2))."
+						<td style='overflow: visible; padding: 0px; text-align: center;' class='tscell nowrap'>
+							".(round($subrow["duration"] / 60, 2))."ч
+							<br>
+							<n style='color: #050;'>{$subrow["pay"]}</n>
 						</td>
 					";
-					$sigmaduration = $sigmaduration + $subrow["duration"];
-					$sigmamoney = $sigmamoney + $subrow["pay"];
+
+					$sigmaduration += $subrow["duration"];
+					$sigmapay += $subrow["pay"];
+					$dayduration[$i] += $subrow["duration"];
+					$daypay[$i] += $subrow["pay"];
+
 					if( $subrow = mysqli_fetch_array($subres) ) {
 						$day = $subrow["Day"];
 					}
@@ -233,16 +241,53 @@ foreach ($_GET as &$value) {
 				}
 				$i++;
 			}
-			$sigmamoney = round($sigmamoney);
-			$premium = round($premium);
-			$total = $sigmamoney + $premium;
-			$whole = intval($sigmahours);
-			$frac = ($sigmahours - intval($sigmahours)) * 4;
 
-			echo "<td class='txtright' colspan='2'>".(round($sigmaduration / 60, 2))."</td>";	// Сумма часов
-			echo "<td class='txtright' colspan='2'>{$sigmamoney}</td>";								// Сумма денег
+			echo "
+				<td style='font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+					".(round($sigmaduration / 60, 2))."ч
+					<br>
+					<n style='color: #050;'>{$sigmapay}</n>
+				</td>
+			";
 			echo "</tr>";
 		}
+
+		// Итог снизу
+		echo "<tr><td style='text-align: center; font-size: 1.5em; background: #3333;'><b>Σ</b></td>";
+		$i = 1;
+		$sigmaduration = 0;
+		$sigmapay = 0;
+		while ($i <= $days) {
+			if( $daypay[$i] > 0 ) {
+				echo "
+					<td style='overflow: visible; padding: 0px; text-align: center; background: #3333; font-weight: bold;' class='tscell nowrap'>
+						".(round($dayduration[$i] / 60, 2))."ч
+						<br>
+						<n style='color: #050;'>{$daypay[$i]}</n>
+					</td>
+				";
+
+				$sigmaduration += $dayduration[$i];
+				$sigmapay += $daypay[$i];
+
+				if( $subrow = mysqli_fetch_array($subres) ) {
+					$day = $subrow["Day"];
+				}
+			}
+			else {
+				echo "<td class='tscell' style='background: #3333;'></td>";
+			}
+			$i++;
+		}
+		echo "
+			<td style='font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+				".(round($sigmaduration / 60, 2))."ч
+				<br>
+				<n style='color: #050;'>{$sigmapay}</n>
+			</td>
+		";
+		echo "</tr>";
+
 	?>
 	</tbody>
 </table>
