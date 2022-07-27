@@ -260,10 +260,12 @@ foreach ($_GET as &$value) {
 		while ($i <= $days) {
 			if( $daypay[$i] > 0 ) {
 				echo "
-					<td style='overflow: visible; padding: 0px; text-align: center; background: #3333; font-weight: bold;' class='tscell nowrap'>
+					<td style='padding: 0px; text-align: center; background: #3333; font-weight: bold;' class='tscell nowrap'>
+						<span>
 						".(round($dayduration[$i] / 60, 2))."ч
 						<br>
 						<n style='color: #050;'>{$daypay[$i]}</n>
+						</span>
 					</td>
 				";
 
@@ -281,11 +283,9 @@ foreach ($_GET as &$value) {
 		}
 		echo "
 			<td style='font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
-				<span>
 				".(round($sigmaduration / 60, 2))."ч
 				<br>
 				<n style='color: #050;'>{$sigmapay}</n>
-				</span>
 			</td>
 		";
 		echo "</tr>";
