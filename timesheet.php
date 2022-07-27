@@ -158,8 +158,8 @@ foreach ($_GET as &$value) {
 				}
 			?>
 
-			<th width="45" colspan="2">Часы</th>
-			<th width="55" colspan="2">Сумма</th>
+			<th colspan="2">Часы</th>
+			<th colspan="2">Сумма</th>
 		</tr>
 	</thead>
 	<tbody>
