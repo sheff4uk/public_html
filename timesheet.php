@@ -158,6 +158,8 @@ foreach ($_GET as &$value) {
 				}
 			?>
 
+			<th colspan="2">1-15</th>
+			<th colspan="2">16-<?=$days?></th>
 			<th colspan="2" style="font-size: 1.5em;">Σ</th>
 		</tr>
 	</thead>
@@ -208,8 +210,10 @@ foreach ($_GET as &$value) {
 			";
 			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
-			$sigmaduration = 0; // Сумма отработанных часов по работнику
-			$sigmapay = 0; // Сумма заработанных денег по работнику
+			$sigmaduration1 = 0; // Сумма отработанных часов по работнику 1-15
+			$sigmapay1 = 0; // Сумма заработанных денег по работнику 1-15
+			$sigmaduration2 = 0; // Сумма отработанных часов по работнику 16-30
+			$sigmapay2 = 0; // Сумма заработанных денег по работнику 16-30
 			$day = 0;
 			if( $subrow = mysqli_fetch_array($subres) ) {
 				$day = $subrow["Day"];
@@ -227,8 +231,14 @@ foreach ($_GET as &$value) {
 						</td>
 					";
 
-					$sigmaduration += $subrow["duration"];
-					$sigmapay += $subrow["pay"];
+					if( $i < 16 ) {
+						$sigmaduration1 += $subrow["duration"];
+						$sigmapay1 += $subrow["pay"];
+					}
+					else {
+						$sigmaduration2 += $subrow["duration"];
+						$sigmapay2 += $subrow["pay"];
+					}
 					$dayduration[$i] += $subrow["duration"];
 					$daypay[$i] += $subrow["pay"];
 
@@ -244,9 +254,19 @@ foreach ($_GET as &$value) {
 
 			echo "
 				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
-					".(round($sigmaduration / 60, 1))."ч
+					".(round($sigmaduration1 / 60, 1))."ч
 					<br>
-					<n style='color: #050;'>".(number_format($sigmapay, 0, '', ' '))."</n>
+					<n style='color: #050;'>".(number_format($sigmapay1, 0, '', ' '))."</n>
+				</td>
+				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+					".(round($sigmaduration2 / 60, 1))."ч
+					<br>
+					<n style='color: #050;'>".(number_format($sigmapay2, 0, '', ' '))."</n>
+				</td>
+				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+					".(round(($sigmaduration1 + $sigmaduration2) / 60, 1))."ч
+					<br>
+					<n style='color: #050;'>".(number_format(($sigmapay1 + $sigmapay2), 0, '', ' '))."</n>
 				</td>
 			";
 			echo "</tr>";
@@ -255,8 +275,10 @@ foreach ($_GET as &$value) {
 		// Итог снизу
 		echo "<tr><td style='text-align: center; font-size: 1.5em; background: #3333;'><b>Σ</b></td>";
 		$i = 1;
-		$sigmaduration = 0;
-		$sigmapay = 0;
+		$sigmaduration1 = 0;
+		$sigmapay1 = 0;
+		$sigmaduration2 = 0;
+		$sigmapay2 = 0;
 		while ($i <= $days) {
 			if( $daypay[$i] > 0 ) {
 				echo "
@@ -267,8 +289,14 @@ foreach ($_GET as &$value) {
 					</td>
 				";
 
-				$sigmaduration += $dayduration[$i];
-				$sigmapay += $daypay[$i];
+				if( $i < 16 ) {
+					$sigmaduration1 += $dayduration[$i];
+					$sigmapay1 += $daypay[$i];
+				}
+				else {
+					$sigmaduration2 += $dayduration[$i];
+					$sigmapay2 += $daypay[$i];
+				}
 
 				if( $subrow = mysqli_fetch_array($subres) ) {
 					$day = $subrow["Day"];
@@ -281,9 +309,19 @@ foreach ($_GET as &$value) {
 		}
 		echo "
 			<td style='font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
-				".(round($sigmaduration / 60, 1))."ч
+				".(round($sigmaduration1 / 60, 1))."ч
 				<br>
-				<n style='color: #050;'>".(number_format($sigmapay, 0, '', ' '))."</n>
+				<n style='color: #050;'>".(number_format($sigmapay1, 0, '', ' '))."</n>
+			</td>
+			<td style='font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+				".(round($sigmaduration2 / 60, 1))."ч
+				<br>
+				<n style='color: #050;'>".(number_format($sigmapay2, 0, '', ' '))."</n>
+			</td>
+			<td style='font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+				".(round(($sigmaduration1 + $sigmaduration2) / 60, 1))."ч
+				<br>
+				<n style='color: #050;'>".(number_format(($sigmapay1 + $sigmapay2), 0, '', ' '))."</n>
 			</td>
 		";
 		echo "</tr>";
