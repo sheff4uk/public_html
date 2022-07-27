@@ -243,7 +243,7 @@ foreach ($_GET as &$value) {
 			}
 
 			echo "
-				<td style='font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
 					".(round($sigmaduration / 60, 2))."ч
 					<br>
 					<n style='color: #050;'>{$sigmapay}</n>
@@ -281,9 +281,11 @@ foreach ($_GET as &$value) {
 		}
 		echo "
 			<td style='font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+				<span>
 				".(round($sigmaduration / 60, 2))."ч
 				<br>
 				<n style='color: #050;'>{$sigmapay}</n>
+				</span>
 			</td>
 		";
 		echo "</tr>";
