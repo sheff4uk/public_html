@@ -260,12 +260,10 @@ foreach ($_GET as &$value) {
 		while ($i <= $days) {
 			if( $daypay[$i] > 0 ) {
 				echo "
-					<td style='padding: 0px; text-align: center; background: #3333; font-weight: bold;' class='tscell nowrap'>
-						<span>
+					<td style='padding: 0px; text-align: center; background: #3333; font-weight: bold; writing-mode: vertical-rl;' class='tscell nowrap'>
 						".(round($dayduration[$i] / 60, 2))."ч
 						<br>
 						<n style='color: #050;'>{$daypay[$i]}</n>
-						</span>
 					</td>
 				";
 
