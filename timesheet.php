@@ -221,7 +221,7 @@ foreach ($_GET as &$value) {
 				if( $i == $day ) {
 					echo "
 						<td style='overflow: visible; padding: 0px; text-align: center;".($subrow["duration"] == 0 ? " background: #f005;" : "")."' class='tscell nowrap'>
-							".(round($subrow["duration"] / 60, 2))."ч
+							".(round($subrow["duration"] / 60, 1))."ч
 							<br>
 							<n style='color: #050;'>{$subrow["pay"]}</n>
 						</td>
@@ -244,7 +244,7 @@ foreach ($_GET as &$value) {
 
 			echo "
 				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
-					".(round($sigmaduration / 60, 2))."ч
+					".(round($sigmaduration / 60, 1))."ч
 					<br>
 					<n style='color: #050;'>{$sigmapay}</n>
 				</td>
@@ -261,7 +261,7 @@ foreach ($_GET as &$value) {
 			if( $daypay[$i] > 0 ) {
 				echo "
 					<td style='padding: 0px; text-align: center; background: #3333; font-weight: bold; writing-mode: vertical-rl;' class='tscell nowrap'>
-						".(round($dayduration[$i] / 60, 2))."ч
+						".(round($dayduration[$i] / 60, 1))."ч
 						<br>
 						<n style='color: #050;'>{$daypay[$i]}</n>
 					</td>
@@ -281,7 +281,7 @@ foreach ($_GET as &$value) {
 		}
 		echo "
 			<td style='font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
-				".(round($sigmaduration / 60, 2))."ч
+				".(round($sigmaduration / 60, 1))."ч
 				<br>
 				<n style='color: #050;'>{$sigmapay}</n>
 			</td>
