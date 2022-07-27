@@ -220,7 +220,7 @@ foreach ($_GET as &$value) {
 			while ($i <= $days) {
 				if( $i == $day ) {
 					echo "
-						<td style='overflow: visible; padding: 0px; text-align: center;' class='tscell nowrap'>
+						<td style='overflow: visible; padding: 0px; text-align: center;".($subrow["duration"] == 0 ? " background: #f005;" : "")."' class='tscell nowrap'>
 							".(round($subrow["duration"] / 60, 2))."ч
 							<br>
 							<n style='color: #050;'>{$subrow["pay"]}</n>
