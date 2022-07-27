@@ -84,7 +84,7 @@ th {
 }
 
 table tbody tr:hover, tbody td.hover {
-	background: #ffa; /* Цвет фона при наведении */
+	background: #ffa !important; /* Цвет фона при наведении */
 }
 
 .cassette {
@@ -577,7 +577,7 @@ td.tscell {
 	position: relative;
 }
 td.tscell:hover {
-	background: #fca;
+	background: #fca !important;
 }
 td.tscell > i {
 	position: absolute;
