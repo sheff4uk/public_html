@@ -209,6 +209,7 @@ function src_url($src) {
 		$menu["Анализ"]["<i class='fas fa-trash fa-lg'></i> Статистика брака"] = "daily_reject_stat.php";
 		$menu["Доп. данные"]["<i class='fas fa-cube fa-lg'></i> Испытания кубов"] = "cubetest.php";
 		$menu["Доп. данные"]["<i class='fas fa-user-clock fa-lg'></i> Журнал смен"] = "shift_log.php";
+		$menu["Доп. данные"]["<i class='fas fa-table fa-lg'></i> Табель"] = "timesheet.php";
 		$menu["Учет"]["<i class='fas fa-stream fa-lg'></i> Поддоны противовесов"] = "pallet_accounting.php";
 		$menu["Учет"]["<i class='fas fa-shapes fa-lg'></i> Сырьё"] = "material_accounting.php";
 		$menu["Учет"]["<i class='fas fa-th fa-lg'></i> Формы"] = "shell_accounting.php";
