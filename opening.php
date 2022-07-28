@@ -322,9 +322,9 @@ $query = "
 		#,MIN(LW.weight) min_weight
 		,ROUND(AVG(LW.weight)) avg_weight
 		#,MAX(LW.weight) max_weight
-		#,IF(MIN(LW.weight) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(MIN(LW.weight) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MIN(LW.weight) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MIN(LW.weight) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) min_diff
-		,IF(ROUND(AVG(LW.weight)) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(ROUND(AVG(LW.weight)) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) avg_diff
-		#,IF(MAX(LW.weight) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(MAX(LW.weight) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MAX(LW.weight) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MAX(LW.weight) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) max_diff
+			#,IF(MIN(LW.weight) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(MIN(LW.weight) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MIN(LW.weight) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MIN(LW.weight) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) min_diff
+		#,IF(ROUND(AVG(LW.weight)) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(ROUND(AVG(LW.weight)) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) avg_diff
+			#,IF(MAX(LW.weight) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(MAX(LW.weight) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MAX(LW.weight) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MAX(LW.weight) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) max_diff
 		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 		,LO.cassette
 		,CW.item
@@ -332,9 +332,9 @@ $query = "
 		,PB.CW_ID
 		,LB.LB_ID
 		,LB.mix_density
-		,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
-		#,COUNT(DISTINCT LO.LO_ID, SLO.LO_ID) dbl
-		#,SUM(1) dbl
+		#,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
+			#,COUNT(DISTINCT LO.LO_ID, SLO.LO_ID) dbl
+			#,SUM(1) dbl
 	FROM list__Opening LO
 	#JOIN list__Opening SLO ON SLO.cassette = LO.cassette AND SLO.LF_ID = LO.LF_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
@@ -378,7 +378,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["o_date"]?></td>
 		<td><?=$row["o_time"]?></td>
 		<td><?=$cassette?></td>
-		<td style="background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
+		<td style="background: rgb(255,0,0,<?=//((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
 		<td colspan="2" class="nowrap" style="text-align: left;">
 			<?=($row["not_spill"] ? "<font color='red'>{$row["not_spill"]}</font> непролив<br>" : "")?>
 			<?=($row["crack"] ? "<font color='red'>{$row["crack"]}</font> мех. трещина<br>" : "")?>
