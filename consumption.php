@@ -152,6 +152,7 @@ foreach ($_GET as &$value) {
 			<th colspan="2">Окалина</th>
 			<th colspan="2">Шлак 0-10</th>
 			<th colspan="2">Шлак 10-20</th>
+			<th colspan="2">Шлак 0-20</th>
 			<th colspan="2">Шлак 5-30</th>
 			<th colspan="2">КМП</th>
 			<th colspan="2">Отсев</th>
@@ -161,6 +162,8 @@ foreach ($_GET as &$value) {
 			<th colspan="2">Арматура</th>
 		</tr>
 		<tr>
+			<th>Расход, кг</th>
+			<th>На деталь, г</th>
 			<th>Расход, кг</th>
 			<th>На деталь, г</th>
 			<th>Расход, кг</th>
@@ -198,6 +201,7 @@ foreach ($_GET as &$value) {
 				,SUM(LB.iron_oxide) iron_oxide
 				,SUM(LB.slag10) slag10
 				,SUM(LB.slag20) slag20
+				,SUM(LB.slag020) slag020
 				,SUM(LB.slag30) slag30
 				,SUM(LB.sand) sand
 				,SUM(LB.crushed_stone) crushed_stone
@@ -224,6 +228,7 @@ foreach ($_GET as &$value) {
 			$iron_oxide += $row["iron_oxide"];
 			$slag10 += $row["slag10"];
 			$slag20 += $row["slag20"];
+			$slag020 += $row["slag020"];
 			$slag30 += $row["slag30"];
 			$sand += $row["sand"];
 			$crushed_stone += $row["crushed_stone"];
@@ -245,6 +250,8 @@ foreach ($_GET as &$value) {
 				<td style="background: #33333388;"><?=number_format($row["slag10"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #33333388;"><?=number_format($row["slag20"], 0, ',', ' ')?></td>
 				<td style="background: #33333388;"><?=number_format($row["slag20"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #33333388;"><?=number_format($row["slag020"], 0, ',', ' ')?></td>
+				<td style="background: #33333388;"><?=number_format($row["slag020"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #33333388;"><?=number_format($row["slag30"], 0, ',', ' ')?></td>
 				<td style="background: #33333388;"><?=number_format($row["slag30"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #f4a46088;"><?=number_format($row["sand"], 0, ',', ' ')?></td>
@@ -277,6 +284,8 @@ foreach ($_GET as &$value) {
 			<td><?=number_format($slag10, 0, ',', ' ')?></td>
 			<td></td>
 			<td><?=number_format($slag20, 0, ',', ' ')?></td>
+			<td></td>
+			<td><?=number_format($slag020, 0, ',', ' ')?></td>
 			<td></td>
 			<td><?=number_format($slag30, 0, ',', ' ')?></td>
 			<td></td>

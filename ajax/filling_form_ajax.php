@@ -21,6 +21,7 @@ $query = "
 		,PB.io_density
 		,PB.sl10_density
 		,PB.sl20_density
+		,PB.sl020_density
 		,PB.sl30_density
 		,PB.sn_density
 		,PB.cs_density
@@ -51,6 +52,7 @@ $lf_density = $row["lf_density"];
 $io_density = $row["io_density"];
 $sl10_density = $row["sl10_density"];
 $sl20_density = $row["sl20_density"];
+$sl020_density = $row["sl020_density"];
 $sl30_density = $row["sl30_density"];
 $sn_density = $row["sn_density"];
 $cs_density = $row["cs_density"];
@@ -118,6 +120,7 @@ $query = "
 		,IFNULL(MF.iron_oxide, 0) iron_oxide
 		,IFNULL(MF.slag10, 0) slag10
 		,IFNULL(MF.slag20, 0) slag20
+		,IFNULL(MF.slag020, 0) slag020
 		,IFNULL(MF.slag30, 0) slag30
 		,IFNULL(MF.sand, 0) sand
 		,IFNULL(MF.crushed_stone, 0) crushed_stone
@@ -129,6 +132,7 @@ $query = "
 		,COUNT(MF.iron_oxide) io_cnt
 		,COUNT(MF.slag10) sl10_cnt
 		,COUNT(MF.slag20) sl20_cnt
+		,COUNT(MF.slag020) sl020_cnt
 		,COUNT(MF.slag30) sl30_cnt
 		,COUNT(MF.sand) sn_cnt
 		,COUNT(MF.crushed_stone) cs_cnt
@@ -155,6 +159,7 @@ $html .= "
 				".($row["io_cnt"] ? "<th>Окалина, кг</th>" : "")."
 				".($row["sl10_cnt"] ? "<th>Шлак 0-10, кг</th>" : "")."
 				".($row["sl20_cnt"] ? "<th>Шлак 10-20, кг</th>" : "")."
+				".($row["sl020_cnt"] ? "<th>Шлак 0-20, кг</th>" : "")."
 				".($row["sl30_cnt"] ? "<th>Шлак 5-30, кг</th>" : "")."
 				".($row["sn_cnt"] ? "<th>КМП, кг</th>" : "")."
 				".($row["cs_cnt"] ? "<th>Отсев, кг</th>" : "")."
@@ -171,6 +176,7 @@ $html .= "
 				".($row["io_cnt"] ? "<th><input type='number' min='2' max='3' step='0.01' value='".($io_density/1000)."' name='io_density' style='width: 100%; background-color: #a52a2a80;' ></th>" : "")."
 				".($row["sl10_cnt"] ? "<th><input type='number' min='1' max='3' step='0.01' value='".($sl10_density/1000)."' name='sl10_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
 				".($row["sl20_cnt"] ? "<th><input type='number' min='1' max='3' step='0.01' value='".($sl20_density/1000)."' name='sl20_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
+				".($row["sl020_cnt"] ? "<th><input type='number' min='1' max='3' step='0.01' value='".($sl020_density/1000)."' name='sl020_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
 				".($row["sl30_cnt"] ? "<th><input type='number' min='1' max='3' step='0.01' value='".($sl30_density/1000)."' name='sl30_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
 				".($row["sn_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($sn_density/1000)."' name='sn_density' style='width: 100%; background-color: #f4a46082;' ></th>" : "")."
 				".($row["cs_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($cs_density/1000)."' name='cs_density' style='width: 100%; background-color: #8b45137a;' ></th>" : "")."
@@ -183,6 +189,7 @@ $html .= "
 				".($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")."
 				".($row["sl10_cnt"] ? "<th class='nowrap'>{$row["slag10"]}</th>" : "")."
 				".($row["sl20_cnt"] ? "<th class='nowrap'>{$row["slag20"]}</th>" : "")."
+				".($row["sl020_cnt"] ? "<th class='nowrap'>{$row["slag020"]}</th>" : "")."
 				".($row["sl30_cnt"] ? "<th class='nowrap'>{$row["slag30"]}</th>" : "")."
 				".($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")."
 				".($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")."
@@ -208,6 +215,7 @@ if( $fact_batches ) {
 			,IFNULL(LB.iron_oxide, 0) iron_oxide
 			,IFNULL(LB.slag10, 0) slag10
 			,IFNULL(LB.slag20, 0) slag20
+			,IFNULL(LB.slag020, 0) slag020
 			,IFNULL(LB.slag30, 0) slag30
 			,IFNULL(LB.sand, 0) sand
 			,IFNULL(LB.crushed_stone, 0) crushed_stone
@@ -257,6 +265,7 @@ if( $fact_batches ) {
 				".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[{$subrow["LB_ID"]}]' value='{$subrow["iron_oxide"]}' style='width: 100%;' required></td>" : "")."
 				".($row["sl10_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag10[{$subrow["LB_ID"]}]' value='{$subrow["slag10"]}' style='width: 100%;' required></td>" : "")."
 				".($row["sl20_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag20[{$subrow["LB_ID"]}]' value='{$subrow["slag20"]}' style='width: 100%;' required></td>" : "")."
+				".($row["sl020_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag020[{$subrow["LB_ID"]}]' value='{$subrow["slag020"]}' style='width: 100%;' required></td>" : "")."
 				".($row["sl30_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag30[{$subrow["LB_ID"]}]' value='{$subrow["slag30"]}' style='width: 100%;' required></td>" : "")."
 				".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[{$subrow["LB_ID"]}]' value='{$subrow["sand"]}' style='width: 100%;' required></td>" : "")."
 				".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone"]}' style='width: 100%;' required></td>" : "")."
@@ -295,6 +304,7 @@ for ($i = $fact_batches + 1; $i <= $max_batches; $i++) {
 			".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["sl10_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag10[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["sl20_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag20[n_{$i}]' style='width: 100%;' required></td>" : "")."
+			".($row["sl020_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag020[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["sl30_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag30[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[n_{$i}]' style='width: 100%;' required></td>" : "")."
 			".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[n_{$i}]' style='width: 100%;' required></td>" : "")."

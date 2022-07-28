@@ -72,6 +72,7 @@ foreach ($_GET as &$value) {
 			<th>Окалина, кг</th>
 			<th>Шлак 0-10, кг</th>
 			<th>Шлак 10-20, кг</th>
+			<th>Шлак 0-20, кг</th>
 			<th>Шлак 5-30, кг</th>
 			<th>КМП, кг</th>
 			<th>Отсев, кг</th>
@@ -93,6 +94,7 @@ $query = "
 		,MF.iron_oxide
 		,MF.slag10
 		,MF.slag20
+		,MF.slag020
 		,MF.slag30
 		,MF.sand
 		,MF.crushed_stone
@@ -113,6 +115,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td style="background: #a52a2a80;"><?=$row["iron_oxide"]?></td>
 		<td style="background: #33333380;"><?=$row["slag10"]?></td>
 		<td style="background: #33333380;"><?=$row["slag20"]?></td>
+		<td style="background: #33333380;"><?=$row["slag020"]?></td>
 		<td style="background: #33333380;"><?=$row["slag30"]?></td>
 		<td style="background: #f4a46082;"><?=$row["sand"]?></td>
 		<td style="background: #8b45137a;"><?=$row["crushed_stone"]?></td>

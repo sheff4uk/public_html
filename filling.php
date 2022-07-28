@@ -171,6 +171,7 @@ foreach ($_GET as &$value) {
 			<th class="iron_oxide">Окалина,<br>кг</th>
 			<th class="slag10">Шлак 0-10,<br>кг</th>
 			<th class="slag20">Шлак 10-20,<br>кг</th>
+			<th class="slag020">Шлак 0-20,<br>кг</th>
 			<th class="slag30">Шлак 5-30,<br>кг</th>
 			<th class="sand">КМП,<br>кг</th>
 			<th class="crushed_stone">Отсев,<br>кг</th>
@@ -203,6 +204,7 @@ $query = "
 		,PB.io_density
 		,PB.sl10_density
 		,PB.sl20_density
+		,PB.sl020_density
 		,PB.sl30_density
 		,PB.sn_density
 		,PB.cs_density
@@ -254,6 +256,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$io_density = $row["io_density"]/1000;
 	$sl10_density = $row["sl10_density"]/1000;
 	$sl20_density = $row["sl20_density"]/1000;
+	$sl020_density = $row["sl020_density"]/1000;
 	$sl30_density = $row["sl30_density"]/1000;
 	$sn_density = $row["sn_density"]/1000;
 	$cs_density = $row["cs_density"]/1000;
@@ -273,6 +276,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.iron_oxide
 			,LB.slag10
 			,LB.slag20
+			,LB.slag020
 			,LB.slag30
 			,LB.sand
 			,LB.crushed_stone
@@ -287,6 +291,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,mix_io_diff({$row["MF_ID"]}, LB.iron_oxide) io_diff
 			,mix_sl10_diff({$row["MF_ID"]}, LB.slag10) sl10_diff
 			,mix_sl20_diff({$row["MF_ID"]}, LB.slag20) sl20_diff
+			,mix_sl020_diff({$row["MF_ID"]}, LB.slag020) sl020_diff
 			,mix_sl30_diff({$row["MF_ID"]}, LB.slag30) sl30_diff
 			,mix_sn_diff({$row["MF_ID"]}, LB.sand) sn_diff
 			,mix_cs_diff({$row["MF_ID"]}, LB.crushed_stone) cs_diff
@@ -307,6 +312,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		$iron_oxide += $subrow["iron_oxide"];
 		$slag10 += $subrow["slag10"];
 		$slag20 += $subrow["slag20"];
+		$slag020 += $subrow["slag020"];
 		$slag30 += $subrow["slag30"];
 		$sand += $subrow["sand"];
 		$crushed_stone += $subrow["crushed_stone"];
@@ -349,6 +355,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					".($io_density ? "<span class='nowrap'><b>{$io_density}</b>кг окалина</span>" : "")."
 					".($sl10_density ? "<span class='nowrap'><b>{$sl10_density}</b>кг шлак 0-10</span>" : "")."
 					".($sl20_density ? "<span class='nowrap'><b>{$sl20_density}</b>кг шлак 10-20</span>" : "")."
+					".($sl020_density ? "<span class='nowrap'><b>{$sl020_density}</b>кг шлак 0-20</span>" : "")."
 					".($sl30_density ? "<span class='nowrap'><b>{$sl30_density}</b>кг шлак 5-30</span>" : "")."
 					".($sn_density ? "<span class='nowrap'><b>{$sn_density}</b>кг КМП</span>" : "")."
 					".($cs_density ? "<span class='nowrap'><b>{$cs_density}</b>кг отсев</span>" : "")."
@@ -364,6 +371,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td class="iron_oxide" style="background: #a52a2a80;"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font class='diff_alert'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
 				<td class="slag10" style="background: #33333380;"><?=$subrow["slag10"]?><?=($subrow["sl10_diff"] ? "<font class='diff_alert'>".($subrow["sl10_diff"] > 0 ? " +" : " ").($subrow["sl10_diff"])."</font>" : "")?></td>
 				<td class="slag20" style="background: #33333380;"><?=$subrow["slag20"]?><?=($subrow["sl20_diff"] ? "<font class='diff_alert'>".($subrow["sl20_diff"] > 0 ? " +" : " ").($subrow["sl20_diff"])."</font>" : "")?></td>
+				<td class="slag020" style="background: #33333380;"><?=$subrow["slag020"]?><?=($subrow["sl020_diff"] ? "<font class='diff_alert'>".($subrow["sl020_diff"] > 0 ? " +" : " ").($subrow["sl020_diff"])."</font>" : "")?></td>
 				<td class="slag30" style="background: #33333380;"><?=$subrow["slag30"]?><?=($subrow["sl30_diff"] ? "<font class='diff_alert'>".($subrow["sl30_diff"] > 0 ? " +" : " ").($subrow["sl30_diff"])."</font>" : "")?></td>
 				<td class="sand" style="background: #f4a46082;"><?=$subrow["sand"]?><?=($subrow["sn_diff"] ? "<font class='diff_alert'>".($subrow["sn_diff"] > 0 ? " +" : " ").($subrow["sn_diff"])."</font>" : "")?></td>
 				<td class="crushed_stone" style="background: #8b45137a;"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font class='diff_alert'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
@@ -395,6 +403,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	<?=($iron_oxide ? "" : ".iron_oxide{ display: none; }")?>
 	<?=($slag10 ? "" : ".slag10{ display: none; }")?>
 	<?=($slag20 ? "" : ".slag20{ display: none; }")?>
+	<?=($slag020 ? "" : ".slag020{ display: none; }")?>
 	<?=($slag30 ? "" : ".slag30{ display: none; }")?>
 	<?=($sand ? "" : ".sand{ display: none; }")?>
 	<?=($crushed_stone ? "" : ".crushed_stone{ display: none; }")?>

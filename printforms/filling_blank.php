@@ -140,6 +140,7 @@ $query = "
 		,IFNULL(CONCAT(MF.iron_oxide, ' кг'), 0) iron_oxide
 		,IFNULL(CONCAT(MF.slag10, ' кг'), 0) slag10
 		,IFNULL(CONCAT(MF.slag20, ' кг'), 0) slag20
+		,IFNULL(CONCAT(MF.slag020, ' кг'), 0) slag020
 		,IFNULL(CONCAT(MF.slag30, ' кг'), 0) slag30
 		,IFNULL(CONCAT(MF.sand, ' кг'), 0) sand
 		,IFNULL(CONCAT(MF.crushed_stone, ' кг'), 0) crushed_stone
@@ -151,6 +152,7 @@ $query = "
 		,COUNT(MF.iron_oxide) io_cnt
 		,COUNT(MF.slag10) sl10_cnt
 		,COUNT(MF.slag20) sl20_cnt
+		,COUNT(MF.slag020) sl020_cnt
 		,COUNT(MF.slag30) sl30_cnt
 		,COUNT(MF.sand) sn_cnt
 		,COUNT(MF.crushed_stone) cs_cnt
@@ -177,6 +179,7 @@ $row = mysqli_fetch_array($res);
 			<?=($row["io_cnt"] ? "<th>Окалина</th>" : "")?>
 			<?=($row["sl10_cnt"] ? "<th>Шлак 0-10</th>" : "")?>
 			<?=($row["sl20_cnt"] ? "<th>Шлак 10-20</th>" : "")?>
+			<?=($row["sl020_cnt"] ? "<th>Шлак 0-20</th>" : "")?>
 			<?=($row["sl30_cnt"] ? "<th>Шлак 5-30</th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th>КМП</th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th>Отсев</th>" : "")?>
@@ -194,6 +197,7 @@ $row = mysqli_fetch_array($res);
 			<?=($row["io_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 			<?=($row["sl10_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 			<?=($row["sl20_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
+			<?=($row["sl020_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 			<?=($row["sl30_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
@@ -205,6 +209,7 @@ $row = mysqli_fetch_array($res);
 			<?=($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")?>
 			<?=($row["sl10_cnt"] ? "<th class='nowrap'>{$row["slag10"]}</th>" : "")?>
 			<?=($row["sl20_cnt"] ? "<th class='nowrap'>{$row["slag20"]}</th>" : "")?>
+			<?=($row["sl020_cnt"] ? "<th class='nowrap'>{$row["slag020"]}</th>" : "")?>
 			<?=($row["sl30_cnt"] ? "<th class='nowrap'>{$row["slag30"]}</th>" : "")?>
 			<?=($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")?>
 			<?=($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")?>
@@ -235,6 +240,7 @@ for ($i = 1; $i <= $batches; $i++) {
 			".($row["io_cnt"] ? "<td></td>" : "")."
 			".($row["sl10_cnt"] ? "<td></td>" : "")."
 			".($row["sl20_cnt"] ? "<td></td>" : "")."
+			".($row["sl020_cnt"] ? "<td></td>" : "")."
 			".($row["sl30_cnt"] ? "<td></td>" : "")."
 			".($row["sn_cnt"] ? "<td></td>" : "")."
 			".($row["cs_cnt"] ? "<td></td>" : "")."
