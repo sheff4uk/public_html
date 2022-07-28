@@ -378,7 +378,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["o_date"]?></td>
 		<td><?=$row["o_time"]?></td>
 		<td><?=$cassette?></td>
-		<td style="background: rgb(255,0,0,<?=//((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
+		<td style="!!!!background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
 		<td colspan="2" class="nowrap" style="text-align: left;">
 			<?=($row["not_spill"] ? "<font color='red'>{$row["not_spill"]}</font> непролив<br>" : "")?>
 			<?=($row["crack"] ? "<font color='red'>{$row["crack"]}</font> мех. трещина<br>" : "")?>
