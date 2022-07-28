@@ -284,6 +284,16 @@ foreach ($_GET as &$value) {
 	});
 </script>
 
+<style>
+	.diff_alert {
+		font-size: .8em;
+		display: block;
+		line-height: .4em;
+		color: red;
+		display: none;
+	}
+</style>
+
 <table class="main_table">
 	<thead>
 		<tr>
@@ -323,7 +333,7 @@ $query = "
 		,ROUND(AVG(LW.weight)) avg_weight
 		#,MAX(LW.weight) max_weight
 			#,IF(MIN(LW.weight) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(MIN(LW.weight) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MIN(LW.weight) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MIN(LW.weight) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) min_diff
-		#,IF(ROUND(AVG(LW.weight)) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(ROUND(AVG(LW.weight)) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) avg_diff
+		,IF(ROUND(AVG(LW.weight)) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(ROUND(AVG(LW.weight)) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) avg_diff
 			#,IF(MAX(LW.weight) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(MAX(LW.weight) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MAX(LW.weight) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MAX(LW.weight) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) max_diff
 		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 		,LO.cassette
@@ -332,7 +342,7 @@ $query = "
 		,PB.CW_ID
 		,LB.LB_ID
 		,LB.mix_density
-		#,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
+		,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
 			#,COUNT(DISTINCT LO.LO_ID, SLO.LO_ID) dbl
 			#,SUM(1) dbl
 	FROM list__Opening LO
@@ -388,10 +398,10 @@ while( $row = mysqli_fetch_array($res) ) {
 			<?=($row["def_assembly"] ? "<font color='red'>{$row["def_assembly"]}</font> дефект сборки<br>" : "")?>
 		</td>
 		<td <?=(abs($row["in_cassette"] - $row["cnt_weight"]) > $row["in_cassette"] / 2 ? "style='color: red;'" : "")?>><?=$row["in_cassette"]?> / <?=$row["cnt_weight"]?></td>
-<!--		<td><?=($row["min_weight"] ? $row["min_weight"]/1000 : "")?><?=($row["min_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["min_diff"] > 0 ? " +" : " ").($row["min_diff"]/1000)."</font>" : "")?></td>-->
-		<td><a href="#" class="edit_transactions" LO_ID="<?=$row["LO_ID"]?>" title="Список регистраций"><?=($row["avg_weight"] ? number_format($row["avg_weight"], 0, ',', '&nbsp;') : "")?><?=($row["avg_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["avg_diff"] > 0 ? " +" : " ").number_format($row["avg_diff"], 0, ',', '&nbsp;')."</font>" : "")?></a></td>
-<!--		<td><?=($row["max_weight"] ? $row["max_weight"]/1000 : "")?><?=($row["max_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["max_diff"] > 0 ? " +" : " ").($row["max_diff"]/1000)."</font>" : "")?></td>-->
-		<td class="bg-gray"><?=number_format($row["mix_density"], 0, ',', '&nbsp;')?><?=($row["mix_diff"] ? "<font style='font-size: .8em; display: block; line-height: .4em;' color='red'>".($row["mix_diff"] > 0 ? " +" : " ").number_format($row["mix_diff"], 0, ',', '&nbsp;')."</font>" : "")?></td>
+<!--		<td><?=($row["min_weight"] ? $row["min_weight"]/1000 : "")?><?=($row["min_diff"] ? "<font class='diff_alert'>".($row["min_diff"] > 0 ? " +" : " ").($row["min_diff"]/1000)."</font>" : "")?></td>-->
+		<td><a href="#" class="edit_transactions" LO_ID="<?=$row["LO_ID"]?>" title="Список регистраций"><?=($row["avg_weight"] ? number_format($row["avg_weight"], 0, ',', '&nbsp;') : "")?><?=($row["avg_diff"] ? "<font class='diff_alert'>".($row["avg_diff"] > 0 ? " +" : " ").number_format($row["avg_diff"], 0, ',', '&nbsp;')."</font>" : "")?></a></td>
+<!--		<td><?=($row["max_weight"] ? $row["max_weight"]/1000 : "")?><?=($row["max_diff"] ? "<font class='diff_alert'>".($row["max_diff"] > 0 ? " +" : " ").($row["max_diff"]/1000)."</font>" : "")?></td>-->
+		<td class="bg-gray"><?=number_format($row["mix_density"], 0, ',', '&nbsp;')?><?=($row["mix_diff"] ? "<font class='diff_alert'>".($row["mix_diff"] > 0 ? " +" : " ").number_format($row["mix_diff"], 0, ',', '&nbsp;')."</font>" : "")?></td>
 		<td class="bg-gray"><?=$row["item"]?></td>
 		<td class="bg-gray"><a href="filling.php?F_ID=<?=$_GET["F_ID"]?>&week=<?=$row["lb_week"]?>#<?=$row["LB_ID"]?>" title="Заливка" target="_blank"><?=$row["batch_date_format"]?></a></td>
 <!--
