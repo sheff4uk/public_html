@@ -107,7 +107,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th>Время регистрации</th>
 						<th>Время добавления</th>
-						<th>Время удаления</th>
+						<th>Время отмены</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -151,7 +151,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						html = html + "<td style='"+del_style+" color: #911;'>"+val["del_time"]+"<br><br>"+val["del_author"]+"</td>";
 					}
 					else {
-						html = html + "<td style='"+del_style+"'><label>Удалить<input type='checkbox' class='del_reg' name='del_reg[]' value='"+val["TR_ID"]+"'></label></td>";
+						html = html + "<td style='"+del_style+"'><label>Отменить<input type='checkbox' class='del_reg' name='del_reg[]' value='"+val["TR_ID"]+"'></label></td>";
 					}
 					html = html + "</tr>";
 				});
