@@ -1,0 +1,241 @@
+<?
+include_once "../config.php";
+
+// Сохранение/редактирование
+if( isset($_POST["F_ID"]) ) {
+	session_start();
+	$F_ID = $_POST["F_ID"];
+	$month = $_POST["month"];
+
+	if( $_POST["TS_ID"] ) {
+		$TS_ID = $_POST["TS_ID"];
+	}
+	else {
+		if( $_POST["tr_time1"] or $_POST["tr_time2"] ) {
+			// Делаем запись в табеле
+			$ts_date = $_POST["ts_date"];
+			$USR_ID = $_POST["usr_id"];
+			$query = "
+				INSERT INTO Timesheet
+				SET ts_date = '{$ts_date}'
+					,USR_ID = {$USR_ID}
+					,F_ID = {$F_ID}
+					,T_ID = (
+						SELECT T_ID
+						FROM Tariff
+						WHERE USR_ID = {$USR_ID}
+							AND from_date < CURDATE()
+						ORDER BY from_date DESC, T_ID ASC
+						LIMIT 1
+					)
+				ON DUPLICATE KEY UPDATE
+					T_ID = (
+						SELECT T_ID
+						FROM Tariff
+						WHERE USR_ID = {$USR_ID}
+							AND from_date < CURDATE()
+						ORDER BY from_date DESC, T_ID ASC
+						LIMIT 1
+					)
+			";
+			if( !mysqli_query( $mysqli, $query ) ) {
+				$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+			}
+			else {
+				$TS_ID = mysqli_insert_id( $mysqli );
+			}
+		}
+	}
+
+	// Записываем регистрации
+	if( $_POST["tr_time1"] ) {
+		$tr_time1 = $_POST["tr_time1"];
+		$query = "
+			INSERT INTO TimeReg
+			SET TS_ID = {$TS_ID}
+				,tr_time = '{$tr_time1}'
+				,add_time = NOW()
+				,add_author = {$_SESSION['id']}
+		";
+		if( !mysqli_query( $mysqli, $query ) ) {
+			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+		}
+	}
+	if( $_POST["tr_time2"] ) {
+		$tr_time2 = $_POST["tr_time2"];
+		$query = "
+			INSERT INTO TimeReg
+			SET TS_ID = {$TS_ID}
+				,tr_time = '{$tr_time2}'
+				,add_time = NOW()
+				,add_author = {$_SESSION['id']}
+		";
+		if( !mysqli_query( $mysqli, $query ) ) {
+			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+		}
+	}
+	//////////////////////////////
+
+	// Помечаем удаленные регистрации
+	foreach ($_POST["del_reg"] as $key => $value) {
+		$query = "
+			UPDATE TimeReg
+			SET del_time = NOW()
+				,del_author = {$_SESSION['id']}
+			WHERE TR_ID = {$value}
+		";
+		if( !mysqli_query( $mysqli, $query ) ) {
+			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+		}
+	}
+
+	// Перенаправление в табель
+	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&week='.$month.'#'.$TS_ID.'">');
+}
+?>
+
+<div id='timesheet_form' style='display:none;'>
+	<form method='post' action="/forms/timesheet_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
+this.subbut.value='Подождите, пожалуйста!';">
+		<fieldset>
+			<hide><!--Формируется скриптом--></hide>
+			<input type="hidden" name="F_ID" value="<?=$F_ID?>">
+			<input type="hidden" name="month" value="<?=$_GET["month"]?>">
+
+			<table style="width: 100%; table-layout: fixed;">
+				<thead>
+					<tr>
+						<th>Время регистрации</th>
+						<th>Время добавления</th>
+						<th>Время удаления</th>
+					</tr>
+				</thead>
+				<tbody style="text-align: center;">
+					<!--Формируется скриптом-->
+				</tbody>
+			</table>
+		</fieldset>
+		<div>
+			<hr>
+			<input type='submit' name="subbut" value='Записать' style='float: right;'>
+		</div>
+	</form>
+</div>
+
+<script>
+	$(function() {
+		$('.tscell').on('click', function(){
+			// Проверяем сессию
+			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
+
+			var ts_id = $(this).attr('ts_id'),
+				date_format = $(this).attr('date_format'),
+				usr_name = $(this).attr('usr_name'),
+				html = '',
+				html_hide = '';
+
+			if( ts_id > 0 ) {
+				// Формируем скрытые поля
+				html_hide = html_hide + "<input type='hidden' name='TS_ID' value='"+ts_id+"'>";
+
+				var arr_reg = TimeReg[ts_id];
+
+				$.each(arr_reg, function(key, val){
+					if( val["del_time"] != '' ) {
+						var del_style = 'background: #0006;';
+					}
+					html = html + "<tr>";
+					html = html + "<td style='"+del_style+"'><div style='display: flex; width: 160px; height: 120px; background-color: #fdce46bf; background-image: url(/time_tracking/upload/"+val["tr_photo"]+"); background-size: contain; border-radius: 5px; margin: 5px auto; overflow: hidden; position: relative; box-shadow: 5px 5px 8px rgb(0 0 0 / 60%);'><span style='-webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff; align-self: flex-end; font-size: 1.5em; margin: 5px;'>"+val["tr_time"]+"</span></div></td>";
+					html = html + "<td style='"+del_style+"'>"+val["add_time"]+"<br><br>"+val["add_author"]+"</td>";
+					if( val["del_time"] != '' ) {
+						html = html + "<td style='"+del_style+" color: #911;'>"+val["del_time"]+"<br><br>"+val["del_author"]+"</td>";
+					}
+					else {
+						html = html + "<td style='"+del_style+"'><label>Удалить<input type='checkbox' class='del_reg' name='del_reg[]' value='"+val["TR_ID"]+"'></label></td>";
+					}
+					html = html + "</tr>";
+				});
+			}
+			else {
+				var ts_date = $(this).attr('ts_date'),
+					usr_id = $(this).attr('usr_id');
+
+				// Формируем скрытые поля
+				html_hide = html_hide + "<input type='hidden' name='ts_date' value='"+ts_date+"'>";
+				html_hide = html_hide + "<input type='hidden' name='usr_id' value='"+usr_id+"'>";
+			}
+
+			html = html + "<tr><td><input type='time' name='tr_time1' step='1' style='margin: 10px; font-size: 1.5em;'><i class='fas fa-arrow-left'></i></td><td>Чтобы добавить новую регистрацию, укажите время.</td><td></td></tr>";
+			html = html + "<tr><td><input type='time' name='tr_time2' step='1' style='margin: 10px; font-size: 1.5em;'><i class='fas fa-arrow-left'></i></td><td>Чтобы добавить новую регистрацию, укажите время.</td><td></td></tr>";
+
+			$('#timesheet_form hide').html(html_hide);
+			$('#timesheet_form tbody').html(html);
+
+			$('#timesheet_form').dialog({
+				title: date_format + ' | ' + usr_name,
+				resizable: false,
+				width: 600,
+				modal: true,
+				closeText: 'Закрыть'
+			});
+
+			return false;
+		});
+
+		$('#timesheet_form tbody').on('change', '.del_reg', function(event) {
+			if( $(this).is(":checked") ) {
+				$(this).parents('td').css('background', '#f005');
+			}
+			else {
+				$(this).parents('td').css('background', 'none');
+			}
+		});
+
+		// Кнопка добавления расформовки
+		$('.add_cubetest').click( function() {
+			// Проверяем сессию
+			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
+
+			var LCT_ID = $(this).attr("LCT_ID");
+
+			// В случае редактирования заполняем форму
+			if( LCT_ID ) {
+				// Данные аяксом
+				$.ajax({
+					url: "/ajax/cubetest_json.php?LCT_ID=" + LCT_ID,
+					success: function(msg) { test_data = msg; },
+					dataType: "json",
+					async: false
+				});
+				$('#cubetest_form input[name="LCT_ID"]').val(LCT_ID);
+				$('#cubetest_form input[name="LB_ID"]').val(test_data['LB_ID']);
+				$('#cubetest_form input[name="delay"]').val(test_data['delay']);
+				$('#cubetest_form input[name="test_date"]').val(test_data['test_date']);
+				$('#cubetest_form input[name="test_time"]').val(test_data['test_time']);
+				$('#cubetest_form input[name="cube_weight"]').val(test_data['cube_weight']);
+				$('#cubetest_form input[name="pressure"]').val(test_data['pressure']);
+			}
+			// Иначе очищаем форму
+			else {
+				var LB_ID = $(this).attr("LB_ID"),
+					delay = $(this).attr("delay"),
+					test_date = $(this).attr("test_date");
+
+				$('#cubetest_form input[name="LCT_ID"]').val('');
+				$('#cubetest_form input[name="LB_ID"]').val(LB_ID);
+				$('#cubetest_form input[name="delay"]').val(delay);
+				$('#cubetest_form table input').val('');
+				$('#cubetest_form input[name="test_date"]').val(test_date);
+			}
+
+			$('#timesheet_form').dialog({
+				resizable: false,
+				width: 1000,
+				modal: true,
+				closeText: 'Закрыть'
+			});
+
+			return false;
+		});
+	});
+</script>

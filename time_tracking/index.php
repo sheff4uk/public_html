@@ -66,9 +66,8 @@ if( isset($_POST["cardcode"]) ) {
 		// Добавляем регистрацию работника
 		$query = "
 			INSERT INTO TimeReg
-			SET USR_ID = {$USR_ID}
+			SET TS_ID = {$TS_ID}
 				,tr_time = TIME(NOW())
-				,TS_ID = {$TS_ID}
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$TR_ID = mysqli_insert_id( $mysqli );
@@ -256,7 +255,7 @@ if( isset($_POST["cardcode"]) ) {
 			<?
 			// Выводим список зарегистрированных сегодня работников
 			$query = "
-				SELECT USR_Name(TR.USR_ID) `name`
+				SELECT USR_Name(TS.USR_ID) `name`
 					,TR.tr_photo
 					,TR.tr_time
 				FROM TimeReg TR

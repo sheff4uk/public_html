@@ -11,7 +11,7 @@ if( !$_GET["month"] ) {
 	$_GET["month"] = $row["month"];
 
 	$year = substr($_GET["month"], 0, 4);
-	$month = substr($_GET["month"], -1, 2);
+	$month = substr($_GET["month"], 4, 2);
 }
 
 // Если не выбран участок, берем из сессии
@@ -19,6 +19,8 @@ if( !$_GET["F_ID"] ) {
 	$_GET["F_ID"] = $_SESSION['F_ID'];
 }
 $F_ID = $_GET["F_ID"];
+
+include "./forms/timesheet_form.php";
 
 // Узнаем кол-во дней в выбранном месяце
 $strdate = '01.'.$month.'.'.$year;
@@ -158,8 +160,8 @@ foreach ($_GET as &$value) {
 				}
 			?>
 
-			<th colspan="2">1-15</th>
-			<th colspan="2">16-<?=$days?></th>
+			<th colspan="2">[1...15]</th>
+			<th colspan="2">[16...<?=$days?>]</th>
 			<th colspan="2" style="font-size: 1.5em;">Σ</th>
 		</tr>
 	</thead>
@@ -168,6 +170,8 @@ foreach ($_GET as &$value) {
 		// Суммарные результаты за день
 		$dayduration = array();
 		$daypay = array();
+		// Массив регистраций
+		$TimeReg = array();
 
 		// Получаем список работников
 		$query = "
@@ -199,7 +203,8 @@ foreach ($_GET as &$value) {
 
 			// Получаем список часов по работнику за месяц
 			$query = "
-				SELECT DAY(ts_date) Day
+				SELECT TS_ID
+					,DAY(ts_date) Day
 					,duration
 					,pay
 				FROM Timesheet
@@ -222,10 +227,29 @@ foreach ($_GET as &$value) {
 			// Цикл по количеству дней в месяце
 			$i = 1;
 			while ($i <= $days) {
+				$d = str_pad($i, 2, "0", STR_PAD_LEFT);
 				if( $i == $day ) {
+					// Заполняем массив регистраций
+					$query = "
+						SELECT TR.TR_ID
+							,TR.tr_time
+							,TR.tr_photo
+							,CONCAT(Friendly_date(TR.add_time), '<br>', DATE_FORMAT(TR.add_time, '%H:%i:%s')) add_time
+							,IF(TR.add_author IS NOT NULL, USR_Icon(TR.add_author), '') add_author
+							,CONCAT(Friendly_date(TR.del_time), '<br>', DATE_FORMAT(TR.del_time, '%H:%i:%s')) del_time
+							,IF(TR.del_author IS NOT NULL, USR_Icon(TR.del_author), '') del_author
+						FROM TimeReg TR
+						WHERE TR.TS_ID = {$subrow["TS_ID"]}
+						ORDER BY TR.tr_time
+					";
+					$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $subsubrow = mysqli_fetch_array($subsubres) ) {
+						$TimeReg[$subrow["TS_ID"]][] = array("TR_ID" => $subsubrow["TR_ID"], "tr_time" => "{$subsubrow["tr_time"]}", "tr_photo" => "{$subsubrow["tr_photo"]}", "add_time" => "{$subsubrow["add_time"]}", "add_author" => "{$subsubrow["add_author"]}", "del_time" => "{$subsubrow["del_time"]}", "del_author" => "{$subsubrow["del_author"]}");
+					}
+
 					echo "
-						<td style='overflow: visible; padding: 0px; text-align: center;".($subrow["duration"] == 0 ? " color: red; font-weight: bold;" : "")."' class='tscell nowrap'>
-							".(round($subrow["duration"] / 60, 1))."ч
+						<td id='{$subrow["TS_ID"]}' style='overflow: visible; padding: 0px; text-align: center;' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'>
+							<n style='".($subrow["duration"] == 0 ? " color: red; font-weight: bold;" : "")."'>".(round($subrow["duration"] / 60, 1))."ч</n>
 							<br>
 							<n style='color: #050;'>".(number_format($subrow["pay"], 0, '', ' '))."</n>
 						</td>
@@ -247,29 +271,28 @@ foreach ($_GET as &$value) {
 					}
 				}
 				else {
-					echo "<td class='tscell'></td>";
+					echo "<td class='tscell' ts_date='{$year}-{$month}-{$d}' usr_id='{$row["USR_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'></td>";
 				}
 				$i++;
 			}
 
 			echo "
-				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright' colspan='2'>
 					".(round($sigmaduration1 / 60, 1))."ч
 					<br>
 					<n style='color: #050;'>".(number_format($sigmapay1, 0, '', ' '))."</n>
 				</td>
-				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright' colspan='2'>
 					".(round($sigmaduration2 / 60, 1))."ч
 					<br>
 					<n style='color: #050;'>".(number_format($sigmapay2, 0, '', ' '))."</n>
 				</td>
-				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright' colspan='2'>
 					".(round(($sigmaduration1 + $sigmaduration2) / 60, 1))."ч
 					<br>
 					<n style='color: #050;'>".(number_format(($sigmapay1 + $sigmapay2), 0, '', ' '))."</n>
 				</td>
 			";
-			echo "</tr>";
 		}
 
 		// Итог снизу
@@ -280,13 +303,12 @@ foreach ($_GET as &$value) {
 		$sigmaduration2 = 0;
 		$sigmapay2 = 0;
 		while ($i <= $days) {
+			echo "<td style='padding: 0px; text-align: center; background: #3333; font-weight: bold; writing-mode: vertical-rl;' class='nowrap'>";
 			if( $daypay[$i] > 0 ) {
 				echo "
-					<td style='padding: 0px; text-align: center; background: #3333; font-weight: bold; writing-mode: vertical-rl;' class='tscell nowrap'>
-						".(round($dayduration[$i] / 60, 1))."ч
-						<br>
-						<n style='color: #050;'>".(number_format($daypay[$i], 0, '', ' '))."</n>
-					</td>
+					".(round($dayduration[$i] / 60, 1))."ч
+					<br>
+					<n style='color: #050;'>".(number_format($daypay[$i], 0, '', ' '))."</n>
 				";
 
 				if( $i < 16 ) {
@@ -302,23 +324,21 @@ foreach ($_GET as &$value) {
 					$day = $subrow["Day"];
 				}
 			}
-			else {
-				echo "<td class='tscell' style='background: #3333;'></td>";
-			}
+			echo "</td>";
 			$i++;
 		}
 		echo "
-			<td style='font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+			<td style='font-weight: bold; background: #3333;' class='txtright' colspan='2'>
 				".(round($sigmaduration1 / 60, 1))."ч
 				<br>
 				<n style='color: #050;'>".(number_format($sigmapay1, 0, '', ' '))."</n>
 			</td>
-			<td style='font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+			<td style='font-weight: bold; background: #3333;' class='txtright' colspan='2'>
 				".(round($sigmaduration2 / 60, 1))."ч
 				<br>
 				<n style='color: #050;'>".(number_format($sigmapay2, 0, '', ' '))."</n>
 			</td>
-			<td style='font-weight: bold; background: #3333;' class='txtright tscell' colspan='2'>
+			<td style='font-weight: bold; background: #3333;' class='txtright' colspan='2'>
 				".(round(($sigmaduration1 + $sigmaduration2) / 60, 1))."ч
 				<br>
 				<n style='color: #050;'>".(number_format(($sigmapay1 + $sigmapay2), 0, '', ' '))."</n>
@@ -334,6 +354,9 @@ foreach ($_GET as &$value) {
 	$(function(){
 		// Подсвечивание столбцов таблицы
 		$('#timesheet').columnHover({eachCell:true, hoverClass:'hover', ignoreCols: [1]});
+
+		// Массив регистраций в JSON
+		TimeReg = <?= json_encode($TimeReg); ?>;
 	});
 </script>
 
