@@ -84,7 +84,7 @@ th {
 }
 
 table tbody tr:hover, tbody td.hover {
-	background: #ffa !important; /* Цвет фона при наведении */
+	background-color: #ffa !important; /* Цвет фона при наведении */
 }
 
 .cassette {
