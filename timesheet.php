@@ -212,6 +212,7 @@ foreach ($_GET as &$value) {
 					AND MONTH(ts_date) = {$month}
 					AND USR_ID = {$row["USR_ID"]}
 					AND F_ID = {$F_ID}
+				ORDER BY Day
 			";
 			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
@@ -248,10 +249,8 @@ foreach ($_GET as &$value) {
 					}
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='overflow: visible; padding: 0px; text-align: center;' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'>
-							<n style='".($subrow["duration"] == 0 ? " color: red; font-weight: bold;" : "")."'>".(round($subrow["duration"] / 60, 1))."ч</n>
-							<br>
-							<n style='color: #050;'>".(number_format($subrow["pay"], 0, '', ' '))."</n>
+						<td id='{$subrow["TS_ID"]}' style='overflow: visible; padding: 0px; text-align: center;".($subrow["duration"] == 0 ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'>
+							<n>".(number_format($subrow["pay"], 0, '', ' '))."</n>
 						</td>
 					";
 
@@ -278,19 +277,13 @@ foreach ($_GET as &$value) {
 
 			echo "
 				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright' colspan='2'>
-					".(round($sigmaduration1 / 60, 1))."ч
-					<br>
-					<n style='color: #050;'>".(number_format($sigmapay1, 0, '', ' '))."</n>
+					<n>".(number_format($sigmapay1, 0, '', ' '))."</n>
 				</td>
 				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright' colspan='2'>
-					".(round($sigmaduration2 / 60, 1))."ч
-					<br>
-					<n style='color: #050;'>".(number_format($sigmapay2, 0, '', ' '))."</n>
+					<n>".(number_format($sigmapay2, 0, '', ' '))."</n>
 				</td>
 				<td style='overflow: visible; font-weight: bold; background: #3333;' class='txtright' colspan='2'>
-					".(round(($sigmaduration1 + $sigmaduration2) / 60, 1))."ч
-					<br>
-					<n style='color: #050;'>".(number_format(($sigmapay1 + $sigmapay2), 0, '', ' '))."</n>
+					<n>".(number_format(($sigmapay1 + $sigmapay2), 0, '', ' '))."</n>
 				</td>
 			";
 		}
@@ -305,11 +298,7 @@ foreach ($_GET as &$value) {
 		while ($i <= $days) {
 			echo "<td style='padding: 0px; text-align: center; background: #3333; font-weight: bold; writing-mode: vertical-rl;' class='nowrap'>";
 			if( $daypay[$i] > 0 ) {
-				echo "
-					".(round($dayduration[$i] / 60, 1))."ч
-					<br>
-					<n style='color: #050;'>".(number_format($daypay[$i], 0, '', ' '))."</n>
-				";
+				echo "<n>".(number_format($daypay[$i], 0, '', ' '))."</n>";
 
 				if( $i < 16 ) {
 					$sigmaduration1 += $dayduration[$i];
@@ -329,19 +318,13 @@ foreach ($_GET as &$value) {
 		}
 		echo "
 			<td style='font-weight: bold; background: #3333;' class='txtright' colspan='2'>
-				".(round($sigmaduration1 / 60, 1))."ч
-				<br>
-				<n style='color: #050;'>".(number_format($sigmapay1, 0, '', ' '))."</n>
+				<n>".(number_format($sigmapay1, 0, '', ' '))."</n>
 			</td>
 			<td style='font-weight: bold; background: #3333;' class='txtright' colspan='2'>
-				".(round($sigmaduration2 / 60, 1))."ч
-				<br>
-				<n style='color: #050;'>".(number_format($sigmapay2, 0, '', ' '))."</n>
+				<n>".(number_format($sigmapay2, 0, '', ' '))."</n>
 			</td>
 			<td style='font-weight: bold; background: #3333;' class='txtright' colspan='2'>
-				".(round(($sigmaduration1 + $sigmaduration2) / 60, 1))."ч
-				<br>
-				<n style='color: #050;'>".(number_format(($sigmapay1 + $sigmapay2), 0, '', ' '))."</n>
+				<n>".(number_format(($sigmapay1 + $sigmapay2), 0, '', ' '))."</n>
 			</td>
 		";
 		echo "</tr>";
