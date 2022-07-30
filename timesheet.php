@@ -206,7 +206,7 @@ foreach ($_GET as &$value) {
 				SELECT TS_ID
 					,DAY(ts_date) Day
 					,duration
-					,pay
+					,IFNULL(pay, '') pay
 				FROM Timesheet
 				WHERE YEAR(ts_date) = {$year}
 					AND MONTH(ts_date) = {$month}
