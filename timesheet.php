@@ -249,7 +249,7 @@ foreach ($_GET as &$value) {
 					}
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='overflow: visible; padding: 0px; text-align: center;".($subrow["duration"] == 0 ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'>
+						<td id='{$subrow["TS_ID"]}' style='overflow: visible; padding: 0px; text-align: center;".($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'>
 							<n>".(number_format($subrow["pay"], 0, '', ' '))."</n>
 						</td>
 					";
