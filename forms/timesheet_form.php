@@ -90,7 +90,7 @@ if( isset($_POST["F_ID"]) ) {
 	}
 
 	// Перенаправление в табель
-	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&week='.$month.'#'.$TS_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'#'.$TS_ID.'">');
 }
 ?>
 

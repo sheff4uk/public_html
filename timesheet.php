@@ -137,9 +137,11 @@ foreach ($_GET as &$value) {
 
 				$i = 1;
 				$workdays = 0;
+				$weekdays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 				while ($i <= $days) {
 					$date = $year.'-'.$month.'-'.$i;
-					$day_of_week = date('N', strtotime($date));	// День недели
+					$day_of_week = date('N', strtotime($date));	// День недели 1..7
+					$dow = date('w', strtotime($date));			// День недели 0..6
 					$day = date('d', strtotime($date));			// День месяца
 
 					// Перебираем массив и если находим дату то проверяем ее тип (тип дня: 1 - выходной день, 2 - рабочий и сокращенный (может быть использован для любого дня недели), 3 - рабочий день (суббота/воскресенье))
@@ -151,10 +153,10 @@ foreach ($_GET as &$value) {
 					}
 
 					if ( (($day_of_week >= 6 and $t != "3" and $t != "2") or ($t == "1")) ) { // Выделяем цветом выходные дни
-						echo "<th style='background: chocolate;'>".$i++."</th>";
+						echo "<th style='background: chocolate;'>".$i++."<br>".$weekdays[$dow]."</th>";
 					}
 					else {
-						echo "<th>".$i++."</th>";
+						echo "<th>".$i++."<br>".$weekdays[$dow]."</th>";
 						$workdays++;
 					}
 				}
@@ -229,6 +231,8 @@ foreach ($_GET as &$value) {
 			$i = 1;
 			while ($i <= $days) {
 				$d = str_pad($i, 2, "0", STR_PAD_LEFT);
+				$date = $year.'-'.$month.'-'.$i;
+				$day_of_week = date('N', strtotime($date));	// День недели 1..7
 				if( $i == $day ) {
 					// Заполняем массив регистраций
 					$query = "
@@ -249,7 +253,7 @@ foreach ($_GET as &$value) {
 					}
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='overflow: visible; padding: 0px; text-align: center;".($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'>
+						<td id='{$subrow["TS_ID"]}' style='overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f6;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'>
 							<n>".(number_format($subrow["pay"], 0, '', ' '))."</n>
 						</td>
 					";
@@ -270,7 +274,7 @@ foreach ($_GET as &$value) {
 					}
 				}
 				else {
-					echo "<td class='tscell' ts_date='{$year}-{$month}-{$d}' usr_id='{$row["USR_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'></td>";
+					echo "<td style='".($day_of_week >= 6 ? " background: #09f6;" : "")."' class='tscell' ts_date='{$year}-{$month}-{$d}' usr_id='{$row["USR_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'></td>";
 				}
 				$i++;
 			}
