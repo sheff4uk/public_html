@@ -35,7 +35,7 @@ if( isset($_POST["cardcode"]) ) {
 					SELECT T_ID
 					FROM Tariff
 					WHERE USR_ID = {$USR_ID}
-						AND from_date < CURDATE()
+						AND from_date <= CURDATE()
 					ORDER BY from_date DESC, T_ID ASC
 					LIMIT 1
 				)
@@ -44,7 +44,7 @@ if( isset($_POST["cardcode"]) ) {
 					SELECT T_ID
 					FROM Tariff
 					WHERE USR_ID = {$USR_ID}
-						AND from_date < CURDATE()
+						AND from_date <= CURDATE()
 					ORDER BY from_date DESC, T_ID ASC
 					LIMIT 1
 				)
