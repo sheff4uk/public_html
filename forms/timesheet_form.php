@@ -98,9 +98,11 @@ if( isset($_POST["F_ID"]) ) {
 	<form method='post' action="/forms/timesheet_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
-			<hide><!--Формируется скриптом--></hide>
 			<input type="hidden" name="F_ID" value="<?=$F_ID?>">
 			<input type="hidden" name="month" value="<?=$_GET["month"]?>">
+
+			<div id="hide"><!--Формируется скриптом--></div>
+			<div id="summary"><!--Формируется скриптом--></div>
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
@@ -110,7 +112,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Время отмены</th>
 					</tr>
 				</thead>
-				<tbody style="text-align: center;">
+				<tbody id="timereg" style="text-align: center;">
 					<!--Формируется скриптом-->
 				</tbody>
 			</table>
@@ -132,13 +134,21 @@ this.subbut.value='Подождите, пожалуйста!';">
 				date_format = $(this).attr('date_format'),
 				usr_name = $(this).attr('usr_name'),
 				html = '',
-				html_hide = '';
+				html_hide = '',
+				html_summary = '';
 
 			if( ts_id > 0 ) {
 				// Формируем скрытые поля
 				html_hide = html_hide + "<input type='hidden' name='TS_ID' value='"+ts_id+"'>";
 
 				var arr_reg = TimeReg[ts_id];
+				var tariff = $(this).attr('tariff'),
+					duration = $(this).attr('duration'),
+					pay = $(this).attr('pay');
+
+				html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th>Тариф</th><th>Продолжительность</th><th>Вознаграждение</th></tr></thead><tbody style='text-align: center; font-size: 1.5em;'><tr>";
+				html_summary = html_summary + "<td>"+tariff+"</td><td>"+duration+"</td><td>"+pay+"</td>";
+				html_summary = html_summary + "</tr></tbody></table>";
 
 				$.each(arr_reg, function(key, val){
 					if( val["del_time"] != '' ) {
@@ -168,8 +178,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 			html = html + "<tr><td><input type='time' name='tr_time1' step='1' style='margin: 10px; font-size: 1.5em;'><i class='fas fa-arrow-left'></i></td><td colspan='2' rowspan='2'>Чтобы добавить новую регистрацию, укажите время.</td></tr>";
 			html = html + "<tr><td><input type='time' name='tr_time2' step='1' style='margin: 10px; font-size: 1.5em;'><i class='fas fa-arrow-left'></i></td></tr>";
 
-			$('#timesheet_form hide').html(html_hide);
-			$('#timesheet_form tbody').html(html);
+			$('#timesheet_form #hide').html(html_hide);
+			$('#timesheet_form #summary').html(html_summary);
+			$('#timesheet_form #timereg').html(html);
 
 			$('#timesheet_form').dialog({
 				title: date_format + ' | ' + usr_name,

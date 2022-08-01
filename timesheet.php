@@ -203,17 +203,21 @@ foreach ($_GET as &$value) {
 		while( $row = mysqli_fetch_array($res) ) {
 			echo "<tr><td colspan='2' style='text-align: center;'>{$row["Name"]}</td>";
 
-			// Получаем список часов по работнику за месяц
+			// Получаем список начислений по работнику за месяц
 			$query = "
-				SELECT TS_ID
-					,DAY(ts_date) Day
-					,duration
-					,IFNULL(pay, '') pay
-				FROM Timesheet
-				WHERE YEAR(ts_date) = {$year}
-					AND MONTH(ts_date) = {$month}
-					AND USR_ID = {$row["USR_ID"]}
-					AND F_ID = {$F_ID}
+				SELECT TS.TS_ID
+					,DAY(TS.ts_date) Day
+					,TS.duration
+					,IFNULL(TS.pay, '') pay
+					,IF(T.type = 1, 'Смена', IF(T.type = 2, 'Час', 'Час (тракторист)')) type
+					,T.tariff
+					,CONCAT(TS.duration DIV 60, ':', TS.duration % 60) duration_hm
+				FROM Timesheet TS
+				JOIN Tariff T ON T.T_ID = TS.T_ID
+				WHERE YEAR(TS.ts_date) = {$year}
+					AND MONTH(TS.ts_date) = {$month}
+					AND TS.USR_ID = {$row["USR_ID"]}
+					AND TS.F_ID = {$F_ID}
 				ORDER BY Day
 			";
 			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -253,7 +257,7 @@ foreach ($_GET as &$value) {
 					}
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'>
+						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='".(number_format($subrow["pay"], 0, '', ' '))."'>
 							<n>".(number_format($subrow["pay"], 0, '', ' '))."</n>
 						</td>
 					";
