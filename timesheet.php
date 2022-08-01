@@ -274,7 +274,7 @@ foreach ($_GET as &$value) {
 					}
 				}
 				else {
-					echo "<td style='".($day_of_week >= 6 ? " background: #09f6;" : "")."' class='tscell' ts_date='{$year}-{$month}-{$d}' usr_id='{$row["USR_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'></td>";
+					echo "<td style='".($day_of_week >= 6 ? " background: #09f3;" : "")."' class='tscell' ts_date='{$year}-{$month}-{$d}' usr_id='{$row["USR_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'></td>";
 				}
 				$i++;
 			}
