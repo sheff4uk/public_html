@@ -128,7 +128,7 @@ foreach ($_GET as &$value) {
 <table id="timesheet" class="main_table">
 	<thead>
 		<tr class="nowrap">
-			<th></th>
+			<th colspan="2"></th>
 			<?
 				// Получаем производственный календарь на выбранный год
 				$xml = simplexml_load_file("http://xmlcalendar.ru/data/ru/".$year."/calendar.xml");
@@ -201,7 +201,7 @@ foreach ($_GET as &$value) {
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
-			echo "<tr><td style='text-align: center;'>{$row["Icon"]}</td>";
+			echo "<tr><td colspan='2' style='text-align: center;'>{$row["Name"]}</td>";
 
 			// Получаем список часов по работнику за месяц
 			$query = "
@@ -253,7 +253,7 @@ foreach ($_GET as &$value) {
 					}
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f6;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'>
+						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f6;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'>
 							<n>".(number_format($subrow["pay"], 0, '', ' '))."</n>
 						</td>
 					";
@@ -293,7 +293,7 @@ foreach ($_GET as &$value) {
 		}
 
 		// Итог снизу
-		echo "<tr><td style='text-align: center; font-size: 1.5em; background: #3333;'><b>Σ</b></td>";
+		echo "<tr><td colspan='2' style='text-align: center; font-size: 1.5em; background: #3333;'><b>Σ</b></td>";
 		$i = 1;
 		$sigmaduration1 = 0;
 		$sigmapay1 = 0;
