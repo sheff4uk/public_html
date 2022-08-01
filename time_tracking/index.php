@@ -187,7 +187,7 @@ if( isset($_POST["cardcode"]) ) {
 									width: 320,
 									height: 240,
 									image_format: 'jpeg',
-									jpeg_quality: 90
+									jpeg_quality: 70
 								});
 								Webcam.attach( '#my_camera' );
 
