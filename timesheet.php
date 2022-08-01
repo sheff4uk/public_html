@@ -10,9 +10,9 @@ if( !$_GET["month"] ) {
 	$row = mysqli_fetch_array($res);
 	$_GET["month"] = $row["month"];
 
-	$year = substr($_GET["month"], 0, 4);
-	$month = substr($_GET["month"], 4, 2);
 }
+$year = substr($_GET["month"], 0, 4);
+$month = substr($_GET["month"], 4, 2);
 
 // Если не выбран участок, берем из сессии
 if( !$_GET["F_ID"] ) {
@@ -55,7 +55,7 @@ $days = date('t', $timestamp);
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Месяц:</span>
-			<select name="week" class="<?=$_GET["month"] ? "filtered" : ""?>" onchange="this.form.submit()">
+			<select name="month" class="<?=$_GET["month"] ? "filtered" : ""?>" onchange="this.form.submit()">
 				<?
 				$query = "
 					SELECT YEAR(CURDATE()) year
