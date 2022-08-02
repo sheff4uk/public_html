@@ -29,11 +29,19 @@ else {
 	// Узнаем атрибуты пользователя
 	$query = "
 		SELECT USR_Icon(USR.USR_ID) USR_Icon
+			,USR.RL_ID
 		FROM Users USR
 		WHERE USR_ID = {$_SESSION['id']}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$USR_Role = mysqli_result($res,0,'RL_ID');
 	$USR_Icon = mysqli_result($res,0,'USR_Icon');
+
+	// Получаем права пользователя
+	$query = "SELECT RT_ID FROM Role_Rights WHERE RL_ID = {$USR_Role}";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		$Rights[] = $row["RT_ID"];
+	}
 }
 ?>

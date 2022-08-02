@@ -71,11 +71,11 @@ if( isset($_POST["USR_ID"]) ) {
 $title = 'Пользователи';
 include "header.php";
 
-//// Проверка прав на доступ к экрану
-//if( !in_array('users', $Rights) ) {
-//	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
-//	die('Недостаточно прав для совершения операции');
-//}
+// Проверка прав на доступ к экрану
+if( !in_array('users', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
 ?>
 
 <style>
