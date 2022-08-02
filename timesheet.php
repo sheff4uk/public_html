@@ -26,6 +26,8 @@ include "./forms/timesheet_form.php";
 $strdate = '01.'.$month.'.'.$year;
 $timestamp = strtotime($strdate);
 $days = date('t', $timestamp);
+
+$outsrc = $_GET["outsrc"];
 ?>
 
 <!--Фильтр-->
@@ -73,11 +75,13 @@ $days = date('t', $timestamp);
 						FROM (
 							SELECT YEAR(CURDATE()) year
 								,DATE_FORMAT(CURDATE(), '%Y%m') month
-								,DATE_FORMAT(CURDATE(), '%b') month_format
+								#,DATE_FORMAT(CURDATE(), '%b') month_format
+								,DATE_FORMAT(CURDATE(), '%c') month_format
 							UNION
 							SELECT YEAR(ts_date) year
 								,DATE_FORMAT(ts_date, '%Y%m') month
-								,DATE_FORMAT(ts_date, '%b') month_format
+								#,DATE_FORMAT(ts_date, '%b') month_format
+								,DATE_FORMAT(ts_date, '%c') month_format
 							FROM Timesheet
 							WHERE YEAR(ts_date) = {$row["year"]}
 							GROUP BY month
@@ -88,7 +92,7 @@ $days = date('t', $timestamp);
 					$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $subrow = mysqli_fetch_array($subres) ) {
 						$selected = ($subrow["month"] == $_GET["month"]) ? "selected" : "";
-						echo "<option value='{$subrow["month"]}' {$selected}>{$subrow["month_format"]}</option>";
+						echo "<option value='{$subrow["month"]}' {$selected}>{$MONTHS[$subrow["month_format"]]}</option>";
 					}
 					echo "</optgroup>";
 				}
@@ -96,6 +100,16 @@ $days = date('t', $timestamp);
 			</select>
 			<i class="fas fa-question-circle" title="По умолчанию устанавливается текущий месяц."></i>
 		</div>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Аутсорсер:</span>
+			<select name="outsrc" class="<?=($_GET["outsrc"] != '') ? "filtered" : ""?>" onchange="this.form.submit()">
+				<option value=""></option>
+				<option <?=(($_GET["outsrc"] == '1') ? "selected" : "")?> value="1">Да</option>
+				<option <?=(($_GET["outsrc"] == '0') ? "selected" : "")?> value="0">Нет</option>
+			</select>
+		</div>
+
 		<button style="float: right;">Фильтр</button>
 	</form>
 </div>
@@ -183,6 +197,7 @@ foreach ($_GET as &$value) {
 				,USR_Icon(USR.USR_ID) Icon
 				,USR.act
 				,IFNULL(SUM(TS.duration), 0) duration
+				,USR.official
 			FROM Users USR
 			# У работника должен быть активный тариф в выбранном месяце
 			JOIN (
@@ -195,13 +210,15 @@ foreach ($_GET as &$value) {
 				AND YEAR(TS.ts_date) = {$year}
 				AND MONTH(TS.ts_date) = {$month}
 				AND TS.F_ID = {$F_ID}
+			WHERE 1
+				".(($outsrc != '') ? "AND IFNULL(USR.outsourcer, 0) = {$outsrc}" : "")."
 			GROUP BY USR.USR_ID
 			HAVING (act = 1 AND F_ID = {$F_ID}) OR duration > 0
 			ORDER BY Name
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
-			echo "<tr><td colspan='2' style='text-align: center;'>{$row["Name"]}</td>";
+			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'>{$row["Name"]}</td>";
 
 			// Получаем список начислений по работнику за месяц
 			$query = "
@@ -211,7 +228,7 @@ foreach ($_GET as &$value) {
 					,IFNULL(TS.pay, '') pay
 					,IF(T.type = 1, 'Смена', IF(T.type = 2, 'Час', 'Час (тракторист)')) type
 					,T.tariff
-					,CONCAT(TS.duration DIV 60, ':', TS.duration % 60) duration_hm
+					,CONCAT(TS.duration DIV 60, ':', LPAD(TS.duration % 60, 2, '0')) duration_hm
 				FROM Timesheet TS
 				JOIN Tariff T ON T.T_ID = TS.T_ID
 				WHERE YEAR(TS.ts_date) = {$year}
