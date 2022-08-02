@@ -120,7 +120,7 @@ if( !in_array('users', $Rights) ) {
 			FROM Users USR
 			JOIN Roles RL ON RL.RL_ID = USR.RL_ID
 			JOIN factory F ON F.F_ID = USR.F_ID
-			ORDER BY USR.F_ID, USR.RL_ID
+			ORDER BY USR.F_ID, USR.RL_ID, USR.Surname, USR.Name
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
