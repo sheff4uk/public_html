@@ -91,34 +91,6 @@ if( isset($_POST["cardcode"]) ) {
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 		<script src="../js/jquery-1.11.3.min.js"></script>
 		<script src="../js/ui/jquery-ui.js"></script>
-		<script>
-			$(function() {
-				// Считывание карточки
-				var cardcode="";
-				$(document).keydown(function(e)
-				{
-					var code = (e.keyCode ? e.keyCode : e.which);
-					if (code==0) cardcode="";
-					if( code==13 || code==9 )// Enter key hit. Tab key hit.
-					{
-						console.log(cardcode);
-						if( cardcode.length == 10 ) {
-							$("input[name=cardcode]").val(cardcode);
-							$( "#target" ).submit();
-							cardcode="";
-							return false;
-						}
-						cardcode="";
-					}
-					else
-					{
-						if (code >= 48 && code <= 57) {
-							cardcode=cardcode+String.fromCharCode(code);
-						}
-					}
-				});
-			});
-		</script>
 	</head>
 	<body>
 		<style>
@@ -155,8 +127,9 @@ if( isset($_POST["cardcode"]) ) {
 			}
 		</style>
 
-		<form method="post" id="target" style="display: none;">
+		<form method="post" id="target" style="display: none;" onsubmit="JavaScript:this.subbut.disabled=true;">
 			<input type="hidden" name="cardcode">
+			<input type="submit" name="subbut">
 		</form>
 
 		<?
@@ -240,10 +213,10 @@ if( isset($_POST["cardcode"]) ) {
 						}
 					?>
 					<script>
-						// Автоматический возврат на главный экран после авторизации
+						// Автоматический возврат на главный экран по истечению времени
 						setTimeout(function(){
 							$(location).attr('href', "/time_tracking");
-						}, 10000);
+						}, 5000);
 					</script>
 				</form>
 			</div>
@@ -251,6 +224,34 @@ if( isset($_POST["cardcode"]) ) {
 		}
 		else {
 			?>
+			<script>
+				$(function() {
+					// Считывание карточки
+					var cardcode="";
+					$(document).keydown(function(e)
+					{
+						var code = (e.keyCode ? e.keyCode : e.which);
+						if (code==0) cardcode="";
+						if( code==13 || code==9 )// Enter key hit. Tab key hit.
+						{
+							console.log(cardcode);
+							if( cardcode.length == 10 ) {
+								$("input[name=cardcode]").val(cardcode);
+								$( "#target input[name=subbut]" ).click();
+								cardcode="";
+								return false;
+							}
+							cardcode="";
+						}
+						else
+						{
+							if (code >= 48 && code <= 57) {
+								cardcode=cardcode+String.fromCharCode(code);
+							}
+						}
+					});
+				});
+			</script>
 			<div style="display: flex; flex-direction: row; flex-wrap: wrap; padding: 5px; margin: 5px;">
 			<?
 			// Выводим список зарегистрированных сегодня работников
