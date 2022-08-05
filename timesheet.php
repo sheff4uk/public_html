@@ -186,6 +186,7 @@ foreach ($_GET as &$value) {
 		// Суммарные результаты за день
 		$dayduration = array();
 		$daypay = array();
+		$daycnt = array();
 		// Массив регистраций
 		$TimeReg = array();
 
@@ -289,6 +290,7 @@ foreach ($_GET as &$value) {
 					}
 					$dayduration[$i] += $subrow["duration"];
 					$daypay[$i] += $subrow["pay"];
+					$daycnt[$i] += ($subrow["pay"] ? 1 : 0);
 
 					if( $subrow = mysqli_fetch_array($subres) ) {
 						$day = $subrow["Day"];
@@ -321,9 +323,10 @@ foreach ($_GET as &$value) {
 		$sigmaduration2 = 0;
 		$sigmapay2 = 0;
 		while ($i <= $days) {
-			echo "<td style='padding: 0px; text-align: center; background: #3333; font-weight: bold; writing-mode: vertical-rl;' class='nowrap'>";
+			echo "<td style='padding: 0px; text-align: center; background: #3333;'>";
 			if( $daypay[$i] > 0 ) {
-				echo "<n>".(number_format($daypay[$i], 0, '', ' '))."</n>";
+				echo "<b>".(number_format($daypay[$i], 0, '', ' '))."</b>";
+				echo "<br><n>x{$daycnt[$i]}</i>";
 
 				if( $i < 16 ) {
 					$sigmaduration1 += $dayduration[$i];
