@@ -31,23 +31,8 @@ if( isset($_POST["cardcode"]) ) {
 			SET ts_date = CURDATE()
 				,USR_ID = {$USR_ID}
 				,F_ID = {$F_ID}
-				,T_ID = (
-					SELECT T_ID
-					FROM Tariff
-					WHERE USR_ID = {$USR_ID}
-						AND from_date <= CURDATE()
-					ORDER BY from_date DESC, T_ID ASC
-					LIMIT 1
-				)
 			ON DUPLICATE KEY UPDATE
-				T_ID = (
-					SELECT T_ID
-					FROM Tariff
-					WHERE USR_ID = {$USR_ID}
-						AND from_date <= CURDATE()
-					ORDER BY from_date DESC, T_ID ASC
-					LIMIT 1
-				)
+				ts_date = ts_date
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 

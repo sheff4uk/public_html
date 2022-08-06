@@ -6,6 +6,7 @@ if( isset($_POST["F_ID"]) ) {
 	session_start();
 	$F_ID = $_POST["F_ID"];
 	$month = $_POST["month"];
+	$outsrc = $_POST["outsrc"];
 
 	if( $_POST["TS_ID"] ) {
 		$TS_ID = $_POST["TS_ID"];
@@ -20,30 +21,11 @@ if( isset($_POST["F_ID"]) ) {
 				SET ts_date = '{$ts_date}'
 					,USR_ID = {$USR_ID}
 					,F_ID = {$F_ID}
-					,T_ID = (
-						SELECT T_ID
-						FROM Tariff
-						WHERE USR_ID = {$USR_ID}
-							AND from_date < CURDATE()
-						ORDER BY from_date DESC, T_ID ASC
-						LIMIT 1
-					)
 				ON DUPLICATE KEY UPDATE
-					T_ID = (
-						SELECT T_ID
-						FROM Tariff
-						WHERE USR_ID = {$USR_ID}
-							AND from_date < CURDATE()
-						ORDER BY from_date DESC, T_ID ASC
-						LIMIT 1
-					)
+					ts_date = ts_date
 			";
-			if( !mysqli_query( $mysqli, $query ) ) {
-				$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
-			}
-			else {
-				$TS_ID = mysqli_insert_id( $mysqli );
-			}
+			mysqli_query( $mysqli, $query );
+			$TS_ID = mysqli_insert_id( $mysqli );
 		}
 	}
 
@@ -57,9 +39,7 @@ if( isset($_POST["F_ID"]) ) {
 				,add_time = NOW()
 				,add_author = {$_SESSION['id']}
 		";
-		if( !mysqli_query( $mysqli, $query ) ) {
-			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
-		}
+		mysqli_query( $mysqli, $query );
 	}
 	if( $_POST["tr_time2"] ) {
 		$tr_time2 = $_POST["tr_time2"];
@@ -70,9 +50,7 @@ if( isset($_POST["F_ID"]) ) {
 				,add_time = NOW()
 				,add_author = {$_SESSION['id']}
 		";
-		if( !mysqli_query( $mysqli, $query ) ) {
-			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
-		}
+		mysqli_query( $mysqli, $query );
 	}
 	//////////////////////////////
 
@@ -84,13 +62,11 @@ if( isset($_POST["F_ID"]) ) {
 				,del_author = {$_SESSION['id']}
 			WHERE TR_ID = {$value}
 		";
-		if( !mysqli_query( $mysqli, $query ) ) {
-			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
-		}
+		mysqli_query( $mysqli, $query );
 	}
 
 	// Перенаправление в табель
-	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'#'.$TS_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&outsrc='.$outsrc.'#'.$TS_ID.'">');
 }
 ?>
 
@@ -100,6 +76,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="F_ID" value="<?=$F_ID?>">
 			<input type="hidden" name="month" value="<?=$_GET["month"]?>">
+			<input type="hidden" name="outsrc" value="<?=$_GET["outsrc"]?>">
 
 			<div id="hide"><!--Формируется скриптом--></div>
 			<div id="summary"><!--Формируется скриптом--></div>
@@ -146,7 +123,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					duration = $(this).attr('duration'),
 					pay = $(this).attr('pay');
 
-				html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th>Тариф</th><th>Продолжительность</th><th>Вознаграждение</th></tr></thead><tbody style='text-align: center; font-size: 1.5em;'><tr>";
+				html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th>Тариф</th><th>Продолжительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.5em;'><tr>";
 				html_summary = html_summary + "<td>"+tariff+"</td><td>"+duration+"</td><td>"+pay+"</td>";
 				html_summary = html_summary + "</tr></tbody></table>";
 

@@ -169,10 +169,12 @@ switch( $_GET["do"] ) {
 			<p><sup>*</sup>КИС - корпоративная информационная система</p>
 		</div>
 
-		<div id="send_code_form" style="display: none;">
+		<div id="send_code_form" style="display: none;" title="Последние 4 цифры входящего">
 			<form method='post'>
-				<input type='text' name='code' placeholder='последние 4 цифры' autocomplete='off'>
-				<button>ОК</button>
+				<input type='text' name='code' autocomplete='off' style="font-size: 4em; width: 100%; text-align: center;">
+				<br>
+				<br>
+				<button style="width: 100%;">Продолжить</button>
 			</form>
 		</div>
 

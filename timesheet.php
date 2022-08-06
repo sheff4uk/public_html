@@ -1,5 +1,71 @@
 <?
 include "config.php";
+
+// Сохранение/редактирование
+if( isset($_POST["F_ID"]) ) {
+	session_start();
+	$F_ID = $_POST["F_ID"];
+	$month = $_POST["month"];
+	$outsrc = $_POST["outsrc"];
+
+	// Изменение тарифов возможно только в текущем месяце
+	if( $month == date('Ym') ) {
+		foreach ($_POST["tariff"] as $key => $value) {
+			$USR_ID = $key;
+			$new_tariff = $value;
+			$new_type = $_POST["type"][$key];
+
+			// Узнаем текущее значение
+			$query = "
+				SELECT TM.tariff, TM.type
+				FROM TariffMonth TM
+				WHERE CONCAT(TM.year, LPAD(TM.month, 2, '0')) LIKE '{$month}'
+					AND TM.USR_ID = {$USR_ID}
+					AND TM.F_ID = {$F_ID}
+			";
+			$res = mysqli_query( $mysqli, $query );
+			$row = mysqli_fetch_array($res);
+			$tariff = $row["tariff"];
+			$type = $row["type"];
+
+			// Если тариф изменился
+			if( $new_tariff != $tariff or $new_type != $type ) {
+				// Обновляем тариф
+				$query = "
+					UPDATE TariffMonth TM
+					SET TM.tariff = {$new_tariff}, TM.type = {$new_type}
+					WHERE CONCAT(TM.year, LPAD(TM.month, 2, '0')) LIKE '{$month}'
+						AND TM.USR_ID = {$USR_ID}
+						AND TM.F_ID = {$F_ID}
+				";
+				mysqli_query( $mysqli, $query );
+
+				// Пересчитываем начисления в табеле
+				$query = "
+					SELECT GROUP_CONCAT(TS.TS_ID) TS_IDs
+					FROM Timesheet TS
+					WHERE TS.USR_ID = {$USR_ID}
+						AND TS.F_ID = {$F_ID}
+						AND DATE_FORMAT(TS.ts_date, '%Y%m') LIKE '{$month}'
+				";
+				$res = mysqli_query( $mysqli, $query );
+				$row = mysqli_fetch_array($res);
+				$TS_IDs = $row["TS_IDs"];
+
+				$query = "
+					UPDATE TimeReg TR
+					SET TR.tr_time = TR.tr_time
+					WHERE TR.TS_ID IN (0,{$TS_IDs})
+				";
+				mysqli_query( $mysqli, $query );
+			}
+		}
+	}
+
+	// Перенаправление в табель
+	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&outsrc='.$outsrc.'">');
+}
+
 $title = 'Табель';
 include "header.php";
 
@@ -139,10 +205,16 @@ foreach ($_GET as &$value) {
 	});
 </script>
 
+<form method="post">
+<input type="hidden" name="F_ID" value="<?=$_GET["F_ID"]?>">
+<input type="hidden" name="month" value="<?=$_GET["month"]?>">
+<input type="hidden" name="outsrc" value="<?=$_GET["outsrc"]?>">
+
 <table id="timesheet" class="main_table">
 	<thead>
 		<tr class="nowrap">
-			<th colspan="2"></th>
+			<th colspan="2">Работник</th>
+			<th colspan="2">Тариф</th>
 			<?
 				// Получаем производственный календарь на выбранный год
 				$xml = simplexml_load_file("http://xmlcalendar.ru/data/ru/".$year."/calendar.xml");
@@ -197,36 +269,46 @@ foreach ($_GET as &$value) {
 				,USR_Name(USR.USR_ID) Name
 				,USR_Icon(USR.USR_ID) Icon
 				,USR.act
-				,IFNULL(SUM(TS.duration), 0) duration
+				,(
+					SELECT SUM(duration)
+					FROM Timesheet
+					WHERE USR_ID = USR.USR_ID
+						AND YEAR(ts_date) = {$year}
+						AND MONTH(ts_date) = {$month}
+						AND F_ID = {$F_ID}
+				) duration
 				,USR.official
+				,TM.tariff
+				,TM.type
 			FROM Users USR
-			# У работника должен быть активный тариф в выбранном месяце
-			JOIN (
-				SELECT USR_ID
-				FROM Tariff
-				WHERE from_date <= '{$year}-{$month}-{$days}'
-				GROUP BY USR_ID
-			) T ON T.USR_ID = USR.USR_ID
-			LEFT JOIN Timesheet TS ON TS.USR_ID = USR.USR_ID
-				AND YEAR(TS.ts_date) = {$year}
-				AND MONTH(TS.ts_date) = {$month}
-				AND TS.F_ID = {$F_ID}
+			JOIN TariffMonth TM ON TM.year = {$year} AND TM.month = {$month} AND TM.USR_ID = USR.USR_ID
 			WHERE 1
 				".(($outsrc != '') ? "AND IFNULL(USR.outsourcer, 0) = {$outsrc}" : "")."
-			GROUP BY USR.USR_ID
 			HAVING (act = 1 AND F_ID = {$F_ID}) OR duration > 0
 			ORDER BY Name
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
 			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'>{$row["Name"]}</td>";
+			?>
+			<td colspan="2">
+				<input type="number" value="<?=$row["tariff"]?>" name="tariff[<?=$row["USR_ID"]?>]" min="0" style="width: 60px;" <?=$_GET["month"] == date('Ym') ? "" : "disabled"?>>
+				<br>
+				<div class="nowrap">
+					<input type="radio" name="type[<?=$row["USR_ID"]?>]" value="1" style="margin: 0;" title="Смена" <?=$row["type"] == 1 ? "checked" : ""?> <?=$_GET["month"] == date('Ym') ? "" : "disabled"?>>
+					<input type="radio" name="type[<?=$row["USR_ID"]?>]" value="2" style="margin: 0;" title="Час" <?=$row["type"] == 2 ? "checked" : ""?> <?=$_GET["month"] == date('Ym') ? "" : "disabled"?>>
+					<input type="radio" name="type[<?=$row["USR_ID"]?>]" value="3" style="margin: 0;" title="Час (тракторист)"  <?=$row["type"] == 3 ? "checked" : ""?> <?=$_GET["month"] == date('Ym') ? "" : "disabled"?>>
+				</div>
+			</td>
+			<?
 
 			// Получаем список начислений по работнику за месяц
 			$query = "
 				SELECT TS.TS_ID
 					,DAY(TS.ts_date) Day
 					,TS.duration
-					,IFNULL(TS.pay, '') pay
+					#,IFNULL(TS.pay, '') pay
+					,TS.pay
 					,IF(T.type = 1, 'Смена', IF(T.type = 2, 'Час', 'Час (тракторист)')) type
 					,T.tariff
 					,CONCAT(TS.duration DIV 60, ':', LPAD(TS.duration % 60, 2, '0')) duration_hm
@@ -275,8 +357,8 @@ foreach ($_GET as &$value) {
 					}
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='".(number_format($subrow["pay"], 0, '', ' '))."'>
-							<n>".(number_format($subrow["pay"], 0, '', ' '))."</n>
+						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}'>
+							{$subrow["pay"]}
 						</td>
 					";
 
@@ -317,6 +399,12 @@ foreach ($_GET as &$value) {
 
 		// Итог снизу
 		echo "<tr><td colspan='2' style='text-align: center; font-size: 1.5em; background: #3333;'><b>Σ</b></td>";
+		echo "<td colspan='2' style='text-align: center; background: #3333;'>";
+		if( $_GET["month"] == date('Ym') ) {
+			echo "<button title='Сохранить изменения в тарифах'><i class='fas fa-save'></i></button>";
+		}
+		echo "</td>";
+
 		$i = 1;
 		$sigmaduration1 = 0;
 		$sigmapay1 = 0;
@@ -360,6 +448,7 @@ foreach ($_GET as &$value) {
 	?>
 	</tbody>
 </table>
+</form>
 
 <script>
 	$(function(){
