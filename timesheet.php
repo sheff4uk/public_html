@@ -269,22 +269,16 @@ foreach ($_GET as &$value) {
 				,USR_Name(USR.USR_ID) Name
 				,USR_Icon(USR.USR_ID) Icon
 				,USR.act
-				,(
-					SELECT SUM(duration)
-					FROM Timesheet
-					WHERE USR_ID = USR.USR_ID
-						AND YEAR(ts_date) = {$year}
-						AND MONTH(ts_date) = {$month}
-						AND F_ID = {$F_ID}
-				) duration
 				,USR.official
 				,TM.tariff
 				,TM.type
 			FROM Users USR
-			JOIN TariffMonth TM ON TM.year = {$year} AND TM.month = {$month} AND TM.USR_ID = USR.USR_ID
+			JOIN TariffMonth TM ON TM.year = {$year}
+				AND TM.month = {$month}
+				AND TM.USR_ID = USR.USR_ID
+				AND TM.F_ID = {$F_ID}
 			WHERE 1
 				".(($outsrc != '') ? "AND IFNULL(USR.outsourcer, 0) = {$outsrc}" : "")."
-			HAVING (act = 1 AND F_ID = {$F_ID}) OR duration > 0
 			ORDER BY Name
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

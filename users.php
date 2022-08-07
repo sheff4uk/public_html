@@ -60,7 +60,40 @@ if( isset($_POST["USR_ID"]) ) {
 		$USR_ID = $_POST["USR_ID"];
 	}
 
-	if( count($_SESSION["error"]) == 0) {
+	// Если указан номер карты, добавляем работника в табель
+	if( $cardcode != '' and $act == 1 ) {
+		$query = "
+			INSERT INTO TariffMonth
+			SET year = YEAR(CURDATE())
+				,month = MONTH(CURDATE())
+				,USR_ID = {$USR_ID}
+				,F_ID = {$_POST["F_ID"]}
+			ON DUPLICATE KEY UPDATE
+				F_ID = F_ID
+		";
+		if( !mysqli_query( $mysqli, $query ) ) {
+			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+		}
+	}
+	// Убираем возможные пустые записи из табеля
+	$query = "
+		DELETE TM
+		FROM TariffMonth AS TM
+		WHERE TM.year = YEAR(CURDATE())
+			AND TM.month = MONTH(CURDATE())
+			AND TM.USR_ID = {$USR_ID}
+			".(($cardcode != '' and $act == 1) ? "AND TM.F_ID NOT IN({$_POST["F_ID"]})" : "")."
+			AND (
+				SELECT IFNULL(SUM(1), 0)
+				FROM Timesheet TS
+				WHERE TS.TM_ID = TM.TM_ID
+			) = 0
+	";
+	if( !mysqli_query( $mysqli, $query ) ) {
+		$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+	}
+
+	if( !isset($_SESSION["error"]) ) {
 		$_SESSION["success"][] = $add ? "Новая запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 
