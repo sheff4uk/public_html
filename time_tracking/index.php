@@ -34,8 +34,8 @@ if( isset($_POST["cardcode"]) ) {
 				,TM_ID = (
 					SELECT TM_ID
 					FROM TariffMonth
-					WHERE year = YEAR('{$ts_date}')
-						AND month = MONTH('{$ts_date}')
+					WHERE year = YEAR(CURDATE())
+						AND month = MONTH(CURDATE())
 						AND USR_ID = {$USR_ID}
 						AND F_ID = {$F_ID}
 				)
@@ -43,8 +43,8 @@ if( isset($_POST["cardcode"]) ) {
 				TM_ID = (
 					SELECT TM_ID
 					FROM TariffMonth
-					WHERE year = YEAR('{$ts_date}')
-						AND month = MONTH('{$ts_date}')
+					WHERE year = YEAR(CURDATE())
+						AND month = MONTH(CURDATE())
 						AND USR_ID = {$USR_ID}
 						AND F_ID = {$F_ID}
 				)
