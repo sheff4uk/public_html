@@ -307,13 +307,12 @@ foreach ($_GET as &$value) {
 				SELECT TS.TS_ID
 					,DAY(TS.ts_date) Day
 					,TS.duration
-					#,IFNULL(TS.pay, '') pay
 					,TS.pay
-					,IF(T.type = 1, 'Смена', IF(T.type = 2, 'Час', 'Час (тракторист)')) type
-					,T.tariff
+					,IF(TM.type = 1, 'Смена', IF(TM.type = 2, 'Час', 'Час (тракторист)')) type
+					,TM.tariff
 					,CONCAT(TS.duration DIV 60, ':', LPAD(TS.duration % 60, 2, '0')) duration_hm
 				FROM Timesheet TS
-				JOIN Tariff T ON T.T_ID = TS.T_ID
+				JOIN TariffMonth TM ON TM.TM_ID = TS.TM_ID
 				WHERE YEAR(TS.ts_date) = {$year}
 					AND MONTH(TS.ts_date) = {$month}
 					AND TS.USR_ID = {$row["USR_ID"]}
