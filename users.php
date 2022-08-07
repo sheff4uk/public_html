@@ -248,6 +248,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<label>Номер карты:</label>
 				<div>
 					<input id="cardcode" type='text' name='cardcode' autocomplete='off'>
+					<br>
+					<span style='color: #911; font-size: .8em;'>Необходим для ведения табеля</span>
 				</div>
 			</div>
 			<div id="tariff">
