@@ -354,8 +354,8 @@ foreach ($_GET as &$value) {
 					}
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: hidden; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}'>
-							".($man_reg ? "<div style='position: absolute; top: -5px; left: -5px; width: 10px; height: 10px; border-radius: 50%; background: red; box-shadow: 0 0 3px 3px red;'></div>" : "")."
+						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}'>
+							".($man_reg ? "<div style='position: absolute; top: 1px; left: 1px; width: 5px; height: 5px; border-radius: 0 0 5px 0; background: red; box-shadow: 0 0 2px 2px red;'></div>" : "")."
 							{$subrow["pay"]}
 						</td>
 					";
