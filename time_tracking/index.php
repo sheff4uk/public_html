@@ -11,7 +11,7 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 $row = mysqli_fetch_array($res);
 $F_ID = $row["F_ID"];
 
-//if( !$F_ID ) die("Access denied");
+if( !$F_ID ) die("Access denied");
 
 if( isset($_POST["cardcode"]) ) {
 	// Верифицируем работника
@@ -19,12 +19,49 @@ if( isset($_POST["cardcode"]) ) {
 		SELECT USR.USR_ID
 		FROM Users USR
 		WHERE USR.cardcode LIKE '{$_POST["cardcode"]}'
+			AND USR.act = 1
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
 	$USR_ID = $row["USR_ID"];
+
 	// Если работник верифицирован
 	if( $USR_ID ) {
+		// Обновляем участок работника
+		$query = "
+			UPDATE Users
+			SET F_ID = {$F_ID}
+			WHERE USR_ID = {$USR_ID}
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+		// Новая строка в табеле, если еще не было
+		$query = "
+			INSERT INTO TariffMonth
+			SET year = YEAR(CURDATE())
+				,month = MONTH(CURDATE())
+				,USR_ID = {$USR_ID}
+				,F_ID = {$F_ID}
+			ON DUPLICATE KEY UPDATE
+				F_ID = F_ID
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		// Убираем возможные пустые записи из табеля
+		$query = "
+			DELETE TM
+			FROM TariffMonth AS TM
+			WHERE TM.year = YEAR(CURDATE())
+				AND TM.month = MONTH(CURDATE())
+				AND TM.USR_ID = {$USR_ID}
+				AND TM.F_ID NOT IN({$F_ID})
+				AND (
+					SELECT IFNULL(SUM(1), 0)
+					FROM Timesheet TS
+					WHERE TS.TM_ID = TM.TM_ID
+				) = 0
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
 		// Добавляем запись в табель
 		$query = "
 			INSERT INTO Timesheet
