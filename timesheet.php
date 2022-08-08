@@ -302,7 +302,7 @@ foreach ($_GET as &$value) {
 					,DAY(TS.ts_date) Day
 					,TS.duration
 					,TS.pay
-					,IF(TM.type = 1, 'Смена', IF(TM.type = 2, 'Час', 'Час (тракторист)')) type
+					,IF(TM.type = 1, 'Смена', IF(TM.type = 2, 'Час', IF(TM.type = 3, 'Час (тракторист)', ''))) type
 					,TM.tariff
 					,CONCAT(TS.duration DIV 60, ':', LPAD(TS.duration % 60, 2, '0')) duration_hm
 				FROM Timesheet TS
