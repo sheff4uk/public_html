@@ -344,13 +344,18 @@ foreach ($_GET as &$value) {
 						WHERE TR.TS_ID = {$subrow["TS_ID"]}
 						ORDER BY TR.tr_time
 					";
+					$man_reg = 0;
 					$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $subsubrow = mysqli_fetch_array($subsubres) ) {
 						$TimeReg[$subrow["TS_ID"]][] = array("TR_ID" => $subsubrow["TR_ID"], "tr_time" => "{$subsubrow["tr_time"]}", "tr_photo" => "{$subsubrow["tr_photo"]}", "add_time" => "{$subsubrow["add_time"]}", "add_author" => "{$subsubrow["add_author"]}", "del_time" => "{$subsubrow["del_time"]}", "del_author" => "{$subsubrow["del_author"]}");
+						if( $subsubrow["add_time"] != '' and $subsubrow["del_time"] == '' ) {
+							$man_reg = 1;
+						}
 					}
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}'>
+						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: hidden; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}'>
+							".($man_reg ? "<div style='position: absolute; top: -5px; left: -5px; width: 10px; height: 10px; border-radius: 50%; background: red; box-shadow: 0 0 3px 3px red;'></div>" : "")."
 							{$subrow["pay"]}
 						</td>
 					";
