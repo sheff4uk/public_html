@@ -26,6 +26,7 @@ if( isset($_POST["USR_ID"]) ) {
 			FROM Users USR
 			WHERE USR.cardcode LIKE '{$cardcode}'
 				AND USR.act = 1
+				".($_POST["USR_ID"] != "add" ? "AND USR.USR_ID <> {$_POST["USR_ID"]}" : "")."
 		";
 		$res = mysqli_query( $mysqli, $query );
 		$row = mysqli_fetch_array($res);
