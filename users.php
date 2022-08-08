@@ -19,6 +19,24 @@ if( isset($_POST["USR_ID"]) ) {
 	$Name = convert_str($_POST["Name"]);
 	$Name = mysqli_real_escape_string($mysqli, $Name);
 
+	// Проверка карты на повтор
+	if( $cardcode != '' and $act == 1 ) {
+		$query = "
+			SELECT USR_Name(USR.USR_ID) name
+			FROM Users USR
+			WHERE USR.cardcode LIKE '{$cardcode}'
+				AND USR.act = 1
+		";
+	}
+	$res = mysqli_query( $mysqli, $query );
+	$row = mysqli_fetch_array($res);
+	$name = $row["name"];
+	if( $name ) {
+		$_SESSION["error"][] = "Карту с таким номером уже использует {$name}.";
+		$cardcode = '';
+	}
+
+	// Добавление / обновление
 	if( $_POST["USR_ID"] == "add" ) {
 		$query = "
 			INSERT INTO Users
