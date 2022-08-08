@@ -27,13 +27,22 @@ if( isset($_POST["USR_ID"]) ) {
 			WHERE USR.cardcode LIKE '{$cardcode}'
 				AND USR.act = 1
 		";
-	}
-	$res = mysqli_query( $mysqli, $query );
-	$row = mysqli_fetch_array($res);
-	$name = $row["name"];
-	if( $name ) {
-		$_SESSION["error"][] = "Карту с таким номером уже использует {$name}.";
-		$cardcode = '';
+		$res = mysqli_query( $mysqli, $query );
+		$row = mysqli_fetch_array($res);
+		$name = $row["name"];
+		if( $name ) {
+			$_SESSION["error"][] = "Карту с таким номером уже использует {$name}.";
+			$cardcode = '';
+		}
+		else {
+			$query = "
+				UPDATE Users
+				SET cardcode = ''
+				WHERE cardcode LIKE '{$cardcode}'
+					AND act = 0
+			";
+			mysqli_query( $mysqli, $query );
+		}
 	}
 
 	// Добавление / обновление
