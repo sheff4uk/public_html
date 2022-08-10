@@ -1,7 +1,13 @@
 <?
 include "config.php";
-$title = 'Факт заливок';
+$title = 'Заливки по суткам';
 include "header.php";
+
+// Проверка прав на доступ к экрану
+if( !in_array('daily_production', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
 
 // Если не выбран участок, берем из сессии
 if( !$_GET["F_ID"] ) {

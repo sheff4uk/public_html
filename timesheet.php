@@ -69,6 +69,12 @@ if( isset($_POST["F_ID"]) ) {
 $title = 'Табель';
 include "header.php";
 
+// Проверка прав на доступ к экрану
+if( !in_array('timesheet', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 // Если в фильтре не установлена неделя, показываем текущую
 if( !$_GET["month"] ) {
 	$query = "SELECT DATE_FORMAT(CURDATE(), '%Y%m') month";

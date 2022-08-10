@@ -3,6 +3,12 @@ include "config.php";
 $title = 'Статистика по браку';
 include "header.php";
 
+// Проверка прав на доступ к экрану
+if( !in_array('reject', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["date_from"] ) {
 	$date = date_create('-6 days');

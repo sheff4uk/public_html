@@ -2,6 +2,13 @@
 include "config.php";
 $title = 'Протокол испытаний куба';
 include "header.php";
+
+// Проверка прав на доступ к экрану
+if( !in_array('cubetest', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 include "./forms/cubetest_form.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней

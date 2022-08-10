@@ -3,6 +3,12 @@ include "config.php";
 $title = 'Климат';
 include "header.php";
 
+// Проверка прав на доступ к экрану
+if( !in_array('climate', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 // Если в фильтре не установлена неделя, показываем текущую
 if( !$_GET["week"] ) {
 	$query = "SELECT YEARWEEK(CURDATE(), 1) week";

@@ -2,6 +2,13 @@
 include "config.php";
 $title = 'Расформовка';
 include "header.php";
+
+// Проверка прав на доступ к экрану
+if( !in_array('filling_opening', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 include "./forms/opening_form.php";
 
 // Если в фильтре не установлена неделя, показываем текущую

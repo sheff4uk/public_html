@@ -2,6 +2,13 @@
 include "config.php";
 $title = 'Журнал смен';
 include "header.php";
+
+// Проверка прав на доступ к экрану
+if( !in_array('shift_log', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 include "./forms/shift_log_form.php";
 //die("<h1>Ведутся работы</h1>");
 

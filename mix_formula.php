@@ -2,6 +2,13 @@
 include "config.php";
 $title = 'Рецепты';
 include "header.php";
+
+// Проверка прав на доступ к экрану
+if( !in_array('mix_formula', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 include "./forms/mix_formula_form.php";
 
 // Если не выбран участок, берем из сессии

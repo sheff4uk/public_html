@@ -38,6 +38,7 @@ else {
 	$USR_Icon = mysqli_result($res,0,'USR_Icon');
 
 	// Получаем права пользователя
+	$Rights = array();
 	$query = "SELECT RT_ID FROM Role_Rights WHERE RL_ID = {$USR_Role}";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {

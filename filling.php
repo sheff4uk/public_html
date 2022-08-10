@@ -2,6 +2,13 @@
 include "config.php";
 $title = 'Заливка';
 include "header.php";
+
+// Проверка прав на доступ к экрану
+if( !in_array('filling_opening', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 include "./forms/filling_form.php";
 //die("<h1>Ведутся работы</h1>");
 

@@ -194,31 +194,69 @@ function src_url($src) {
 		</div>
 <?
 	if( !empty($_SESSION['id']) ) {
-		$menu["Бланки"] = "blanks.php";
-		$menu["План"]["<i class='fas fa-fill fa-lg'></i> Заливка"] = "plan_batch.php";
-		$menu["Факт"]["<i class='fas fa-fill-drip fa-lg'></i> Чек листы операторов"] = "filling.php";
-		$menu["Факт"]["<i class='fas fa-expand fa-lg'></i> Расформовка"] = "opening.php";
-		$menu["Факт"]["<i class='fas fa-industry fa-lg'></i> Стадии производства"] = "manufacturing.php";
-		$menu["Факт"]["<i class='fas fa-pallet fa-lg'></i> Склад продукции"] = "stock.php";
-		$menu["Факт"]["<i class='fas fa-truck fa-lg'></i> Отгрузка"] = "shipment.php";
-		$menu["Анализ"]["<i class='fas fa-cogs fa-lg'></i> Заливки по суткам"] = "daily_production.php";
-		$menu["Анализ"]["<i class='fas fa-history fa-lg'></i> История кассет"] = "history.php";
-		$menu["Анализ"]["<i class='fas fa-thermometer-half fa-lg'></i> Климат"] = "climate.php";
-		$menu["Анализ"]["Расход сырья"] = "consumption.php";
-		$menu["Анализ"]["Брак"] = "statistic.php";
-		$menu["Анализ"]["<i class='fas fa-trash fa-lg'></i> Статистика брака"] = "daily_reject_stat.php";
-		$menu["Доп. данные"]["<i class='fas fa-cube fa-lg'></i> Испытания кубов"] = "cubetest.php";
-		$menu["Доп. данные"]["<i class='fas fa-user-clock fa-lg'></i> Журнал смен"] = "shift_log.php";
-		$menu["Доп. данные"]["<i class='fas fa-table fa-lg'></i> Табель"] = "timesheet.php";
-		$menu["Учет"]["<i class='fas fa-stream fa-lg'></i> Поддоны противовесов"] = "pallet_accounting.php";
-		$menu["Учет"]["<i class='fas fa-shapes fa-lg'></i> Сырьё"] = "material_accounting.php";
-		$menu["Учет"]["<i class='fas fa-th fa-lg'></i> Формы"] = "shell_accounting.php";
-		$menu["Учет"]["<i class='fas fa-gas-pump fa-lg'></i> Дизтопливо"] = "fuel_accounting.php";
-		$menu["Учет"]["<i class='fas fa-sign-language fa-lg'></i> СИЗ/расходники"] = "overal_accounting.php";
+		if( in_array('blanks', $Rights) ) {
+			$menu["Бланки"] = "blanks.php";
+		}
+		if( in_array('plan_batch', $Rights) ) {
+			$menu["План"]["<i class='fas fa-fill fa-lg'></i> Заливка"] = "plan_batch.php";
+		}
+		if( in_array('filling_opening', $Rights) ) {
+			$menu["Факт"]["<i class='fas fa-fill-drip fa-lg'></i> Чек листы операторов"] = "filling.php";
+			$menu["Факт"]["<i class='fas fa-expand fa-lg'></i> Расформовка"] = "opening.php";
+			$menu["Факт"]["<i class='fas fa-industry fa-lg'></i> Стадии производства"] = "manufacturing.php";
+		}
+		if( in_array('stock', $Rights) ) {
+			$menu["Факт"]["<i class='fas fa-pallet fa-lg'></i> Склад продукции"] = "stock.php";
+		}
+		if( in_array('shipment', $Rights) ) {
+			$menu["Факт"]["<i class='fas fa-truck fa-lg'></i> Отгрузка"] = "shipment.php";
+		}
+		if( in_array('daily_production', $Rights) ) {
+			$menu["Анализ"]["<i class='fas fa-cogs fa-lg'></i> Заливки по суткам"] = "daily_production.php";
+		}
+		if( in_array('history', $Rights) ) {
+			$menu["Анализ"]["<i class='fas fa-history fa-lg'></i> История кассет"] = "history.php";
+		}
+		if( in_array('climate', $Rights) ) {
+			$menu["Анализ"]["<i class='fas fa-thermometer-half fa-lg'></i> Климат"] = "climate.php";
+		}
+		if( in_array('consumption', $Rights) ) {
+			$menu["Анализ"]["Расход сырья"] = "consumption.php";
+		}
+		if( in_array('reject', $Rights) ) {
+			$menu["Анализ"]["Брак"] = "statistic.php";
+			$menu["Анализ"]["<i class='fas fa-trash fa-lg'></i> Статистика брака"] = "daily_reject_stat.php";
+		}
+		if( in_array('cubetest', $Rights) ) {
+			$menu["Доп. данные"]["<i class='fas fa-cube fa-lg'></i> Испытания кубов"] = "cubetest.php";
+		}
+		if( in_array('shift_log', $Rights) ) {
+			$menu["Доп. данные"]["<i class='fas fa-user-clock fa-lg'></i> Журнал смен"] = "shift_log.php";
+		}
+		if( in_array('timesheet', $Rights) ) {
+			$menu["Доп. данные"]["<i class='fas fa-table fa-lg'></i> Табель"] = "timesheet.php";
+		}
+		if( in_array('pallet_accounting', $Rights) ) {
+			$menu["Учет"]["<i class='fas fa-stream fa-lg'></i> Поддоны"] = "pallet_accounting.php";
+		}
+		if( in_array('material_accounting', $Rights) ) {
+			$menu["Учет"]["<i class='fas fa-shapes fa-lg'></i> Сырьё"] = "material_accounting.php";
+		}
+		if( in_array('shell_accounting', $Rights) ) {
+			$menu["Учет"]["<i class='fas fa-th fa-lg'></i> Формы"] = "shell_accounting.php";
+		}
+		if( in_array('fuel_accounting', $Rights) ) {
+			$menu["Учет"]["<i class='fas fa-gas-pump fa-lg'></i> Дизтопливо"] = "fuel_accounting.php";
+		}
+		if( in_array('overal_accounting', $Rights) ) {
+			$menu["Учет"]["<i class='fas fa-sign-language fa-lg'></i> СИЗ/расходники"] = "overal_accounting.php";
+		}
 		if( in_array('users', $Rights) ) {
 			$menu["<i class='fas fa-cog fa-lg'></i>"]["Пользователи"] = "users.php";
 		}
-		$menu["<i class='fas fa-cog fa-lg'></i>"]["Рецепты"] = "mix_formula.php";
+		if( in_array('mix_formula', $Rights) ) {
+			$menu["<i class='fas fa-cog fa-lg'></i>"]["Рецепты"] = "mix_formula.php";
+		}
 		$menu["Выход {$USR_Icon}"] = "exit.php";
 	}
 

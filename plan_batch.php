@@ -3,6 +3,12 @@ include "config.php";
 $title = 'План заливки';
 include "header.php";
 
+// Проверка прав на доступ к экрану
+if( !in_array('plan_batch', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 $page = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 
 //Запись подтверждения печати чек-листа

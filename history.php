@@ -2,6 +2,12 @@
 include "config.php";
 $title = 'История кассет';
 include "header.php";
+
+// Проверка прав на доступ к экрану
+if( !in_array('history', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
 ?>
 
 <form method="get" style="font-size: 1.5em;">

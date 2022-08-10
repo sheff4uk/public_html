@@ -2,6 +2,13 @@
 include "config.php";
 $title = 'Приемка сырья';
 include "header.php";
+
+// Проверка прав на доступ к экрану
+if( !in_array('material_accounting', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 $location = $_SERVER['REQUEST_URI'];
 include "./forms/material_accounting_form.php";
 

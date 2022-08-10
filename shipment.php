@@ -2,6 +2,13 @@
 include "config.php";
 $title = 'Отгрузка';
 include "header.php";
+
+// Проверка прав на доступ к экрану
+if( !in_array('shipment', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 include "./forms/shipment_form.php";
 
 // Если в фильтре не установлена неделя, показываем текущую

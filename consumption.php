@@ -3,6 +3,12 @@ include "config.php";
 $title = 'Расход сырья';
 include "header.php";
 
+// Проверка прав на доступ к экрану
+if( !in_array('consumption', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 // Если не выбран участок, берем из сессии
 if( !$_GET["F_ID"] ) {
 	$_GET["F_ID"] = $_SESSION['F_ID'];

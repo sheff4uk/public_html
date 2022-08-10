@@ -2,6 +2,13 @@
 include "config.php";
 $title = 'Учет дизтоплива';
 include "header.php";
+
+// Проверка прав на доступ к экрану
+if( !in_array('fuel_accounting', $Rights) ) {
+	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
+	die('Недостаточно прав для совершения операции');
+}
+
 $FT_ID = 1; // Номер топливной цистерны
 
 // Если в фильтре не установлен период, показываем последние 7 дней
