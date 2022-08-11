@@ -12,7 +12,7 @@ if( isset($_POST["F_ID"]) ) {
 		$TS_ID = $_POST["TS_ID"];
 	}
 	else {
-		if( $_POST["tr_time1"] or $_POST["tr_time2"] or $_POST["status"] >= 0 ) {
+		if( $_POST["tr_time1"] or $_POST["tr_time2"] or $_POST["status"] != '' ) {
 			// Делаем запись в табеле
 			$ts_date = $_POST["ts_date"];
 			$USR_ID = $_POST["usr_id"];
@@ -71,7 +71,7 @@ if( isset($_POST["F_ID"]) ) {
 
 	// Обновляем статус
 	if( $TS_ID ) {
-		$status = ($_POST["status"] >= 0 ? $_POST["status"] : "NULL");
+		$status = ($_POST["status"] != '' ? $_POST["status"] : "NULL");
 		$query = "
 			UPDATE Timesheet
 			SET status = {$status}
