@@ -136,7 +136,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<option value="1">Отпуск</option>
 						<option value="2">Уволен</option>
 						<option value="3">Больничный</option>
-						<option value="4">Отгул</option>
+						<option value="4">Выходной</option>
 						<option value="5">Прогул</option>
 					</select>
 				</div>
