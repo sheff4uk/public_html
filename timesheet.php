@@ -311,6 +311,7 @@ foreach ($_GET as &$value) {
 					,IF(TM.type = 1, 'Смена', IF(TM.type = 2, 'Час', IF(TM.type = 3, 'Час (тракторист)', ''))) type
 					,TM.tariff
 					,CONCAT(TS.duration DIV 60, ':', LPAD(TS.duration % 60, 2, '0')) duration_hm
+					,TS.status
 				FROM Timesheet TS
 				JOIN TariffMonth TM ON TM.TM_ID = TS.TM_ID
 				WHERE YEAR(TS.ts_date) = {$year}
@@ -360,9 +361,10 @@ foreach ($_GET as &$value) {
 					}
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}'>
+						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}' status='{$subrow["status"]}'>
 							".($man_reg ? "<div style='position: absolute; top: 0px; left: 0px; width: 5px; height: 5px; border-radius: 0 0 5px 0; background: red; box-shadow: 0 0 1px 1px red;'></div>" : "")."
 							{$subrow["pay"]}
+							".($subrow["status"] == '0' ? "<div>&mdash;</div>" : ($subrow["status"] == '1' ? "<div>ОТП</div>" : ($subrow["status"] == '2' ? "<div>УВ</div>" : ($subrow["status"] == '3' ? "<div>Б</div>" : ($subrow["status"] == '4' ? "<div>ОТГ</div>" : ($subrow["status"] == '5' ? "<div>ПР</div>" : ""))))))."
 						</td>
 					";
 
