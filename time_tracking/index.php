@@ -104,6 +104,7 @@ if( isset($_POST["cardcode"]) ) {
 		$query = "
 			INSERT INTO TimeReg
 			SET TS_ID = {$TS_ID}
+				,cardcode = '{$_POST["cardcode"]}'
 				,tr_time = TIME(NOW())
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
