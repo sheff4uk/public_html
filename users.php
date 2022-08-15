@@ -8,6 +8,7 @@ if( isset($_POST["USR_ID"]) ) {
 
 	$chars = array("+", " ", "(", ")"); // Символы, которые требуется удалить из строки с телефоном
 	$phone = $_POST["phone"] ? '\''.str_replace($chars, "", $_POST["phone"]).'\'' : 'NULL';
+	$photo = $_POST["photo"] ? '\''.$_POST["photo"].'\'' : 'NULL';
 	$act = $_POST["act"] ? 1 : 0;
 	$cardcode = $_POST["cardcode"];
 	$outsourcer = $_POST["outsourcer"] ? 1 : 0;
@@ -54,6 +55,7 @@ if( isset($_POST["USR_ID"]) ) {
 				,Name = '{$Name}'
 				,act = {$act}
 				,phone = {$phone}
+				,photo = {$photo}
 				,F_ID = {$_POST["F_ID"]}
 				,RL_ID = {$_POST["RL_ID"]}
 				,cardcode = '{$cardcode}'
@@ -75,6 +77,7 @@ if( isset($_POST["USR_ID"]) ) {
 				,Name = '{$Name}'
 				,act = {$act}
 				,phone = {$phone}
+				,photo = {$photo}
 				,F_ID = {$_POST["F_ID"]}
 				,RL_ID = {$_POST["RL_ID"]}
 				,cardcode = '{$cardcode}'
@@ -143,6 +146,19 @@ if( !in_array('users', $Rights) ) {
 	.not_act td {
 		background: rgb(150,0,0, .3);
 	}
+	.wr_photo {
+		transition: all 0.3s ease-in-out;
+		display: flex;
+		width: 160px;
+		height: 120px;
+		background-color: #fdce46;
+		background-size: cover;
+		border-radius: 5px;
+		margin: 5px auto;
+		overflow: hidden;
+		position: relative;
+		box-shadow: 5px 5px 8px rgb(0 0 0 / 60%);
+	}
 </style>
 
 <!--Таблица с пользавателями-->
@@ -163,6 +179,8 @@ if( !in_array('users', $Rights) ) {
 	</thead>
 	<tbody style="text-align: center;">
 		<?
+		$usr_photo = array();
+
 		$query = "
 			SELECT USR.USR_ID
 				,USR_Icon(USR.USR_ID) icon
@@ -170,6 +188,7 @@ if( !in_array('users', $Rights) ) {
 				,USR.Name
 				,USR.head
 				,USR.phone
+				,USR.photo
 				,USR.RL_ID
 				,USR.cardcode
 				,USR.F_ID
@@ -188,10 +207,27 @@ if( !in_array('users', $Rights) ) {
 			//формируем массив для JSON данных
 			$users_data[$row["USR_ID"]] = $row;
 
+			// Формируем массив фотографий
+			if( $row["photo"] != '' ) {
+				$usr_photo[$row["USR_ID"]][] = "{$row["photo"]}";
+			}
+			$query = "
+				SELECT TR.tr_photo
+				FROM Timesheet TS
+				JOIN TimeReg TR ON TR.TS_ID = TS.TS_ID AND TR.tr_photo IS NOT NULL
+				WHERE TS.USR_ID = {$row["USR_ID"]}
+				ORDER BY TR.TR_ID DESC
+				LIMIT 20
+			";
+			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $subrow = mysqli_fetch_array($subres) ) {
+				$usr_photo[$row["USR_ID"]][] = "{$subrow["tr_photo"]}";
+			}
+
 			$rowstyle = $row["act"] ? "" : "background: rgb(150,0,0, .3);";
 			echo "
 				<tr id='{$row["USR_ID"]}' class='".($row["act"] ? "" : "not_act")."'>
-					<td>{$row["icon"]}</td>
+					<td style='position: relative;'>".($row["photo"] ? "<img src='/time_tracking/upload/{$row["photo"]}' style='width: 100%; border-radius: 5px;'>" : "<div style='height: 32px;'></div>")."<div style='position: absolute; top: 10px; left: 5px;'>{$row["icon"]}</div></td>
 					<td>{$row["Surname"]}</td>
 					<td>{$row["Name"]}</td>
 					<td>{$row["phone"]}</td>
@@ -220,6 +256,14 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<label>Активен:</label>
 				<div>
 					<input type='checkbox' name='act' value="1">
+				</div>
+			</div>
+			<div>
+				<label>Фото:</label>
+				<div>
+					<select name="photo" style="width: 200px;" data-placeholder="Выберите фото">
+						<!--Формируется скриптом-->
+					</select>
 				</div>
 			</div>
 			<div>
@@ -302,9 +346,26 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 <script>
 	users_data = <?= json_encode($users_data); ?>;
-	shops = <?= json_encode($shops); ?>;
+	usr_photo = <?= json_encode($usr_photo); ?>;
 
 	$(function() {
+		// Select2
+		function format (state) {
+			var originalOption = state.element;
+			if (!state.id || !$(originalOption).data('foo')) return state.text; // optgroup
+			return "<div style='display: flex;'><img style='width: 160px; height: 120px;' src='/time_tracking/upload/" + $(originalOption).data('foo') + "'/><div>";
+		};
+		$('select[name="photo"]').select2({
+			language: "ru",
+			templateResult: format,
+			escapeMarkup: function(m) { return m; }
+		});
+
+//		// Костыль для Select2 чтобы работал поиск
+//		$.ui.dialog.prototype._allowInteraction = function (e) {
+//			return true;
+//		};
+
 		$("#cardcode").mask("9999999999");
 
 		// Кнопка добавления набора
@@ -312,17 +373,28 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
-			usr = $(this).attr('usr');
+			var usr = $(this).attr('usr');
 
 			// Очистка формы
+			$('#user_form #USR_ID').html('');
 			//$('#user_form fieldset select[name="head"] option').attr('disabled', false);
 			$('#user_form fieldset input:not([type="checkbox"])').val('');
 			$('#user_form fieldset select').val('').trigger("change");
 			$('#user_form input[name="act"]').prop('checked', true );
 			$('#user_form input[name="USR_ID"]').val('add');
 			//$('#user_form input[name="act"]').attr('is_head', '0');
+			$('#user_form select[name="photo"]').html('');
 
 			if (usr) {
+				var arr_photo = usr_photo[usr],
+					html = '';
+				if( arr_photo ) {
+					$.each(arr_photo, function(key, val){
+						html = html + "<option value='"+val+"' data-foo='"+val+"'>"+val+"</option>";
+					});
+					$('#user_form select[name="photo"]').html(html);
+				}
+
 				$('#user_form #USR_ID').html(users_data[usr]['icon']);
 				$('#user_form input[name="USR_ID"]').val(usr);
 				$('#user_form input[name="act"]').prop('checked', users_data[usr]['act'] == 1 );
@@ -346,93 +418,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 			return false;
 		});
-
-//		// При смене роли меняем содержимое формы
-//		$('#user_form select[name="RL_ID"]').on("change",function(){
-//			var RL_ID = $(this).val();
-//
-//			//Если оптовик, предлагаем выбрать контрагента, иначе выбор руководителя
-//			if( RL_ID == 6 ) {
-//				$('#kontragent').show('fast');
-//				$('#kontragent select[name="KA_ID"]').attr("required", true);
-//
-//				$('#head').hide('fast');
-//				$('#head select[name="head"]').val('');
-//			}
-//			else {
-//				$('#kontragent').hide('fast');
-//				$('#kontragent select[name="KA_ID"]').attr("required", false);
-//				$('#kontragent select[name="KA_ID"]').val('');
-//
-//				$('#head').show('fast');
-//			}
-//
-//			// Если почасовик, показываем тариф
-//			if( RL_ID == 11 ) {
-//				$('#tariff').show('fast');
-//				$('#tariff input[name="tariff"]').attr("required", true);
-//			}
-//			else {
-//				$('#tariff').hide('fast');
-//				$('#tariff input[name="tariff"]').attr("required", false);
-//				$('#tariff input[name="tariff"]').val('');
-//			}
-//
-//			// Если продавец, эмулируем смену региона для запуска отображения салонов
-//			$('#user_form select[name="CT_ID"]').trigger("change");
-//		});
-//
-//		// При смене региона выводим список салонов этого региона если роль продавца
-//		$('#user_form select[name="CT_ID"]').on("change",function(){
-//			// Узнаем выбранный регион и роль
-//			var CT_ID = $(this).val(),
-//				RL_ID = $('#user_form select[name="RL_ID"]').val();
-//			// Если продавец, выводим список салонов для региона
-//			if( RL_ID == 5 ) {
-//				$('#shops').show('fast');
-//				$('#shops input').prop('checked', false);
-//				$('#shops .shop_label').hide('fast');
-//				if( typeof shops[CT_ID] !== 'undefined' ) {
-//					$.each(shops[CT_ID], function(k, v) {
-//						$('#user_form input[name="SH_ID['+v+']"]').parent('.shop_label').show('fast');
-//					});
-//				}
-//			}
-//			else {
-//				$('#shops input').prop('checked', false);
-//				$('#shops').hide('fast');
-//			}
-//		});
-//
-//		// При выборе руководителя, проверяем нет ли его среди подчиненных
-//		$('#user_form select[name="head"]').on("change",function(){
-//			var head = $(this).val(),
-//				usr = $('#user_form input[name="USR_ID"]').val();
-//			tree(usr, head, users_data);
-//		});
-//
-//		//При попытке сделать неактивным проверяем есть ли подчиненные
-//		$('#user_form input[name="act"]').click(function() {
-//			var is_head = $(this).attr('is_head');
-//			if( is_head > 0 ) {
-//				noty({timeout: 3000, text: 'Нельзя выключить пользователя, у которого есть подчиненные!', type: 'error'});
-//				return false;
-//			}
-//		});
-//
-//		function tree(usr, head, data) {
-//			if( head > 0 ) {
-//				if( usr != head ) {
-//					var head = data[head]["head"];
-//					tree(usr, head, data);
-//				}
-//				else {
-//					noty({timeout: 3000, text: 'Нельза выбрать руководителя из числа подчиненных или самого себя!', type: 'error'});
-//					$('#user_form select[name="head"] option:selected').attr('disabled', true);
-//					$('#user_form select[name="head"]').val('');
-//				}
-//			}
-//		}
 	});
 
 </script>

@@ -185,12 +185,18 @@ this.subbut.value='Подождите, пожалуйста!';">
 				var tariff = $(this).attr('tariff'),
 					duration = $(this).attr('duration'),
 					pay = $(this).attr('pay'),
-					status = $(this).attr('status');
+					status = $(this).attr('status'),
+					photo = $(this).attr('photo');
 
 				$('#timesheet_form select[name=status]').val(status);
 
-				html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th>Тариф</th><th>Продолжительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.5em;'><tr>";
-				html_summary = html_summary + "<td>"+tariff+"</td><td>"+duration+"</td><td>"+pay+"</td>";
+				var html_photo = '';
+				if( photo ) {
+					html_photo = "<img src='/time_tracking/upload/"+photo+"' style='width: 100%; border-radius: 5px;'>";
+				}
+
+				html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th></th><th>Тариф</th><th>Продолжительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.5em;'><tr>";
+				html_summary = html_summary + "<td>"+html_photo+"</td><td>"+tariff+"</td><td>"+duration+"</td><td>"+pay+"</td>";
 				html_summary = html_summary + "</tr></tbody></table>";
 
 				if( arr_reg ) {
