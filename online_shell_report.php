@@ -1,6 +1,5 @@
 <?
 include "config.php";
-//include "header.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["date_from"] ) {
@@ -21,8 +20,8 @@ if( !$_GET["date_to"] ) {
 		<title>Shell report</title>
 		<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?v=2">
 		<link rel='stylesheet' type='text/css' href='css/style.css?v=23'>
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 		<link rel='stylesheet' type='text/css' href='plugins/jReject-master/css/jquery.reject.css'>
+		<script src="https://kit.fontawesome.com/020f21ae61.js" crossorigin="anonymous"></script>
 		<script src="js/jquery-1.11.3.min.js"></script>
 		<script src="js/ui/jquery-ui.js"></script>
 		<script src="js/script.js?v=1"></script>

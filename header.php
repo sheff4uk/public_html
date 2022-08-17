@@ -17,38 +17,24 @@ function src_url($src) {
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?=$title?></title>
-<!--	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css">-->
 	<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?3">
 	<link rel='stylesheet' type='text/css' href='css/style.css?31'>
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-<!--	<link rel='stylesheet' type='text/css' href='css/font-awesome.min.css'>-->
 	<link rel='stylesheet' type='text/css' href='css/buttons.css'>
 	<link rel='stylesheet' type='text/css' href='css/animate.css'>
 	<link rel='stylesheet' type='text/css' href='plugins/jReject-master/css/jquery.reject.css'>
 	<link rel='stylesheet' type='text/css' href='css/loading.css'>
-<!--	<link rel='stylesheet' type='text/css' href='js/timepicker/jquery-ui-timepicker-addon.css'>-->
-<!--	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
-<!--	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>-->
+	<script src="https://kit.fontawesome.com/020f21ae61.js" crossorigin="anonymous"></script>
 	<script src="js/jquery-1.11.3.min.js"></script>
 	<script src="js/ui/jquery-ui.js"></script>
-<!--	<script src="js/jquery.ui.datepicker-ru.js"></script>-->
 	<script src="js/script.js?v=6" type="text/javascript"></script>
 	<script src="js/jquery.printPage.js" type="text/javascript"></script>
 	<script src="js/jquery.columnhover.js" type="text/javascript"></script>
 	<script src="js/noty/packaged/jquery.noty.packaged.min.js" type="text/javascript"></script>
-
-<!--	<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0"></script>-->
-<!--	<script src="js/moment-with-locales.min.js" type="text/javascript"></script>-->
-<!--	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/ru.min.js"></script>-->
 	<script src="js/Chart.min.js?1" type="text/javascript"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/ru.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@0.1.1"></script>
-
 	<script src="plugins/jReject-master/js/jquery.reject.js" type="text/javascript"></script>
-<!--	<script src="js/timepicker/jquery-ui-timepicker-addon.js" type="text/javascript"></script>-->
-<!--	<script src="js/timepicker/jquery-ui-timepicker-ru.js" type="text/javascript"></script>-->
-
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.4.0/clipboard.min.js"></script>
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css" rel="stylesheet" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js"></script>
