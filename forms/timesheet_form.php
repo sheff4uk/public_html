@@ -21,23 +21,6 @@ if( isset($_POST["F_ID"]) ) {
 				SET ts_date = '{$ts_date}'
 					,USR_ID = {$USR_ID}
 					,F_ID = {$F_ID}
-					,TM_ID = (
-						SELECT TM_ID
-						FROM TariffMonth
-						WHERE year = YEAR('{$ts_date}')
-							AND month = MONTH('{$ts_date}')
-							AND USR_ID = {$USR_ID}
-							AND F_ID = {$F_ID}
-					)
-				ON DUPLICATE KEY UPDATE
-					TM_ID = (
-						SELECT TM_ID
-						FROM TariffMonth
-						WHERE year = YEAR('{$ts_date}')
-							AND month = MONTH('{$ts_date}')
-							AND USR_ID = {$USR_ID}
-							AND F_ID = {$F_ID}
-					)
 			";
 			mysqli_query( $mysqli, $query );
 			$TS_ID = mysqli_insert_id( $mysqli );

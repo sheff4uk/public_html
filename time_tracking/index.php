@@ -68,37 +68,11 @@ if( isset($_POST["cardcode"]) ) {
 			SET ts_date = CURDATE()
 				,USR_ID = {$USR_ID}
 				,F_ID = {$F_ID}
-				,TM_ID = (
-					SELECT TM_ID
-					FROM TariffMonth
-					WHERE year = YEAR(CURDATE())
-						AND month = MONTH(CURDATE())
-						AND USR_ID = {$USR_ID}
-						AND F_ID = {$F_ID}
-				)
 			ON DUPLICATE KEY UPDATE
-				TM_ID = (
-					SELECT TM_ID
-					FROM TariffMonth
-					WHERE year = YEAR(CURDATE())
-						AND month = MONTH(CURDATE())
-						AND USR_ID = {$USR_ID}
-						AND F_ID = {$F_ID}
-				)
+				TS_ID = LAST_INSERT_ID(TS_ID)
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-
-		// Узнаем TS_ID
-		$query = "
-			SELECT TS_ID
-			FROM Timesheet
-			WHERE ts_date = CURDATE()
-				AND USR_ID = {$USR_ID}
-				AND F_ID = {$F_ID}
-		";
-		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		$row = mysqli_fetch_array($res);
-		$TS_ID = $row["TS_ID"];
+		$TS_ID = mysqli_insert_id( $mysqli );
 
 		// Добавляем регистрацию работника
 		$query = "

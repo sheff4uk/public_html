@@ -53,7 +53,7 @@ if( isset($_POST["USR_ID"]) ) {
 			INSERT INTO Users
 			SET Surname = '{$Surname}'
 				,Name = '{$Name}'
-				,act = {$act}
+				,act = 1
 				,phone = {$phone}
 				,photo = {$photo}
 				,F_ID = {$_POST["F_ID"]}
@@ -91,7 +91,7 @@ if( isset($_POST["USR_ID"]) ) {
 		$USR_ID = $_POST["USR_ID"];
 	}
 
-	// Если указан номер карты, добавляем работника в табель
+	// Если указан номер карты, пытаемся добавить работника в табель
 	if( $cardcode != '' and $act == 1 ) {
 		$query = "
 			INSERT INTO TariffMonth
@@ -105,7 +105,65 @@ if( isset($_POST["USR_ID"]) ) {
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 		}
+		elseif( mysqli_insert_id( $mysqli ) ) {
+			// Если добавление произошло, заполняем прочерками ранние даты
+			$i = 1;
+			$cur_year = date('Y');
+			$cur_month = date('m');
+			$cur_day = date('d');
+			while ($i < $cur_day) {
+				$query = "
+					INSERT INTO Timesheet
+					SET ts_date = '{$cur_year}-{$cur_month}-{$i}'
+						,USR_ID = {$USR_ID}
+						,F_ID = {$_POST["F_ID"]}
+						,status = 0
+				";
+				mysqli_query( $mysqli, $query );
+				$i++;
+			}
+		}
+		else {
+			// Убираем метку УВ в случае восстановления
+			$i = date('d');
+			$cur_year = date('Y');
+			$cur_month = date('m');
+			$las_tday = date('t');
+			while ($i <= $las_tday) {
+				$query = "
+					UPDATE Timesheet
+					SET status = IF(status = 2, NULL, status)
+					WHERE ts_date = '{$cur_year}-{$cur_month}-{$i}'
+						AND USR_ID = {$USR_ID}
+						AND F_ID = {$_POST["F_ID"]}
+				";
+				mysqli_query( $mysqli, $query );
+				$i++;
+			}
+		}
 	}
+
+	// Усли уволен, проставляем метки УВ
+	if( $cardcode != '' and $act == 0 ) {
+		$i = date('d');
+		$curyear = date('Y');
+		$curmonth = date('m');
+		$lastday = date('t');
+		while ($i <= $lastday) {
+			$query = "
+				INSERT INTO Timesheet
+				SET ts_date = '{$curyear}-{$curmonth}-{$i}'
+					,USR_ID = {$USR_ID}
+					,F_ID = {$_POST["F_ID"]}
+					,status = 2
+				ON DUPLICATE KEY UPDATE
+					status = IFNULL(status, 2)
+			";
+			mysqli_query( $mysqli, $query );
+			$i++;
+		}
+	}
+
 	// Убираем возможные пустые записи из табеля
 	$query = "
 		DELETE TM
@@ -376,6 +434,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			var usr = $(this).attr('usr');
 
 			// Очистка формы
+			$('#user_form #act').hide();
 			$('#user_form #USR_ID').html('');
 			//$('#user_form fieldset select[name="head"] option').attr('disabled', false);
 			$('#user_form fieldset input:not([type="checkbox"])').val('');
@@ -395,6 +454,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					$('#user_form select[name="photo"]').html(html);
 				}
 
+				$('#user_form #act').show();
 				$('#user_form #USR_ID').html(users_data[usr]['icon']);
 				$('#user_form input[name="USR_ID"]').val(usr);
 				$('#user_form input[name="act"]').prop('checked', users_data[usr]['act'] == 1 );
