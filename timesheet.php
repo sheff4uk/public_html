@@ -193,7 +193,18 @@ foreach ($_GET as &$value) {
 	if( $value ) $filter = 1;
 }
 ?>
-
+<style>
+	.label {
+		background: #00F;
+		border-radius: 3px;
+		color: #fff;
+		font-weight: bold;
+		line-height: 1em;
+		padding: 0.2em;
+		width: fit-content;
+		margin: auto;
+	}
+</style>
 <script>
 	$(document).ready(function() {
 		$( "#filter" ).accordion({
@@ -365,7 +376,7 @@ foreach ($_GET as &$value) {
 						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($subrow["pay"] == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}' status='{$subrow["status"]}'>
 							".($man_reg ? "<div style='position: absolute; top: 0px; left: 0px; width: 5px; height: 5px; border-radius: 0 0 5px 0; background: red; box-shadow: 0 0 1px 1px red;'></div>" : "")."
 							{$subrow["pay"]}
-							".($subrow["status"] == '0' ? "<div>&mdash;</div>" : ($subrow["status"] == '1' ? "<div>ОТП</div>" : ($subrow["status"] == '2' ? "<div>УВ</div>" : ($subrow["status"] == '3' ? "<div>Б</div>" : ($subrow["status"] == '4' ? "<div>В</div>" : ($subrow["status"] == '5' ? "<div>ПР</div>" : ""))))))."
+							".($subrow["status"] == '0' ? "<div class='label'>&mdash;</div>" : ($subrow["status"] == '1' ? "<div class='label'>ОТП</div>" : ($subrow["status"] == '2' ? "<div class='label'>УВ</div>" : ($subrow["status"] == '3' ? "<div class='label'>Б</div>" : ($subrow["status"] == '4' ? "<div class='label'>В</div>" : ($subrow["status"] == '5' ? "<div class='label'>ПР</div>" : ""))))))."
 						</td>
 					";
 
