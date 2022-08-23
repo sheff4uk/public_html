@@ -195,7 +195,7 @@ foreach ($_GET as &$value) {
 ?>
 <style>
 	.label {
-		background: #66F;
+		background: #99F;
 		border-radius: 3px;
 		color: #fff;
 		font-weight: bold;
