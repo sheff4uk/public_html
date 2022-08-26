@@ -7,12 +7,13 @@ if( isset($_POST["F_ID"]) ) {
 	$F_ID = $_POST["F_ID"];
 	$month = $_POST["month"];
 	$outsrc = $_POST["outsrc"];
+	//$_POST["substitute"] = ( $_POST["status"] != '' ) ? '' : $_POST["substitute"];
 
 	if( $_POST["TS_ID"] ) {
 		$TS_ID = $_POST["TS_ID"];
 	}
 	else {
-		if( $_POST["tr_time1"] or $_POST["tr_time2"] or $_POST["status"] != '' ) {
+		if( $_POST["tr_time1"] or $_POST["tr_time2"] or $_POST["status"] != '' or $_POST["substitute"] ) {
 			// Делаем запись в табеле
 			$ts_date = $_POST["ts_date"];
 			$USR_ID = $_POST["usr_id"];
@@ -27,7 +28,9 @@ if( isset($_POST["F_ID"]) ) {
 		}
 	}
 
-	// Записываем регистрации
+	////////////////////////////
+	// Записываем регистрации //
+	////////////////////////////
 	if( $_POST["tr_time1"] ) {
 		$tr_time1 = $_POST["tr_time1"];
 		$query = "
@@ -52,7 +55,97 @@ if( isset($_POST["F_ID"]) ) {
 	}
 	//////////////////////////////
 
-	// Обновляем статус
+	/////////////////////////
+	// Замещение работника //
+	/////////////////////////
+	$query = "
+		SELECT TS.ts_date
+			,USR_ID
+		FROM Timesheet TS
+		WHERE TS.TS_ID = {$TS_ID}
+	";
+	$res = mysqli_query( $mysqli, $query );
+	$row = mysqli_fetch_array($res);
+	$ts_date = $row["ts_date"];
+	$USR_ID = $row["USR_ID"];
+
+	if( $_POST["substitute"] ) {
+		// Проверяем, чтобы не было замещения самого себя
+		if( $USR_ID == $_POST["substitute"] ) {
+			$_SESSION["error"][] = "Работник не может замещать сам себя.";
+		}
+		else {
+			// Проверяем чтобы у замещаемого не было действительных регистраций
+			$query = "
+				SELECT IFNULL(SUM(1), 0) is_sub_reg
+				FROM TimeReg TR
+				WHERE TR.TS_ID = (SELECT TS_ID FROM Timesheet WHERE ts_date = '{$ts_date}' AND F_ID = {$F_ID} AND USR_ID = {$_POST["substitute"]})
+					AND TR.del_time IS NULL
+			";
+			$res = mysqli_query( $mysqli, $query );
+			$row = mysqli_fetch_array($res);
+			$is_sub_reg = $row["is_sub_reg"];
+
+			if( $is_sub_reg ) {
+				$_SESSION["error"][] = "У замещаемого работника есть действительные регистрации в этот день. Замещение невозможно.";
+			}
+			else {
+				// Делаем запись в табеле у замещаемого и узнаем его TS_ID
+				$query = "
+					INSERT INTO Timesheet
+					SET ts_date = '{$ts_date}'
+						,F_ID = {$F_ID}
+						,USR_ID = {$_POST["substitute"]}
+					ON DUPLICATE KEY UPDATE
+						TS_ID = LAST_INSERT_ID(TS_ID)
+				";
+				mysqli_query( $mysqli, $query );
+				$sub_TS_ID = mysqli_insert_id( $mysqli );
+
+				// Устанавливаем указатель на замещаемого работника
+				$query = "
+					UPDATE Timesheet
+					SET sub_TS_ID = {$sub_TS_ID}
+					WHERE TS_ID = {$TS_ID}
+				";
+				mysqli_query( $mysqli, $query );
+
+				// Вычисляем повышающий коэффициент по числу указателей
+				$query = "
+					SELECT IFNULL(SUM(1), 0) sub_cnt
+					FROM Timesheet
+					WHERE sub_TS_ID = {$sub_TS_ID}
+				";
+				$res = mysqli_query( $mysqli, $query );
+				$row = mysqli_fetch_array($res);
+				$sub_cnt = $row["sub_cnt"];
+
+				if( $sub_cnt > 0 ) {
+					// Обновляем коэффициент у замещающих
+					$query = "
+						UPDATE Timesheet
+						SET rate = 1 + IF({$sub_cnt} = 1, 1/2, 1/{$sub_cnt})
+						WHERE sub_TS_ID = {$sub_TS_ID}
+					";
+					mysqli_query( $mysqli, $query );
+				}
+			}
+		}
+	}
+	else {
+		$query = "
+			UPDATE Timesheet
+			SET sub_TS_ID = NULL
+				,rate = 1
+			WHERE TS_ID = {$TS_ID}
+		";
+		mysqli_query( $mysqli, $query );
+	}
+	/////////////////////////////
+
+	//////////////////////
+	// Обновляем статус //
+	//////////////////////
 	if( $TS_ID ) {
 		$status = ($_POST["status"] != '' ? $_POST["status"] : "NULL");
 		$query = "
@@ -62,9 +155,11 @@ if( isset($_POST["F_ID"]) ) {
 		";
 		mysqli_query( $mysqli, $query );
 	}
-	/////////////////////////////////////////
+	///////////////////////////////////
 
-	// Помечаем удаленные регистрации
+	////////////////////////////////////
+	// Помечаем удаленные регистрации //
+	////////////////////////////////////
 	foreach ($_POST["del_reg"] as $key => $value) {
 		$query = "
 			UPDATE TimeReg
@@ -74,6 +169,7 @@ if( isset($_POST["F_ID"]) ) {
 		";
 		mysqli_query( $mysqli, $query );
 	}
+	/////////////////////////////////////
 
 	// Перенаправление в табель
 	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&outsrc='.$outsrc.'#'.$TS_ID.'">');
@@ -110,18 +206,44 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<div id="hide"><!--Формируется скриптом--></div>
 			<div id="summary"><!--Формируется скриптом--></div>
 
-			<div style="display: flex; width: 100%; margin: 1em 0; font-size: 1.5em;">
-				<label style="width: 100px; line-height: 36px;">Статус:</label>
-				<div>
-					<select name="status">
-						<option value=""></option>
-						<option value="0">Прочерк</option>
-						<option value="1">Отпуск</option>
-						<option value="2">Уволен</option>
-						<option value="3">Больничный</option>
-						<option value="4">Выходной</option>
-						<option value="5">Прогул</option>
-					</select>
+			<div style="display: flex; justify-content: space-between; font-size: 1.3em;">
+				<div style="display: flex; margin: 1em 0;">
+					<label style="margin-right: .5em; line-height: 1.8em;">Статус:</label>
+					<div>
+						<select name="status" style="width: 150px;">
+							<option value=""></option>
+							<option value="0">Прочерк</option>
+							<option value="1">Отпуск</option>
+							<option value="2">Уволен</option>
+							<option value="3">Больничный</option>
+							<option value="4">Выходной</option>
+							<option value="5">Прогул</option>
+						</select>
+					</div>
+				</div>
+
+				<div style="display: flex; margin: 1em 0;">
+					<label style="margin-right: .5em; line-height: 1.8em;">Замещает:</label>
+					<div>
+						<select name="substitute" style="width: 150px;">
+							<option value=""></option>
+								<?
+								$query = "
+									SELECT TM.USR_ID
+										,USR_Name(TM.USR_ID) name
+									FROM TariffMonth TM
+									WHERE TM.year = {$year}
+										AND TM.month = {$month}
+										AND TM.F_ID = {$F_ID}
+									ORDER BY name
+								";
+								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+								while( $row = mysqli_fetch_array($res) ) {
+									echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
+								}
+								?>
+						</select>
+					</div>
 				</div>
 			</div>
 
@@ -152,6 +274,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
 			$('#timesheet_form select[name=status]').val('');
+			$('#timesheet_form select[name=substitute]').val('');
 
 			var ts_id = $(this).attr('ts_id'),
 				date_format = $(this).attr('date_format'),
@@ -169,9 +292,11 @@ this.subbut.value='Подождите, пожалуйста!';">
 					duration = $(this).attr('duration'),
 					pay = $(this).attr('pay'),
 					status = $(this).attr('status'),
+					substitute = $(this).attr('substitute'),
 					photo = $(this).attr('photo');
 
 				$('#timesheet_form select[name=status]').val(status);
+				$('#timesheet_form select[name=substitute]').val(substitute);
 
 				var html_photo = '';
 				if( photo ) {
@@ -223,6 +348,18 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#timesheet_form #hide').html(html_hide);
 			$('#timesheet_form #summary').html(html_summary);
 			$('#timesheet_form #timereg').html(html);
+
+			// Делаем форму неактивной в случае замещения работника
+			if( $(this).attr('sub_is') > 0 ) {
+				$('#timesheet_form input[name="tr_time1"]').attr('disabled', true);
+				$('#timesheet_form input[name="tr_time2"]').attr('disabled', true);
+				$('#timesheet_form select[name=substitute]').attr('disabled', true);
+			}
+			else {
+				$('#timesheet_form input[name="tr_time1"]').attr('disabled', false);
+				$('#timesheet_form input[name="tr_time2"]').attr('disabled', false);
+				$('#timesheet_form select[name=substitute]').attr('disabled', false);
+			}
 
 			$('#timesheet_form').dialog({
 				title: date_format + ' | ' + usr_name,
