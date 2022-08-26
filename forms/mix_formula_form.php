@@ -41,7 +41,7 @@ if( isset($_POST["CW_ID"]) ) {
 		$F_ID = $_POST["F_ID"];
 	}
 
-	if( count($_SESSION["error"]) == 0) {
+	if( !isset($_SESSION["error"]) ) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 

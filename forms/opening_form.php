@@ -28,7 +28,7 @@ if( isset($_POST["LO_ID"]) ) {
 		$LO_ID = $_POST["LO_ID"];
 	}
 
-	if( count($_SESSION["error"]) == 0) {
+	if( !isset($_SESSION["error"]) ) {
 		$_SESSION["success"][] = "Запись успешно отредактирована.";
 	}
 

@@ -170,7 +170,7 @@ if( isset($_POST["PB_ID"]) ) {
 		$_SESSION["error"][] = "Что-то пошло не так. Пожалуйста, повторите попытку.";
 	}
 
-	if( count($_SESSION["error"]) == 0) {
+	if( !isset($_SESSION["error"]) ) {
 		$_SESSION["success"][] = "Данные чек-листа оператора успешно сохранены.";
 	}
 

@@ -49,7 +49,7 @@ if( isset($_POST["sr_cnt"]) ) {
 		}
 	}
 
-	if( count($_SESSION["error"]) == 0) {
+	if( !isset($_SESSION["error"]) ) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 
@@ -111,7 +111,7 @@ if( isset($_POST["sa_cnt"]) ) {
 		}
 	}
 
-	if( count($_SESSION["error"]) == 0) {
+	if( !isset($_SESSION["error"]) ) {
 		$_SESSION["success"][] = $add ? "Новыя запись успешно добавлена." : "Запись успешно отредактирована.";
 	}
 

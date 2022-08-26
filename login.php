@@ -77,7 +77,7 @@ switch( $_GET["do"] ) {
 					closeOnEscape: false
 				});
 			";
-			if( count($_SESSION["error"]) == 0 ) {
+			if( !isset($_SESSION["error"])  ) {
 				echo "noty({text: '<h1>Поступит звонок со случайного номера.<br><br>Введите последние 4 цифры определившегося номера.</h1>', type: 'alert'});";
 			}
 			else {

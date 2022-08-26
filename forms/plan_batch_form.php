@@ -33,7 +33,7 @@ if( isset($_POST["cycle"]) ) {
 		}
 	}
 
-	if( count($_SESSION["error"]) == 0) {
+	if( !isset($_SESSION["error"]) ) {
 		$_SESSION["success"][] = "Данные успешно сохранены.";
 	}
 
