@@ -291,6 +291,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				var tariff = $(this).attr('tariff'),
 					duration = $(this).attr('duration'),
 					pay = $(this).attr('pay'),
+					rate = $(this).attr('rate'),
 					status = $(this).attr('status'),
 					substitute = $(this).attr('substitute'),
 					photo = $(this).attr('photo');
@@ -303,9 +304,18 @@ this.subbut.value='Подождите, пожалуйста!';">
 					html_photo = "<img src='/time_tracking/upload/"+photo+"' style='width: 100%; border-radius: 5px;'>";
 				}
 
-				html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th></th><th>Тариф</th><th>Продолжительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.5em;'><tr>";
-				html_summary = html_summary + "<td>"+html_photo+"</td><td>"+tariff+"</td><td>"+duration+"</td><td>"+pay+"</td>";
-				html_summary = html_summary + "</tr></tbody></table>";
+				html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th></th><th>Тариф</th><th>Продолжительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.3em;'><tr>";
+
+				var total;
+				if( rate > 1 ) { total = pay+"<br>x"+Math.round(rate*100)/100+"<i class='fas fa-question-circle' title='Коэффициент замещения'></i><br>"+Math.round(pay*rate); }
+				else { total = pay; }
+
+				html_summary = html_summary
+					+ "<td>"+html_photo+"</td>"
+					+ "<td>"+tariff+"</td>"
+					+ "<td>"+duration+"</td>"
+					+ "<td>"+total+"</td>";
+					+ "</tr></tbody></table>";
 
 				if( arr_reg ) {
 					$.each(arr_reg, function(key, val){
