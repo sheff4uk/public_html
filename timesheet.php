@@ -204,6 +204,25 @@ foreach ($_GET as &$value) {
 		width: fit-content;
 		margin: auto;
 	}
+	#timesheet_report_btn {
+		text-align: center;
+		line-height: 68px;
+		color: #fff;
+		bottom: 100px;
+		cursor: pointer;
+		width: 56px;
+		height: 56px;
+		opacity: .4;
+		position: fixed;
+		right: 20px;
+		z-index: 9;
+		border-radius: 50%;
+		background-color: #db4437;
+		box-shadow: 0 0 4px rgb(0 0 0 / 14%), 0 4px 8px rgb(0 0 0 / 28%);
+	}
+	#timesheet_report_btn:hover {
+		opacity: 1;
+	}
 </style>
 <script>
 	$(document).ready(function() {
@@ -464,6 +483,8 @@ foreach ($_GET as &$value) {
 </table>
 </form>
 
+<div id="timesheet_report_btn" title="Распечатать табель"><a href="/printforms/timesheet_report.php?F_ID=<?=$_GET["F_ID"]?>&month=<?=$_GET["month"]?>&outsrc=<?=$outsrc?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
+
 <script>
 	$(function(){
 		// Подсвечивание столбцов таблицы
@@ -471,6 +492,8 @@ foreach ($_GET as &$value) {
 
 		// Массив регистраций в JSON
 		TimeReg = <?= json_encode($TimeReg); ?>;
+
+		$(".print").printPage();
 	});
 </script>
 

@@ -48,7 +48,7 @@ echo "<title>Табель версия для печати</title>";
 		font-size: 8pt;
 	}
 	table {
-/*		table-layout: fixed;*/
+		table-layout: fixed;
 		width: 100%;
 		border-collapse: collapse;
 		border-spacing: 0px;
@@ -162,9 +162,9 @@ echo "<title>Табель версия для печати</title>";
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
-			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'>{$row["Name"]}</td>";
+			echo "<tr><td colspan='2' style='text-align: center; overflow: hidden;'>{$row["Name"]}</td>";
 			?>
-			<td colspan="2">
+			<td colspan="2" style="overflow: hidden;">
 				<?=$row["tariff"]?>
 				<br>
 				<?=($row["type"] == 1 ? "Смена" : ($row["type"] == 2 ? "Час" : ($row["type"] == 3 ? "Тракторист" : "")))?>
