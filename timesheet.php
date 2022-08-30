@@ -318,7 +318,7 @@ foreach ($_GET as &$value) {
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
-			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'>{$row["Name"]}</td>";
+			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'><a href='users.php#{$row["USR_ID"]}' target='_blank'>{$row["Name"]}</a></td>";
 			?>
 			<td colspan="2">
 				<input type="number" value="<?=$row["tariff"]?>" name="tariff[<?=$row["USR_ID"]?>]" min="0" style="width: 60px;" <?=$_GET["month"] == date('Ym') ? "" : "disabled"?>>
