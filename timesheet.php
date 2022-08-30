@@ -239,7 +239,6 @@ foreach ($_GET as &$value) {
 				$data = json_decode($json,TRUE);
 
 				$i = 1;
-				$workdays = 0;
 				$weekdays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 				while ($i <= $days) {
 					$date = $year.'-'.$month.'-'.$i;
@@ -260,7 +259,6 @@ foreach ($_GET as &$value) {
 					}
 					else {
 						echo "<th>".$i++."<br>".$weekdays[$dow]."</th>";
-						$workdays++;
 					}
 				}
 			?>
