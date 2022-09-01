@@ -74,7 +74,7 @@ include "./forms/pallet_accounting_form.php";
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Клиент:</span>
+			<span>Заказчик:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
 				<?
@@ -308,7 +308,8 @@ $query = "
 		,YEARWEEK(LS.ls_date, 1)
 		,LS.LS_ID
 	FROM list__Shipment LS
-	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
+	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LS.CWP_ID
+	JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 	JOIN ClientBrand CB ON CB.CB_ID = CW.CB_ID
 	JOIN pallet__Name PN ON PN.PN_ID = LS.PN_ID
 	WHERE 1
@@ -396,7 +397,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	<table style="font-size: 1.5em;">
 		<thead>
 			<tr>
-				<th>Клиент</th>
+				<th>Заказчик</th>
 				<th>Наименование</th>
 				<th>Кол-во</th>
 			</tr>

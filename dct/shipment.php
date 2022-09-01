@@ -1,9 +1,23 @@
 <?
 include_once "../config.php";
 $ip = $_SERVER['REMOTE_ADDR'];
-if( $ip != $from_ip ) die("Access denied");
+
+// Узнаем участок
+$query = "
+	SELECT F_ID
+		,shipment_group
+	FROM factory
+	WHERE from_ip = '{$ip}'
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$F_ID = $row["F_ID"];
+
+if( !$F_ID ) die("Access denied");
 
 define('LIMIT_PALLETS', 22);
+
+$shipment_group = $row["shipment_group"];
 
 //ID поддона введен вручную
 if( isset($_POST["barcode"]) ) {
@@ -52,21 +66,24 @@ if( isset($_POST["lpp_id"]) ) {
 
 	if( mysqli_affected_rows($mysqli) ) {
 		// Сообщение в телеграм об отгрузке машины
-		$message = "🚛";
+		//$message = "🚛";
+		$message = "";
 		$query = "
-			SELECT CW.item
+			SELECT CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
 				,SUM(1) cnt
 			FROM list__PackingPallet LPP
-			JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID
+			JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+			JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 			WHERE LPP.LPP_ID IN ({$LPP_IDs})
-			GROUP BY LPP.CW_ID
-			ORDER BY LPP.CW_ID
+			GROUP BY LPP.CWP_ID
+			ORDER BY LPP.CWP_ID
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
 			$message .= "\n{$row["item"]} x {$row["cnt"]}";
 		}
 		message_to_telegram($message, '-647915518');
+		//message_to_telegram($message, '{$shipment_group}');
 	}
 
 	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php">');
@@ -153,13 +170,14 @@ if( isset($_POST["lpp_id"]) ) {
 			// Если было сканирование
 			$query = "
 				SELECT LPP.LPP_ID
-					,CW.item
+					,CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
 					,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i:%s') packed_time_format
 					,DATE_FORMAT(LPP.scan_time, '%d.%m.%Y %H:%i:%s') scan_time_format
 					,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i:%s') shipment_time_format
 					,IFNULL(LPP.PN_ID, 0) PN_ID
 				FROM list__PackingPallet LPP
-				JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID
+				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 				WHERE LPP.WT_ID = {$_GET["WT_ID"]} AND LPP.nextID = {$_GET["nextID"]}
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -259,11 +277,12 @@ if( isset($_POST["lpp_id"]) ) {
 		";
 		$query = "
 			SELECT LPP.LPP_ID
-				,substr(CW.item, -3, 3) item
+				,CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
 				,DATE_FORMAT(LPP.scan_time, '%d.%m %H:%i:%s') scan_time_format
 				,substr(lpad(LPP.nextID, 8, '0'), -4, 4) last4dig
 			FROM list__PackingPallet LPP
-			JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID
+			JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+			JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 			WHERE LPP.scan_time IS NOT NULL
 				AND LPP.shipment_time IS NULL
 			ORDER BY LPP.scan_time

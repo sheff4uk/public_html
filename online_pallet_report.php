@@ -153,12 +153,13 @@ $query = "
 		UNION
 
 		SELECT DATE_FORMAT(LS.ls_date, '%d/%m/%Y')
-			,SUM(pallets) pallets_shipment
+			,SUM(LS.pallets) pallets_shipment
 			,NULL
 			,NULL
 			,LS.ls_date
 		FROM list__Shipment LS
-		JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID AND CW.CB_ID = 2
+		JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LS.CWP_ID
+		JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID AND CW.CB_ID = 2
 		WHERE 1
 			".($_GET["date_from"] ? "AND LS.ls_date >= '{$_GET["date_from"]}'" : "")."
 			".($_GET["date_to"] ? "AND LS.ls_date <= '{$_GET["date_to"]}'" : "")."

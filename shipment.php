@@ -11,12 +11,14 @@ if( !in_array('shipment', $Rights) ) {
 
 include "./forms/shipment_form.php";
 
-// Если в фильтре не установлена неделя, показываем текущую
-if( !$_GET["week"] ) {
-	$query = "SELECT YEARWEEK(CURDATE(), 1) week";
-	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-	$row = mysqli_fetch_array($res);
-	$_GET["week"] = $row["week"];
+// Если в фильтре не установлен период, показываем последние 7 дней
+if( !$_GET["date_from"] ) {
+	$date = date_create('-6 days');
+	$_GET["date_from"] = date_format($date, 'Y-m-d');
+}
+if( !$_GET["date_to"] ) {
+	$date = date_create('-0 days');
+	$_GET["date_to"] = date_format($date, 'Y-m-d');
 }
 ?>
 
@@ -27,76 +29,34 @@ if( !$_GET["week"] ) {
 		<a href="/shipment.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
-			<span>Неделя:</span>
-			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
-				$query = "
-					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
-					UNION
-					SELECT LEFT(YEARWEEK(ls_date, 1), 4) year
-					FROM list__Shipment
-					ORDER BY year DESC
-				";
-				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-				while( $row = mysqli_fetch_array($res) ) {
-					echo "<optgroup label='{$row["year"]}'>";
-					$query = "
-						SELECT SUB.week
-							,SUB.week_format
-							,SUB.WeekStart
-							,SUB.WeekEnd
-						FROM (
-							SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
-								,YEARWEEK(CURDATE(), 1) week
-								,RIGHT(YEARWEEK(CURDATE(), 1), 2) week_format
-								,DATE_FORMAT(ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())), '%e %b') WeekStart
-								,DATE_FORMAT(ADDDATE(CURDATE(), 6-WEEKDAY(CURDATE())), '%e %b') WeekEnd
-							UNION
-							SELECT LEFT(YEARWEEK(ls_date, 1), 4) year
-								,YEARWEEK(ls_date, 1) week
-								,RIGHT(YEARWEEK(ls_date, 1), 2) week_format
-								,DATE_FORMAT(ADDDATE(ls_date, 0-WEEKDAY(ls_date)), '%e %b') WeekStart
-								,DATE_FORMAT(ADDDATE(ls_date, 6-WEEKDAY(ls_date)), '%e %b') WeekEnd
-							FROM list__Shipment
-							WHERE LEFT(YEARWEEK(ls_date, 1), 4) = {$row["year"]}
-							GROUP BY week
-						) SUB
-						WHERE SUB.year = {$row["year"]}
-						ORDER BY SUB.week DESC
-					";
-					$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					while( $subrow = mysqli_fetch_array($subres) ) {
-						$selected = ($subrow["week"] == $_GET["week"]) ? "selected" : "";
-						echo "<option value='{$subrow["week"]}' {$selected}>{$subrow["week_format"]} [{$subrow["WeekStart"]} - {$subrow["WeekEnd"]}]</option>";
-					}
-					echo "</optgroup>";
-				}
-				?>
-			</select>
-			<i class="fas fa-question-circle" title="По умолчанию устанавливается текущая неделя."></i>
+			<span style="display: inline-block; width: 200px;">Дата отгрузки между:</span>
+			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
+			<input name="date_to" type="date" value="<?=$_GET["date_to"]?>" class="<?=$_GET["date_to"] ? "filtered" : ""?>">
+			<i class="fas fa-question-circle" title="По умолчанию устанавливаются последние 7 дней."></i>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Код противовеса:</span>
-			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
+			<span>Комплект противовесов:</span>
+			<select name="CWP_ID" class="<?=$_GET["CWP_ID"] ? "filtered" : ""?>" style="width: 200px;">
 				<option value=""></option>
 				<?
 				$query = "
-					SELECT CW.CW_ID, CW.item
-					FROM CounterWeight CW
-					ORDER BY CW.CW_ID
+					SELECT CWP.CWP_ID, CW.item, CWP.in_pallet
+					FROM CounterWeightPallet CWP
+					JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+					ORDER BY CWP.CWP_ID
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
-					$selected = ($row["CW_ID"] == $_GET["CW_ID"]) ? "selected" : "";
-					echo "<option value='{$row["CW_ID"]}' {$selected}>{$row["item"]}</option>";
+					$selected = ($row["CWP_ID"] == $_GET["CWP_ID"]) ? "selected" : "";
+					echo "<option value='{$row["CWP_ID"]}' {$selected}>{$row["item"]} ({$row["in_pallet"]}шт)</option>";
 				}
 				?>
 			</select>
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Бренд:</span>
+			<span>Заказчик:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
 				<?
@@ -152,7 +112,7 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th>Дата</th>
-			<th>Противовес</th>
+			<th>Комплект противовесов</th>
 			<th>Поддон</th>
 			<th>Паллетов</th>
 			<th>Деталей в паллете</th>
@@ -171,12 +131,14 @@ $query = "
 		,SUM(LS.pallets) pallets
 		,SUM(LS.pallets * LS.in_pallet) details
 	FROM list__Shipment LS
+	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LS.CWP_ID
 	WHERE 1
-		".($_GET["week"] ? "AND YEARWEEK(LS.ls_date, 1) LIKE '{$_GET["week"]}'" : "")."
-		".($_GET["CW_ID"] ? "AND LS.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND LS.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		".($_GET["date_from"] ? "AND LS.ls_date >= '{$_GET["date_from"]}'" : "")."
+		".($_GET["date_to"] ? "AND LS.ls_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["CWP_ID"] ? "AND LS.CWP_ID={$_GET["CWP_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND CWP.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
 	GROUP BY LS.ls_date
-	ORDER BY LS.ls_date, LS.CW_ID
+	ORDER BY LS.ls_date, LS.CWP_ID
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -185,20 +147,21 @@ while( $row = mysqli_fetch_array($res) ) {
 	$query = "
 		SELECT LS.LS_ID
 			,LS.ls_date
-			,CW.item
-			,LS.CW_ID
+			,CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
+			,LS.CWP_ID
 			,LS.pallets
 			,LS.in_pallet
 			,LS.pallets * LS.in_pallet details
 			,PN.pallet_name
 		FROM list__Shipment LS
-		JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
+		JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LS.CWP_ID
+		JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 		JOIN pallet__Name PN ON PN.PN_ID = LS.PN_ID
 		WHERE 1
 			AND LS.ls_date = '{$row["ls_date"]}'
-			".($_GET["CW_ID"] ? "AND LS.CW_ID={$_GET["CW_ID"]}" : "")."
-			".($_GET["CB_ID"] ? "AND LS.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
-		ORDER BY LS.ls_date DESC, LS.CW_ID
+			".($_GET["CWP_ID"] ? "AND LS.CWP_ID={$_GET["CWP_ID"]}" : "")."
+			".($_GET["CB_ID"] ? "AND CWP.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		ORDER BY LS.ls_date DESC, LS.CWP_ID
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {

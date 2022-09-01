@@ -2,10 +2,10 @@
 include_once "../config.php";
 
 // Сохранение/редактирование отгрузки
-if( isset($_POST["CW_ID"]) ) {
+if( isset($_POST["CWP_ID"]) ) {
 	session_start();
 	$ls_date = $_POST["ls_date"];
-	$CW_ID = $_POST["CW_ID"];
+	$CWP_ID = $_POST["CWP_ID"];
 	$pallets = $_POST["pallets"];
 	$in_pallet = $_POST["in_pallet"];
 	$PN_ID = $_POST["PN_ID"];
@@ -14,7 +14,7 @@ if( isset($_POST["CW_ID"]) ) {
 		$query = "
 			UPDATE list__Shipment
 			SET ls_date = '{$ls_date}'
-				,CW_ID = {$CW_ID}
+				,CWP_ID = {$CWP_ID}
 				,pallets = {$pallets}
 				,in_pallet = {$in_pallet}
 				,PN_ID = {$PN_ID}
@@ -29,7 +29,7 @@ if( isset($_POST["CW_ID"]) ) {
 		$query = "
 			INSERT INTO list__Shipment
 			SET ls_date = '{$ls_date}'
-				,CW_ID = {$CW_ID}
+				,CWP_ID = {$CWP_ID}
 				,pallets = {$pallets}
 				,in_pallet = {$in_pallet}
 				,PN_ID = {$PN_ID}
@@ -80,7 +80,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<thead>
 					<tr>
 						<th>Дата</th>
-						<th>Противовес</th>
+						<th>Комплект противовесов</th>
 						<th>Поддон</th>
 						<th>Паллетов</th>
 						<th>Деталей паллете</th>
@@ -91,17 +91,18 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<td><input type="date" name="ls_date" required></td>
 						<td>
-							<select name="CW_ID" style="width: 150px;" required>
+							<select name="CWP_ID" style="width: 150px;" required>
 								<option value=""></option>
 								<?
 								$query = "
-									SELECT CW.CW_ID, CW.item, CW.in_pallet
+									SELECT CWP.CWP_ID, CW.item, CWP.in_pallet
 									FROM CounterWeight CW
-									ORDER BY CW.CW_ID
+									JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
+									ORDER BY CWP.CWP_ID
 								";
 								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 								while( $row = mysqli_fetch_array($res) ) {
-									echo "<option value='{$row["CW_ID"]}' in_pallet='{$row["in_pallet"]}'>{$row["item"]}</option>";
+									echo "<option value='{$row["CWP_ID"]}' in_pallet='{$row["in_pallet"]}'>{$row["item"]} ({$row["in_pallet"]}шт)</option>";
 								}
 								?>
 							</select>
@@ -156,7 +157,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					async: false
 				});
 
-				$('#shipment_form select[name="CW_ID"]').val(ps_data['CW_ID']);
+				$('#shipment_form select[name="CWP_ID"]').val(ps_data['CWP_ID']);
 				$('#shipment_form select[name="PN_ID"]').val(ps_data['PN_ID']);
 				$('#shipment_form input[name="pallets"]').val(ps_data['pallets']);
 				$('#shipment_form input[name="in_pallet"]').val(ps_data['in_pallet']);
@@ -183,8 +184,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 		});
 
 		// При изменении противовеса обновляем число деталей в поддоне
-		$('#shipment_form select[name="CW_ID"]').change(function() {
-			var in_pallet = $('#shipment_form select[name="CW_ID"] option:selected').attr('in_pallet');
+		$('#shipment_form select[name="CWP_ID"]').change(function() {
+			var in_pallet = $('#shipment_form select[name="CWP_ID"] option:selected').attr('in_pallet');
 
 			$('#shipment_form input[name="in_pallet"]').val(in_pallet).change();
 		});

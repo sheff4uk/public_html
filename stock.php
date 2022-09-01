@@ -9,6 +9,11 @@ if( !in_array('stock', $Rights) ) {
 	die('Недостаточно прав для совершения операции');
 }
 
+// Если не выбран участок, берем из сессии
+if( !$_GET["F_ID"] ) {
+	$_GET["F_ID"] = $_SESSION['F_ID'];
+}
+
 $page = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 
 //Удаление регистрации поддона
@@ -25,7 +30,6 @@ if( isset($_GET["remove"]) ) {
 	";
 	mysqli_query( $mysqli, $query );
 
-	// Перенаправление в план
 	exit ('<meta http-equiv="refresh" content="0; url='.$page.'#'.$LPP_ID.'">');
 }
 
@@ -41,30 +45,16 @@ if( isset($_GET["undo"]) ) {
 	";
 	mysqli_query( $mysqli, $query );
 
-	// Перенаправление в план
 	exit ('<meta http-equiv="refresh" content="0; url='.$page.'#'.$LPP_ID.'">');
 }
 
-//// Отсчитываем 30 рабочих дней назад
-//$query = "
-//	SELECT MIN(SUB.packed_date) date_from
-//	FROM (
-//		SELECT DATE(packed_time) packed_date
-//		FROM list__PackingPallet
-//		GROUP BY packed_date
-//		ORDER BY packed_date DESC
-//		LIMIT 30
-//	) SUB
-//";
-//$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//$row = mysqli_fetch_array($res);
-//$date_from = $row["date_from"];
-
 // Узнаем время упаковки самого старого поддона на складе
 $query = "
-	SELECT DATE(MIN(packed_time)) date_from
-	FROM list__PackingPallet
-	WHERE shipment_time IS NULL AND removal_time IS NULL
+	SELECT IFNULL(DATE(MIN(LPP.packed_time)), CURDATE()) date_from
+	FROM list__PackingPallet LPP
+	WHERE LPP.shipment_time IS NULL
+		AND LPP.removal_time IS NULL
+		AND LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
@@ -72,11 +62,13 @@ $date_from = $row["date_from"];
 
 // Получаем список отгрузок и сохраняем в массив
 $query = "
-	SELECT shipment_time
-	FROM list__PackingPallet
-	WHERE DATE(packed_time) >= '{$date_from}' AND shipment_time IS NOT NULL
-	GROUP BY shipment_time
-	ORDER BY shipment_time DESC
+	SELECT LPP.shipment_time
+	FROM list__PackingPallet LPP
+	WHERE DATE(LPP.packed_time) >= '{$date_from}'
+		AND LPP.shipment_time IS NOT NULL
+		AND LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
+	GROUP BY LPP.shipment_time
+	ORDER BY LPP.shipment_time DESC
 ";
 $shipment_arr = array();
 $i = 100;
@@ -87,6 +79,60 @@ while( $row = mysqli_fetch_array($res) ) {
 	$shipment_arr["{$row["shipment_time"]}"] = $i;
 }
 ?>
+
+<!--Фильтр-->
+<div id="filter">
+	<h3>Фильтр</h3>
+	<form method="get" style="position: relative;">
+		<a href="/stock.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Участок:</span>
+			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT F_ID
+						,f_name
+					FROM factory
+					ORDER BY F_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["F_ID"] == $_GET["F_ID"]) ? "selected" : "";
+					echo "<option value='{$row["F_ID"]}' {$selected}>{$row["f_name"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+
+	</form>
+</div>
+
+<?
+// Узнаем есть ли фильтр
+$filter = 0;
+foreach ($_GET as &$value) {
+	if( $value ) $filter = 1;
+}
+?>
+
+<script>
+	$(document).ready(function() {
+		$( "#filter" ).accordion({
+			active: <?=($filter ? "0" : "false")?>,
+			collapsible: true,
+			heightStyle: "content"
+		});
+
+		// При скроле сворачивается фильтр
+		$(window).scroll(function(){
+			$( "#filter" ).accordion({
+				active: "false"
+			});
+		});
+	});
+</script>
+
 <style>
 	.main_table tbody tr:hover {
 		font-size: 14px;
@@ -94,17 +140,17 @@ while( $row = mysqli_fetch_array($res) ) {
 	#wr_stock {
 		position: fixed;
 		background-color: white;
-		left: -280px;
 		border: 1px solid #bbb;
 		padding: 10px;
 		border-radius: 10px;
-		width: 300px;
 		opacity: .8;
 		transition: .3s;
 		z-index: 10;
+		right: calc(100% - 20px);
 	}
 	#wr_stock:hover {
 		left: 0px;
+		right: unset;
 	}
 	#wr_shipment {
 		position: fixed;
@@ -128,8 +174,8 @@ while( $row = mysqli_fetch_array($res) ) {
 	<table style="text-align: center; font-weight: bold;">
 		<thead>
 			<tr>
-				<th rowspan="2">Код</th>
-				<th colspan="6">Кол-во поддонов</th>
+				<th rowspan="2">Комплект противовесов</th>
+				<th colspan="6">Кол-во паллетов</th>
 			</tr>
 			<tr>
 				<th>4д</th>
@@ -143,7 +189,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<tbody>
 		<?
 			$query = "
-				SELECT CW.item
+				SELECT CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
 					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 18 HOUR AND NOW() - INTERVAL 0 HOUR, 1, 0)) day4
 					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 42 HOUR AND NOW() - INTERVAL 18 HOUR, 1, 0)) day3
 					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 66 HOUR AND NOW() - INTERVAL 42 HOUR, 1, 0)) day2
@@ -151,17 +197,20 @@ while( $row = mysqli_fetch_array($res) ) {
 					,SUM(IF(NOW() - INTERVAL 90 HOUR < LPP.packed_time, 0, 1)) ready
 					,SUM(1) total
 				FROM list__PackingPallet LPP
-				JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID AND CW.CB_ID = 2
-				WHERE DATE(LPP.packed_time) >= '{$date_from}'
+				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+				WHERE LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
+					AND DATE(LPP.packed_time) >= '{$date_from}'
 					AND LPP.shipment_time IS NULL
 					AND LPP.removal_time IS NULL
-				GROUP BY LPP.CW_ID
-				ORDER BY LPP.CW_ID ASC
+					#AND CW.CB_ID = 2
+				GROUP BY LPP.CWP_ID
+				ORDER BY LPP.CWP_ID ASC
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
 				echo "<tr>";
-				echo "<td><b style='font-size: 1.5em; width: 60px; display: inline-block;'>{$row["item"]}</b></td>";
+				echo "<td><span class='nowrap'>{$row["item"]}</span></td>";
 				echo "<td style='color: rgb(100,0,0);'>{$row["day4"]}</td>";
 				echo "<td style='color: rgb(150,0,0);'>{$row["day3"]}</td>";
 				echo "<td style='color: rgb(200,0,0);'>{$row["day2"]}</td>";
@@ -186,11 +235,12 @@ while( $row = mysqli_fetch_array($res) ) {
 		<tbody>
 		<?
 			$query = "
-				SELECT DATE_FORMAT(shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
-					,shipment_time
-				FROM list__PackingPallet
-				GROUP BY shipment_time
-				ORDER BY shipment_time DESC
+				SELECT DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
+					,LPP.shipment_time
+				FROM list__PackingPallet LPP
+				WHERE LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
+				GROUP BY LPP.shipment_time
+				ORDER BY LPP.shipment_time DESC
 				LIMIT 20
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -215,7 +265,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					nextID = $(this).parents("td").attr("nextID");
 					item = $(this).parents("td").attr("item");
 				confirm(
-					"<span style='font-size: 1.2em;'>Подтвердите <font color='red'>удаление</font> регистрации с номером <b>" + nextID + "</b> (противовес <b>" + item + "</b>).</span>",
+					"<span style='font-size: 1.2em;'>Подтвердите <font color='red'>удаление</font> регистрации с номером <b>" + nextID + "</b> (комплект противовесов <b>" + item + "</b>).</span>",
 					"<?=$page?>?remove=" + id
 				);
 			});
@@ -227,7 +277,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					nextID = $(this).parents("td").attr("nextID");
 					item = $(this).parents("td").attr("item");
 				confirm(
-					"<span style='font-size: 1.2em;'>Подтвердите <font color='green'>восстановление</font> регистрации с номером <b>" + nextID + "</b> (противовес <b>" + item + "</b>).</span>",
+					"<span style='font-size: 1.2em;'>Подтвердите <font color='green'>восстановление</font> регистрации с номером <b>" + nextID + "</b> (комплект противовесов <b>" + item + "</b>).</span>",
 					"<?=$page?>?undo=" + id
 				);
 			});
@@ -252,17 +302,24 @@ while( $row = mysqli_fetch_array($res) ) {
 			<th>Время упаковки</th>
 			<?
 			$query = "
-				SELECT CW_ID
-					,item
-				FROM CounterWeight
-				WHERE CB_ID = 2
-				ORDER BY CW_ID
+				SELECT LPP.CWP_ID
+					,CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
+				FROM list__PackingPallet LPP
+				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+				WHERE LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
+					AND DATE(LPP.packed_time) >= '{$date_from}'
+					AND LPP.shipment_time IS NULL
+					AND LPP.removal_time IS NULL
+					#AND CW.CB_ID = 2
+				GROUP BY LPP.CWP_ID
+				ORDER BY LPP.CWP_ID ASC
 			";
 			$cw_arr = array();
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
 				echo "<th>{$row["item"]}</th>";
-				$cw_arr[] = $row["CW_ID"];
+				$cwp_arr[] = $row["CWP_ID"];
 			}
 			?>
 		</tr>
@@ -276,21 +333,24 @@ $query = "
 		,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
 		,DATE_FORMAT(LPP.removal_time, '%d.%m.%Y %H:%i') removal_time_format
 		,LPP.nextID
-		,LPP.CW_ID
-		,CW.item
+		,LPP.CWP_ID
+		,CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
 		,LPP.shipment_time
 		,IF(IFNULL(LPP.shipment_time, NOW()) - INTERVAL 90 HOUR < LPP.packed_time, 0, 1) ready
 	FROM list__PackingPallet LPP
-	JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID AND CW.CB_ID = 2
+	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+	JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 	WHERE DATE(LPP.packed_time) >= '{$date_from}'
+		AND LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
+		#AND CW.CB_ID = 2
 	ORDER BY LPP.packed_time DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	echo "<tr id='{$row["LPP_ID"]}' class='pallet_row' ".($row["removal_time_format"] ? "style='text-decoration: line-through;'" : "")." shipment_time='{$row["shipment_time_format"]}'>";
 	echo "<td>{$row["packed_time_format"]}</td>";
-	foreach ( $cw_arr as $value ) {
-		if( $value == $row["CW_ID"] ) {
+	foreach ( $cwp_arr as $value ) {
+		if( $value == $row["CWP_ID"] ) {
 			echo "<td nextID='{$row["nextID"]}' item='{$row["item"]}' style='background-color: ".($row["shipment_time"] ? "rgb(0,128,0,.{$shipment_arr[$row["shipment_time"]]});" : ($row["removal_time_format"] ? "gray;" : "orange;")).($row["ready"] || $row["removal_time_format"] ? "" : "border-left: 6px solid red;")."'><b>{$row["nextID"]}</b>&nbsp;".($row["shipment_time_format"] ? "" : ($row["removal_time_format"] ? "<font color='red'><i class='fa fa-undo'></i></font>" : "<font color='red'><i class='fa fa-times'></i></font>"))."<br>{$row["shipment_time_format"]}</td>";
 		}
 		else {

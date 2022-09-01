@@ -23,8 +23,8 @@ $message = "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 		<thead style='word-wrap: break-word;'>
 			<tr>
-				<th>Код</th>
-				<th>Поддонов</th>
+				<th>Комплект противовесов</th>
+				<th>Паллетов</th>
 				<th>Деталей</th>
 			</tr>
 		</thead>
@@ -32,14 +32,16 @@ $message = "
 ";
 
 $query = "
-	SELECT CW.item
+	SELECT CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
 		,SUM(1) pallets
-		,SUM(CW.in_pallet) details
+		,SUM(CWP.in_pallet) details
 	FROM list__PackingPallet LPP
-	JOIN CounterWeight CW ON CW.CW_ID = LPP.CW_ID AND CW.CB_ID = 2
-	WHERE LPP.packed_time > NOW() - INTERVAL 4 WEEK AND LPP.shipment_time IS NULL
-	GROUP BY LPP.CW_ID
-	ORDER BY LPP.CW_ID ASC
+	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+	JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+	WHERE LPP.shipment_time IS NULL AND LPP.removal_time IS NULL
+		AND LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = 1)
+	GROUP BY LPP.CWP_ID
+	ORDER BY LPP.CWP_ID ASC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query1: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {

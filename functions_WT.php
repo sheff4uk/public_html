@@ -366,7 +366,7 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 							SET packed_time = '{$transactionDate}'
 								,nextID = {$nextID}
 								,WT_ID = {$deviceID}
-								,CW_ID = {$goodsID}
+								,CWP_ID = {$goodsID}
 						";
 						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					}
@@ -375,7 +375,7 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 						$query = "
 							UPDATE list__PackingPallet
 							SET removal_time = '{$transactionDate}'
-							WHERE CW_ID = {$goodsID}
+							WHERE CWP_ID = {$goodsID}
 								AND WT_ID = {$deviceID}
 							ORDER BY nextID DESC
 							LIMIT 1

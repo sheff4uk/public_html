@@ -79,7 +79,6 @@ echo "<title>Табель версия для печати</title>";
 	<thead>
 		<tr>
 			<th rowspan="1"><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
-			<th rowspan="1" style="font-size: 2em;">Табель</th>
 			<th style="position: relative; padding-top: 10px;">
 				<span style="position: absolute; top: 0px; left: 5px;" class="nowrap">участок</span>
 				<n style="font-size: 2em;"><?=$f_name?></n></th>
