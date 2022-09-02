@@ -116,7 +116,8 @@ if( $ip == $from_ip ) {
 					read_transaction_LW($row["last_transaction"]+1, 1, $socket, $mysqli);
 				}
 				else {
-					message_to_telegram("Пост <b>{$row["post"]}</b>\n<b>Нет связи с весами!</b>", "{$notification_group}");
+					//message_to_telegram("Пост <b>{$row["post"]}</b>\n<b>Нет связи с весами!</b>", "{$notification_group}");
+					message_to_telegram("Пост <b>{$row["post"]}</b>\n<b>Нет связи с весами!</b>", TELEGRAM_CHATID);
 				}
 				socket_close($socket);
 			}
