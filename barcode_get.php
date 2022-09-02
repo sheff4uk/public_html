@@ -57,7 +57,7 @@ if( $ip == $from_ip ) {
 		read_transaction_LA($row["last_transaction"]+1, 1, $socket, $mysqli);
 	}
 	else {
-		message_to_telegram("<b>Нет связи с терминалом расформовки!</b>", "{$notification_group}");
+		message_to_telegram("<b>Нет связи с терминалом расформовки!</b>", $notification_group);
 	}
 	socket_close($socket);
 
@@ -116,8 +116,7 @@ if( $ip == $from_ip ) {
 					read_transaction_LW($row["last_transaction"]+1, 1, $socket, $mysqli);
 				}
 				else {
-					//message_to_telegram("Пост <b>{$row["post"]}</b>\n<b>Нет связи с весами!</b>", "{$notification_group}");
-					message_to_telegram("Пост <b>{$row["post"]}</b>\n<b>Нет связи с весами!</b>", TELEGRAM_CHATID);
+					message_to_telegram("Пост <b>{$row["post"]}</b>\n<b>Нет связи с весами!</b>", $notification_group);
 				}
 				socket_close($socket);
 			}
@@ -170,7 +169,7 @@ if( $ip == $from_ip ) {
 				set_terminal_text($filling_time_format, $socket, $mysqli);
 			}
 			else {
-				message_to_telegram("<b>Нет связи с терминалом этикетирования паллетов!</b>", "{$notification_group}");
+				message_to_telegram("<b>Нет связи с терминалом этикетирования паллетов!</b>", $notification_group);
 			}
 			socket_close($socket);
 		}
@@ -190,7 +189,7 @@ if( $ip == $from_ip ) {
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
-			message_to_telegram("Цикл: <b>{$row["cycle"]}</b>\nКод: <b>{$row["item"]}</b>\n<b>Нет данных по заливкам более 24 часов!</b>", "{$notification_group}");
+			message_to_telegram("Цикл: <b>{$row["cycle"]}</b>\nКод: <b>{$row["item"]}</b>\n<b>Нет данных по заливкам более 24 часов!</b>", $notification_group);
 		}
 	}
 }
