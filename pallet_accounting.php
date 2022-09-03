@@ -74,7 +74,7 @@ include "./forms/pallet_accounting_form.php";
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Заказчик:</span>
+			<span>Клиент:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
 				<?
@@ -397,7 +397,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	<table style="font-size: 1.5em;">
 		<thead>
 			<tr>
-				<th>Заказчик</th>
+				<th>Клиент</th>
 				<th>Наименование</th>
 				<th>Кол-во</th>
 			</tr>
