@@ -151,7 +151,7 @@ if( !$_GET["F_ID"] ) {
 
 <!--
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>Бренд:</span>
+			<span>Клиент:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
 				<?
@@ -297,7 +297,6 @@ foreach ($_GET as &$value) {
 		display: block;
 		line-height: .4em;
 		color: red;
-		display: none;
 	}
 </style>
 
@@ -395,7 +394,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["o_date"]?></td>
 		<td><?=$row["o_time"]?></td>
 		<td><?=$cassette?></td>
-		<td style="!!!!background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
+		<td style="background: rgb(255,0,0,<?=((24 - $row["o_interval"]) / 10)?>);"><?=$row["o_interval"]?></td>
 		<td colspan="2" class="nowrap" style="text-align: left;">
 			<?=($row["not_spill"] ? "<font color='red'>{$row["not_spill"]}</font> непролив<br>" : "")?>
 			<?=($row["crack"] ? "<font color='red'>{$row["crack"]}</font> мех. трещина<br>" : "")?>
