@@ -371,7 +371,7 @@ foreach ($_GET as &$value) {
 					// Заполняем массив регистраций
 					$query = "
 						SELECT TR.TR_ID
-							,DATE_FORMAT(TR.tr_time, '%H:%s') tr_time
+							,DATE_FORMAT(TR.tr_time, '%H:%i') tr_time
 							,TR.tr_photo
 							,CONCAT(Friendly_date(TR.add_time), '<br>', DATE_FORMAT(TR.add_time, '%H:%i:%s')) add_time
 							,IF(TR.add_author IS NOT NULL, USR_Icon(TR.add_author), '') add_author

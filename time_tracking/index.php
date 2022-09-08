@@ -271,7 +271,7 @@ if( isset($_POST["cardcode"]) ) {
 			$query = "
 				SELECT USR_Name(TS.USR_ID) `name`
 					,TR.tr_photo
-					,DATE_FORMAT(TR.tr_time, '%H:%s') tr_time
+					,DATE_FORMAT(TR.tr_time, '%H:%i') tr_time
 					,TR.del_time
 				FROM TimeReg TR
 				JOIN Timesheet TS ON TS.TS_ID = TR.TS_ID AND TS.ts_date = CURDATE()
