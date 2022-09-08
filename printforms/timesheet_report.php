@@ -246,7 +246,7 @@ echo "<title>Табель версия для печати</title>";
 					}
 					$dayduration[$i] += $subrow["duration"];
 					$daypay[$i] += $pay;
-					$daycnt[$i] += ($pay ? 1 : 0);
+					$daycnt[$i] += ($pay > 0 ? 1 : 0);
 
 					if( $subrow = mysqli_fetch_array($subres) ) {
 						$day = $subrow["Day"];
@@ -281,7 +281,7 @@ echo "<title>Табель версия для печати</title>";
 		$sigmapay2 = 0;
 		while ($i <= $days) {
 			echo "<td style='text-align: center;'>";
-			if( $daypay[$i] > 0 ) {
+			if( $daypay[$i] != 0 ) {
 				echo "<b>".(number_format($daypay[$i], 0, '', ' '))."</b>";
 				echo "<br><n>x{$daycnt[$i]}</i>";
 

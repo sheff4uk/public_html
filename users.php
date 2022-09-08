@@ -187,7 +187,7 @@ if( isset($_POST["USR_ID"]) ) {
 	}
 
 	// Перенаправление
-	exit ('<meta http-equiv="refresh" content="0; url=#'.$USR_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/users.php#'.$USR_ID.'">');
 }
 
 $title = 'Пользователи';
@@ -478,6 +478,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 			return false;
 		});
+
+		<?=($_GET["USR_ID"] ? "$('tr#{$_GET["USR_ID"]} .add_user').click();" : "")?>
 	});
 
 </script>

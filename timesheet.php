@@ -318,7 +318,7 @@ foreach ($_GET as &$value) {
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
-			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'><a href='users.php#{$row["USR_ID"]}' target='_blank'>{$row["Name"]}</a></td>";
+			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'><a href='users.php?USR_ID={$row["USR_ID"]}' target='_blank'>{$row["Name"]}</a></td>";
 			?>
 			<td colspan="2">
 				<input type="number" value="<?=$row["tariff"]?>" name="tariff[<?=$row["USR_ID"]?>]" min="0" style="width: 60px;" <?=$_GET["month"] == date('Ym') ? "" : "disabled"?>>
@@ -393,10 +393,10 @@ foreach ($_GET as &$value) {
 					$pay = ($subrow["pay"] != null) ? round($subrow["pay"] * $subrow["rate"]) : null;
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($pay == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}'>
+						<td id='{$subrow["TS_ID"]}' title='{$subrow["duration_hm"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($day_of_week >= 6 ? " background: #09f3;" : "").($pay == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}'>
 							".($man_reg ? "<div style='position: absolute; top: 0px; left: 0px; width: 5px; height: 5px; border-radius: 0 0 5px 0; background: red; box-shadow: 0 0 1px 1px red;'></div>" : "")."
 							".(($subrow["sub_is"] or $subrow["substitute"]) ? "<div style='position: absolute; bottom: 0px; right: 0px; width: 5px; height: 5px; border-radius: 5px 0 0 0; background: blue; box-shadow: 0 0 1px 1px blue;'></div>" : "")."
-							{$pay}
+							<font color='".($pay < 0 ? "red" : "")."'>{$pay}</font>
 							".($subrow["status"] == '0' ? "<div class='label'>&mdash;</div>" : ($subrow["status"] == '1' ? "<div class='label'>ОТП</div>" : ($subrow["status"] == '2' ? "<div class='label'>УВ</div>" : ($subrow["status"] == '3' ? "<div class='label'>Б</div>" : ($subrow["status"] == '4' ? "<div class='label'>В</div>" : ($subrow["status"] == '5' ? "<div class='label'>ПР</div>" : ""))))))."
 						</td>
 					";
@@ -409,7 +409,7 @@ foreach ($_GET as &$value) {
 					}
 					$dayduration[$i] += $subrow["duration"];
 					$daypay[$i] += $pay;
-					$daycnt[$i] += ($pay ? 1 : 0);
+					$daycnt[$i] += ($pay > 0 ? 1 : 0);
 
 					if( $subrow = mysqli_fetch_array($subres) ) {
 						$day = $subrow["Day"];
@@ -447,7 +447,7 @@ foreach ($_GET as &$value) {
 		$sigmapay2 = 0;
 		while ($i <= $days) {
 			echo "<td style='padding: 0px; text-align: center; background: #3333;'>";
-			if( $daypay[$i] > 0 ) {
+			if( $daypay[$i] != 0 ) {
 				echo "<b>".(number_format($daypay[$i], 0, '', ' '))."</b>";
 				echo "<br><n>x{$daycnt[$i]}</i>";
 

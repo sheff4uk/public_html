@@ -7,7 +7,6 @@ if( isset($_POST["F_ID"]) ) {
 	$F_ID = $_POST["F_ID"];
 	$month = $_POST["month"];
 	$outsrc = $_POST["outsrc"];
-	//$_POST["substitute"] = ( $_POST["status"] != '' ) ? '' : $_POST["substitute"];
 
 	if( $_POST["TS_ID"] ) {
 		$TS_ID = $_POST["TS_ID"];
@@ -143,20 +142,6 @@ if( isset($_POST["F_ID"]) ) {
 	}
 	/////////////////////////////
 
-	//////////////////////
-	// Обновляем статус //
-	//////////////////////
-	if( $TS_ID ) {
-		$status = ($_POST["status"] != '' ? $_POST["status"] : "NULL");
-		$query = "
-			UPDATE Timesheet
-			SET status = {$status}
-			WHERE TS_ID = {$TS_ID}
-		";
-		mysqli_query( $mysqli, $query );
-	}
-	///////////////////////////////////
-
 	////////////////////////////////////
 	// Помечаем удаленные регистрации //
 	////////////////////////////////////
@@ -170,6 +155,21 @@ if( isset($_POST["F_ID"]) ) {
 		mysqli_query( $mysqli, $query );
 	}
 	/////////////////////////////////////
+
+	//////////////////////
+	// Обновляем статус //
+	//////////////////////
+	if( $TS_ID ) {
+		$status = ($_POST["status"] != '' ? $_POST["status"] : "NULL");
+		$query = "
+			UPDATE Timesheet
+			SET status = {$status}
+				,pay = IF({$status} = 5 AND pay IS NULL, -5000, IF(IFNULL({$status}, 0) != 5 AND pay < 0, NULL, pay))
+			WHERE TS_ID = {$TS_ID}
+		";
+		mysqli_query( $mysqli, $query );
+	}
+	///////////////////////////////////
 
 	// Перенаправление в табель
 	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&outsrc='.$outsrc.'#'.$TS_ID.'">');
