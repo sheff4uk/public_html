@@ -207,27 +207,6 @@ echo "<title>Табель версия для печати</title>";
 				$date = $year.'-'.$month.'-'.$i;
 				$day_of_week = date('N', strtotime($date));	// День недели 1..7
 				if( $i == $day ) {
-					// Заполняем массив регистраций
-					$query = "
-						SELECT TR.TR_ID
-							,TR.tr_time
-							,TR.tr_photo
-							,CONCAT(Friendly_date(TR.add_time), '<br>', DATE_FORMAT(TR.add_time, '%H:%i:%s')) add_time
-							,IF(TR.add_author IS NOT NULL, USR_Icon(TR.add_author), '') add_author
-							,CONCAT(Friendly_date(TR.del_time), '<br>', DATE_FORMAT(TR.del_time, '%H:%i:%s')) del_time
-							,IF(TR.del_author IS NOT NULL, USR_Icon(TR.del_author), '') del_author
-						FROM TimeReg TR
-						WHERE TR.TS_ID = {$subrow["TS_ID"]}
-						ORDER BY TR.tr_time
-					";
-					$man_reg = 0;
-					$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					while( $subsubrow = mysqli_fetch_array($subsubres) ) {
-						$TimeReg[$subrow["TS_ID"]][] = array("TR_ID" => $subsubrow["TR_ID"], "tr_time" => "{$subsubrow["tr_time"]}", "tr_photo" => "{$subsubrow["tr_photo"]}", "add_time" => "{$subsubrow["add_time"]}", "add_author" => "{$subsubrow["add_author"]}", "del_time" => "{$subsubrow["del_time"]}", "del_author" => "{$subsubrow["del_author"]}");
-						if( $subsubrow["add_time"] != '' and $subsubrow["del_time"] == '' ) {
-							$man_reg = 1;
-						}
-					}
 
 					$pay = ($subrow["pay"] != null) ? round($subrow["pay"] * $subrow["rate"]) : null;
 

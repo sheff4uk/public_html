@@ -371,7 +371,7 @@ foreach ($_GET as &$value) {
 					// Заполняем массив регистраций
 					$query = "
 						SELECT TR.TR_ID
-							,TR.tr_time
+							,DATE_FORMAT(TR.tr_time, '%H:%s') tr_time
 							,TR.tr_photo
 							,CONCAT(Friendly_date(TR.add_time), '<br>', DATE_FORMAT(TR.add_time, '%H:%i:%s')) add_time
 							,IF(TR.add_author IS NOT NULL, USR_Icon(TR.add_author), '') add_author
@@ -379,7 +379,7 @@ foreach ($_GET as &$value) {
 							,IF(TR.del_author IS NOT NULL, USR_Icon(TR.del_author), '') del_author
 						FROM TimeReg TR
 						WHERE TR.TS_ID = {$subrow["TS_ID"]}
-						ORDER BY TR.tr_time
+						ORDER BY TR.tr_time, TR.TR_ID
 					";
 					$man_reg = 0;
 					$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
