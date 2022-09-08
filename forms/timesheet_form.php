@@ -352,8 +352,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				html_hide = html_hide + "<input type='hidden' name='usr_id' value='"+usr_id+"'>";
 			}
 
-			html = html + "<tr><td><input type='time' name='tr_time1' step='1' style='margin: 10px; font-size: 1.5em;'><i class='fas fa-arrow-left'></i></td><td colspan='2' rowspan='2'>Чтобы добавить новую регистрацию, укажите время.</td></tr>";
-			html = html + "<tr><td><input type='time' name='tr_time2' step='1' style='margin: 10px; font-size: 1.5em;'><i class='fas fa-arrow-left'></i></td></tr>";
+			html = html + "<tr><td><input type='time' name='tr_time1' style='margin: 10px; font-size: 1.5em;'><i class='fas fa-arrow-left'></i></td><td colspan='2' rowspan='2'>Чтобы добавить новую регистрацию, укажите время.</td></tr>";
+			html = html + "<tr><td><input type='time' name='tr_time2' style='margin: 10px; font-size: 1.5em;'><i class='fas fa-arrow-left'></i></td></tr>";
 
 			$('#timesheet_form #hide').html(html_hide);
 			$('#timesheet_form #summary').html(html_summary);

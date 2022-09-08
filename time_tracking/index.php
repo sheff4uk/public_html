@@ -79,7 +79,8 @@ if( isset($_POST["cardcode"]) ) {
 			INSERT INTO TimeReg
 			SET TS_ID = {$TS_ID}
 				,cardcode = '{$_POST["cardcode"]}'
-				,tr_time = TIME(NOW())
+				#,tr_time = TIME(NOW())
+				,tr_time = DATE_FORMAT(NOW(), '%H:%i:00')
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$TR_ID = mysqli_insert_id( $mysqli );
