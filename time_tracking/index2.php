@@ -85,11 +85,11 @@ if( isset($_POST["cardcode"]) ) {
 //		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 //		$TR_ID = mysqli_insert_id( $mysqli );
 
-		exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/?id='.$USR_ID.'&tr_id='.$TR_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/index2.php?id='.$USR_ID.'&tr_id='.$TR_ID.'">');
 	}
 	// Не верифицирован
 	{
-		exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/?id=0">');
+		exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/index2.php?id=0">');
 	}
 }
 
