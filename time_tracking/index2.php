@@ -187,19 +187,19 @@ if( isset($_POST["cardcode"]) ) {
 										shutter.autoplay = false;
 										shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
 
-										// play sound effect
-										shutter.play();
-
-										$('#my_camera').hide();
-										$('#results').show();
 
 										// take snapshot and get image data
 										Webcam.snap( function(data_uri) {
 											// display results in page
-											$('#results').html('<img id="imageprev" src="'+data_uri+'"/>');
+											//$('#results').html('<img id="imageprev" src="'+data_uri+'"/>');
 											Webcam.upload( data_uri, 'upload2.php?tr_id=<?=$_GET["tr_id"]?>', function(code, text) {
-												console.log('Save successfully');
-												console.log(text);
+												//console.log('Save successfully');
+												//console.log(text);
+												$('#results').html('<img id="imageprev" src="'+text+'"/>');
+												// play sound effect
+												shutter.play();
+												$('#my_camera').hide();
+												$('#results').show();
 											});
 										});
 
