@@ -212,7 +212,7 @@ if( isset($_POST["cardcode"]) ) {
 
 										// Автоматический возврат на главный экран после фотографирования
 										setTimeout(function(){
-											$(location).attr('href', "/time_tracking/upload2.php");
+											$(location).attr('href', "/time_tracking/index2.php");
 										}, 2000);
 									}, 500);
 								});
@@ -228,7 +228,7 @@ if( isset($_POST["cardcode"]) ) {
 					<script>
 						// Автоматический возврат на главный экран по истечению времени
 						setTimeout(function(){
-							$(location).attr('href', "/time_tracking/upload2.php");
+							$(location).attr('href', "/time_tracking/index2.php");
 						}, 4000);
 					</script>
 				</form>
