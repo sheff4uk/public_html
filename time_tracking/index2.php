@@ -160,68 +160,74 @@ if( isset($_POST["cardcode"]) ) {
 							$row = mysqli_fetch_array($res);
 							$name = $row["name"];
 
+							if( $_GET["tr_id"] > 0 ) {
 							?>
-							<div id="my_camera" style="margin: auto;"></div>
-							<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
+								<div id="my_camera" style="margin: auto;"></div>
+								<div id="results" style="width: 320px; height: 240px; margin: auto; display: none;"></div>
 
-							<!--https://makitweb.com/how-to-capture-picture-from-webcam-with-webcam-js/-->
-							<script src="../js/webcam.min.js"></script>
+								<!--https://makitweb.com/how-to-capture-picture-from-webcam-with-webcam-js/-->
+								<script src="../js/webcam.min.js"></script>
 
-							<script>
-								// Configure a few settings and attach camera
-								Webcam.set({
-									width: 320,
-									height: 240,
-									image_format: 'jpeg',
-									jpeg_quality: 70
-								});
-								Webcam.attach( '#my_camera' );
+								<script>
+									// Configure a few settings and attach camera
+									Webcam.set({
+										width: 320,
+										height: 240,
+										image_format: 'jpeg',
+										jpeg_quality: 70
+									});
+									Webcam.attach( '#my_camera' );
 
-								Webcam.on( 'load', function() {
-									// Обратный отсчет
-									//timerDecrement();
+									Webcam.on( 'load', function() {
+										// Обратный отсчет
+										//timerDecrement();
 
-									setTimeout(function(){
-										// preload shutter audio clip
-										var shutter = new Audio();
-										shutter.autoplay = false;
-										shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
-
-
-										// take snapshot and get image data
-										Webcam.snap( function(data_uri) {
-											// display results in page
-											//$('#results').html('<img id="imageprev" src="'+data_uri+'"/>');
-											Webcam.upload( data_uri, 'upload2.php?tr_id=<?=$_GET["tr_id"]?>', function(code, text) {
-												console.log(text);
-												$('#results').html('<img id="imageprev" src="'+text+'"/>');
-												// play sound effect
-												shutter.play();
-												$('#my_camera').hide();
-												$('#results').show();
-											});
-										});
-
-										// Get base64 value from <img id='imageprev'> source
-										//var base64image = document.getElementById("imageprev").src;
-
-
-//										Webcam.upload( base64image, 'upload2.php?tr_id=<?=$_GET["tr_id"]?>', function(code, text) {
-//											console.log('Save successfully');
-//											console.log(text);
-//										});
-
-										Webcam.reset();
-
-										// Автоматический возврат на главный экран после фотографирования
 										setTimeout(function(){
-											$(location).attr('href', "/time_tracking/index2.php");
-										}, 5000);
-									}, 500);
-								});
-							</script>
+											// preload shutter audio clip
+											var shutter = new Audio();
+											shutter.autoplay = false;
+											shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
+
+
+											// take snapshot and get image data
+											Webcam.snap( function(data_uri) {
+												// display results in page
+												//$('#results').html('<img id="imageprev" src="'+data_uri+'"/>');
+												Webcam.upload( data_uri, 'upload2.php?tr_id=<?=$_GET["tr_id"]?>', function(code, text) {
+													console.log(text);
+													$('#results').html('<img id="imageprev" src="'+text+'"/>');
+													// play sound effect
+													shutter.play();
+													$('#my_camera').hide();
+													$('#results').show();
+												});
+											});
+
+											// Get base64 value from <img id='imageprev'> source
+											//var base64image = document.getElementById("imageprev").src;
+
+
+	//										Webcam.upload( base64image, 'upload2.php?tr_id=<?=$_GET["tr_id"]?>', function(code, text) {
+	//											console.log('Save successfully');
+	//											console.log(text);
+	//										});
+
+											Webcam.reset();
+
+											// Автоматический возврат на главный экран после фотографирования
+											setTimeout(function(){
+												$(location).attr('href', "/time_tracking/index2.php");
+											}, 5000);
+										}, 500);
+									});
+								</script>
 
 							<?
+							}
+							else {
+								echo "<p class='title' style='color: #911;'>Регистрация не удалась!</p>";
+								echo "<p class='title' style='color: #911;'>Повторите попытку.</p>";
+							}
 							echo "<h1>{$name}</h1>";
 						}
 						else {
