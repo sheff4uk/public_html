@@ -213,7 +213,7 @@ if( isset($_POST["cardcode"]) ) {
 										// Автоматический возврат на главный экран после фотографирования
 										setTimeout(function(){
 											$(location).attr('href', "/time_tracking");
-										}, 500);
+										}, 2000);
 									}, 500);
 								});
 							</script>
