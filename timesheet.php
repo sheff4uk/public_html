@@ -10,56 +10,38 @@ if( isset($_POST["F_ID"]) ) {
 
 	// Изменение тарифов возможно только в текущем месяце
 	if( $month == date('Ym') ) {
-		foreach ($_POST["tariff"] as $key => $value) {
-			$USR_ID = $key;
-			$new_tariff = $value;
-			$new_type = $_POST["type"][$key];
+		$USR_ID = $_POST["USR_ID"];
+		$tariff = $_POST["tariff"];
+		$type = $_POST["type"];
 
-			// Узнаем текущее значение
-			$query = "
-				SELECT TM.tariff, TM.type
-				FROM TariffMonth TM
-				WHERE CONCAT(TM.year, LPAD(TM.month, 2, '0')) LIKE '{$month}'
-					AND TM.USR_ID = {$USR_ID}
-					AND TM.F_ID = {$F_ID}
-			";
-			$res = mysqli_query( $mysqli, $query );
-			$row = mysqli_fetch_array($res);
-			$tariff = $row["tariff"];
-			$type = $row["type"];
+		// Обновляем тариф
+		$query = "
+			UPDATE TariffMonth TM
+			SET TM.tariff = {$tariff}, TM.type = {$type}
+			WHERE CONCAT(TM.year, LPAD(TM.month, 2, '0')) LIKE '{$month}'
+				AND TM.USR_ID = {$USR_ID}
+				AND TM.F_ID = {$F_ID}
+		";
+		mysqli_query( $mysqli, $query );
 
-			// Если тариф изменился
-			if( $new_tariff != $tariff or $new_type != $type ) {
-				// Обновляем тариф
-				$query = "
-					UPDATE TariffMonth TM
-					SET TM.tariff = {$new_tariff}, TM.type = {$new_type}
-					WHERE CONCAT(TM.year, LPAD(TM.month, 2, '0')) LIKE '{$month}'
-						AND TM.USR_ID = {$USR_ID}
-						AND TM.F_ID = {$F_ID}
-				";
-				mysqli_query( $mysqli, $query );
+		// Пересчитываем начисления в табеле
+		$query = "
+			SELECT GROUP_CONCAT(TS.TS_ID) TS_IDs
+			FROM Timesheet TS
+			WHERE TS.USR_ID = {$USR_ID}
+				AND TS.F_ID = {$F_ID}
+				AND DATE_FORMAT(TS.ts_date, '%Y%m') LIKE '{$month}'
+		";
+		$res = mysqli_query( $mysqli, $query );
+		$row = mysqli_fetch_array($res);
+		$TS_IDs = $row["TS_IDs"];
 
-				// Пересчитываем начисления в табеле
-				$query = "
-					SELECT GROUP_CONCAT(TS.TS_ID) TS_IDs
-					FROM Timesheet TS
-					WHERE TS.USR_ID = {$USR_ID}
-						AND TS.F_ID = {$F_ID}
-						AND DATE_FORMAT(TS.ts_date, '%Y%m') LIKE '{$month}'
-				";
-				$res = mysqli_query( $mysqli, $query );
-				$row = mysqli_fetch_array($res);
-				$TS_IDs = $row["TS_IDs"];
-
-				$query = "
-					UPDATE TimeReg TR
-					SET TR.tr_time = TR.tr_time
-					WHERE TR.TS_ID IN (0,{$TS_IDs})
-				";
-				mysqli_query( $mysqli, $query );
-			}
-		}
+		$query = "
+			UPDATE TimeReg TR
+			SET TR.tr_time = TR.tr_time
+			WHERE TR.TS_ID IN (0,{$TS_IDs})
+		";
+		mysqli_query( $mysqli, $query );
 	}
 
 	// Перенаправление в табель
@@ -241,11 +223,6 @@ foreach ($_GET as &$value) {
 	});
 </script>
 
-<form method="post">
-<input type="hidden" name="F_ID" value="<?=$_GET["F_ID"]?>">
-<input type="hidden" name="month" value="<?=$_GET["month"]?>">
-<input type="hidden" name="outsrc" value="<?=$_GET["outsrc"]?>">
-
 <table id="timesheet" class="main_table">
 	<thead>
 		<tr class="nowrap">
@@ -320,14 +297,12 @@ foreach ($_GET as &$value) {
 		while( $row = mysqli_fetch_array($res) ) {
 			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'><a href='users.php?USR_ID={$row["USR_ID"]}' target='_blank'>{$row["Name"]}</a></td>";
 			?>
-			<td colspan="2">
-				<input type="number" value="<?=$row["tariff"]?>" name="tariff[<?=$row["USR_ID"]?>]" min="0" style="width: 60px;" <?=$_GET["month"] == date('Ym') ? "" : "disabled"?>>
-				<br>
-				<div class="nowrap">
-					<input type="radio" name="type[<?=$row["USR_ID"]?>]" value="1" style="margin: 0;" title="Смена" <?=$row["type"] == 1 ? "checked" : ""?> <?=$_GET["month"] == date('Ym') ? "" : "disabled"?>>
-					<input type="radio" name="type[<?=$row["USR_ID"]?>]" value="2" style="margin: 0;" title="Час" <?=$row["type"] == 2 ? "checked" : ""?> <?=$_GET["month"] == date('Ym') ? "" : "disabled"?>>
-					<input type="radio" name="type[<?=$row["USR_ID"]?>]" value="3" style="margin: 0;" title="Час (тракторист)"  <?=$row["type"] == 3 ? "checked" : ""?> <?=$_GET["month"] == date('Ym') ? "" : "disabled"?>>
-				</div>
+			<td colspan="2" style="overflow: hidden;">
+				<?=$_GET["month"] == date('Ym') ? "<a href='#' class='tariff_edit' tariff='{$row["tariff"]}' type='{$row["type"]}' USR_ID='{$row["USR_ID"]}' name='{$row["Name"]}'><i class='fa fa-pencil-alt'></i>" : ""?>
+					<?=$row["tariff"]?>
+					<br>
+					<?=($row["type"] == 1 ? "Смена" : ($row["type"] == 2 ? "Час" : ($row["type"] == 3 ? "Тракторист" : "")))?>
+				<?=$_GET["month"] == date('Ym') ? "</a>" : ""?>
 			</td>
 			<?
 
@@ -436,11 +411,7 @@ foreach ($_GET as &$value) {
 
 		// Итог снизу
 		echo "<tr><td colspan='2' style='text-align: center; font-size: 1.5em; background: #3333;'><b>Σ</b></td>";
-		echo "<td colspan='2' style='text-align: center; background: #3333;'>";
-		if( $_GET["month"] == date('Ym') ) {
-			echo "<button title='Сохранить изменения в тарифах'><i class='fas fa-save'></i></button>";
-		}
-		echo "</td>";
+		echo "<td colspan='2' style='text-align: center; background: #3333;'></td>";
 
 		$i = 1;
 		$sigmapay1 = 0;
@@ -481,9 +452,37 @@ foreach ($_GET as &$value) {
 	?>
 	</tbody>
 </table>
-</form>
 
 <div id="timesheet_report_btn" title="Распечатать табель"><a href="/printforms/timesheet_report.php?F_ID=<?=$_GET["F_ID"]?>&month=<?=$_GET["month"]?>&outsrc=<?=$outsrc?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
+
+<div id='tariff_form' class="addproduct" style='display:none;'>
+	<form method='post' onsubmit="JavaScript:this.subbut.disabled=true;
+this.subbut.value='Подождите, пожалуйста!';">
+		<fieldset>
+			<input type="hidden" name="F_ID" value="<?=$F_ID?>">
+			<input type="hidden" name="month" value="<?=$_GET["month"]?>">
+			<input type="hidden" name="outsrc" value="<?=$outsrc?>">
+			<input type="hidden" name="USR_ID">
+
+			<div>
+				<label>Тариф:</label>
+				<div>
+					<input type="number" name="tariff" min="0" style="width: 100px;" required>
+					<select name="type" required>
+						<option value=""></option>
+						<option value="1">Смена</option>
+						<option value="2">Час</option>
+						<option value="3">Час (тракторист)</option>
+					</select>
+				</div>
+			</div>
+		</fieldset>
+		<div>
+			<hr>
+			<input type='submit' name="subbut" value='Записать' style='float: right;'>
+		</div>
+	</form>
+</div>
 
 <script>
 	$(function(){
@@ -494,6 +493,31 @@ foreach ($_GET as &$value) {
 		TimeReg = <?= json_encode($TimeReg); ?>;
 
 		$(".print").printPage();
+
+		// Редактирование тарифа
+		$('.tariff_edit').click( function() {
+			// Проверяем сессию
+			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
+
+			var tariff = $(this).attr('tariff'),
+				type = $(this).attr('type'),
+				USR_ID = $(this).attr('USR_ID'),
+				name = $(this).attr('name');
+
+			$('#tariff_form input[name="tariff"]').val(tariff);
+			$('#tariff_form select[name="type"]').val(type);
+			$('#tariff_form input[name="USR_ID"]').val(USR_ID);
+
+			$('#tariff_form').dialog({
+				title: name,
+				resizable: false,
+				width: 500,
+				modal: true,
+				closeText: 'Закрыть'
+			});
+
+			return false;
+		});
 	});
 </script>
 
