@@ -193,8 +193,7 @@ if( isset($_POST["cardcode"]) ) {
 											// display results in page
 											//$('#results').html('<img id="imageprev" src="'+data_uri+'"/>');
 											Webcam.upload( data_uri, 'upload2.php?tr_id=<?=$_GET["tr_id"]?>', function(code, text) {
-												//console.log('Save successfully');
-												//console.log(text);
+												console.log(text);
 												$('#results').html('<img id="imageprev" src="'+text+'"/>');
 												// play sound effect
 												shutter.play();
@@ -217,7 +216,7 @@ if( isset($_POST["cardcode"]) ) {
 										// Автоматический возврат на главный экран после фотографирования
 										setTimeout(function(){
 											$(location).attr('href', "/time_tracking/index2.php");
-										}, 2000);
+										}, 5000);
 									}, 500);
 								});
 							</script>
@@ -233,7 +232,7 @@ if( isset($_POST["cardcode"]) ) {
 						// Автоматический возврат на главный экран по истечению времени
 						setTimeout(function(){
 							$(location).attr('href', "/time_tracking/index2.php");
-						}, 4000);
+						}, 14000);
 					</script>
 				</form>
 			</div>
