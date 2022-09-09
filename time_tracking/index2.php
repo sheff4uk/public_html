@@ -27,63 +27,63 @@ if( isset($_POST["cardcode"]) ) {
 
 	// Если работник верифицирован
 	if( $USR_ID ) {
-		// Обновляем участок работника
-		$query = "
-			UPDATE Users
-			SET F_ID = {$F_ID}
-			WHERE USR_ID = {$USR_ID}
-		";
-		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-
-		// Новая строка в табеле, если еще не было
-		$query = "
-			INSERT INTO TariffMonth
-			SET year = YEAR(CURDATE())
-				,month = MONTH(CURDATE())
-				,USR_ID = {$USR_ID}
-				,F_ID = {$F_ID}
-			ON DUPLICATE KEY UPDATE
-				F_ID = F_ID
-		";
-		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		// Убираем возможные пустые записи из табеля
-		$query = "
-			DELETE TM
-			FROM TariffMonth AS TM
-			WHERE TM.year = YEAR(CURDATE())
-				AND TM.month = MONTH(CURDATE())
-				AND TM.USR_ID = {$USR_ID}
-				AND TM.F_ID NOT IN({$F_ID})
-				AND (
-					SELECT IFNULL(SUM(1), 0)
-					FROM Timesheet TS
-					WHERE TS.TM_ID = TM.TM_ID
-				) = 0
-		";
-		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-
-		// Добавляем запись в табель
-		$query = "
-			INSERT INTO Timesheet
-			SET ts_date = CURDATE()
-				,USR_ID = {$USR_ID}
-				,F_ID = {$F_ID}
-			ON DUPLICATE KEY UPDATE
-				TS_ID = LAST_INSERT_ID(TS_ID)
-		";
-		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		$TS_ID = mysqli_insert_id( $mysqli );
-
-		// Добавляем регистрацию работника
-		$query = "
-			INSERT INTO TimeReg
-			SET TS_ID = {$TS_ID}
-				,cardcode = '{$_POST["cardcode"]}'
-				#,tr_time = TIME(NOW())
-				,tr_time = DATE_FORMAT(NOW(), '%H:%i:00')
-		";
-		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		$TR_ID = mysqli_insert_id( $mysqli );
+//		// Обновляем участок работника
+//		$query = "
+//			UPDATE Users
+//			SET F_ID = {$F_ID}
+//			WHERE USR_ID = {$USR_ID}
+//		";
+//		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//
+//		// Новая строка в табеле, если еще не было
+//		$query = "
+//			INSERT INTO TariffMonth
+//			SET year = YEAR(CURDATE())
+//				,month = MONTH(CURDATE())
+//				,USR_ID = {$USR_ID}
+//				,F_ID = {$F_ID}
+//			ON DUPLICATE KEY UPDATE
+//				F_ID = F_ID
+//		";
+//		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//		// Убираем возможные пустые записи из табеля
+//		$query = "
+//			DELETE TM
+//			FROM TariffMonth AS TM
+//			WHERE TM.year = YEAR(CURDATE())
+//				AND TM.month = MONTH(CURDATE())
+//				AND TM.USR_ID = {$USR_ID}
+//				AND TM.F_ID NOT IN({$F_ID})
+//				AND (
+//					SELECT IFNULL(SUM(1), 0)
+//					FROM Timesheet TS
+//					WHERE TS.TM_ID = TM.TM_ID
+//				) = 0
+//		";
+//		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//
+//		// Добавляем запись в табель
+//		$query = "
+//			INSERT INTO Timesheet
+//			SET ts_date = CURDATE()
+//				,USR_ID = {$USR_ID}
+//				,F_ID = {$F_ID}
+//			ON DUPLICATE KEY UPDATE
+//				TS_ID = LAST_INSERT_ID(TS_ID)
+//		";
+//		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//		$TS_ID = mysqli_insert_id( $mysqli );
+//
+//		// Добавляем регистрацию работника
+//		$query = "
+//			INSERT INTO TimeReg
+//			SET TS_ID = {$TS_ID}
+//				,cardcode = '{$_POST["cardcode"]}'
+//				#,tr_time = TIME(NOW())
+//				,tr_time = DATE_FORMAT(NOW(), '%H:%i:00')
+//		";
+//		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//		$TR_ID = mysqli_insert_id( $mysqli );
 
 		exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/?id='.$USR_ID.'&tr_id='.$TR_ID.'">');
 	}
