@@ -91,6 +91,32 @@ if( isset($_POST["USR_ID"]) ) {
 		$USR_ID = $_POST["USR_ID"];
 	}
 
+	//////////////////////////////
+	// Сохранение фото паспорта //
+	//////////////////////////////
+	if( $_FILES['uploadfile']['name'] ) {
+		$filename = date('U').'_'.$_FILES['uploadfile']['name'];
+		$uploaddir = './uploads/';
+		$uploadfile = $uploaddir.basename($filename);
+		// Копируем файл из каталога для временного хранения файлов:
+		if (copy($_FILES['uploadfile']['tmp_name'], $uploadfile))
+		{
+			// Записываем в БД информацию о файле
+			$query = "
+				UPDATE Users
+				SET passport = '{$filename}'
+				WHERE USR_ID = {$USR_ID}
+			";
+			mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+			$_SESSION["success"][] = "Файл ".$_FILES['uploadfile']['name']." успешно загружен на сервер.";
+		}
+		else {
+			$_SESSION["alert"][] = "Ошибка! Не удалось загрузить файл на сервер!";
+		}
+	}
+	///////////////////////////////////
+
 	// Если указан номер карты, пытаемся добавить работника в табель
 	if( $cardcode != '' and $act == 1 ) {
 		$query = "
@@ -224,6 +250,7 @@ if( !in_array('users', $Rights) ) {
 	<thead>
 		<tr>
 			<th></th>
+			<th>Паспорт</th>
 			<th>Фамилия</th>
 			<th>Имя</th>
 			<th>Телефон</th>
@@ -247,6 +274,7 @@ if( !in_array('users', $Rights) ) {
 				,USR.head
 				,USR.phone
 				,USR.photo
+				,USR.passport
 				,USR.RL_ID
 				,USR.cardcode
 				,USR.F_ID
@@ -286,6 +314,7 @@ if( !in_array('users', $Rights) ) {
 			echo "
 				<tr id='{$row["USR_ID"]}' class='".($row["act"] ? "" : "not_act")."'>
 					<td style='position: relative;'>".($row["photo"] ? "<img src='/time_tracking/upload/{$row["photo"]}' style='width: 100%; border-radius: 5px;'>" : "<div style='height: 32px;'></div>")."<div style='position: absolute; top: 10px; left: 5px;'>{$row["icon"]}</div></td>
+					<td>".(($row["passport"] ? "<a href='/uploads/{$row["passport"]}' target='_blank'><img src='/uploads/{$row["passport"]}' style='width: 100%; border-radius: 5px;'></a>" : ""))."</td>
 					<td>{$row["Surname"]}</td>
 					<td>{$row["Name"]}</td>
 					<td>{$row["phone"]}</td>
@@ -305,7 +334,7 @@ if( !in_array('users', $Rights) ) {
 <div id='add_btn' class="add_user" title='Добавить пользователя'></div>
 
 <div id='user_form' class='addproduct' title='Данные пользователя' style='display:none;'>
-	<form method='post' onsubmit="JavaScript:this.subbut.disabled=true;
+	<form enctype='multipart/form-data' method='post' onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<div id="USR_ID" style="width: auto; float: right; transform: scale(3);"></div>
@@ -322,6 +351,13 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<select name="photo" style="width: 200px;" data-placeholder="Выберите фото">
 						<!--Формируется скриптом-->
 					</select>
+				</div>
+			</div>
+			<div>
+				<label>Паспорт:</label>
+				<div>
+					<input type="hidden" name="MAX_FILE_SIZE" value="30000" />
+					<input type='file' name='uploadfile'>
 				</div>
 			</div>
 			<div>
