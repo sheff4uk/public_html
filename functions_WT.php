@@ -170,7 +170,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 							AND WT_ID = {$deviceID}
 							AND LO_ID IS NULL
 					";
-					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query1: " .mysqli_error( $mysqli ));
 					$row = mysqli_fetch_array($res);
 					$RN = $row["RN"];
 
@@ -216,7 +216,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 							WHERE WT_ID = {$deviceID}
 								AND LO_ID IS NULL
 						";
-						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						mysqli_query( $mysqli, $query ) or die("Invalid query2: " .mysqli_error( $mysqli ));
 
 						$receipt_err = 0;
 						// Попытка прочитать вторую строку запроса, чтобы выявить не закрытую партию
