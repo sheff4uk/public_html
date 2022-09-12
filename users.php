@@ -250,7 +250,6 @@ if( !in_array('users', $Rights) ) {
 	<thead>
 		<tr>
 			<th></th>
-			<th>Паспорт</th>
 			<th>Фамилия</th>
 			<th>Имя</th>
 			<th>Телефон</th>
@@ -313,8 +312,11 @@ if( !in_array('users', $Rights) ) {
 			$rowstyle = $row["act"] ? "" : "background: rgb(150,0,0, .3);";
 			echo "
 				<tr id='{$row["USR_ID"]}' class='".($row["act"] ? "" : "not_act")."'>
-					<td style='position: relative;'>".($row["photo"] ? "<img src='/time_tracking/upload/{$row["photo"]}' style='width: 100%; border-radius: 5px;'>" : "<div style='height: 32px;'></div>")."<div style='position: absolute; top: 10px; left: 5px;'>{$row["icon"]}</div></td>
-					<td>".(($row["passport"] ? "<a href='/uploads/{$row["passport"]}' target='_blank'><img src='/uploads/{$row["passport"]}' style='width: 100%; border-radius: 5px;'></a>" : ""))."</td>
+					<td style='position: relative;'>
+						".($row["photo"] ? "<img src='/time_tracking/upload/{$row["photo"]}' style='width: 100%; border-radius: 5px;'>" : "<div style='height: 32px;'></div>")."
+						<div style='position: absolute; top: 10px; left: 5px;'>{$row["icon"]}</div>
+						".(($row["passport"] ? "<a style='position: absolute; bottom: 10px; right: 5px;' href='/uploads/{$row["passport"]}' target='_blank' title='Паспорт'><i class='fa-solid fa-passport fa-2x' style='filter: drop-shadow(0px 0px 2px #000);'></i></a>" : ""))."
+					</td>
 					<td>{$row["Surname"]}</td>
 					<td>{$row["Name"]}</td>
 					<td>{$row["phone"]}</td>
