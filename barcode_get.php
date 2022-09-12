@@ -20,7 +20,7 @@ $from_ip = $row["from_ip"];
 $notification_group = $row["notification_group"];
 
 // Проверка доступа и корректность кода (не менее 8 символов)
-if( $ip == $from_ip or 1) {
+if( $ip == $from_ip ) {
 	////////////////////////////////////////////////////////
 	// функции сбора данных с весовых терминалов
 	include "functions_WT.php";
