@@ -15,7 +15,7 @@ $F_ID = $row["F_ID"];
 
 if( !$F_ID ) die("Access denied");
 
-define('LIMIT_PALLETS', 22);
+//define('LIMIT_PALLETS', 22);
 
 $shipment_group = $row["shipment_group"];
 
@@ -303,15 +303,48 @@ if( isset($_POST["lpp_id"]) ) {
 				</tbody>
 			</table>
 		";
-		if( $i == LIMIT_PALLETS ) {
-			echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
-			echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
-			if( $status ) { // Если поддон не был в списке
-				echo "
-					<script>
-						$('#do').html('<h2 style=\'color: red;\'>В списке ".LIMIT_PALLETS." поддона. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
-					</script>
-				";
+//		if( $i == LIMIT_PALLETS ) {
+//			echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
+//			echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
+//			if( $status ) { // Если поддон не был в списке
+//				echo "
+//					<script>
+//						$('#do').html('<h2 style=\'color: red;\'>В списке ".LIMIT_PALLETS." поддона. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
+//					</script>
+//				";
+//			}
+//		}
+		if( $i > 0 ) {
+			// Узнаем ограничение на количество паллетов в машине
+			$query = "
+				SELECT CB.limit_pallets
+				FROM list__PackingPallet LPP
+				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+				JOIN ClientBrand CB ON CB.CB_ID = CW.CB_ID
+				WHERE LPP.scan_time IS NOT NULL
+					AND LPP.shipment_time IS NULL
+				GROUP BY CB.CB_ID
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			$row = mysqli_fetch_array($res);
+			$limit_pallets = $row["limit_pallets"];
+
+			if( $limit_pallets > 0 ) {
+				if( $i == $limit_pallets )
+				echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
+				echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
+				if( $status ) { // Если сканированный поддон еще не в списке
+					echo "
+						<script>
+							$('#do').html('<h2 style=\'color: red;\'>В списке ".$limit_pallets." поддона. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
+						</script>
+					";
+				}
+			}
+			else {
+				echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
+				echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
 			}
 		}
 		echo "</form>";
