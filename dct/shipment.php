@@ -331,15 +331,16 @@ if( isset($_POST["lpp_id"]) ) {
 			$limit_pallets = $row["limit_pallets"];
 
 			if( $limit_pallets > 0 ) {
-				if( $i == $limit_pallets )
-				echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
-				echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
-				if( $status ) { // Если сканированный поддон еще не в списке
-					echo "
-						<script>
-							$('#do').html('<h2 style=\'color: red;\'>В списке ".$limit_pallets." поддона. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
-						</script>
-					";
+				if( $i == $limit_pallets ) {
+					echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
+					echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
+					if( $status ) { // Если сканированный поддон еще не в списке
+						echo "
+							<script>
+								$('#do').html('<h2 style=\'color: red;\'>В списке ".$limit_pallets." поддона. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
+							</script>
+						";
+					}
 				}
 			}
 			else {
