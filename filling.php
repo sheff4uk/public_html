@@ -162,6 +162,7 @@ foreach ($_GET as &$value) {
 		display: block;
 		line-height: .4em;
 		color: red;
+		display: none;
 	}
 </style>
 
