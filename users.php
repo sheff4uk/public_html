@@ -224,7 +224,84 @@ if( !in_array('users', $Rights) ) {
 	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
 	die('Недостаточно прав для совершения операции');
 }
+
+// Если не выбран участок, берем из сессии
+//if( !$_GET["F_ID"] ) {
+//	$_GET["F_ID"] = $_SESSION['F_ID'];
+//}
 ?>
+
+<!--Фильтр-->
+<div id="filter">
+	<h3>Фильтр</h3>
+	<form method="get" style="position: relative;">
+		<a href="/users.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Участок:</span>
+			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT F_ID
+						,f_name
+					FROM factory
+					ORDER BY F_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["F_ID"] == $_GET["F_ID"]) ? "selected" : "";
+					echo "<option value='{$row["F_ID"]}' {$selected}>{$row["f_name"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Аутсорсер:</span>
+			<select name="outsrc" class="<?=($_GET["outsrc"] != '') ? "filtered" : ""?>" onchange="this.form.submit()">
+				<option value=""></option>
+				<option <?=(($_GET["outsrc"] == '1') ? "selected" : "")?> value="1">Да</option>
+				<option <?=(($_GET["outsrc"] == '0') ? "selected" : "")?> value="0">Нет</option>
+			</select>
+		</div>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Активен:</span>
+			<select name="act" class="<?=($_GET["act"] != '') ? "filtered" : ""?>" onchange="this.form.submit()">
+				<option value=""></option>
+				<option <?=(($_GET["act"] == '1') ? "selected" : "")?> value="1">Да</option>
+				<option <?=(($_GET["act"] == '0') ? "selected" : "")?> value="0">Нет</option>
+			</select>
+		</div>
+
+		<button style="float: right;">Фильтр</button>
+	</form>
+</div>
+
+<?
+// Узнаем есть ли фильтр
+$filter = 0;
+foreach ($_GET as &$value) {
+	if( $value ) $filter = 1;
+}
+?>
+<script>
+	$(document).ready(function() {
+		$( "#filter" ).accordion({
+			active: <?=($filter ? "0" : "false")?>,
+			collapsible: true,
+			heightStyle: "content"
+		});
+
+		// При скроле сворачивается фильтр
+		$(window).scroll(function(){
+			$( "#filter" ).accordion({
+				active: "false"
+			});
+		});
+	});
+</script>
 
 <style>
 	.not_act td {
@@ -285,6 +362,10 @@ if( !in_array('users', $Rights) ) {
 			FROM Users USR
 			JOIN Roles RL ON RL.RL_ID = USR.RL_ID
 			JOIN factory F ON F.F_ID = USR.F_ID
+			WHERE 1
+				".(($_GET["F_ID"] != '') ? "AND USR.F_ID = {$_GET["F_ID"]}" : "")."
+				".(($_GET["outsrc"] != '') ? "AND IFNULL(USR.outsourcer, 0) = {$_GET["outsrc"]}" : "")."
+				".(($_GET["act"] != '') ? "AND IFNULL(USR.act, 0) = {$_GET["act"]}" : "")."
 			ORDER BY USR.F_ID, USR.RL_ID, USR.Surname, USR.Name
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
