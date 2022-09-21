@@ -350,7 +350,7 @@ foreach ($_GET as &$value) {
 				,USR.head
 				,USR.phone
 				,USR.photo
-				,USR.passport
+				#,USR.passport
 				,USR.RL_ID
 				,USR.cardcode
 				,USR.F_ID
@@ -436,6 +436,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					</select>
 				</div>
 			</div>
+<!--
 			<div>
 				<label>Паспорт:</label>
 				<div>
@@ -443,6 +444,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<input type='file' name='uploadfile'>
 				</div>
 			</div>
+-->
 			<div>
 				<label>Фамилия:</label>
 				<div>

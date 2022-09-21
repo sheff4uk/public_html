@@ -2,7 +2,7 @@
 include "config.php";
 
 // Сохранение/редактирование
-if( isset($_POST["F_ID"]) ) {
+if( isset($_POST["tariff"]) ) {
 	session_start();
 	$F_ID = $_POST["F_ID"];
 	$month = $_POST["month"];
@@ -47,6 +47,40 @@ if( isset($_POST["F_ID"]) ) {
 	// Перенаправление в табель
 	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&outsrc='.$outsrc.'">');
 }
+
+///////////////////////
+// Сохранение файлов //
+///////////////////////
+if( $_FILES['uploadfile']['name'] ) {
+	session_start();
+	$F_ID = $_POST["F_ID"];
+	$month = $_POST["month"];
+	$outsrc = $_POST["outsrc"];
+
+	$filename = date('U').'_'.$_FILES['uploadfile']['name'];
+	$uploaddir = './uploads/';
+	$uploadfile = $uploaddir.basename($filename);
+	// Копируем файл из каталога для временного хранения файлов:
+	if (copy($_FILES['uploadfile']['tmp_name'], $uploadfile))
+	{
+		// Записываем в БД информацию о файле
+		$query = "
+			INSERT INTO UserAttachments
+			SET USR_ID = {$_POST["USR_ID"]}
+				,filename = '{$filename}'
+				,comment = '{$_POST["comment"]}'
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+		$_SESSION["success"][] = "Файл ".$_FILES['uploadfile']['name']." успешно загружен на сервер.";
+	}
+	else {
+		$_SESSION["alert"][] = "Ошибка! Не удалось загрузить файл на сервер!";
+	}
+	// Перенаправление в табель
+	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&outsrc='.$outsrc.'">');
+}
+//////////////////////////////
 
 $title = 'Табель';
 include "header.php";
@@ -272,6 +306,8 @@ foreach ($_GET as &$value) {
 		$daycnt = array();
 		// Массив регистраций
 		$TimeReg = array();
+		// Массив файлов
+		$UserAttachments = array();
 
 		// Получаем список работников
 		$query = "
@@ -295,10 +331,23 @@ foreach ($_GET as &$value) {
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
-			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'><a href='users.php?USR_ID={$row["USR_ID"]}' target='_blank'>{$row["Name"]}</a></td>";
+			// Заполняем массив файлов
+			$query = "
+				SELECT UA.UA_ID
+					,UA.filename
+					,UA.comment
+				FROM UserAttachments UA
+				WHERE UA.USR_ID = {$row["USR_ID"]}
+			";
+			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $subrow = mysqli_fetch_array($subres) ) {
+				$UserAttachments[$row["USR_ID"]][] = array("UA_ID" => $subrow["UA_ID"], "filename" => "{$subrow["filename"]}", "comment" => "{$subrow["comment"]}");
+			}
+
+			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'><a href='#' class='usercell' USR_ID='{$row["USR_ID"]}' name='{$row["Name"]}'>{$row["Name"]}</a></td>";
 			?>
 			<td colspan="2" style="overflow: hidden;">
-				<?=$_GET["month"] == date('Ym') ? "<a href='#' class='tariff_edit' tariff='{$row["tariff"]}' type='{$row["type"]}' USR_ID='{$row["USR_ID"]}' name='{$row["Name"]}'><i class='fa fa-pencil-alt'></i>" : ""?>
+				<?=$_GET["month"] == date('Ym') ? "<a href='#' class='tariff_edit' tariff='{$row["tariff"]}' type='{$row["type"]}' USR_ID='{$row["USR_ID"]}' name='{$row["Name"]}'>" : ""?>
 					<?=$row["tariff"]?>
 					<br>
 					<?=($row["type"] == 1 ? "Смена" : ($row["type"] == 2 ? "Час" : ($row["type"] == 3 ? "Тракторист" : "")))?>
@@ -484,6 +533,38 @@ this.subbut.value='Подождите, пожалуйста!';">
 	</form>
 </div>
 
+<div id='uploads_form' class="addproduct" style='display:none;'>
+	<form enctype='multipart/form-data' method='post' onsubmit="JavaScript:this.subbut.disabled=true;
+this.subbut.value='Подождите, пожалуйста!';">
+		<fieldset>
+			<input type="hidden" name="F_ID" value="<?=$F_ID?>">
+			<input type="hidden" name="month" value="<?=$_GET["month"]?>">
+			<input type="hidden" name="outsrc" value="<?=$outsrc?>">
+			<input type="hidden" name="USR_ID">
+
+			<a id="user_edit" href="" target="_blank" class="button">Редактировать данные работника</a>
+
+			<table style="width: 100%;">
+				<thead>
+					<tr>
+					<th width="">Файл</th>
+					<th width="">Комментарий</th>
+					<th width=""></th>
+					</tr>
+				</thead>
+				<tbody id="attachments"></tbody>
+			</table>
+
+			<input type="file" name="uploadfile">
+			<input type="text" name="comment" placeholder="Комментарий">
+		</fieldset>
+		<div>
+			<hr>
+			<input type='submit' name="subbut" value='Загрузить' style='float: right;'>
+		</div>
+	</form>
+</div>
+
 <script>
 	$(function(){
 		// Подсвечивание столбцов таблицы
@@ -491,6 +572,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 		// Массив регистраций в JSON
 		TimeReg = <?= json_encode($TimeReg); ?>;
+
+		// Массив файлов в JSON
+		UserAttachments = <?= json_encode($UserAttachments); ?>;
 
 		$(".print").printPage();
 
@@ -512,6 +596,40 @@ this.subbut.value='Подождите, пожалуйста!';">
 				title: name,
 				resizable: false,
 				width: 500,
+				modal: true,
+				closeText: 'Закрыть'
+			});
+
+			return false;
+		});
+
+		$('.usercell').on('click', function(){
+			// Проверяем сессию
+			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
+
+			var USR_ID = $(this).attr('USR_ID'),
+				name = $(this).attr('name');
+			var arr_attachments = UserAttachments[USR_ID];
+			var html = '';
+
+			$('#uploads_form input[name=USR_ID]').val(USR_ID);
+			$('#uploads_form #user_edit').attr('href', 'users.php?USR_ID='+USR_ID);
+
+			if( arr_attachments ) {
+				$.each(arr_attachments, function(key, val){
+					html = html + "<tr>";
+					html = html + "<td><a href='/uploads/"+val["filename"]+"' target='_blank'>"+val["filename"]+"</td>";
+					html = html + "<td>"+val["comment"]+"</td>";
+					html = html + "</tr>";
+				});
+			}
+
+			$('#uploads_form #attachments').html(html);
+
+			$('#uploads_form').dialog({
+				title: 'Файлы | '+name,
+				resizable: false,
+				width: 650,
 				modal: true,
 				closeText: 'Закрыть'
 			});

@@ -842,23 +842,6 @@ td.tscell > i {
 	opacity: 1;
 }
 
-#wr_order_change_log {
-	height: 300px;
-	margin-top: 10px;
-	background: #fff;
-/*	border: 1px solid #bbb;*/
-	padding: 10px;
-/*	border-radius: 10px;*/
-	position: relative;
-}
-#order_log_table, #order_message, #attachments {
-	height: calc(100% - 60px);
-	position: absolute;
-	overflow-y: scroll;
-	background: #fff;
-	width: calc(100% - 20px);
-	box-shadow: 0 0 1px #666;
-}
 #navbar_workflow {
 	width: 20px;
 	height: 20px;
