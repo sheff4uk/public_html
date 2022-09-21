@@ -1,5 +1,6 @@
 <?
 include "config.php";
+include "checkrights.php";
 
 // Сохранение/редактирование
 if( isset($_POST["tariff"]) ) {
@@ -60,6 +61,8 @@ if( $_FILES['uploadfile']['name'] ) {
 	$filename = date('U').'_'.$_FILES['uploadfile']['name'];
 	$uploaddir = './uploads/';
 	$uploadfile = $uploaddir.basename($filename);
+	$comment = convert_str($_POST["comment"]);
+	$comment = mysqli_real_escape_string($mysqli, $comment);
 	// Копируем файл из каталога для временного хранения файлов:
 	if (copy($_FILES['uploadfile']['tmp_name'], $uploadfile))
 	{
@@ -68,7 +71,7 @@ if( $_FILES['uploadfile']['name'] ) {
 			INSERT INTO UserAttachments
 			SET USR_ID = {$_POST["USR_ID"]}
 				,filename = '{$filename}'
-				,comment = '{$_POST["comment"]}'
+				,comment = '{$comment}'
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
@@ -556,7 +559,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			</table>
 
 			<input type="file" name="uploadfile">
-			<input type="text" name="comment" placeholder="Комментарий">
+			<input type="text" name="comment" placeholder="Комментарий" autocomplete="off">
 		</fieldset>
 		<div>
 			<hr>
