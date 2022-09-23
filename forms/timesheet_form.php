@@ -1,5 +1,6 @@
 <?
 include_once "../config.php";
+include_once "../checkrights.php";
 
 // Сохранение/редактирование
 if( isset($_POST["F_ID"]) ) {
@@ -12,7 +13,7 @@ if( isset($_POST["F_ID"]) ) {
 		$TS_ID = $_POST["TS_ID"];
 	}
 	else {
-		if( $_POST["tr_time1"] or $_POST["tr_time2"] or $_POST["status"] != '' or $_POST["substitute"] ) {
+		if( $_POST["tr_time1"] or $_POST["tr_time2"] or $_POST["status"] != '' or $_POST["substitute"] or $_POST["payout"] ) {
 			// Делаем запись в табеле
 			$ts_date = $_POST["ts_date"];
 			$USR_ID = $_POST["usr_id"];
@@ -171,6 +172,23 @@ if( isset($_POST["F_ID"]) ) {
 	}
 	///////////////////////////////////
 
+	////////////////////
+	// Обновляем займ //
+	////////////////////
+	if( $TS_ID ) {
+		$payout = ($_POST["payout"] != '' ? $_POST["payout"] : "NULL");
+		$comment = convert_str($_POST["comment"]);
+		$comment = mysqli_real_escape_string($mysqli, $comment);
+		$query = "
+			UPDATE Timesheet
+			SET payout = {$payout}
+				,comment = '{$comment}'
+			WHERE TS_ID = {$TS_ID}
+		";
+		mysqli_query( $mysqli, $query );
+	}
+	///////////////////////////////////
+
 	// Перенаправление в табель
 	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&outsrc='.$outsrc.'#'.$TS_ID.'">');
 }
@@ -205,6 +223,18 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 			<div id="hide"><!--Формируется скриптом--></div>
 			<div id="summary"><!--Формируется скриптом--></div>
+
+			<fieldset>
+				<legend style="font-size: 1.3em;">Займ:</legend>
+				<div style="display: flex; justify-content: space-between; font-size: 1.3em;">
+					<div style="display: flex; margin: 1em 0;">
+						<input type="number" name="payout" min="0" placeholder="Сумма" style="width: 100px;">
+					</div>
+					<div style="display: flex; margin: 1em 0;">
+						<input type="text" name="comment" placeholder="Комментарий"  style="width: 400px;" autocomplete="off">
+					</div>
+				</div>
+			</fieldset>
 
 			<div style="display: flex; justify-content: space-between; font-size: 1.3em;">
 				<div style="display: flex; margin: 1em 0;">
@@ -275,6 +305,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 			$('#timesheet_form select[name=status]').val('');
 			$('#timesheet_form select[name=substitute]').val('');
+			$('#timesheet_form input[name=payout]').val('');
+			$('#timesheet_form input[name=comment]').val('');
 
 			var ts_id = $(this).attr('ts_id'),
 				date_format = $(this).attr('date_format'),
@@ -294,10 +326,14 @@ this.subbut.value='Подождите, пожалуйста!';">
 					rate = $(this).attr('rate'),
 					status = $(this).attr('status'),
 					substitute = $(this).attr('substitute'),
-					photo = $(this).attr('photo');
+					photo = $(this).attr('photo'),
+					payout = $(this).attr('payout'),
+					comment = $(this).attr('comment');
 
 				$('#timesheet_form select[name=status]').val(status);
 				$('#timesheet_form select[name=substitute]').val(substitute);
+				$('#timesheet_form input[name=payout]').val(payout);
+				$('#timesheet_form input[name=comment]').val(comment);
 
 				var html_photo = '';
 				if( photo ) {

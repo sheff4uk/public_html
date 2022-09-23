@@ -183,6 +183,8 @@ echo "<title>Табель версия для печати</title>";
 					,TS.status
 					,(SELECT USR_ID FROM Timesheet WHERE TS_ID = TS.sub_TS_ID) substitute
 					,(SELECT SUM(1) FROM Timesheet WHERE sub_TS_ID = TS.TS_ID) sub_is
+					,TS.payout
+					,TS.comment
 				FROM Timesheet TS
 				JOIN TariffMonth TM ON TM.TM_ID = TS.TM_ID
 				WHERE YEAR(TS.ts_date) = {$year}
@@ -211,20 +213,21 @@ echo "<title>Табель версия для печати</title>";
 					$pay = ($subrow["pay"] != null) ? round($subrow["pay"] * $subrow["rate"]) : null;
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible;' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}'>
-							{$pay}
+						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible;' class='tscell nowrap' >
+							<div>{$pay}</div>
+							".($subrow["payout"] ? "<div>-{$subrow["payout"]}</div>" : "")."
 							".($subrow["status"] == '0' ? "<div class='label'>&mdash;</div>" : ($subrow["status"] == '1' ? "<div class='label'>ОТП</div>" : ($subrow["status"] == '2' ? "<div class='label'>УВ</div>" : ($subrow["status"] == '3' ? "<div class='label'>Б</div>" : ($subrow["status"] == '4' ? "<div class='label'>В</div>" : ($subrow["status"] == '5' ? "<div class='label'>ПР</div>" : ""))))))."
 						</td>
 					";
 
 					if( $i < 16 ) {
-						$sigmapay1 += $pay;
+						$sigmapay1 += $pay - $subrow["payout"];
 					}
 					else {
-						$sigmapay2 += $pay;
+						$sigmapay2 += $pay - $subrow["payout"];
 					}
 					$dayduration[$i] += $subrow["duration"];
-					$daypay[$i] += $pay;
+					$daypay[$i] += $pay - $subrow["payout"];
 					$daycnt[$i] += ($pay > 0 ? 1 : 0);
 
 					if( $subrow = mysqli_fetch_array($subres) ) {
