@@ -274,7 +274,9 @@ if( isset($_POST["cardcode"]) ) {
 					,DATE_FORMAT(TR.tr_time, '%H:%i') tr_time
 					,TR.del_time
 				FROM TimeReg TR
-				JOIN Timesheet TS ON TS.TS_ID = TR.TS_ID AND TS.ts_date = CURDATE()
+				JOIN Timesheet TS ON TS.TS_ID = TR.TS_ID
+					AND TS.ts_date = CURDATE()
+					AND TS.F_ID = {$F_ID}
 				ORDER BY `name`, TR.tr_time
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
