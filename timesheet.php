@@ -350,7 +350,7 @@ foreach ($_GET as &$value) {
 			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'><a href='#' class='usercell' USR_ID='{$row["USR_ID"]}' name='{$row["Name"]}'>{$row["Name"]}</a></td>";
 			?>
 			<td colspan="2" style="overflow: hidden;">
-				<?=$_GET["month"] == date('Ym') ? "<a href='#' class='tariff_edit' tariff='{$row["tariff"]}' type='{$row["type"]}' USR_ID='{$row["USR_ID"]}' name='{$row["Name"]}'>" : ""?>
+				<?=$_GET["month"] == date('Ym') ? "<a href='#' class='tariff_edit' tariff='{$row["tariff"]}' type='{$row["type"]}' USR_ID='{$row["USR_ID"]}' name='{$row["Name"]}'><i class='fa fa-pencil-alt fa-lg'></i>" : ""?>
 					<?=$row["tariff"]?>
 					<br>
 					<?=($row["type"] == 1 ? "Смена" : ($row["type"] == 2 ? "Час" : ($row["type"] == 3 ? "Тракторист" : "")))?>
