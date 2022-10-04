@@ -24,9 +24,14 @@ if( !$_GET["date_to"] ) {
 include "./forms/fuel_accounting_form.php";
 
 // Узнаем баланс топлива
+//$query = "
+//	SELECT SUM(FT.ft_balance) ft_balance
+//	FROM fuel__Tank FT
+//";
 $query = "
-	SELECT SUM(FT.ft_balance) ft_balance
+	SELECT FT.ft_balance
 	FROM fuel__Tank FT
+	WHERE FT.FT_ID = {$FT_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
