@@ -209,7 +209,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			AND PB.cycle = '{$row["cycle"]}'
 			AND PB.F_ID = {$_GET["F_ID"]}
 		GROUP BY PB.PB_ID
-		ORDER BY PB.CW_ID
+		#ORDER BY PB.CW_ID
+		ORDER BY IFNULL(PB.print_time, NOW()) DESC
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
