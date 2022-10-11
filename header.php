@@ -184,18 +184,18 @@ function src_url($src) {
 			$menu["Бланки"] = "blanks.php";
 		}
 		if( in_array('plan_batch', $Rights) ) {
-			$menu["План"]["<i class='fas fa-fill fa-lg'></i> Заливка"] = "plan_batch.php";
+			$menu["Производство"]["<i class='fas fa-clipboard-list fa-lg'></i> График заливки"] = "plan_batch.php";
 		}
 		if( in_array('filling_opening', $Rights) ) {
-			$menu["Факт"]["<i class='fas fa-fill-drip fa-lg'></i> Чек листы операторов"] = "filling.php";
-			$menu["Факт"]["<i class='fas fa-expand fa-lg'></i> Расформовка"] = "opening.php";
-			$menu["Факт"]["<i class='fas fa-industry fa-lg'></i> Стадии производства"] = "manufacturing.php";
+			$menu["Производство"]["<i class='fas fa-fill-drip fa-lg'></i> Чек листы операторов"] = "filling.php";
+			$menu["Производство"]["<i class='fas fa-expand fa-lg'></i> Расформовка"] = "opening.php";
+			$menu["Производство"]["<i class='fas fa-industry fa-lg'></i> Стадии производства"] = "manufacturing.php";
 		}
 		if( in_array('stock', $Rights) ) {
-			$menu["Факт"]["<i class='fas fa-pallet fa-lg'></i> Склад продукции"] = "stock.php";
+			$menu["Производство"]["<i class='fas fa-pallet fa-lg'></i> Склад продукции"] = "stock.php";
 		}
 		if( in_array('shipment', $Rights) ) {
-			$menu["Факт"]["<i class='fas fa-truck fa-lg'></i> Отгрузка"] = "shipment.php";
+			$menu["Производство"]["<i class='fas fa-truck fa-lg'></i> Отгрузка"] = "shipment.php";
 		}
 		if( in_array('daily_production', $Rights) ) {
 			$menu["Анализ"]["<i class='fas fa-cogs fa-lg'></i> Заливки по суткам"] = "daily_production.php";

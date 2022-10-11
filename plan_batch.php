@@ -1,6 +1,6 @@
 <?
 include "config.php";
-$title = 'План заливки';
+$title = 'График заливки';
 include "header.php";
 
 // Проверка прав на доступ к экрану
