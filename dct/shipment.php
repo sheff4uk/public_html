@@ -175,6 +175,7 @@ if( isset($_POST["lpp_id"]) ) {
 					,DATE_FORMAT(LPP.scan_time, '%d.%m.%Y %H:%i:%s') scan_time_format
 					,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i:%s') shipment_time_format
 					,IFNULL(LPP.PN_ID, 0) PN_ID
+					,(96 - TIMESTAMPDIFF(HOUR, LPP.packed_time, NOW())) duration
 				FROM list__PackingPallet LPP
 				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
 				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
@@ -248,12 +249,18 @@ if( isset($_POST["lpp_id"]) ) {
 			}
 			else {
 				$status = 1;
+				if( $row["duration"] > 0 ) {
+					echo "<span style='color: #f00; font-size: 2em; font-weight: bold;'>Отгрузка запрещена!</span><br>";
+					echo "<span>До полного созревания необходимо <b>{$row["duration"]}</b> ч.</span>";
+				}
+				else {
 				?>
 					<input type="hidden" name="WT_ID" value="<?=$_GET["WT_ID"]?>">
 					<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
 					<input type="hidden" name="PN_ID" value="1">
 					<input type="submit" value="В список ⬇" style="background-color: green; font-size: 2em; color: white;">
 				<?
+				}
 			}
 			echo "</form>";
 			echo "</fieldset>";
