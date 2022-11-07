@@ -103,9 +103,10 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 							$query = "
 								DELETE FROM list__Weight
 								WHERE weight = ABS({$netWeight})
+									AND WT_ID = {$deviceID}
 									AND goodsID = {$goodsID}
 									AND RN = {$ReceiptNumber}
-								ORDER BY LW_ID DESC
+								ORDER BY nextID DESC
 								LIMIT 1
 							";
 							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

@@ -334,7 +334,7 @@ $query = "
 		,LOD.def_form
 		,LOD.def_assembly
 		,PB.in_cassette
-		,COUNT(DISTINCT LW.LW_ID) cnt_weight
+		,COUNT(LW.nextID) cnt_weight
 		#,MIN(LW.weight) min_weight
 		,ROUND(AVG(LW.weight)) avg_weight
 		#,MAX(LW.weight) max_weight
@@ -349,10 +349,7 @@ $query = "
 		,LB.LB_ID
 		,LB.mix_density
 		,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
-			#,COUNT(DISTINCT LO.LO_ID, SLO.LO_ID) dbl
-			#,SUM(1) dbl
 	FROM list__Opening LO
-	#JOIN list__Opening SLO ON SLO.cassette = LO.cassette AND SLO.LF_ID = LO.LF_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 	LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
