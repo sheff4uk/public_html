@@ -248,6 +248,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							<option value="3">Больничный</option>
 							<option value="4">Выходной</option>
 							<option value="5">Прогул</option>
+							<option value="6">Командировка</option>
 						</select>
 					</div>
 				</div>
