@@ -139,6 +139,8 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 //									,weighing_time = '{$transactionDate}'
 //									,goodsID = {$goodsID}
 //									,RN = {$ReceiptNumber}
+//								ON DUPLICATE KEY UPDATE
+//									weighing_time = '{$transactionDate}'
 //							";
 //							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 //						}
