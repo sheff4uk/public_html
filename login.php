@@ -163,10 +163,11 @@ switch( $_GET["do"] ) {
 			$code = str_replace(" ", "", $_POST['code']);
 			// Если код верный - сохраняем в сессию пользователя и покидаем экран
 			if( $code == $_SESSION["code"] ) {
-				$query = "SELECT USR_ID, last_url FROM Users WHERE phone='{$_SESSION['mtel']}'";
+				$query = "SELECT USR_ID, F_ID, last_url FROM Users WHERE phone='{$_SESSION['mtel']}'";
 				$result = mysqli_query( $mysqli, $query );
 				$myrow = mysqli_fetch_array($result);
 				$_SESSION['id'] = $myrow['USR_ID'];
+				$_SESSION['F_ID'] = $myrow['F_ID'];
 				unset($_SESSION['code']);
 				unset($_SESSION['mtel']);
 
