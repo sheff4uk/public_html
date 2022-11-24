@@ -14,11 +14,15 @@ $F_ID = $row["F_ID"];
 if( !$F_ID ) die("Access denied");
 
 if( isset($_POST["cardcode"]) ) {
+	// Выделяем префикс и номер карты
+	$prefix = substr($_POST["cardcode"], 0, 1)
+	$cardcode = substr($_POST["cardcode"], 1, 10)
+
 	// Верифицируем работника
 	$query = "
 		SELECT USR.USR_ID
 		FROM Users USR
-		WHERE USR.cardcode LIKE '{$_POST["cardcode"]}'
+		WHERE USR.cardcode LIKE '{$cardcode}'
 			AND USR.act = 1
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -78,7 +82,7 @@ if( isset($_POST["cardcode"]) ) {
 		$query = "
 			INSERT INTO TimeReg
 			SET TS_ID = {$TS_ID}
-				,cardcode = '{$_POST["cardcode"]}'
+				,cardcode = '{$cardcode}'
 				#,tr_time = TIME(NOW())
 				,tr_time = DATE_FORMAT(NOW(), '%H:%i:00')
 		";
@@ -248,7 +252,7 @@ if( isset($_POST["cardcode"]) ) {
 						if( code==13 || code==9 )// Enter key hit. Tab key hit.
 						{
 							console.log(cardcode);
-							if( cardcode.length == 10 ) {
+							if( cardcode.length == 11 ) {
 								$("input[name=cardcode]").val(cardcode);
 								$( "#target input[name=subbut]" ).click();
 								cardcode="";
