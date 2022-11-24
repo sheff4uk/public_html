@@ -15,8 +15,8 @@ if( !$F_ID ) die("Access denied");
 
 if( isset($_POST["cardcode"]) ) {
 	// Выделяем префикс и номер карты
-	$prefix = substr($_POST["cardcode"], 0, 1)
-	$cardcode = substr($_POST["cardcode"], 1, 10)
+	$prefix = substr($_POST["cardcode"], 0, 1);
+	$cardcode = substr($_POST["cardcode"], 1, 10);
 
 	// Верифицируем работника
 	$query = "
