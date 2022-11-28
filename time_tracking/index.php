@@ -82,6 +82,7 @@ if( isset($_POST["cardcode"]) ) {
 		$query = "
 			INSERT INTO TimeReg
 			SET TS_ID = {$TS_ID}
+				,prefix = {$prefix}
 				,cardcode = '{$cardcode}'
 				#,tr_time = TIME(NOW())
 				,tr_time = DATE_FORMAT(NOW(), '%H:%i:00')
