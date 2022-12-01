@@ -13,7 +13,7 @@ if( isset($_POST["F_ID"]) ) {
 		$TS_ID = $_POST["TS_ID"];
 	}
 	else {
-		if( $_POST["tr_time1"] or $_POST["tr_time2"] or $_POST["status"] != '' or $_POST["substitute"] or $_POST["payout"] ) {
+		if( $_POST["tr_time1"] or $_POST["tr_time0"] or $_POST["status"] != '' or $_POST["substitute"] or $_POST["payout"] ) {
 			// Делаем запись в табеле
 			$ts_date = $_POST["ts_date"];
 			$USR_ID = $_POST["usr_id"];
@@ -42,7 +42,7 @@ if( isset($_POST["F_ID"]) ) {
 		";
 		mysqli_query( $mysqli, $query );
 	}
-	if( $_POST["tr_time2"] ) {
+	if( $_POST["tr_time0"] ) {
 		$tr_time2 = $_POST["tr_time2"];
 		$query = "
 			INSERT INTO TimeReg
@@ -165,7 +165,7 @@ if( isset($_POST["F_ID"]) ) {
 		$query = "
 			UPDATE Timesheet
 			SET status = {$status}
-				,pay = IF({$status} = 5 AND pay IS NULL, -5000, IF(IFNULL({$status}, 0) != 5 AND pay < 0, NULL, pay))
+				,fine = IF({$status} = 5, 5000, NULL)
 			WHERE TS_ID = {$TS_ID}
 		";
 		mysqli_query( $mysqli, $query );
@@ -224,22 +224,11 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<div id="hide"><!--Формируется скриптом--></div>
 			<div id="summary"><!--Формируется скриптом--></div>
 
-			<fieldset>
-				<legend style="font-size: 1.3em;">Займ:</legend>
-				<div style="display: flex; justify-content: space-between; font-size: 1.3em;">
-					<div style="display: flex; margin: 1em 0;">
-						<input type="number" name="payout" min="0" placeholder="Сумма" style="width: 100px;">
-					</div>
-					<div style="display: flex; margin: 1em 0;">
-						<input type="text" name="comment" placeholder="Комментарий"  style="width: 400px;" autocomplete="off">
-					</div>
-				</div>
-			</fieldset>
 
 			<div style="display: flex; justify-content: space-between; font-size: 1.3em;">
-				<div style="display: flex; margin: 1em 0;">
-					<label style="margin-right: .5em; line-height: 1.8em;">Статус:</label>
-					<div>
+				<fieldset>
+					<legend>Статус:</legend>
+					<div style="display: flex; margin: .5em 0;">
 						<select name="status" style="width: 150px;">
 							<option value=""></option>
 							<option value="0">Прочерк</option>
@@ -251,8 +240,20 @@ this.subbut.value='Подождите, пожалуйста!';">
 							<option value="6">Командировка</option>
 						</select>
 					</div>
-				</div>
+				</fieldset>
 
+				<fieldset>
+					<legend>Займ:</legend>
+					<div style="display: flex; justify-content: space-between;">
+						<div style="display: flex; margin: .5em 0;">
+							<input type="number" name="payout" min="0" placeholder="Сумма" style="width: 100px;">
+						</div>
+						<div style="display: flex; margin: .5em 0;">
+							<input type="text" name="comment" placeholder="Комментарий"  style="width: 400px;" autocomplete="off">
+						</div>
+					</div>
+				</fieldset>
+<!--
 				<div style="display: flex; margin: 1em 0;">
 					<label style="margin-right: .5em; line-height: 1.8em;">Замещает:</label>
 					<div>
@@ -276,11 +277,13 @@ this.subbut.value='Подождите, пожалуйста!';">
 						</select>
 					</div>
 				</div>
+-->
 			</div>
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
+						<th>Смена</th>
 						<th>Время регистрации</th>
 						<th>Время добавления</th>
 						<th>Время отмены</th>
@@ -311,6 +314,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 			var ts_id = $(this).attr('ts_id'),
 				date_format = $(this).attr('date_format'),
+				date = $(this).attr('date'),
+				tomorrow = $(this).attr('tomorrow'),
 				usr_name = $(this).attr('usr_name'),
 				html = '',
 				html_hide = '',
@@ -322,6 +327,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 				var arr_reg = TimeReg[ts_id];
 				var tariff = $(this).attr('tariff'),
+					shift_cnt = $(this).attr('shift_cnt'),
 					duration = $(this).attr('duration'),
 					pay = $(this).attr('pay'),
 					rate = $(this).attr('rate'),
@@ -341,7 +347,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					html_photo = "<img src='/time_tracking/upload/"+photo+"' style='width: 100%; border-radius: 5px;'>";
 				}
 
-				html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th></th><th>Тариф</th><th>Продолжительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.3em;'><tr>";
+				html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th></th><th>Тариф</th><th>Смен</th><th>Продолжительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.3em;'><tr>";
 
 				var total;
 				if( rate > 1 ) { total = pay+"<br>x"+Math.round(rate*100)/100+"<i class='fas fa-question-circle' title='Коэффициент замещения'></i><br>="+Math.round(pay*rate); }
@@ -350,6 +356,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				html_summary = html_summary
 					+ "<td>"+html_photo+"</td>"
 					+ "<td>"+tariff+"</td>"
+					+ "<td>"+shift_cnt+"</td>"
 					+ "<td>"+duration+"</td>"
 					+ "<td>"+total+"</td>";
 					+ "</tr></tbody></table>";
@@ -368,13 +375,15 @@ this.subbut.value='Подождите, пожалуйста!';">
 						}
 
 						html = html + "<tr>";
-						html = html + "<td style='"+del_style+"'><div style='display: flex;'><div class='wr_photo' style='"+photo_style+"'><span style='-webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff; font-size: 1.5em; margin: 5px;'>"+val["tr_time"]+"</span></div></div></td>";
+						html = html + "<td style='"+del_style+"'><span style='font-size: 2em;'>"+val["shift_num"]+"</span></td>";
+						html = html + "<td style='"+del_style+"'><div style='display: flex;'><div class='wr_photo' style='"+photo_style+"'><span style='filter: drop-shadow(0px 0px 2px #000); color: #fff; font-size: 1.5em; margin: 5px;'>"+val["tr_time"]+" "+val["prefix"]+"</span></div></div></td>";
 						html = html + "<td style='"+del_style+"'><div style='height: 50px; display: flex; align-items: center; justify-content: space-evenly;'><div>"+val["add_author"]+"</div><div>"+val["add_time"]+"</div></div></td>";
 						if( val["del_time"] != '' ) {
 							html = html + "<td style='"+del_style+" color: #911;'><div style='height: 50px; display: flex; align-items: center; justify-content: space-evenly;'><div>"+val["del_author"]+"</div><div>"+val["del_time"]+"</div></div></td>";
 						}
 						else {
-							html = html + "<td style='"+del_style+"'><div style='height: 50px; display: flex; align-items: center; justify-content: space-evenly;'><label>Отменить<input type='checkbox' class='del_reg' name='del_reg[]' value='"+val["TR_ID"]+"'></label></div></td>";
+							html = html + "<td style='"+del_style+"'><div style='height: 50px; display: flex; align-items: center; justify-content: space-evenly;'></div></td>";
+							//html = html + "<td style='"+del_style+"'><div style='height: 50px; display: flex; align-items: center; justify-content: space-evenly;'><label>Отменить<input type='checkbox' class='del_reg' name='del_reg[]' value='"+val["TR_ID"]+"'></label></div></td>";
 						}
 						html = html + "</tr>";
 					});
@@ -389,8 +398,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 				html_hide = html_hide + "<input type='hidden' name='usr_id' value='"+usr_id+"'>";
 			}
 
-			html = html + "<tr><td><input type='time' name='tr_time1' style='margin: 10px; font-size: 1.5em;'><i class='fas fa-arrow-left'></i></td><td colspan='2' rowspan='2'>Чтобы добавить новую регистрацию, укажите время.</td></tr>";
-			html = html + "<tr><td><input type='time' name='tr_time2' style='margin: 10px; font-size: 1.5em;'><i class='fas fa-arrow-left'></i></td></tr>";
+//			html = html + "<tr><td colspan='2'>Открытие <input type='datetime-local' name='tr_time1' min='"+date+"T00:00' max='"+tomorrow+"T08:00' def='"+date+"T00:00' style='margin: 10px; font-size: 1.2em;'><i class='fas fa-arrow-left'></i></td><td colspan='2' rowspan='2'>Чтобы добавить новую регистрацию, укажите время.</td></tr>";
+//			html = html + "<tr><td colspan='2'>Закрытие <input type='datetime-local' name='tr_time0' min='"+date+"T00:00' max='"+tomorrow+"T08:00' def='"+tomorrow+"T08:00' style='margin: 10px; font-size: 1.2em;'><i class='fas fa-arrow-left'></i></td></tr>";
+//			html = html + "<tr><td colspan='2'><input type='time' name='tr_time1' style='margin: 10px; font-size: 1.5em;'><i class='fas fa-arrow-left'></i></td><td colspan='2' rowspan='2'>Чтобы добавить новую регистрацию, укажите время.</td></tr>";
+//			html = html + "<tr><td colspan='2'><input type='time' name='tr_time2' style='margin: 10px; font-size: 1.5em;'><i class='fas fa-arrow-left'></i></td></tr>";
 
 			$('#timesheet_form #hide').html(html_hide);
 			$('#timesheet_form #summary').html(html_summary);
@@ -411,12 +422,24 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#timesheet_form').dialog({
 				title: date_format + ' | ' + usr_name,
 				resizable: false,
-				width: 650,
+				width: 800,
 				modal: true,
 				closeText: 'Закрыть'
 			});
 
 			return false;
+		});
+
+		$('#timesheet_form #timereg').on('change', 'input[name=tr_time1]', function(event) {
+			var def = $(this).attr('def');
+				border = ($(this).val() != '') ? $(this).val() : def;
+			$('#timereg input[name=tr_time0]').attr('min', border);
+		});
+
+		$('#timesheet_form #timereg').on('change', 'input[name=tr_time0]', function(event) {
+			var def = $(this).attr('def');
+				border = ($(this).val() != '') ? $(this).val() : def;
+			$('#timereg input[name=tr_time1]').attr('max', border);
 		});
 
 		$('#timesheet_form tbody').on('change', '.del_reg', function(event) {

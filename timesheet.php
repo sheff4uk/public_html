@@ -366,13 +366,17 @@ foreach ($_GET as &$value) {
 			// Получаем список начислений по работнику за месяц
 			$query = "
 				SELECT TS.TS_ID
+					,TS.ts_date
+					,TS.ts_date + INTERVAL 1 DAY tomorrow
 					,DAY(TS.ts_date) Day
-					,TS.duration
-					,TS.pay
+					,SUM(TSS.duration) duration
+					,SUM(TSS.pay) pay
+					,TS.fine
 					,TS.rate
 					,IF(TM.type = 1, 'Смена', IF(TM.type = 2, 'Час', IF(TM.type = 3, 'Час (тракторист)', ''))) type
 					,TM.tariff
-					,CONCAT(TS.duration DIV 60, ':', LPAD(TS.duration % 60, 2, '0')) duration_hm
+					,SUM(IF(TSS.pay > 0, 1, 0)) shift_cnt
+					,GROUP_CONCAT(CONCAT(TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR ', ') duration_hm
 					,TS.status
 					,(SELECT USR_ID FROM Timesheet WHERE TS_ID = TS.sub_TS_ID) substitute
 					,(SELECT SUM(1) FROM Timesheet WHERE sub_TS_ID = TS.TS_ID) sub_is
@@ -380,10 +384,12 @@ foreach ($_GET as &$value) {
 					,TS.comment
 				FROM Timesheet TS
 				JOIN TariffMonth TM ON TM.TM_ID = TS.TM_ID
+				LEFT JOIN TimesheetShift TSS ON TSS.TS_ID = TS.TS_ID
 				WHERE YEAR(TS.ts_date) = {$year}
 					AND MONTH(TS.ts_date) = {$month}
 					AND TS.USR_ID = {$row["USR_ID"]}
 					AND TS.F_ID = {$F_ID}
+				GROUP BY TS.TS_ID
 				ORDER BY Day
 			";
 			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -405,20 +411,23 @@ foreach ($_GET as &$value) {
 					// Заполняем массив регистраций
 					$query = "
 						SELECT TR.TR_ID
-							,DATE_FORMAT(TR.tr_time, '%H:%i') tr_time
+							,TSS.shift_num
+							,IF(TR.prefix, '▶', '◼') prefix
+							,CONCAT(LPAD((TR.tr_minute DIV 60) % 24, 2, '0'), ':', LPAD(TR.tr_minute % 60, 2, '0')) tr_time
 							,TR.tr_photo
 							,CONCAT(Friendly_date(TR.add_time), '<br>', DATE_FORMAT(TR.add_time, '%H:%i:%s')) add_time
 							,IF(TR.add_author IS NOT NULL, USR_Icon(TR.add_author), '') add_author
 							,CONCAT(Friendly_date(TR.del_time), '<br>', DATE_FORMAT(TR.del_time, '%H:%i:%s')) del_time
 							,IF(TR.del_author IS NOT NULL, USR_Icon(TR.del_author), '') del_author
 						FROM TimeReg TR
-						WHERE TR.TS_ID = {$subrow["TS_ID"]}
-						ORDER BY TR.tr_time, TR.TR_ID
+						JOIN TimesheetShift TSS ON TSS.TSS_ID = TR.TSS_ID
+						WHERE TSS.TS_ID = {$subrow["TS_ID"]}
+						ORDER BY TSS.shift_num, TR.tr_minute, TR.TR_ID
 					";
 					$man_reg = 0;
 					$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $subsubrow = mysqli_fetch_array($subsubres) ) {
-						$TimeReg[$subrow["TS_ID"]][] = array("TR_ID" => $subsubrow["TR_ID"], "tr_time" => "{$subsubrow["tr_time"]}", "tr_photo" => "{$subsubrow["tr_photo"]}", "add_time" => "{$subsubrow["add_time"]}", "add_author" => "{$subsubrow["add_author"]}", "del_time" => "{$subsubrow["del_time"]}", "del_author" => "{$subsubrow["del_author"]}");
+						$TimeReg[$subrow["TS_ID"]][] = array("TR_ID" => $subsubrow["TR_ID"], "shift_num" => $subsubrow["shift_num"], "prefix" => $subsubrow["prefix"], "tr_time" => "{$subsubrow["tr_time"]}", "tr_photo" => "{$subsubrow["tr_photo"]}", "add_time" => "{$subsubrow["add_time"]}", "add_author" => "{$subsubrow["add_author"]}", "del_time" => "{$subsubrow["del_time"]}", "del_author" => "{$subsubrow["del_author"]}");
 						if( $subsubrow["add_time"] != '' and $subsubrow["del_time"] == '' ) {
 							$man_reg = 1;
 						}
@@ -427,23 +436,24 @@ foreach ($_GET as &$value) {
 					$pay = ($subrow["pay"] != null) ? round($subrow["pay"] * $subrow["rate"]) : null;
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($holidays[$i] == 1 ? " background: #09f3;" : "").($pay == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}' payout='{$subrow["payout"]}' comment='{$subrow["comment"]}'>
+						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($holidays[$i] == 1 ? " background: #09f3;" : "").($pay == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' date='{$subrow["ts_date"]}' tomorrow='{$subrow["tomorrow"]}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' shift_cnt='{$subrow["shift_cnt"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}' payout='{$subrow["payout"]}' comment='{$subrow["comment"]}'>
 							".($man_reg ? "<div style='position: absolute; top: 0px; left: 0px; width: 5px; height: 5px; border-radius: 0 0 5px 0; background: red; box-shadow: 0 0 1px 1px red;'></div>" : "")."
 							".(($subrow["sub_is"] or $subrow["substitute"]) ? "<div style='position: absolute; bottom: 0px; right: 0px; width: 5px; height: 5px; border-radius: 5px 0 0 0; background: blue; box-shadow: 0 0 1px 1px blue;'></div>" : "")."
-							<div style='".($pay < 0 ? "color: red;" : "")."' title='{$subrow["duration_hm"]}'>{$pay}</div>
+							<div title='{$subrow["duration_hm"]}'>{$pay}</div>
 							".($subrow["payout"] ? "<div style='color: red;' title='{$subrow["comment"]}'>-{$subrow["payout"]}</div>" : "")."
+							".($subrow["fine"] ? "<div style='color: red;'>-{$subrow["fine"]}</div>" : "")."
 							".($subrow["status"] == '0' ? "<div class='label'>&mdash;</div>" : ($subrow["status"] == '1' ? "<div class='label'>ОТП</div>" : ($subrow["status"] == '2' ? "<div class='label'>УВ</div>" : ($subrow["status"] == '3' ? "<div class='label'>Б</div>" : ($subrow["status"] == '4' ? "<div class='label'>В</div>" : ($subrow["status"] == '5' ? "<div class='label'>ПР</div>" : ($subrow["status"] == '6' ? "<div class='label'>КОМ</div>" : "")))))))."
 						</td>
 					";
 
 					if( $i < 16 ) {
-						$sigmapay1 += $pay - $subrow["payout"];
+						$sigmapay1 += $pay - $subrow["payout"] - $subrow["fine"];
 					}
 					else {
-						$sigmapay2 += $pay - $subrow["payout"];
+						$sigmapay2 += $pay - $subrow["payout"] - $subrow["fine"];
 					}
 					$dayduration[$i] += $subrow["duration"];
-					$daypay[$i] += $pay - $subrow["payout"];
+					$daypay[$i] += $pay - $subrow["payout"] - $subrow["fine"];
 					$daycnt[$i] += ($pay > 0 ? 1 : 0);
 
 					if( $subrow = mysqli_fetch_array($subres) ) {

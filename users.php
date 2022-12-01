@@ -350,7 +350,6 @@ foreach ($_GET as &$value) {
 				,USR.head
 				,USR.phone
 				,USR.photo
-				#,USR.passport
 				,USR.RL_ID
 				,USR.cardcode
 				,USR.F_ID
@@ -380,7 +379,8 @@ foreach ($_GET as &$value) {
 			$query = "
 				SELECT TR.tr_photo
 				FROM Timesheet TS
-				JOIN TimeReg TR ON TR.TS_ID = TS.TS_ID AND TR.tr_photo IS NOT NULL
+				JOIN TimesheetShift TSS ON TSS.TS_ID = TS.TS_ID
+				JOIN TimeReg TR ON TR.TSS_ID = TSS.TSS_ID AND TR.tr_photo IS NOT NULL
 				WHERE TS.USR_ID = {$row["USR_ID"]}
 				ORDER BY TR.TR_ID DESC
 				LIMIT 20
