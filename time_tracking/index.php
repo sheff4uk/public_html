@@ -387,7 +387,7 @@ if( isset($_POST["cardcode"]) ) {
 						// Автоматический возврат на главный экран по истечению времени
 						setTimeout(function(){
 							$(location).attr('href', "/time_tracking");
-						}, 8000);
+						}, 5000);
 					</script>
 				</form>
 			</div>
