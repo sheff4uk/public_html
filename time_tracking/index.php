@@ -425,29 +425,58 @@ if( isset($_POST["cardcode"]) ) {
 			</script>
 			<div style="display: flex; flex-direction: row; flex-wrap: wrap; padding: 5px; margin: 5px;">
 			<?
-			// Выводим список работников на смене
+			// Получаем список активных смен
 			$query = "
-				SELECT USR_Name(TS.USR_ID) `name`
-					,TR.tr_photo
-					,CONCAT(LPAD((TR.tr_minute DIV 60) % 24, 2, '0'), ':', LPAD(TR.tr_minute % 60, 2, '0')) tr_time
+				SELECT TS.ts_date
+					,DATE_FORMAT(TS.ts_date, '%d.%m.%Y') ts_date_format
+					,TSS.shift_num
+					,CONCAT(LPAD((WS.shift_start DIV 60) % 24, 2, '0'), ':', LPAD(WS.shift_start % 60, 2, '0')) shift_start
+					,CONCAT(LPAD((WS.shift_end DIV 60) % 24, 2, '0'), ':', LPAD(WS.shift_end % 60, 2, '0')) shift_end
 				FROM TimeReg TR
 				JOIN TimesheetShift TSS ON TSS.TSS_ID = TR.TSS_ID
 					AND TSS.duration IS NULL
 				JOIN Timesheet TS ON TS.TS_ID = TSS.TS_ID
 					AND TS.F_ID = {$F_ID}
+				JOIN WorkingShift WS ON WS.F_ID = {$F_ID}
+					AND WS.shift_num = TSS.shift_num
+					AND TS.ts_date BETWEEN WS.valid_from AND IFNULL(WS.valid_to, CURDATE())
 				WHERE TR.del_time IS NULL
-				ORDER BY `name`
+				GROUP BY TS.ts_date, TSS.shift_num
+				ORDER BY TS.ts_date, TSS.shift_num
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
-				?>
-				<div style="display: flex; width: 160px; height: 120px; font-size: 1.0em; background-color: #fdce46bf; background-image: url(/time_tracking/upload/<?=$row["tr_photo"]?>); background-size: contain; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px; overflow: hidden; position: relative;">
-<!--					<div style=" width: 20px; height: 20px; display: inline-block; margin: 15px; border-radius: 50%; background: green; box-shadow: 0 0 3px 3px green; position: absolute;"></div>-->
-					<span style="-webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff; position: absolute; top: 10px; right: 10px;"><?=$row["tr_time"]?></span>
-					<span style="align-self: flex-end; margin: 10px; -webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff;"><?=$row["name"]?></span>
-				</div>
-				<?
+				echo "<fieldset style='width: 100%; display: flex; flex-direction: row; flex-wrap: wrap; padding: 5px; margin: 0px;'>";
+				echo "<legend style='color: #fff; font-size: 1.5em;'><b>{$row["shift_num"]}</b> смена ({$row["shift_start"]} - {$row["shift_end"]})</legend>";
+
+				// Выводим список работников на смене
+				$query = "
+					SELECT USR_Name(TS.USR_ID) `name`
+						,TR.tr_photo
+						,CONCAT(LPAD((TR.tr_minute DIV 60) % 24, 2, '0'), ':', LPAD(TR.tr_minute % 60, 2, '0')) tr_time
+					FROM TimeReg TR
+					JOIN TimesheetShift TSS ON TSS.TSS_ID = TR.TSS_ID
+						AND TSS.duration IS NULL
+						AND TSS.shift_num = {$row["shift_num"]}
+					JOIN Timesheet TS ON TS.TS_ID = TSS.TS_ID
+						AND TS.F_ID = {$F_ID}
+						AND TS.ts_date = '{$row["ts_date"]}'
+					WHERE TR.del_time IS NULL
+					ORDER BY `name`
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					?>
+					<div style="display: flex; width: 160px; height: 120px; font-size: 1.0em; background-color: #fdce46bf; background-image: url(/time_tracking/upload/<?=$row["tr_photo"]?>); background-size: contain; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px; overflow: hidden; position: relative;">
+	<!--					<div style=" width: 20px; height: 20px; display: inline-block; margin: 15px; border-radius: 50%; background: green; box-shadow: 0 0 3px 3px green; position: absolute;"></div>-->
+						<span style="-webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff; position: absolute; top: 10px; right: 10px;"><?=$row["tr_time"]?></span>
+						<span style="align-self: flex-end; margin: 10px; -webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff;"><?=$row["name"]?></span>
+					</div>
+					<?
+				}
+				echo "</fieldset>";
 			}
+
 			?>
 			</div>
 			<div>
