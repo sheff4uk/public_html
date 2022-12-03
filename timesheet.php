@@ -27,20 +27,21 @@ if( isset($_POST["tariff"]) ) {
 
 		// Пересчитываем начисления в табеле
 		$query = "
-			SELECT GROUP_CONCAT(TS.TS_ID) TS_IDs
+			SELECT GROUP_CONCAT(TSS.TSS_ID) TSS_IDs
 			FROM Timesheet TS
+			JOIN TimesheetShift TSS ON TSS.TS_ID = TS.TS_ID
 			WHERE TS.USR_ID = {$USR_ID}
 				AND TS.F_ID = {$F_ID}
 				AND DATE_FORMAT(TS.ts_date, '%Y%m') LIKE '{$month}'
 		";
 		$res = mysqli_query( $mysqli, $query );
 		$row = mysqli_fetch_array($res);
-		$TS_IDs = $row["TS_IDs"];
+		$TSS_IDs = $row["TSS_IDs"];
 
 		$query = "
 			UPDATE TimeReg TR
-			SET TR.tr_time = TR.tr_time
-			WHERE TR.TS_ID IN (0,{$TS_IDs})
+			SET TR.tr_minute = TR.tr_minute
+			WHERE TR.TSS_ID IN (0,{$TSS_IDs})
 		";
 		mysqli_query( $mysqli, $query );
 	}

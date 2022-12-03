@@ -174,12 +174,13 @@ echo "<title>Табель версия для печати</title>";
 			$query = "
 				SELECT TS.TS_ID
 					,DAY(TS.ts_date) Day
-					,TS.duration
-					,TS.pay
+					,SUM(TSS.duration) duration
+					,SUM(TSS.pay) pay
+					,TS.fine
 					,TS.rate
 					,IF(TM.type = 1, 'Смена', IF(TM.type = 2, 'Час', IF(TM.type = 3, 'Час (тракторист)', ''))) type
 					,TM.tariff
-					,CONCAT(TS.duration DIV 60, ':', LPAD(TS.duration % 60, 2, '0')) duration_hm
+					,GROUP_CONCAT(CONCAT(TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR ', ') duration_hm
 					,TS.status
 					,(SELECT USR_ID FROM Timesheet WHERE TS_ID = TS.sub_TS_ID) substitute
 					,(SELECT SUM(1) FROM Timesheet WHERE sub_TS_ID = TS.TS_ID) sub_is
@@ -187,10 +188,12 @@ echo "<title>Табель версия для печати</title>";
 					,TS.comment
 				FROM Timesheet TS
 				JOIN TariffMonth TM ON TM.TM_ID = TS.TM_ID
+				LEFT JOIN TimesheetShift TSS ON TSS.TS_ID = TS.TS_ID
 				WHERE YEAR(TS.ts_date) = {$year}
 					AND MONTH(TS.ts_date) = {$month}
 					AND TS.USR_ID = {$row["USR_ID"]}
 					AND TS.F_ID = {$F_ID}
+				GROUP BY TS.TS_ID
 				ORDER BY Day
 			";
 			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -216,18 +219,19 @@ echo "<title>Табель версия для печати</title>";
 						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible;' class='tscell nowrap' >
 							<div>{$pay}</div>
 							".($subrow["payout"] ? "<div>-{$subrow["payout"]}</div>" : "")."
+							".($subrow["fine"] ? "<div>-{$subrow["fine"]}</div>" : "")."
 							".($subrow["status"] == '0' ? "<div class='label'>&mdash;</div>" : ($subrow["status"] == '1' ? "<div class='label'>ОТП</div>" : ($subrow["status"] == '2' ? "<div class='label'>УВ</div>" : ($subrow["status"] == '3' ? "<div class='label'>Б</div>" : ($subrow["status"] == '4' ? "<div class='label'>В</div>" : ($subrow["status"] == '5' ? "<div class='label'>ПР</div>" : ""))))))."
 						</td>
 					";
 
 					if( $i < 16 ) {
-						$sigmapay1 += $pay - $subrow["payout"];
+						$sigmapay1 += $pay - $subrow["payout"] - $subrow["fine"];
 					}
 					else {
-						$sigmapay2 += $pay - $subrow["payout"];
+						$sigmapay2 += $pay - $subrow["payout"] - $subrow["fine"];
 					}
 					$dayduration[$i] += $subrow["duration"];
-					$daypay[$i] += $pay - $subrow["payout"];
+					$daypay[$i] += $pay - $subrow["payout"] - $subrow["fine"];
 					$daycnt[$i] += ($pay > 0 ? 1 : 0);
 
 					if( $subrow = mysqli_fetch_array($subres) ) {
