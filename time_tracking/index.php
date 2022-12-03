@@ -460,7 +460,7 @@ if( isset($_POST["cardcode"]) ) {
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
 				echo "<fieldset style='width: 100%; display: flex; flex-direction: row; flex-wrap: wrap; padding: 5px; margin: 0px;'>";
-				echo "<legend style='color: #fff; font-size: 1.5em;'><b>{$row["shift_num"]}</b> смена ({$row["shift_start"]} - {$row["shift_end"]}). <font>Закрыть до {$row["deadline"]}, иначе не будет засчитана.</font></legend>";
+				echo "<legend style='color: #fff; font-size: 1.5em;'><b>{$row["shift_num"]}</b> смена ({$row["shift_start"]} - {$row["shift_end"]}). <span style='color: red;'>Закрыть до {$row["deadline"]}, иначе не будет засчитана.</span></legend>";
 
 				// Выводим список работников на смене
 				$query = "
