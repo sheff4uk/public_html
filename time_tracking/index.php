@@ -444,6 +444,7 @@ if( isset($_POST["cardcode"]) ) {
 					,TSS.shift_num
 					,CONCAT(LPAD((WS.shift_start DIV 60) % 24, 2, '0'), ':', LPAD(WS.shift_start % 60, 2, '0')) shift_start
 					,CONCAT(LPAD((WS.shift_end DIV 60) % 24, 2, '0'), ':', LPAD(WS.shift_end % 60, 2, '0')) shift_end
+					,CONCAT(LPAD(((WS.shift_end + 120) DIV 60) % 24, 2, '0'), ':', LPAD((WS.shift_end + 120) % 60, 2, '0')) deadline
 				FROM TimeReg TR
 				JOIN TimesheetShift TSS ON TSS.TSS_ID = TR.TSS_ID
 					AND TSS.duration IS NULL
@@ -459,7 +460,7 @@ if( isset($_POST["cardcode"]) ) {
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
 				echo "<fieldset style='width: 100%; display: flex; flex-direction: row; flex-wrap: wrap; padding: 5px; margin: 0px;'>";
-				echo "<legend style='color: #fff; font-size: 1.5em;'><b>{$row["shift_num"]}</b> смена ({$row["shift_start"]} - {$row["shift_end"]})</legend>";
+				echo "<legend style='color: #fff; font-size: 1.5em;'><b>{$row["shift_num"]}</b> смена ({$row["shift_start"]} - {$row["shift_end"]}). <font color='red'>Закрыть до {$row["deadline"]}, иначе не будет засчитана.</font></legend>";
 
 				// Выводим список работников на смене
 				$query = "
