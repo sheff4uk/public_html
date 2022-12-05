@@ -114,6 +114,7 @@ if( isset($_POST["cardcode"]) ) {
 						AND TSS.shift_num = {$shift_num}
 						AND TSS.duration IS NOT NULL
 					WHERE TS.ts_date = '{$ts_date}'
+						AND TS.USR_ID = {$USR_ID}
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				if( $row = mysqli_fetch_array($res) ) {
