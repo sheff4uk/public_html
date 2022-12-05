@@ -37,7 +37,7 @@ include "../config.php";
 			word-wrap: break-word;
 		}
 		.box span {
-			filter: drop-shadow(0px 0px 2px #000);
+			filter: drop-shadow(0px 0px 2px #000) drop-shadow(0px 0px 2px #000) drop-shadow(0px 0px 2px #000);
 			color: #fff;
 			font-size: 8mm;
 			margin: 2mm;
