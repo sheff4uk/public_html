@@ -406,7 +406,10 @@ foreach ($_GET as &$value) {
 					<td>{$row["cardcode"]}</td>
 					<td>".($row["outsourcer"] ? "<i class='fas fa-check'></i>" : "")."</td>
 					<td>".($row["official"] ? "<i class='fas fa-check'></i>" : "")."</td>
-					<td><a href='#' class='add_user' usr='{$row["USR_ID"]}' title='Изменить данные пользователя'><i class='fa fa-pencil-alt fa-lg'></i></td>
+					<td>
+						<a href='#' class='add_user' usr='{$row["USR_ID"]}' title='Изменить данные пользователя'><i class='fa fa-pencil-alt fa-lg'></i></a>
+						<a href='/printforms/card_label.php?USR_ID={$row["USR_ID"]}' class='print' title='Печать этикетки на карту'><i class='fa-solid fa-address-card fa-lg'></i></a>
+					</td>
 				</tr>
 			";
 		}
@@ -601,6 +604,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 		});
 
 		<?=($_GET["USR_ID"] ? "$('tr#{$_GET["USR_ID"]} .add_user').click();" : "")?>
+
+		$(".print").printPage();
 	});
 
 </script>
