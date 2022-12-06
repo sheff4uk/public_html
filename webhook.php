@@ -1,6 +1,6 @@
 <?
 include "config.php";
-require_once "vendor/autoload.php";
+//require_once "vendor/autoload.php";
 
 //try {
 //	$bot = new \TelegramBot\Api\Client(TELEGRAM_TOKEN);
@@ -23,24 +23,24 @@ require_once "vendor/autoload.php";
 //}
 
 //try {
-	$bot = new \TelegramBot\Api\Client(TELEGRAM_TOKEN);
-
-
-	//Handle /ping command
-	$bot->command('ping', function ($message) use ($bot) {
-		$bot->sendMessage($message->getChat()->getId(), 'pong!');
-	});
-
-	//Handle text messages
-	$bot->on(function (\TelegramBot\Api\Types\Update $update) use ($bot) {
-		$message = $update->getMessage();
-		$id = $message->getChat()->getId();
-		$bot->sendMessage($id, 'Your message: ' . $message->getText());
-	}, function () {
-		return true;
-	});
-
-	$bot->run();
+//	$bot = new \TelegramBot\Api\Client(TELEGRAM_TOKEN);
+//
+//
+//	//Handle /ping command
+//	$bot->command('ping', function ($message) use ($bot) {
+//		$bot->sendMessage($message->getChat()->getId(), 'pong!');
+//	});
+//
+//	//Handle text messages
+//	$bot->on(function (\TelegramBot\Api\Types\Update $update) use ($bot) {
+//		$message = $update->getMessage();
+//		$id = $message->getChat()->getId();
+//		$bot->sendMessage($id, 'Your message: ' . $message->getText());
+//	}, function () {
+//		return true;
+//	});
+//
+//	$bot->run();
 
 //} catch (\TelegramBot\Api\Exception $e) {
 //	$e->getMessage();
