@@ -21,8 +21,8 @@ include "../config.php";
 		.box {
 			position: relative;
 			overflow:hidden;
-			width:50mm;
-			height:80mm;
+			width:80mm;
+			height:50mm;
 			border: 1px solid;
 		}
 		.box img {
@@ -30,8 +30,8 @@ include "../config.php";
 			top:50%;
 			left:50%;
 			transform:translate(-50%,-50%);
-			width:50mm;
-			height:80mm;
+			width:80mm;
+			height:50mm;
 			object-fit:cover;
 			font-size: 8mm;
 			word-wrap: break-word;
@@ -42,8 +42,7 @@ include "../config.php";
 			font-size: 8mm;
 			margin: 2mm;
 			position: absolute;
-			bottom: 2mm;
-			width: 46mm;
+			bottom: 0mm;
 			word-wrap: break-word;
 			line-height: 1em;
 		}
@@ -61,7 +60,7 @@ include "../config.php";
 	$row = mysqli_fetch_array($res);
 ?>
 	<div class="box">
-		<img src="/time_tracking/upload/<?=$row["photo"]?>" alt="<?=$row["name"]?> <?=$row["name"]?>">
+		<img src="/time_tracking/upload/<?=$row["photo"]?>" alt="<?=$row["name"]?>">
 		<span><?=$row["name"]?></span>
 	</div>
 </body>
