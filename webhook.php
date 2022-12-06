@@ -2,6 +2,9 @@
 include "config.php";
 //require_once "vendor/autoload.php";
 
+$query = "INSERT INTO test SET command = 'test'";
+mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
 //try {
 //	$bot = new \TelegramBot\Api\Client(TELEGRAM_TOKEN);
 //	// команда для start
