@@ -12,7 +12,7 @@ include "../config.php";
 		body {
 			margin: 0;
 			padding: 0;
-			font: 0pt "Arial";
+			font: 10pt "Arial";
 		}
 		* {
 			box-sizing: border-box;
@@ -24,6 +24,8 @@ include "../config.php";
 			width:80mm;
 			height:50mm;
 			border: 1px solid;
+			-webkit-print-color-adjust: exact;
+			print-color-adjust: exact;
 		}
 		.box img {
 			position: absolute;
@@ -52,6 +54,7 @@ include "../config.php";
 <?
 	$query = "
 		SELECT USR_Name(USR_ID) name
+			,USR_Icon(USR_ID) icon
 			,photo
 		FROM Users
 		WHERE USR_ID = {$_GET["USR_ID"]}
@@ -62,6 +65,7 @@ include "../config.php";
 	<div class="box">
 		<img src="/time_tracking/upload/<?=$row["photo"]?>" alt="<?=$row["name"]?>">
 		<span><?=$row["name"]?></span>
+		<div style="position: absolute; top: 15px; left: 10px; transform: scale(1.5);"><?=$row["icon"]?></div>
 	</div>
 </body>
 </html>
