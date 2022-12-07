@@ -59,10 +59,7 @@ include "../config.php";
 			,USR_Icon(USR_ID) icon
 			,photo
 		FROM Users
-		#WHERE USR_ID = {$_GET["USR_ID"]}
-		WHERE F_ID = 2
-			AND act = 1
-			AND USR_ID != 2
+		WHERE USR_ID = {$_GET["USR_ID"]}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	//$row = mysqli_fetch_array($res);
