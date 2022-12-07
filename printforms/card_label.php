@@ -13,6 +13,8 @@ include "../config.php";
 			margin: 0;
 			padding: 0;
 			font: 10pt "Arial";
+			display: flex;
+			flex-wrap: wrap;
 		}
 		* {
 			box-sizing: border-box;
@@ -57,15 +59,21 @@ include "../config.php";
 			,USR_Icon(USR_ID) icon
 			,photo
 		FROM Users
-		WHERE USR_ID = {$_GET["USR_ID"]}
+		#WHERE USR_ID = {$_GET["USR_ID"]}
+		WHERE F_ID = 2
+			AND act = 1
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-	$row = mysqli_fetch_array($res);
+	//$row = mysqli_fetch_array($res);
+	while( $row = mysqli_fetch_array($res) ) {
 ?>
 	<div class="box">
 		<img src="/time_tracking/upload/<?=$row["photo"]?>">
 		<span><?=$row["name"]?></span>
 		<div style="position: absolute; top: 15px; left: 10px; transform: scale(1.5);"><?=$row["icon"]?></div>
 	</div>
+<?
+	}
+?>
 </body>
 </html>
