@@ -1,7 +1,7 @@
 <?
 include_once "../checkrights.php";
 
-$max_batches = 40; // Максимально возможное число замесов
+$max_batches = 80; // Максимально возможное число замесов
 $PB_ID = $_GET["PB_ID"];
 $query = "
 	SELECT PB.F_ID
