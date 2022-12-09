@@ -76,7 +76,7 @@ if( isset($_POST["cardcode"]) ) {
 						,WS.shift_num
 					FROM WorkingShift WS
 					WHERE WS.F_ID = {$F_ID}
-						AND {$tr_minute} + 120 BETWEEN WS.shift_start AND WS.shift_end
+						AND ({$tr_minute} + 120) % 1440 BETWEEN WS.shift_start AND WS.shift_end
 						AND CURDATE() BETWEEN WS.valid_from AND IFNULL(WS.valid_to, CURDATE())
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -91,7 +91,7 @@ if( isset($_POST["cardcode"]) ) {
 						FROM WorkingShift WS
 						WHERE WS.F_ID = {$F_ID}
 							AND {$tr_minute} + 1440 + 120 BETWEEN WS.shift_start AND WS.shift_end
-							AND CURDATE() BETWEEN WS.valid_from AND IFNULL(WS.valid_to, CURDATE())
+							AND (CURDATE() - INTERVAL 1 DAY) BETWEEN WS.valid_from AND IFNULL(WS.valid_to, CURDATE())
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					if( $row = mysqli_fetch_array($res) ) {

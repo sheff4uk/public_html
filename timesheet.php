@@ -369,6 +369,7 @@ foreach ($_GET as &$value) {
 				SELECT TS.TS_ID
 					,TS.ts_date
 					,TS.ts_date + INTERVAL 1 DAY tomorrow
+					,IF(TIMESTAMPDIFF(DAY, TS.ts_date, CURDATE()) <= 30 AND TIMESTAMPDIFF(HOUR, TS.ts_date, NOW()) >= 32, 1, 0) editable
 					,DAY(TS.ts_date) Day
 					,SUM(TSS.duration) duration
 					,SUM(TSS.pay) pay
@@ -406,8 +407,8 @@ foreach ($_GET as &$value) {
 			$i = 1;
 			while ($i <= $days) {
 				$d = str_pad($i, 2, "0", STR_PAD_LEFT);
-				$date = $year.'-'.$month.'-'.$i;
-				$day_of_week = date('N', strtotime($date));	// День недели 1..7
+				//$date = $year.'-'.$month.'-'.$d;
+				//$day_of_week = date('N', strtotime($date));	// День недели 1..7
 				if( $i == $day ) {
 					// Заполняем массив регистраций
 					$query = "
@@ -437,7 +438,7 @@ foreach ($_GET as &$value) {
 					$pay = ($subrow["pay"] != null) ? round($subrow["pay"] * $subrow["rate"]) : null;
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($holidays[$i] == 1 ? " background: #09f3;" : "").($pay == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' date='{$subrow["ts_date"]}' tomorrow='{$subrow["tomorrow"]}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' shift_cnt='{$subrow["shift_cnt"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}' payout='{$subrow["payout"]}' comment='{$subrow["comment"]}'>
+						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($holidays[$i] == 1 ? " background: #09f3;" : "").($pay == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' date='{$subrow["ts_date"]}' tomorrow='{$subrow["tomorrow"]}' editable='{$subrow["editable"]}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff"]}/{$subrow["type"]}' shift_cnt='{$subrow["shift_cnt"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}' payout='{$subrow["payout"]}' comment='{$subrow["comment"]}'>
 							".($man_reg ? "<div style='position: absolute; top: 0px; left: 0px; width: 5px; height: 5px; border-radius: 0 0 5px 0; background: red; box-shadow: 0 0 1px 1px red;'></div>" : "")."
 							".(($subrow["sub_is"] or $subrow["substitute"]) ? "<div style='position: absolute; bottom: 0px; right: 0px; width: 5px; height: 5px; border-radius: 5px 0 0 0; background: blue; box-shadow: 0 0 1px 1px blue;'></div>" : "")."
 							<div title='{$subrow["duration_hm"]}'>{$pay}</div>
@@ -462,7 +463,16 @@ foreach ($_GET as &$value) {
 					}
 				}
 				else {
-					echo "<td style='".($holidays[$i] == 1 ? " background: #09f3;" : "")."' class='tscell' ts_date='{$year}-{$month}-{$d}' usr_id='{$row["USR_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'></td>";
+					// Узнаем дату следующего дня
+					$query = "
+						SELECT
+							'{$year}-{$month}-{$d}' + INTERVAL 1 DAY tomorrow
+							,IF(TIMESTAMPDIFF(DAY, '{$year}-{$month}-{$d}', CURDATE()) <= 30 AND TIMESTAMPDIFF(HOUR, '{$year}-{$month}-{$d}', NOW()) >= 32, 1, 0) editable
+					";
+					$subsubsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					$subsubsubrow = mysqli_fetch_array($subsubsubres);
+
+					echo "<td style='".($holidays[$i] == 1 ? " background: #09f3;" : "")."' class='tscell' date='{$year}-{$month}-{$d}' tomorrow='{$subsubsubrow["tomorrow"]}' editable='{$subsubsubrow["editable"]}' ts_date='{$year}-{$month}-{$d}' usr_id='{$row["USR_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'></td>";
 				}
 				$i++;
 			}
