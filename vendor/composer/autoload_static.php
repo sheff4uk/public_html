@@ -6,25 +6,14 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit377deeff98938dc65945738341a43755
 {
-    public static $prefixLengthsPsr4 = array (
-        'T' =>
-        array (
-            'TelegramBot\\Api\\' => 16,
-        ),
-    );
-
-    public static $prefixDirsPsr4 = array (
-        'TelegramBot\\Api\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/telegram-bot/api/src',
-        ),
+    public static $classMap = array (
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit377deeff98938dc65945738341a43755::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit377deeff98938dc65945738341a43755::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit377deeff98938dc65945738341a43755::$classMap;
 
         }, null, ClassLoader::class);
     }
