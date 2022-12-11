@@ -158,6 +158,21 @@ if( isset($_POST["F_ID"]) ) {
 			if( $row = mysqli_fetch_array($res) ) {
 				$duration = $row["duration"];
 				$shift_num = $row["shift_num"];
+
+				// Проверка на соответствие времени закрытия диапазону смены
+				$query = "
+					SELECT 1
+					FROM WorkingShift WS
+					WHERE WS.F_ID = {$F_ID}
+						AND {$tr_minute0} BETWEEN WS.shift_start - 120 AND WS.shift_end + 120
+						AND '{$ts_date}' BETWEEN WS.valid_from AND IFNULL(WS.valid_to, CURDATE())
+						AND WS.shift_num = {$shift_num}
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				if( !$row = mysqli_fetch_array($res) ) {
+					$_SESSION["error"][] = 'Время закрытия выходит за границы смены. Регистрация не сохранена.';
+					unset($tr_minute0);
+				}
 			}
 			else {
 				$_SESSION["error"][] = 'Для нового закрытия смены не найдено открытие. Регистрация не сохранена.';
