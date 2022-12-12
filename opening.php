@@ -174,10 +174,10 @@ if( !$_GET["F_ID"] ) {
 			<span>№№ Кассет:</span>
 			<select name="CAS[]" class="<?=$_GET["CAS"] ? "filtered" : ""?>" style="width: 350px;" multiple>
 				<?
-//				for ($i = 1; $i <= $cassetts; $i++) {
-//					$selected = in_array($i, $_GET["CAS"]) ? "selected" : "";
-//					echo "<option value='{$i}' {$selected}>{$i}</option>";
-//				}
+				for ($i = 1; $i <= $cassetts; $i++) {
+					$selected = in_array($i, $_GET["CAS"]) ? "selected" : "";
+					echo "<option value='{$i}' {$selected}>{$i}</option>";
+				}
 				?>
 			</select>
 		</div>
