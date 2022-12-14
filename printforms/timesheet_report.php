@@ -148,8 +148,6 @@ echo "<title>Табель версия для печати</title>";
 				,USR.act
 				,USR.official
 				,USR.photo
-				,TM.tariff
-				,TM.type
 			FROM Users USR
 			JOIN TariffMonth TM ON TM.year = {$year}
 				AND TM.month = {$month}
@@ -161,12 +159,51 @@ echo "<title>Табель версия для печати</title>";
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
+
+			// Находим все актуальные тарифа для этого месяца
+			$query = "
+				(
+					SELECT TST_ID
+						,tariff
+						,type
+						,DATE_FORMAT(valid_from, '%d') valid_from_format
+						,DATE_FORMAT(DATE('{$year}-{$month}-01'), '%Y%m') cur_month
+						,DATE_FORMAT(valid_from, '%Y%m') from_month
+					FROM TimesheetTariff
+					WHERE valid_from <= DATE('{$year}-{$month}-01')
+						AND USR_ID = {$row["USR_ID"]}
+						AND F_ID = {$F_ID}
+					ORDER BY valid_from DESC
+					LIMIT 1
+				)
+				UNION
+				(
+					SELECT TST_ID
+						,tariff
+						,type
+						,DATE_FORMAT(valid_from, '%d') valid_from_format
+						,DATE_FORMAT(DATE('{$year}-{$month}-01'), '%Y%m') cur_month
+						,DATE_FORMAT(valid_from, '%Y%m') from_month
+					FROM TimesheetTariff
+					WHERE YEAR(valid_from) = {$year}
+						AND MONTH(valid_from) = {$month}
+						AND USR_ID = {$row["USR_ID"]}
+						AND F_ID = {$F_ID}
+					ORDER BY valid_from
+				)
+			";
+			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			$list_tariff = "";
+			while( $subrow = mysqli_fetch_array($subres) ) {
+				$valid_from = ($subrow["cur_month"] == $subrow["from_month"]) ? "({$subrow["valid_from_format"]})" : "";
+				$type = ($subrow["type"] == 1 ? "с" : ($subrow["type"] == 2 ? "ч" : ($subrow["type"] == 3 ? "т" : "")));
+				$list_tariff .= "{$subrow["tariff"]}/{$type}{$valid_from}<br>";
+			}
+
 			echo "<tr><td colspan='2' style='text-align: center; overflow: hidden;'>{$row["Name"]}</td>";
 			?>
 			<td colspan="2" style="overflow: hidden;">
-				<?=$row["tariff"]?>
-				<br>
-				<?=($row["type"] == 1 ? "Смена" : ($row["type"] == 2 ? "Час" : ($row["type"] == 3 ? "Тракторист" : "")))?>
+				<?=$list_tariff?>
 			</td>
 			<?
 
@@ -259,7 +296,8 @@ echo "<title>Табель версия для печати</title>";
 
 		// Итог снизу
 		echo "<tr><td colspan='2' style='font-size: 1.5em;'><b>Σ</b></td>";
-		echo "<td colspan='2' style='text-align: center;'>";
+		echo "<td colspan='2' class='nowrap' style='text-align: center;'>";
+		echo "с-смена<br>ч-час<br>т-час(тр-т)";
 		echo "</td>";
 
 		$i = 1;

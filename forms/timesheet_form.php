@@ -536,19 +536,21 @@ this.subbut.value='Подождите, пожалуйста!';">
 					html_photo = "<img src='/time_tracking/upload/"+photo+"' style='width: 100%; border-radius: 5px;'>";
 				}
 
-				html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th></th><th>Тариф</th><th>Смен</th><th>Продолжительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.3em;'><tr>";
+				if( tariff != '' ) {
+					html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th></th><th>Тариф</th><th>Смен</th><th>Продолжительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.3em;'><tr>";
 
-				var total;
-				if( rate > 1 ) { total = pay+"<br>x"+Math.round(rate*100)/100+"<i class='fas fa-question-circle' title='Коэффициент замещения'></i><br>="+Math.round(pay*rate); }
-				else { total = pay; }
+					var total;
+					if( rate > 1 ) { total = pay+"<br>x"+Math.round(rate*100)/100+"<i class='fas fa-question-circle' title='Коэффициент замещения'></i><br>="+Math.round(pay*rate); }
+					else { total = pay; }
 
-				html_summary = html_summary
-					+ "<td>"+html_photo+"</td>"
-					+ "<td>"+tariff+"</td>"
-					+ "<td>"+shift_cnt+"</td>"
-					+ "<td>"+duration+"</td>"
-					+ "<td>"+total+"</td>";
-					+ "</tr></tbody></table>";
+					html_summary = html_summary
+						+ "<td>"+html_photo+"</td>"
+						+ "<td>"+tariff+"</td>"
+						+ "<td>"+shift_cnt+"</td>"
+						+ "<td>"+duration+"</td>"
+						+ "<td>"+total+"</td>";
+						+ "</tr></tbody></table>";
+				}
 
 				if( arr_reg ) {
 					$.each(arr_reg, function(key, val){
