@@ -368,7 +368,7 @@ foreach ($_GET as &$value) {
 			$list_tariff = "";
 			while( $subrow = mysqli_fetch_array($subres) ) {
 				$type = ($subrow["type"] == 1 ? "с" : ($subrow["type"] == 2 ? "ч" : ($subrow["type"] == 3 ? "т" : "")));
-				$list_tariff .= "<span title='{$subrow["valid_from_format"]}'>{$subrow["tariff"]}/{$type}</span><br>";
+				$list_tariff .= "<span title='{$subrow["valid_from_format"]}' class='nowrap'>{$subrow["tariff"]}/{$type}</span><br>";
 			}
 
 			// Заполняем массив файлов
