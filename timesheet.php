@@ -386,7 +386,7 @@ foreach ($_GET as &$value) {
 
 			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'><a href='#' class='usercell' USR_ID='{$row["USR_ID"]}' name='{$row["Name"]}'>{$row["Name"]}</a></td>";
 			?>
-			<td colspan="2" class='tariff_edit' tst_id='<?=$row["TST_ID"]?>' valid_from='<?=$row["valid_from"]?>' tariff='<?=$row["tariff"]?>' type='<?=$row["type"]?>' USR_ID='<?=$row["USR_ID"]?>' name='<?=$row["Name"]?>' style="overflow: hidden; cursor: pointer;">
+			<td colspan="2" class='tariff_edit' tst_id='<?=$row["TST_ID"]?>' valid_from='<?=$row["valid_from"]?>' tariff='<?=$row["tariff"]?>' type='<?=$row["type"]?>' USR_ID='<?=$row["USR_ID"]?>' name='<?=$row["Name"]?>' style="overflow: hidden; cursor: pointer;<?=($list_tariff == '' ? " background: #f006;" : "")?>">
 				<a href='#'><?=$list_tariff?></a>
 			</td>
 			<?
