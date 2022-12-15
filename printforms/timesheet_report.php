@@ -215,7 +215,6 @@ echo "<title>Табель версия для печати</title>";
 					,SUM(TSS.pay) pay
 					,TS.fine
 					,TS.rate
-					,IF(TM.type = 1, 'Смена', IF(TM.type = 2, 'Час', IF(TM.type = 3, 'Час (тракторист)', ''))) type
 					,GROUP_CONCAT(CONCAT(TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR ', ') duration_hm
 					,TS.status
 					,(SELECT USR_ID FROM Timesheet WHERE TS_ID = TS.sub_TS_ID) substitute
