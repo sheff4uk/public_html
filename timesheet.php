@@ -400,14 +400,15 @@ foreach ($_GET as &$value) {
 					,DAY(TS.ts_date) Day
 					,SUM(TSS.duration) duration
 					,SUM(TSS.pay) pay
+					,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.pay) SEPARATOR '<br>') pay_format
 					,TS.fine
-					,TS.rate
+					#,TS.rate
 					,CONCAT(TST.tariff, '/', IF(TST.type = 1, 'Смена', IF(TST.type = 2, 'Час', IF(TST.type = 3, 'Час (тракторист)', '')))) tariff_type
 					,SUM(IF(TSS.pay > 0, 1, 0)) shift_cnt
 					,GROUP_CONCAT(CONCAT(TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR ', ') duration_hm
 					,TS.status
-					,(SELECT USR_ID FROM Timesheet WHERE TS_ID = TS.sub_TS_ID) substitute
-					,(SELECT SUM(1) FROM Timesheet WHERE sub_TS_ID = TS.TS_ID) sub_is
+					#,(SELECT USR_ID FROM Timesheet WHERE TS_ID = TS.sub_TS_ID) substitute
+					#,(SELECT SUM(1) FROM Timesheet WHERE sub_TS_ID = TS.TS_ID) sub_is
 					,TS.payout
 					,TS.comment
 				FROM Timesheet TS
@@ -461,13 +462,14 @@ foreach ($_GET as &$value) {
 						}
 					}
 
-					$pay = ($subrow["pay"] != null) ? round($subrow["pay"] * $subrow["rate"]) : null;
+					//$pay = ($subrow["pay"] != null) ? round($subrow["pay"] * $subrow["rate"]) : null;
+					$pay = $subrow["pay"];
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($holidays[$i] == 1 ? " background: #09f3;" : "").($pay == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' date='{$subrow["ts_date"]}' tomorrow='{$subrow["tomorrow"]}' editable='{$subrow["editable"]}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff_type"]}' shift_cnt='{$subrow["shift_cnt"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}' payout='{$subrow["payout"]}' comment='{$subrow["comment"]}'>
+						<td id='{$subrow["TS_ID"]}' style='font-size: .8em; overflow: visible; padding: 0px; text-align: center;".($holidays[$i] == 1 ? " background: #09f3;" : "").($pay == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' date='{$subrow["ts_date"]}' tomorrow='{$subrow["tomorrow"]}' editable='{$subrow["editable"]}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff_type"]}' shift_cnt='{$subrow["shift_cnt"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}' payout='{$subrow["payout"]}' comment='{$subrow["comment"]}'>
 							".($man_reg ? "<div style='position: absolute; top: 0px; left: 0px; width: 5px; height: 5px; border-radius: 0 0 5px 0; background: red; box-shadow: 0 0 1px 1px red;'></div>" : "")."
 							".(($subrow["sub_is"] or $subrow["substitute"]) ? "<div style='position: absolute; bottom: 0px; right: 0px; width: 5px; height: 5px; border-radius: 5px 0 0 0; background: blue; box-shadow: 0 0 1px 1px blue;'></div>" : "")."
-							<div title='{$subrow["duration_hm"]}'>{$pay}</div>
+							<div title='{$subrow["duration_hm"]}'>{$subrow["pay_format"]}</div>
 							".($subrow["payout"] ? "<div style='color: red;' title='{$subrow["comment"]}'>-{$subrow["payout"]}</div>" : "")."
 							".($subrow["fine"] ? "<div style='color: red;'>-{$subrow["fine"]}</div>" : "")."
 							".($subrow["status"] == '0' ? "<div class='label'>&mdash;</div>" : ($subrow["status"] == '1' ? "<div class='label'>ОТП</div>" : ($subrow["status"] == '2' ? "<div class='label'>УВ</div>" : ($subrow["status"] == '3' ? "<div class='label'>Б</div>" : ($subrow["status"] == '4' ? "<div class='label'>В</div>" : ($subrow["status"] == '5' ? "<div class='label'>ПР</div>" : ($subrow["status"] == '6' ? "<div class='label'>КОМ</div>" : "")))))))."

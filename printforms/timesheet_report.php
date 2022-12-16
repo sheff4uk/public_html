@@ -213,12 +213,13 @@ echo "<title>Табель версия для печати</title>";
 					,DAY(TS.ts_date) Day
 					,SUM(TSS.duration) duration
 					,SUM(TSS.pay) pay
+					,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.pay) SEPARATOR '<br>') pay_format
 					,TS.fine
-					,TS.rate
+					#,TS.rate
 					,GROUP_CONCAT(CONCAT(TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR ', ') duration_hm
 					,TS.status
-					,(SELECT USR_ID FROM Timesheet WHERE TS_ID = TS.sub_TS_ID) substitute
-					,(SELECT SUM(1) FROM Timesheet WHERE sub_TS_ID = TS.TS_ID) sub_is
+					#,(SELECT USR_ID FROM Timesheet WHERE TS_ID = TS.sub_TS_ID) substitute
+					#,(SELECT SUM(1) FROM Timesheet WHERE sub_TS_ID = TS.TS_ID) sub_is
 					,TS.payout
 					,TS.comment
 				FROM Timesheet TS
@@ -247,11 +248,12 @@ echo "<title>Табель версия для печати</title>";
 				$day_of_week = date('N', strtotime($date));	// День недели 1..7
 				if( $i == $day ) {
 
-					$pay = ($subrow["pay"] != null) ? round($subrow["pay"] * $subrow["rate"]) : null;
+					//$pay = ($subrow["pay"] != null) ? round($subrow["pay"] * $subrow["rate"]) : null;
+					$pay = $subrow["pay"];
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible;' class='tscell nowrap' >
-							<div>{$pay}</div>
+						<td id='{$subrow["TS_ID"]}' style='font-size: .8em; overflow: visible;' class='tscell nowrap' >
+							<div>{$subrow["pay_format"]}</div>
 							".($subrow["payout"] ? "<div>-{$subrow["payout"]}</div>" : "")."
 							".($subrow["fine"] ? "<div>-{$subrow["fine"]}</div>" : "")."
 							".($subrow["status"] == '0' ? "<div class='label'>&mdash;</div>" : ($subrow["status"] == '1' ? "<div class='label'>ОТП</div>" : ($subrow["status"] == '2' ? "<div class='label'>УВ</div>" : ($subrow["status"] == '3' ? "<div class='label'>Б</div>" : ($subrow["status"] == '4' ? "<div class='label'>В</div>" : ($subrow["status"] == '5' ? "<div class='label'>ПР</div>" : ""))))))."
