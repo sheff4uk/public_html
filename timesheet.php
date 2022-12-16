@@ -406,7 +406,7 @@ foreach ($_GET as &$value) {
 					#,TS.rate
 					,CONCAT(TST.tariff, '/', IF(TST.type = 1, 'Смена', IF(TST.type = 2, 'Час', IF(TST.type = 3, 'Час (тракторист)', '')))) tariff_type
 					,SUM(IF(TSS.pay > 0, 1, 0)) shift_cnt
-					,GROUP_CONCAT(CONCAT(TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR ', ') duration_hm
+					,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR ', ') duration_hm
 					,TS.status
 					#,(SELECT USR_ID FROM Timesheet WHERE TS_ID = TS.sub_TS_ID) substitute
 					#,(SELECT SUM(1) FROM Timesheet WHERE sub_TS_ID = TS.TS_ID) sub_is

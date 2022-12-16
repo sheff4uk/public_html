@@ -213,7 +213,8 @@ echo "<title>Табель версия для печати</title>";
 					,DAY(TS.ts_date) Day
 					,SUM(TSS.duration) duration
 					,SUM(TSS.pay) pay
-					,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.pay) SEPARATOR '<br>') pay_format
+					#,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.pay) SEPARATOR '<br>') pay_format
+					,GROUP_CONCAT(TSS.pay SEPARATOR '<br>') pay_format
 					,TS.fine
 					#,TS.rate
 					,GROUP_CONCAT(CONCAT(TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR ', ') duration_hm
