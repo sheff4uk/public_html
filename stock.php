@@ -201,8 +201,8 @@ foreach ($_GET as &$value) {
 				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 				WHERE LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
 					AND DATE(LPP.packed_time) >= '{$date_from}'
-					AND LPP.shipment_time IS NULL
-					AND LPP.removal_time IS NULL
+					#AND LPP.shipment_time IS NULL
+					#AND LPP.removal_time IS NULL
 					#AND CW.CB_ID = 2
 				GROUP BY LPP.CWP_ID
 				ORDER BY LPP.CWP_ID ASC
@@ -309,8 +309,8 @@ foreach ($_GET as &$value) {
 				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 				WHERE LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
 					AND DATE(LPP.packed_time) >= '{$date_from}'
-					AND LPP.shipment_time IS NULL
-					AND LPP.removal_time IS NULL
+					#AND LPP.shipment_time IS NULL
+					#AND LPP.removal_time IS NULL
 					#AND CW.CB_ID = 2
 				GROUP BY LPP.CWP_ID
 				ORDER BY LPP.CWP_ID ASC
