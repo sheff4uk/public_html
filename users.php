@@ -13,6 +13,7 @@ if( isset($_POST["USR_ID"]) ) {
 	$cardcode = $_POST["cardcode"];
 	$outsourcer = $_POST["outsourcer"] ? 1 : 0;
 	$official = $_POST["official"] ? 1 : 0;
+	$overalls_issued = $_POST["overalls_issued"] ? '\''.$_POST["overalls_issued"].'\'' : 'NULL';
 
 	// Обработка строк
 	$Surname = convert_str($_POST["Surname"]);
@@ -61,6 +62,7 @@ if( isset($_POST["USR_ID"]) ) {
 				,cardcode = '{$cardcode}'
 				,outsourcer = {$outsourcer}
 				,official = {$official}
+				,overalls_issued = {$overalls_issued}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -83,6 +85,7 @@ if( isset($_POST["USR_ID"]) ) {
 				,cardcode = '{$cardcode}'
 				,outsourcer = {$outsourcer}
 				,official = {$official}
+				,overalls_issued = {$overalls_issued}
 			WHERE USR_ID = {$_POST["USR_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -90,32 +93,6 @@ if( isset($_POST["USR_ID"]) ) {
 		}
 		$USR_ID = $_POST["USR_ID"];
 	}
-
-	//////////////////////////////
-	// Сохранение фото паспорта //
-	//////////////////////////////
-	if( $_FILES['uploadfile']['name'] ) {
-		$filename = date('U').'_'.$_FILES['uploadfile']['name'];
-		$uploaddir = './uploads/';
-		$uploadfile = $uploaddir.basename($filename);
-		// Копируем файл из каталога для временного хранения файлов:
-		if (copy($_FILES['uploadfile']['tmp_name'], $uploadfile))
-		{
-			// Записываем в БД информацию о файле
-			$query = "
-				UPDATE Users
-				SET passport = '{$filename}'
-				WHERE USR_ID = {$USR_ID}
-			";
-			mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-
-			$_SESSION["success"][] = "Файл ".$_FILES['uploadfile']['name']." успешно загружен на сервер.";
-		}
-		else {
-			$_SESSION["alert"][] = "Ошибка! Не удалось загрузить файл на сервер!";
-		}
-	}
-	///////////////////////////////////
 
 	// Если указан номер карты, пытаемся добавить работника в табель
 	if( $cardcode != '' and $act == 1 ) {
@@ -335,6 +312,7 @@ foreach ($_GET as &$value) {
 			<th>Номер карты</th>
 			<th>Аутсорсер</th>
 			<th>Официально</th>
+			<th>Дата выдачи спецодежды</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -358,6 +336,8 @@ foreach ($_GET as &$value) {
 				,USR.act
 				,USR.outsourcer
 				,USR.official
+				,USR.overalls_issued
+				,DATE_FORMAT(USR.overalls_issued, '%d.%m.%Y') overalls_issued_format
 			FROM Users USR
 			JOIN Roles RL ON RL.RL_ID = USR.RL_ID
 			JOIN factory F ON F.F_ID = USR.F_ID
@@ -406,6 +386,7 @@ foreach ($_GET as &$value) {
 					<td>{$row["cardcode"]}</td>
 					<td>".($row["outsourcer"] ? "<i class='fas fa-check'></i>" : "")."</td>
 					<td>".($row["official"] ? "<i class='fas fa-check'></i>" : "")."</td>
+					<td>{$row["overalls_issued_format"]}</td>
 					<td>
 						<a href='#' class='add_user' usr='{$row["USR_ID"]}' title='Изменить данные пользователя'><i class='fa fa-pencil-alt fa-lg'></i></a>
 						<a href='/printforms/card_label.php?USR_ID={$row["USR_ID"]}' class='print' title='Печать этикетки на карту'><i class='fa-solid fa-address-card fa-lg'></i></a>
@@ -439,15 +420,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 					</select>
 				</div>
 			</div>
-<!--
-			<div>
-				<label>Паспорт:</label>
-				<div>
-					<input type="hidden" name="MAX_FILE_SIZE" value="30000" />
-					<input type='file' name='uploadfile'>
-				</div>
-			</div>
--->
 			<div>
 				<label>Фамилия:</label>
 				<div>
@@ -506,16 +478,22 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<span style='color: #911; font-size: .8em;'>Необходим для ведения табеля</span>
 				</div>
 			</div>
-			<div id="tariff">
+			<div>
 				<label>Аутсорсер:</label>
 				<div>
 					<input type="checkbox" name="outsourcer" value="1">
 				</div>
 			</div>
-			<div id="tariff">
+			<div>
 				<label>Официально:</label>
 				<div>
 					<input type="checkbox" name="official" value="1">
+				</div>
+			</div>
+			<div>
+				<label>Дата выдачи спецодежды:</label>
+				<div>
+					<input type="date" name="overalls_issued" max="<?=date('Y-m-d')?>">
 				</div>
 			</div>
 		</fieldset>
@@ -591,6 +569,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#user_form input[name="cardcode"]').val(users_data[usr]['cardcode']);
 				$('#user_form input[name="outsourcer"]').prop('checked', users_data[usr]['outsourcer'] == 1 );
 				$('#user_form input[name="official"]').prop('checked', users_data[usr]['official'] == 1 );
+				$('#user_form input[name="overalls_issued"]').val(users_data[usr]['overalls_issued']);
 			}
 
 			$('#user_form').dialog({
