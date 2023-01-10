@@ -48,8 +48,9 @@ if( !in_array('cassettes', $Rights) ) {
 		height: 22px;
 	}
 	.legend {
-		font-size: 1.2em;
+/*		font-size: 1.2em;*/
 		font-weight: bold;
+		word-break: break-word;
 	}
 	legend {
 		font-size: 2em;
