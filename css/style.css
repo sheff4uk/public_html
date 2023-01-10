@@ -88,13 +88,15 @@ table tbody tr:hover, tbody td.hover {
 }
 
 .cassette {
-	background-color: #333;
+	background-color: #555;
 	color: #fff;
 	border-radius: 5px;
-	border: 2px solid #333;
+	border: 2px solid #555;
 	margin: 0 2px;
 	display: inline-block;
 	font-weight: bold;
+	-webkit-print-color-adjust: exact;
+	print-color-adjust: exact;
 }
 .cassette:focus {
 	background-color: #333;

@@ -18,7 +18,7 @@ function src_url($src) {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?=$title?></title>
 	<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?3">
-	<link rel='stylesheet' type='text/css' href='css/style.css?32'>
+	<link rel='stylesheet' type='text/css' href='css/style.css?33'>
 	<link rel='stylesheet' type='text/css' href='css/buttons.css'>
 	<link rel='stylesheet' type='text/css' href='css/animate.css'>
 	<link rel='stylesheet' type='text/css' href='plugins/jReject-master/css/jquery.reject.css'>
@@ -242,6 +242,9 @@ function src_url($src) {
 		}
 		if( in_array('mix_formula', $Rights) ) {
 			$menu["<i class='fas fa-cog fa-lg'></i>"]["Рецепты"] = "mix_formula.php";
+		}
+		if( in_array('mix_formula', $Rights) ) {
+			$menu["<i class='fas fa-cog fa-lg'></i>"]["Кассеты"] = "cassettes.php";
 		}
 		$menu["Выход {$USR_Icon}"] = "exit.php";
 	}
