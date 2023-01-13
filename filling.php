@@ -275,7 +275,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 			,LB.mix_density
 			,LB.temp
-			#,IF(ABS(22 - LB.temp) <= 8, NULL, IF(LB.temp - 22 > 8, LB.temp - 30, LB.temp - 14)) temp_diff
+			,IF(ABS(22 - LB.temp) <= 8, NULL, IF(LB.temp - 22 > 8, LB.temp - 30, LB.temp - 14)) temp_diff
 			,PB.per_batch
 			,LB.s_fraction
 			,LB.l_fraction
@@ -291,19 +291,19 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.water
 			,SUM(LF.underfilling) underfilling
 			,LB.test
-			#,mix_diff({$row["CW_ID"]}, LB.mix_density) mix_diff
-			#,mix_sf_diff({$row["MF_ID"]}, LB.s_fraction) sf_diff
-			#,mix_lf_diff({$row["MF_ID"]}, LB.l_fraction) lf_diff
-			#,mix_io_diff({$row["MF_ID"]}, LB.iron_oxide) io_diff
-			#,mix_sl10_diff({$row["MF_ID"]}, LB.slag10) sl10_diff
-			#,mix_sl20_diff({$row["MF_ID"]}, LB.slag20) sl20_diff
-			#,mix_sl020_diff({$row["MF_ID"]}, LB.slag020) sl020_diff
-			#,mix_sl30_diff({$row["MF_ID"]}, LB.slag30) sl30_diff
-			#,mix_sn_diff({$row["MF_ID"]}, LB.sand) sn_diff
-			#,mix_cs_diff({$row["MF_ID"]}, LB.crushed_stone) cs_diff
-			#,mix_cm_diff({$row["MF_ID"]}, LB.cement) cm_diff
-			#,mix_pl_diff({$row["MF_ID"]}, LB.plasticizer) pl_diff
-			#,mix_wt_diff({$row["MF_ID"]}, LB.water) wt_diff
+			,mix_diff({$row["CW_ID"]}, LB.mix_density) mix_diff
+			,mix_sf_diff({$row["MF_ID"]}, LB.s_fraction) sf_diff
+			,mix_lf_diff({$row["MF_ID"]}, LB.l_fraction) lf_diff
+			,mix_io_diff({$row["MF_ID"]}, LB.iron_oxide) io_diff
+			,mix_sl10_diff({$row["MF_ID"]}, LB.slag10) sl10_diff
+			,mix_sl20_diff({$row["MF_ID"]}, LB.slag20) sl20_diff
+			,mix_sl020_diff({$row["MF_ID"]}, LB.slag020) sl020_diff
+			,mix_sl30_diff({$row["MF_ID"]}, LB.slag30) sl30_diff
+			,mix_sn_diff({$row["MF_ID"]}, LB.sand) sn_diff
+			,mix_cs_diff({$row["MF_ID"]}, LB.crushed_stone) cs_diff
+			,mix_cm_diff({$row["MF_ID"]}, LB.cement) cm_diff
+			,mix_pl_diff({$row["MF_ID"]}, LB.plasticizer) pl_diff
+			,mix_wt_diff({$row["MF_ID"]}, LB.water) wt_diff
 		FROM plan__Batch PB
 		JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 		LEFT JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID

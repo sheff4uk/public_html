@@ -335,11 +335,11 @@ $query = "
 		,LOD.def_assembly
 		,PB.in_cassette
 		,COUNT(LW.nextID) cnt_weight
-		#,MIN(LW.weight) min_weight
+			#,MIN(LW.weight) min_weight
 		,ROUND(AVG(LW.weight)) avg_weight
-		#,MAX(LW.weight) max_weight
+			#,MAX(LW.weight) max_weight
 			#,IF(MIN(LW.weight) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(MIN(LW.weight) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MIN(LW.weight) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MIN(LW.weight) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) min_diff
-		#,IF(ROUND(AVG(LW.weight)) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(ROUND(AVG(LW.weight)) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) avg_diff
+		,IF(ROUND(AVG(LW.weight)) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(ROUND(AVG(LW.weight)) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), ROUND(AVG(LW.weight)) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) avg_diff
 			#,IF(MAX(LW.weight) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF(MAX(LW.weight) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MAX(LW.weight) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), MAX(LW.weight) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) max_diff
 		,DATE_FORMAT(LB.batch_date, '%d.%m.%y') batch_date_format
 		,LO.cassette
@@ -348,7 +348,7 @@ $query = "
 		,PB.CW_ID
 		,LB.LB_ID
 		,LB.mix_density
-		#,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
+		,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
 	FROM list__Opening LO
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
