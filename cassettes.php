@@ -39,6 +39,14 @@ if( !in_array('cassettes', $Rights) ) {
 		margin-right: 10px;
 		margin-bottom: 10px;
 		background: #fff;
+		max-height: 200px;
+		overflow: overlay;
+	}
+	.connectedSortable::-webkit-scrollbar {
+		width: 5px;
+	}
+	.connectedSortable::-webkit-scrollbar-thumb {
+		background: #333;
 	}
 	.connectedSortable li {
 		margin: 3px;
