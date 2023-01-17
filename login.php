@@ -132,13 +132,14 @@ switch( $_GET["do"] ) {
 		else $_SESSION["error"][] = "Запрос не выполнился Не удалось установить связь с сервером.";
 
 		// Если не было ошибок - проверяем check_status
-		if( !isset($_SESSION["error"])  ) {
+		if( !isset($_SESSION["error"]) ) {
 			// Если звонок поступил - активируем сессию и заходим в систему
 			if( $check_status == 401 ) {
 				$query = "SELECT USR_ID, last_url FROM Users WHERE phone='{$_SESSION['mtel']}'";
 				$result = mysqli_query( $mysqli, $query );
 				$myrow = mysqli_fetch_array($result);
 				$_SESSION["id"] = $myrow["USR_ID"];
+				$_SESSION['F_ID'] = $myrow['F_ID'];
 				unset($_SESSION['code']);
 				unset($_SESSION['mtel']);
 				echo "location.href = '{$myrow["last_url"]}';";
