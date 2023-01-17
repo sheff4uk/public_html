@@ -203,7 +203,7 @@ $row = mysqli_fetch_array($res);
 			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент</th>" : "")?>
 			<?=($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор</th>" : "")?>
 			<?=($row["wt_cnt"] ? "<th rowspan='2'>Вода</th>" : "")?>
-			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>">№ кассеты<br>(разборчиво)</th>
+			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>" style="border-left: 4px solid;">№ кассеты<br>(разборчиво)</th>
 			<th rowspan="3" width="40">Недолив</th>
 			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
 		</tr>
@@ -236,11 +236,10 @@ $row = mysqli_fetch_array($res);
 	</thead>
 	<tbody>
 <?
-$fillings_cell = "";
+$fillings_cell = "<td rowspan='{$per_batch}' style='border-left: 4px solid;'></td>";
 for ($i = 1; $i <= $fillings; $i++) {
 	$fillings_cell .= "<td rowspan='{$per_batch}'></td>";
 }
-$fillings_cell .= "<td rowspan='{$per_batch}'></td>";
 
 $j = 0;
 
