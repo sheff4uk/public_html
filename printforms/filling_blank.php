@@ -90,6 +90,15 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 		.nowrap {
 			white-space: nowrap;
 		}
+		.cassette {
+			font-weight: bold;
+			border: 1px solid #333;
+			border-radius: 5px;
+			margin: 0 2px;
+			padding: 2px;
+			display: inline-block;
+			width: 28px;
+		}
 	</style>
 </head>
 <body>
@@ -108,31 +117,39 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 				<span style="position: absolute; background: white; left: calc(50% - 40px); top: 48px; width: 80px;"><?=str_pad($PB_ID, 8, "0", STR_PAD_LEFT)?></span>
 			</th>
 		</tr>
+<?
+	// Формируем список вероятных номеров кассет
+	$query = "
+		SELECT LF.cassette
+		FROM list__Batch LB
+		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+		WHERE LB.PB_ID = (
+			SELECT PB_ID
+			FROM plan__Batch
+			WHERE CW_ID = {$CW_ID}
+				AND F_ID = {$F_ID}
+				AND fact_batches > 0
+				AND PB_ID < {$PB_ID}
+			ORDER BY PB_ID DESC
+			LIMIT 1
+		)
+		ORDER BY LF.cassette
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		$cassettes .= "<n class='cassette'>{$row["cassette"]}</n>";
+	}
+?>
+		<tr>
+			<th colspan="4" style="position: relative; padding-top: 12px;">
+				<span style="position: absolute; top: 0px; left: 5px;" class="nowrap">Вероятные номера кассет:</span>
+				<?=$cassettes?>
+			</th>
+		</tr>
 	</thead>
 </table>
 
 <?
-// Формируем список вероятных номеров кассет
-$query = "
-	SELECT LF.cassette
-	FROM list__Batch LB
-	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-	WHERE LB.PB_ID = (
-		SELECT PB_ID
-		FROM plan__Batch
-		WHERE CW_ID = {$CW_ID}
-			AND F_ID = {$F_ID}
-			AND fact_batches > 0
-			AND PB_ID < {$PB_ID}
-		ORDER BY PB_ID DESC
-		LIMIT 1
-	)
-	ORDER BY LF.cassette
-";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-while( $row = mysqli_fetch_array($res) ) {
-	$cassettes .= "<b style='border: 1px solid #333; border-radius: 5px; margin: 0 2px; padding: 2px; display: inline-block;'>{$row["cassette"]}</b>";
-}
 // Данные рецепта
 $query = "
 	SELECT IFNULL(CONCAT(MF.s_fraction, ' кг'), 0) s_fraction
@@ -186,7 +203,6 @@ $row = mysqli_fetch_array($res);
 			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент</th>" : "")?>
 			<?=($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор</th>" : "")?>
 			<?=($row["wt_cnt"] ? "<th rowspan='2'>Вода</th>" : "")?>
-			<th rowspan="3" width="75" style="border-left: 4px solid;">Вероятные номера кассет</th>
 			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>">№ кассеты<br>(разборчиво)</th>
 			<th rowspan="3" width="40">Недолив</th>
 			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
@@ -247,7 +263,6 @@ for ($i = 1; $i <= $batches; $i++) {
 			".($row["cm_cnt"] ? "<td></td>" : "")."
 			".($row["pl_cnt"] ? "<td></td>" : "")."
 			".($row["wt_cnt"] ? "<td></td>" : "")."
-			".($i == 1 ? "<td rowspan='{$batches}' style='border-left: 4px solid;'>{$cassettes}</td>" : "")."
 			".($j == 0 ? $fillings_cell : "")."
 			<td style='text-align: center;'>".(in_array($i, $tests) ? "<b style='font-size: 1.4em;'>&#10065;</b>" : "&#10065;")."</td>
 		</tr>
