@@ -122,8 +122,8 @@ $query = "
 		,SUM(1) details
 		,SUM(IF(LW.goodsID = 2, 1, NULL)) not_spill
 		,SUM(IF(LW.goodsID = 4, 1, NULL)) crack_drying
-		,SUM(IF(LW.weight < ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)), 1, NULL)) light
-		,SUM(IF(LW.weight > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 1, NULL)) heavy
+		,SUM(IF(LW.weight < ROUND(CW.min_weight/100*101), 1, NULL)) light
+		,SUM(IF(LW.weight > ROUND(CW.max_weight/100*101), 1, NULL)) heavy
 		,DATE_FORMAT(LF.filling_time, '%d.%m.%Y %H:%i') filling_time_format
 		,USR_Name(LB.operator) name
 	FROM list__Opening LO

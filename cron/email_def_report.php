@@ -99,8 +99,8 @@ $query = "
 	SELECT USR_Name(LB.operator) operator
 		,CONCAT(SUM(IF(LW.goodsID = 2, 1, 0)), ' (', ROUND(SUM(IF(LW.goodsID = 2, 1, 0)) / SUM(1) * 100, 2), '%)') not_spill
 		,CONCAT(SUM(IF(LW.goodsID = 4, 1, 0)), ' (', ROUND(SUM(IF(LW.goodsID = 4, 1, 0)) / SUM(1) * 100, 2), '%)') crack_drying
-		,CONCAT(SUM(IF(LW.weight < ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)), 1, NULL)), ' (', ROUND(SUM(IF(LW.weight < ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)), 1, NULL)) / SUM(1) * 100, 2), '%)') light
-		,CONCAT(SUM(IF(LW.weight > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 1, NULL)) , ' (', ROUND(SUM(IF(LW.weight > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 1, NULL)) / SUM(1) * 100, 2), '%)') heavy
+		,CONCAT(SUM(IF(LW.weight < ROUND(CW.min_weight/100*101), 1, NULL)), ' (', ROUND(SUM(IF(LW.weight < ROUND(CW.min_weight/100*101), 1, NULL)) / SUM(1) * 100, 2), '%)') light
+		,CONCAT(SUM(IF(LW.weight > ROUND(CW.max_weight/100*101), 1, NULL)), ' (', ROUND(SUM(IF(LW.weight > ROUND(CW.max_weight/100*101), 1, NULL)) / SUM(1) * 100, 2), '%)') heavy
 	FROM plan__Batch PB
 	JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID

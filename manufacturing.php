@@ -190,7 +190,7 @@ $query = "
 		,PB.in_cassette
 		,(SELECT SUM(1) FROM list__Weight WHERE LO_ID = LO.LO_ID) cnt_weight
 		,(SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) avg_weight
-		,IF((SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) BETWEEN ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)) AND ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), 0, IF((SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) > ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), (SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) - ROUND(CW.max_weight + (CW.max_weight/100*CW.drying_percent)), (SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) - ROUND(CW.min_weight + (CW.min_weight/100*CW.drying_percent)))) avg_diff
+		,IF((SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) BETWEEN ROUND(CW.min_weight/100*101) AND ROUND(CW.max_weight/100*101), 0, IF((SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) > ROUND(CW.max_weight/100*101), (SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) - ROUND(CW.max_weight/100*101), (SELECT ROUND(AVG(weight)) FROM list__Weight WHERE LO_ID = LO.LO_ID) - ROUND(CW.min_weight/100*101))) avg_diff
 		,USR_Icon(LO.opening_master) opening_master
 
 		,LOD.not_spill
