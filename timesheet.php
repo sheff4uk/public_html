@@ -396,7 +396,7 @@ foreach ($_GET as &$value) {
 				SELECT TS.TS_ID
 					,TS.ts_date
 					,TS.ts_date + INTERVAL 1 DAY tomorrow
-					,IF(TIMESTAMPDIFF(DAY, TS.ts_date, CURDATE()) <= 30 AND TIMESTAMPDIFF(HOUR, TS.ts_date, NOW()) >= 32, 1, 0) editable
+					,IF(TIMESTAMPDIFF(DAY, TS.ts_date, CURDATE()) <= 40 AND TIMESTAMPDIFF(HOUR, TS.ts_date, NOW()) >= 32, 1, 0) editable
 					,DAY(TS.ts_date) Day
 					,SUM(TSS.duration) duration
 					,SUM(TSS.pay) pay
@@ -497,7 +497,7 @@ foreach ($_GET as &$value) {
 					$query = "
 						SELECT
 							'{$year}-{$month}-{$d}' + INTERVAL 1 DAY tomorrow
-							,IF(TIMESTAMPDIFF(DAY, '{$year}-{$month}-{$d}', CURDATE()) <= 30 AND TIMESTAMPDIFF(HOUR, '{$year}-{$month}-{$d}', NOW()) >= 32, 1, 0) editable
+							,IF(TIMESTAMPDIFF(DAY, '{$year}-{$month}-{$d}', CURDATE()) <= 40 AND TIMESTAMPDIFF(HOUR, '{$year}-{$month}-{$d}', NOW()) >= 32, 1, 0) editable
 					";
 					$subsubsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					$subsubsubrow = mysqli_fetch_array($subsubsubres);
