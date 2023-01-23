@@ -505,13 +505,26 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 						$row = mysqli_fetch_array($res);
 						$F_ID = $row["F_ID"];
 
-//						// Актуализируем участок у кассеты
-//						$query = "
-//							UPDATE Cassettes
-//							SET F_ID = {$F_ID}
-//							WHERE cassette = {$goodsID}
-//						";
-//						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						// Узнаем участок просканированной кассеты
+						$query = "
+							SELECT F_ID
+							FROM Cassettes
+							WHERE cassette = {$goodsID}
+						";
+						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						$row = mysqli_fetch_array($res);
+						$cF_ID = $row["F_ID"];
+
+						// Если участки различаются, обновляем участок у кассеты и переносим в резерв
+						if( $F_ID != $cF_ID ) {
+							$query = "
+								UPDATE Cassettes
+								SET F_ID = {$F_ID}
+									,CW_ID = NULL
+								WHERE cassette = {$goodsID}
+							";
+							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						}
 
 						// Делаем запись в таблицу сборки кассет (расформовка триггером)
 						$query = "
