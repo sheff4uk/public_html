@@ -41,7 +41,7 @@ if( isset($_POST["F_ID"]) ) {
 
 	// Проверка можно ли редактировать регистрации
 	$query = "
-		SELECT IF(TIMESTAMPDIFF(DAY, TS.ts_date, CURDATE()) <= 30 AND TIMESTAMPDIFF(HOUR, TS.ts_date, NOW()) >= 32, 1, 0) editable
+		SELECT IF(TIMESTAMPDIFF(DAY, TS.ts_date, CURDATE()) <= 40 AND TIMESTAMPDIFF(HOUR, TS.ts_date, NOW()) >= 32, 1, 0) editable
 		FROM Timesheet TS
 		WHERE TS.TS_ID = {$TS_ID}
 	";
@@ -247,7 +247,7 @@ if( isset($_POST["F_ID"]) ) {
 		//////////////////////////////
 	}
 	else {
-		$_SESSION["error"][] = 'Не допускается редактирование смен в тот же день или если смена старше 30 дней.';
+		$_SESSION["error"][] = 'Не допускается редактирование смен в тот же день или если смена старше 40 дней.';
 	}
 
 	/////////////////////////
@@ -588,7 +588,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				html_hide = html_hide + "<input type='hidden' name='usr_id' value='"+usr_id+"'>";
 			}
 
-			html = html + "<tr><td colspan='2'>Открытие <input type='datetime-local' name='tr_time1' min='"+date+"T00:00' max='"+tomorrow+"T08:00' def='"+date+"T00:00' "+(editable == 1 ? "" : "disabled")+" style='margin: 10px; font-size: 1.2em;'></td><td colspan='2' rowspan='2'>Редактирование регистраций возможно в течении 30 дней и только за прошлые дни.</td></tr>";
+			html = html + "<tr><td colspan='2'>Открытие <input type='datetime-local' name='tr_time1' min='"+date+"T00:00' max='"+tomorrow+"T08:00' def='"+date+"T00:00' "+(editable == 1 ? "" : "disabled")+" style='margin: 10px; font-size: 1.2em;'></td><td colspan='2' rowspan='2'>Редактирование регистраций возможно в течении 40 дней и только за прошлые дни.</td></tr>";
 			html = html + "<tr><td colspan='2'>Закрытие <input type='datetime-local' name='tr_time0' min='"+date+"T00:00' max='"+tomorrow+"T08:00' def='"+tomorrow+"T08:00' "+(editable == 1 ? "" : "disabled")+" style='margin: 10px; font-size: 1.2em;'></td></tr>";
 
 			$('#timesheet_form #hide').html(html_hide);
