@@ -385,8 +385,8 @@ if( isset($_POST["cardcode"]) ) {
 
 								<?
 								if( isset($_GET["duration"]) ) {
-									if( $_GET["duration"] < 120 ) {
-										echo "<p class='title' style='color: #911;'>Продолжительность смены составила менее 2-х часов.</p>";
+									if( $_GET["duration"] < 30 ) {
+										echo "<p class='title' style='color: #911;'>Продолжительность рабочего времени составила менее 30 минут.</p>";
 										echo "<p class='title' style='color: #911;'>Смена не засчитана.</p>";
 									}
 								}
