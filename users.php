@@ -20,6 +20,10 @@ if( isset($_POST["USR_ID"]) ) {
 	$Surname = mysqli_real_escape_string($mysqli, $Surname);
 	$Name = convert_str($_POST["Name"]);
 	$Name = mysqli_real_escape_string($mysqli, $Name);
+	$post = convert_str($_POST["post"]);
+	$post = mysqli_real_escape_string($mysqli, $post);
+
+	$post = $post ? '\''.$post.'\'' : 'NULL';
 
 	// Проверка карты на повтор
 	if( $cardcode != '' and $act == 1 ) {
@@ -62,6 +66,7 @@ if( isset($_POST["USR_ID"]) ) {
 				,cardcode = '{$cardcode}'
 				,outsourcer = {$outsourcer}
 				,official = {$official}
+				,post = {$post}
 				,overalls_issued = {$overalls_issued}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -85,6 +90,7 @@ if( isset($_POST["USR_ID"]) ) {
 				,cardcode = '{$cardcode}'
 				,outsourcer = {$outsourcer}
 				,official = {$official}
+				,post = {$post}
 				,overalls_issued = {$overalls_issued}
 			WHERE USR_ID = {$_POST["USR_ID"]}
 		";
@@ -309,6 +315,7 @@ foreach ($_GET as &$value) {
 			<th>Телефон</th>
 			<th>Участок</th>
 			<th>Роль</th>
+			<th>Пост</th>
 			<th>Номер карты</th>
 			<th>Аутсорсер</th>
 			<th>Официально</th>
@@ -332,6 +339,7 @@ foreach ($_GET as &$value) {
 				,USR.cardcode
 				,USR.F_ID
 				,RL.Role
+				,USR.post
 				,F.f_name
 				,USR.act
 				,USR.outsourcer
@@ -383,6 +391,7 @@ foreach ($_GET as &$value) {
 					<td>{$row["phone"]}</td>
 					<td>{$row["f_name"]}</td>
 					<td>{$row["Role"]}</td>
+					<td>{$row["post"]}</td>
 					<td>{$row["cardcode"]}</td>
 					<td>".($row["outsourcer"] ? "<i class='fas fa-check'></i>" : "")."</td>
 					<td>".($row["official"] ? "<i class='fas fa-check'></i>" : "")."</td>
@@ -471,6 +480,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</div>
 			</div>
 			<div>
+				<label>Пост:</label>
+				<div>
+					<input type='text' name='post' autocomplete='off'>
+				</div>
+			</div>
+			<div>
 				<label>Номер карты:</label>
 				<div>
 					<input id="cardcode" type='text' name='cardcode' autocomplete='off'>
@@ -509,6 +524,25 @@ this.subbut.value='Подождите, пожалуйста!';">
 	usr_photo = <?= json_encode($usr_photo); ?>;
 
 	$(function() {
+		// Автокомплит постов в форме
+		<?
+			$query = "
+				SELECT USR.post
+				FROM Users USR
+				WHERE USR.post IS NOT NULL
+				GROUP BY USR.post
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $row = mysqli_fetch_array($res) ) {
+				//формируем массив для JSON данных
+				$posts[] = $row["post"];
+			}
+		?>
+		var posts = <?= json_encode($posts); ?>;
+		$('input[name="post"]').autocomplete({
+			source: posts
+		});
+
 		// Select2
 		function format (state) {
 			var originalOption = state.element;
@@ -528,7 +562,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 		$("#cardcode").mask("9999999999");
 
-		// Кнопка добавления набора
+		// Кнопка добавления пользователя
 		$('.add_user').click( function() {
 			// Проверяем сессию
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
@@ -566,6 +600,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#user_form input[name="phone"]').val(users_data[usr]['phone']);
 				$('#user_form select[name="F_ID"]').val(users_data[usr]['F_ID']);
 				$('#user_form select[name="RL_ID"]').val(users_data[usr]['RL_ID']).trigger("change");
+				$('#user_form input[name="post"]').val(users_data[usr]['post']);
 				$('#user_form input[name="cardcode"]').val(users_data[usr]['cardcode']);
 				$('#user_form input[name="outsourcer"]').prop('checked', users_data[usr]['outsourcer'] == 1 );
 				$('#user_form input[name="official"]').prop('checked', users_data[usr]['official'] == 1 );
@@ -578,6 +613,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 				modal: true,
 				closeText: 'Закрыть'
 			});
+
+			// Автокомплит поверх диалога
+			$('input[name="post"]').autocomplete( "option", "appendTo", "#user_form" );
 
 			return false;
 		});
