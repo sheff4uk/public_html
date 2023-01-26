@@ -498,16 +498,16 @@ if( isset($_POST["cardcode"]) ) {
 						<span style="align-self: flex-end; margin: 10px; -webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff;"><?=$subrow["name"]?></span>
 					</div>
 					<?
-					if( $total > 0 ) {
-						echo "<div style='display: flex; background-color: #fdce46bf; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px;'>";
-						echo "<span style='margin: 5px; filter: drop-shadow(0px 0px 2px #000); color: #fff;'>";
-						foreach ($total_by_post as $key => &$value) {
-							echo "{$key}: {$value}<br>";
-						}
-						echo "<b>Всего: {$total}</b>";
-						echo "</span>";
-						echo "</div>";
+				}
+				if( $total > 0 ) {
+					echo "<div style='display: flex; background-color: #fdce46bf; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px;'>";
+					echo "<span style='margin: 5px; filter: drop-shadow(0px 0px 2px #000); color: #fff;'>";
+					foreach ($total_by_post as $key => &$value) {
+						echo "{$key}: {$value}<br>";
 					}
+					echo "<b>Всего: {$total}</b>";
+					echo "</span>";
+					echo "</div>";
 				}
 				echo "</fieldset>";
 			}
