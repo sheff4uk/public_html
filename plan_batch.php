@@ -25,8 +25,37 @@ if( isset($_GET["print_confirm"]) ) {
 	";
 	mysqli_query( $mysqli, $query );
 
+	// Узнаем участок и противовес
+	$query = "
+		SELECT F_ID, CW_ID
+		FROM plan__Batch
+		WHERE PB_ID = {$PB_ID}
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$F_ID = $row["F_ID"];
+	$CW_ID = $row["CW_ID"];
+
+	// Очищаем список связанных кассет
+	$query = "
+		DELETE FROM plan__BatchCassette
+		WHERE PB_ID = {$PB_ID}
+	";
+	echo $query;
+	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+	// Сохраняем список связанных кассет
+	$query = "
+		INSERT INTO plan__BatchCassette(PB_ID, cassette)
+		SELECT {$PB_ID}, cassette
+		FROM Cassettes
+		WHERE F_ID = {$F_ID}
+			AND CW_ID = {$CW_ID}
+	";
+	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
 	// Перенаправление в план
-	exit ('<meta http-equiv="refresh" content="0; url='.$page.'?year='.$year.'#'.$PB_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url='.$page.'?F_ID='.$F_ID.'&year='.$year.'#'.$PB_ID.'">');
 }
 
 // Если в фильтре не установлен год, показываем текущий год
