@@ -202,7 +202,7 @@ $row = mysqli_fetch_array($res);
 	<thead style="word-wrap: break-word;">
 		<tr>
 			<th rowspan="3" width="30">№<br>п/п</th>
-			<th rowspan="2"><sup style="float: left;">Дата замеса:</sup><br>____________</th>
+			<th rowspan="2"><sup style="float: left;">Дата замеса:</sup><br>__________</th>
 			<th  rowspan="2">Масса куба раствора</th>
 			<th rowspan="3" width="30" style="border-right: 4px solid;">t, ℃ 22±8</th>
 			<?=($row["sf_cnt"] ? "<th>Мелкая дробь</th>" : "")?>
