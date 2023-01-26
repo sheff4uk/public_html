@@ -103,8 +103,10 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 </head>
 <body>
 
+<!--
 	<b style="float: right; width: 55%;"><span style="font-size: 1.5em;">ВНИМАНИЕ!</span> Время замеса не должно выходить за границы текущего года.</b>
 <h3>Фактическая дата первого замеса: ________________</h3>
+-->
 
 <table>
 	<thead>
@@ -118,22 +120,34 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 			</th>
 		</tr>
 <?
-	// Формируем список вероятных номеров кассет
+//	// Формируем список вероятных номеров кассет
+//	$query = "
+//		SELECT LF.cassette
+//		FROM list__Batch LB
+//		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+//		WHERE LB.PB_ID = (
+//			SELECT PB_ID
+//			FROM plan__Batch
+//			WHERE CW_ID = {$CW_ID}
+//				AND F_ID = {$F_ID}
+//				AND fact_batches > 0
+//				AND PB_ID < {$PB_ID}
+//			ORDER BY PB_ID DESC
+//			LIMIT 1
+//		)
+//		ORDER BY LF.cassette
+//	";
+//	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//	while( $row = mysqli_fetch_array($res) ) {
+//		$cassettes .= "<n class='cassette'>{$row["cassette"]}</n>";
+//	}
+	// Формируем список зарезервированных кассет
 	$query = "
-		SELECT LF.cassette
-		FROM list__Batch LB
-		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-		WHERE LB.PB_ID = (
-			SELECT PB_ID
-			FROM plan__Batch
-			WHERE CW_ID = {$CW_ID}
-				AND F_ID = {$F_ID}
-				AND fact_batches > 0
-				AND PB_ID < {$PB_ID}
-			ORDER BY PB_ID DESC
-			LIMIT 1
-		)
-		ORDER BY LF.cassette
+		SELECT cassette
+		FROM Cassettes
+		WHERE F_ID = {$F_ID}
+			AND CW_ID = {$CW_ID}
+		ORDER BY cassette
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
@@ -142,7 +156,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 ?>
 		<tr>
 			<th colspan="4" style="position: relative; padding-top: 12px;">
-				<span style="position: absolute; top: 0px; left: 5px;" class="nowrap">Вероятные номера кассет:</span>
+				<span style="position: absolute; top: 0px; left: 5px;" class="nowrap">Зарезервированные кассеты:</span>
 				<?=$cassettes?>
 			</th>
 		</tr>
@@ -188,7 +202,7 @@ $row = mysqli_fetch_array($res);
 	<thead style="word-wrap: break-word;">
 		<tr>
 			<th rowspan="3" width="30">№<br>п/п</th>
-			<th rowspan="3">Время замеса</th>
+			<th rowspan="2"><sup style="float: left;">Дата замеса:</sup><br>____________</th>
 			<th  rowspan="2">Масса куба раствора</th>
 			<th rowspan="3" width="30" style="border-right: 4px solid;">t, ℃ 22±8</th>
 			<?=($row["sf_cnt"] ? "<th>Мелкая дробь</th>" : "")?>
@@ -203,7 +217,7 @@ $row = mysqli_fetch_array($res);
 			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент</th>" : "")?>
 			<?=($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор</th>" : "")?>
 			<?=($row["wt_cnt"] ? "<th rowspan='2'>Вода</th>" : "")?>
-			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>" style="border-left: 4px solid;">№ кассеты<br>(разборчиво)</th>
+			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>" style="border-left: 4px solid;">№ кассеты</th>
 			<th rowspan="3" width="40">Недолив</th>
 			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
 		</tr>
@@ -219,6 +233,7 @@ $row = mysqli_fetch_array($res);
 			<?=($row["cs_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
 		</tr>
 		<tr>
+			<th>Время<br>замеса</th>
 			<th class="nowrap"><?=$spec?> кг</th>
 			<?=($row["sf_cnt"] ? "<th class='nowrap'>{$row["s_fraction"]}</th>" : "")?>
 			<?=($row["lf_cnt"] ? "<th class='nowrap'>{$row["l_fraction"]}</th>" : "")?>
