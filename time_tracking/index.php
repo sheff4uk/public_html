@@ -436,7 +436,10 @@ if( isset($_POST["cardcode"]) ) {
 					});
 				});
 			</script>
-			<div style="display: flex; flex-direction: row; flex-wrap: wrap; padding: 5px; margin: 5px;">
+			<div style="background: #fdce46bf; text-align: center; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px;">
+				<h2>Приложите карту к считывателю</h2>
+			</div>
+			<div style="display: flex; flex-direction: row; flex-wrap: wrap;">
 			<?
 			// Получаем список активных смен
 			$query = "
@@ -468,6 +471,7 @@ if( isset($_POST["cardcode"]) ) {
 					SELECT USR_Name(TS.USR_ID) `name`
 						,TR.tr_photo
 						,CONCAT(LPAD((TR.tr_minute DIV 60) % 24, 2, '0'), ':', LPAD(TR.tr_minute % 60, 2, '0')) tr_time
+						,USR.post
 					FROM TimeReg TR
 					JOIN TimesheetShift TSS ON TSS.TSS_ID = TR.TSS_ID
 						AND TSS.duration IS NULL
@@ -475,28 +479,40 @@ if( isset($_POST["cardcode"]) ) {
 					JOIN Timesheet TS ON TS.TS_ID = TSS.TS_ID
 						AND TS.F_ID = {$F_ID}
 						AND TS.ts_date = '{$row["ts_date"]}'
+					JOIN Users USR ON USR.USR_ID = TS.USR_ID
 					WHERE TR.del_time IS NULL
 					ORDER BY `name`
 				";
 				$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				$total_by_post = array();
+				$total = 0;
 				while( $subrow = mysqli_fetch_array($subres) ) {
+					if( $subrow["post"] != null ) {
+						$total_by_post[$subrow["post"]]++;
+						$total++;
+					}
 					?>
-					<div style="display: flex; width: 160px; height: 120px; font-size: 1.0em; background-color: #fdce46bf; background-image: url(/time_tracking/upload/<?=$subrow["tr_photo"]?>); background-size: contain; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px; overflow: hidden; position: relative;">
+					<div style="display: flex; width: 120px; height: 120px; background-color: #fdce46bf; background-image: url(/time_tracking/upload/<?=$subrow["tr_photo"]?>); background-size: cover; background-position: center; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px; overflow: hidden; position: relative;">
 	<!--					<div style=" width: 20px; height: 20px; display: inline-block; margin: 15px; border-radius: 50%; background: green; box-shadow: 0 0 3px 3px green; position: absolute;"></div>-->
 						<span style="-webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff; position: absolute; top: 10px; right: 10px;"><?=$subrow["tr_time"]?></span>
 						<span style="align-self: flex-end; margin: 10px; -webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff;"><?=$subrow["name"]?></span>
 					</div>
 					<?
+					if( $total > 0 ) {
+						echo "<div style='display: flex; background-color: #fdce46bf; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px;'>";
+						echo "<span style='margin: 5px; filter: drop-shadow(0px 0px 2px #000); color: #fff;'>";
+						foreach ($total_by_post as $key => &$value) {
+							echo "{$key}: {$value}<br>";
+						}
+						echo "<b>Всего: {$total}</b>";
+						echo "</span>";
+						echo "</div>";
+					}
 				}
 				echo "</fieldset>";
 			}
 
 			?>
-			</div>
-			<div>
-				<form>
-					<h2>Приложите карту к считывателю</h2>
-				</form>
 			</div>
 			<?
 		}
