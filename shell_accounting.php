@@ -292,8 +292,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<th>Средний ресурс форм до её списания в циклах заливки</th>
 				<th>Среднесуточное списание форм</th>
 				<th>Списаний за прошедшие сутки</th>
-				<th>Сколько ОБЫЧНО форм задействовалось в производственном цикле</th>
-				<th>Сколько МАКСИМАЛЬНО форм задействовалось в производственном цикле</th>
+				<th>Текущая потребность в формах</th>
 				<th>Дефицит форм в штуках</th>
 				<th>Через сколько дней наступит дефицит форм</th>
 			</tr>
@@ -305,11 +304,18 @@ while( $row = mysqli_fetch_array($res) ) {
 					,CW.shell_balance
 					,ROUND((WB.fillings * PB.in_cassette) / WR.sr_cnt) `durability`
 					,ROUND(WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'), 1) `sr_avg`
-					,ROUND(AVG(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) `often`
-					,MAX(ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette) `max`
-					,MAX(ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette) - CW.shell_balance `need`
-					,ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) `days_max`
-					,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d/%m/%Y') `date_max`
+					#,ROUND(AVG(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) `often`
+					#,MAX(ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette) `max`
+					,(
+						SELECT SUM(MixFormula.in_cassette)
+						FROM Cassettes
+						JOIN MixFormula ON MixFormula.F_ID = Cassettes.F_ID
+							AND MixFormula.CW_ID = Cassettes.CW_ID
+						WHERE MixFormula.CW_ID = CW.CW_ID
+					) current_need
+					#,MAX(ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette) - CW.shell_balance `need`
+					#,ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) `days_max`
+					#,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d/%m/%Y') `date_max`
 					,SR.sr_cnt
 				FROM CounterWeight CW
 				LEFT JOIN (
@@ -347,6 +353,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
 				//$pallets += $row["pallets"];
+				$need = $row["current_need"] - $row["shell_balance"];
+				$days_max = ($row["sr_avg"] > 0) ? round( ($row["shell_balance"] - $row["current_need"]) / $row["sr_avg"] ) : null;
 				?>
 					<tr>
 						<td style="text-align: center;"><?=$row["item"]?></td>
@@ -354,10 +362,13 @@ while( $row = mysqli_fetch_array($res) ) {
 						<td style="text-align: center;"><?=$row["durability"]?></td>
 						<td style="text-align: center;"><?=$row["sr_avg"]?></td>
 						<td style="text-align: center;"><?=$row["sr_cnt"]?></td>
+<!--
 						<td style="text-align: center; <?=($row["often"] > $row["shell_balance"] ? "color: red;" : "")?>"><?=$row["often"]?></td>
 						<td style="text-align: center; <?=($row["max"] > $row["shell_balance"] ? "color: red;" : "")?>"><?=$row["max"]?></td>
-						<td style="text-align: center; color: red;"><?=($row["need"] > 0 ? $row["need"] : "")?></td>
-						<td style="text-align: center;"><?=($row["days_max"] < 0 ? "" : "{$row["days_max"]} <sub>{$row["date_max"]}</sub>")?></td>
+-->
+						<td style="text-align: center; <?=($row["current_need"] > $row["shell_balance"] ? "color: red;" : "")?>"><?=$row["current_need"]?></td>
+						<td style="text-align: center; color: red;"><?=($need > 0 ? $need : "")?></td>
+						<td style="text-align: center;"><?=($days_max < 0 ? "" : $days_max)?></td>
 					</tr>
 				<?
 			}
@@ -365,8 +376,6 @@ while( $row = mysqli_fetch_array($res) ) {
 		</tbody>
 	</table>
 </div>
-
-<!--<h3>Заполненность склада с формами: <?=round(($pallets < 0 ? 0 : $pallets) / 130 * 100)?>%</h3>-->
 
 <!--<div id="shell_report_btn" title="Распечатать отчет"><a href="/printforms/shell_accounting_report.php?CB_ID=2" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>-->
 
