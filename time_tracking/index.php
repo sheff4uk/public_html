@@ -492,7 +492,7 @@ if( isset($_POST["cardcode"]) ) {
 						$total++;
 					}
 					?>
-					<div style="display: flex; width: 120px; height: 120px; background-color: #fdce46bf; background-image: url(/time_tracking/upload/<?=$subrow["tr_photo"]?>); background-size: cover; background-position: center; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px; overflow: hidden; position: relative;">
+					<div style="display: flex; width: 100px; height: 120px; background-color: #fdce46bf; background-image: url(/time_tracking/upload/<?=$subrow["tr_photo"]?>); background-size: cover; background-position: center; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px; overflow: hidden; position: relative;">
 	<!--					<div style=" width: 20px; height: 20px; display: inline-block; margin: 15px; border-radius: 50%; background: green; box-shadow: 0 0 3px 3px green; position: absolute;"></div>-->
 						<span style="-webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff; position: absolute; top: 10px; right: 10px;"><?=$subrow["tr_time"]?></span>
 						<span style="align-self: flex-end; margin: 10px; -webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff;"><?=$subrow["name"]?></span>
