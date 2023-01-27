@@ -27,7 +27,7 @@ $message = "
 				<th>Part-number</th>
 				<th>Number of OK shells</th>
 				<th>Shell scrap on the past day</th>
-				<th>Peak value of shell in use</th>
+				<th>Current need for shells</th>
 				<th>Shortage of shells</th>
 			</tr>
 		</thead>
@@ -37,13 +37,20 @@ $message = "
 $query = "
 	SELECT CW.drawing_item
 		,CW.shell_balance
-		,ROUND((WB.fillings * PB.in_cassette) / WR.sr_cnt) `durability`
-		,ROUND(WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'), 1) `sr_avg`
-		,ROUND(AVG(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) `often`
-		,MAX(ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette) `max`
-		,MAX(ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette) - CW.shell_balance `need`
-		,ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) `days_max`
-		,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d/%m/%Y') `date_max`
+		#,ROUND((WB.fillings * PB.in_cassette) / WR.sr_cnt) `durability`
+		#,ROUND(WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'), 1) `sr_avg`
+		#,ROUND(AVG(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) `often`
+		#,MAX(ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette) `max`
+		,(
+			SELECT SUM(MixFormula.in_cassette)
+			FROM Cassettes
+			JOIN MixFormula ON MixFormula.F_ID = Cassettes.F_ID
+				AND MixFormula.CW_ID = Cassettes.CW_ID
+			WHERE MixFormula.CW_ID = CW.CW_ID
+		) current_need
+		#,MAX(ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette) - CW.shell_balance `need`
+		#,ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) `days_max`
+		#,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d/%m/%Y') `date_max`
 		,SR.sr_cnt
 	FROM CounterWeight CW
 	LEFT JOIN (
@@ -78,13 +85,14 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
+	$need = $row["current_need"] - $row["shell_balance"];
 	$message .= "
 		<tr>
 			<td>{$row["drawing_item"]}</td>
 			<td>{$row["shell_balance"]}</td>
 			<td>{$row["sr_cnt"]}</td>
-			<td>{$row["max"]}</td>
-			<td style='color: red;'>".($row["need"] > 0 ? $row["need"] : "")."</td>
+			<td>{$row["current_need"]}</td>
+			<td style='color: red;'>".($need > 0 ? $need : "")."</td>
 		</tr>
 	";
 }
