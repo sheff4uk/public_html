@@ -90,28 +90,41 @@ $html = "
 	</table>
 ";
 
-// Формируем список вероятных номеров кассет
+//// Формируем список вероятных номеров кассет
+//$query = "
+//	SELECT LF.cassette
+//	FROM list__Batch LB
+//	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+//	WHERE LB.PB_ID = (
+//		SELECT PB_ID
+//		FROM plan__Batch
+//		WHERE CW_ID = {$CW_ID}
+//			AND F_ID = {$F_ID}
+//			AND fact_batches > 0
+//			AND PB_ID < {$PB_ID}
+//		ORDER BY PB_ID DESC
+//		LIMIT 1
+//	)
+//	ORDER BY LF.cassette
+//";
+//$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//while( $row = mysqli_fetch_array($res) ) {
+//	$cassettes .= "<b class='cassette' id='c_{$row["cassette"]}'>{$row["cassette"]}</b>";
+//}
+//$html .= "<div style='width: 100%; border: 1px solid; padding: 10px;'><span>Вероятные номера кассет:</span> {$cassettes}</div>";
+
+// Формируем список зарезервированных кассет
 $query = "
-	SELECT LF.cassette
-	FROM list__Batch LB
-	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-	WHERE LB.PB_ID = (
-		SELECT PB_ID
-		FROM plan__Batch
-		WHERE CW_ID = {$CW_ID}
-			AND F_ID = {$F_ID}
-			AND fact_batches > 0
-			AND PB_ID < {$PB_ID}
-		ORDER BY PB_ID DESC
-		LIMIT 1
-	)
-	ORDER BY LF.cassette
+	SELECT cassette
+	FROM plan__BatchCassette
+	WHERE PB_ID = {$PB_ID}
+	ORDER BY cassette
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$cassettes .= "<b class='cassette' id='c_{$row["cassette"]}'>{$row["cassette"]}</b>";
 }
-$html .= "<div style='width: 100%; border: 1px solid; padding: 10px;'><span>Вероятные номера кассет:</span> {$cassettes}</div>";
+$html .= "<div style='width: 100%; border: 1px solid; padding: 10px;'><span>Зарезервированные кассеты:</span> {$cassettes}</div>";
 
 // Данные рецепта
 $query = "
@@ -325,8 +338,14 @@ $html .= "
 	<datalist id='defaultNumbers'>
 ";
 
+//	$query = "
+//		SELECT cassette FROM Cassettes WHERE F_ID = {$F_ID}
+//	";
 	$query = "
-		SELECT cassette FROM Cassettes WHERE F_ID = {$F_ID}
+		SELECT cassette
+		FROM plan__BatchCassette
+		WHERE PB_ID = {$PB_ID}
+		ORDER BY cassette
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
