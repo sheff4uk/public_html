@@ -135,7 +135,7 @@ switch( $_GET["do"] ) {
 		if( !isset($_SESSION["error"]) ) {
 			// Если звонок поступил - активируем сессию и заходим в систему
 			if( $check_status == 401 ) {
-				$query = "SELECT USR_ID, last_url FROM Users WHERE phone='{$_SESSION['mtel']}'";
+				$query = "SELECT USR_ID, F_ID, last_url FROM Users WHERE phone='{$_SESSION['mtel']}'";
 				$result = mysqli_query( $mysqli, $query );
 				$myrow = mysqli_fetch_array($result);
 				$_SESSION["id"] = $myrow["USR_ID"];
