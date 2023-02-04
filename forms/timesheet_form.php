@@ -150,8 +150,9 @@ if( isset($_POST["F_ID"]) ) {
 				JOIN Timesheet TS ON TS.TS_ID = TSS.TS_ID
 					AND TS.TS_ID = {$TS_ID}
 				WHERE TR.prefix = 1
+					AND TR.del_time IS NULL
 					AND TR.tr_minute <= {$tr_minute0}
-				ORDER BY `duration` DESC
+				ORDER BY `duration` ASC
 				LIMIT 1
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
