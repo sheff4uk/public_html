@@ -6,6 +6,7 @@ include "../config.php";
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<script src="../js/jquery-1.11.3.min.js"></script>
 	<script src="https://kit.fontawesome.com/020f21ae61.js" crossorigin="anonymous"></script>
 
 <?
@@ -100,6 +101,19 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 			width: 28px;
 		}
 	</style>
+
+	<script>
+		function fontSize(elem, maxFontSize) {
+			var fontSize = $(elem).attr('fontSize');
+			var width = $(elem).width();
+			var bodyWidth = $(elem).parent().width();
+			var multiplier = bodyWidth / width;
+			fontSize = Math.floor(fontSize * multiplier);
+			if( fontSize > maxFontSize ) fontSize = maxFontSize;
+			$(elem).css({fontSize: fontSize+'px'});
+			$(elem).attr('fontSize', fontSize);
+		}
+	</script>
 </head>
 <body>
 
@@ -112,7 +126,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 	<thead>
 		<tr>
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
-			<th width="250" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;" class="nowrap">деталь</span><n style="font-size: 3em;"><?=$item?></n></th>
+			<th width="250" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;" class="nowrap">деталь</span><n id="item" style="font-size: 3em;" fontSize="40"><?=$item?></n></th>
 			<th width="175" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">цикл</span><n style="font-size: 3em;"><?=$year?>-<?=$cycle?></n></th>
 			<th width="200" style="position: relative;">
 				<img src="../barcode.php?code=<?=$PB_ID?>&w=200&h=60" alt="barcode">
@@ -287,6 +301,10 @@ for ($i = 1; $i <= $batches; $i++) {
 ?>
 	</tbody>
 </table>
+
+<script>
+	fontSize('#item', 45);
+</script>
 
 </body>
 </html>
