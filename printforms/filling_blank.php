@@ -126,7 +126,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 	<thead>
 		<tr>
 			<th><img src="/img/logo.png" alt="KONSTANTA" style="width: 200px; margin: 5px;"></th>
-			<th width="250" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;" class="nowrap">деталь</span><n id="item" style="font-size: 3em;" fontSize="40"><?=$item?></n></th>
+			<th width="250" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;" class="nowrap">деталь</span><n id="item" style="font-size: 3em;" fontSize="40" class="nowrap"><?=$item?></n></th>
 			<th width="175" style="position: relative;"><span style="position: absolute; top: 0px; left: 5px;">цикл</span><n style="font-size: 3em;"><?=$year?>-<?=$cycle?></n></th>
 			<th width="200" style="position: relative;">
 				<img src="../barcode.php?code=<?=$PB_ID?>&w=200&h=60" alt="barcode">
