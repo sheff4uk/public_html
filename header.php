@@ -243,7 +243,7 @@ function src_url($src) {
 		if( in_array('mix_formula', $Rights) ) {
 			$menu["<i class='fas fa-cog fa-lg'></i>"]["Рецепты"] = "mix_formula.php";
 		}
-		if( in_array('mix_formula', $Rights) ) {
+		if( in_array('cassettes', $Rights) ) {
 			$menu["<i class='fas fa-cog fa-lg'></i>"]["Кассеты"] = "cassettes.php";
 		}
 		$menu["Выход {$USR_Icon}"] = "exit.php";
