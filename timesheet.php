@@ -258,13 +258,18 @@ foreach ($_GET as &$value) {
 			<th colspan="2">Работник</th>
 			<th colspan="2">Тариф</th>
 			<?
-				// Получаем производственный календарь на выбранный год
-				$xml = simplexml_load_file("http://xmlcalendar.ru/data/ru/".$year."/calendar.xml");
-				$json = json_encode($xml);
-				$data = json_decode($json,TRUE);
-
-				// Массив со списком выходных дней
+				// Получаем из базы список выходных дней
 				$holidays = array();
+				$query = "
+					SELECT DATE_FORMAT(holiday, '%e') holiday
+					FROM holidays
+					WHERE YEAR(holiday) = {$year}
+						AND MONTH(holiday) = {$month}
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$holidays[$row["holiday"]] = 1;
+				}
 
 				$i = 1;
 				$weekdays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
@@ -274,23 +279,49 @@ foreach ($_GET as &$value) {
 					$dow = date('w', strtotime($date));			// День недели 0..6
 					$day = date('d', strtotime($date));			// День месяца
 
-					// Перебираем массив и если находим дату то проверяем ее тип (тип дня: 1 - выходной день, 2 - рабочий и сокращенный (может быть использован для любого дня недели), 3 - рабочий день (суббота/воскресенье))
-					$t = 0;
-					foreach( $data["days"]["day"] as $key=>$value ) {
-						if( $value["@attributes"]["d"] == $month.".".$day) {
-							$t = $value["@attributes"]["t"];
-						}
-					}
-
-					if ( (($day_of_week >= 6 and $t != "3" and $t != "2") or ($t == "1")) ) { // Выделяем цветом выходные дни
-						$holidays[$i] = 1;
-						echo "<th style='background: chocolate;'>".$i++."<br>".$weekdays[$dow]."</th>";
+					if ( isset($holidays[$i]) ) { // Выделяем цветом выходные дни
+						echo "<th style='background: chocolate;'>".$i."<br>".$weekdays[$dow]."</th>";
 					}
 					else {
-						$holidays[$i] = 0;
-						echo "<th>".$i++."<br>".$weekdays[$dow]."</th>";
+						echo "<th>".$i."<br>".$weekdays[$dow]."</th>";
 					}
+					$i++;
 				}
+
+//				// Получаем производственный календарь на выбранный год
+//				$xml = simplexml_load_file("http://xmlcalendar.ru/data/ru/".$year."/calendar.xml");
+//				$json = json_encode($xml);
+//				$data = json_decode($json,TRUE);
+//
+//				// Массив со списком выходных дней
+//				$holidays = array();
+//
+//				$i = 1;
+//				$weekdays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+//				while ($i <= $days) {
+//					$date = $year.'-'.$month.'-'.$i;
+//					$day_of_week = date('N', strtotime($date));	// День недели 1..7
+//					$dow = date('w', strtotime($date));			// День недели 0..6
+//					$day = date('d', strtotime($date));			// День месяца
+//
+//					// Перебираем массив и если находим дату то проверяем ее тип (тип дня: 1 - выходной день, 2 - рабочий и сокращенный (может быть использован для любого дня недели), 3 - рабочий день (суббота/воскресенье))
+//					$t = 0;
+//					foreach( $data["days"]["day"] as $key=>$value ) {
+//						if( $value["@attributes"]["d"] == $month.".".$day) {
+//							$t = $value["@attributes"]["t"];
+//						}
+//					}
+//
+//					if ( (($day_of_week >= 6 and $t != "3" and $t != "2") or ($t == "1")) ) { // Выделяем цветом выходные дни
+//						$holidays[$i] = 1;
+//						echo "<th style='background: chocolate;'>".$i."<br>".$weekdays[$dow]."</th>";
+//					}
+//					else {
+//						$holidays[$i] = 0;
+//						echo "<th>".$i."<br>".$weekdays[$dow]."</th>";
+//					}
+//					$i++
+//				}
 			?>
 
 			<th colspan="2">[1...15]</th>
@@ -367,7 +398,7 @@ foreach ($_GET as &$value) {
 			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			$list_tariff = "";
 			while( $subrow = mysqli_fetch_array($subres) ) {
-				$type = ($subrow["type"] == 1 ? "с" : ($subrow["type"] == 2 ? "ч" : ($subrow["type"] == 3 ? "т" : "")));
+				$type = ($subrow["type"] == 1 ? "с" : ($subrow["type"] == 2 ? "ч" : ($subrow["type"] == 3 ? "т" : ($subrow["type"] == 4 ? "м" : ""))));
 				$list_tariff .= "<span title='от {$subrow["valid_from_format"]}' class='nowrap'>{$subrow["tariff"]}/{$type}</span><br>";
 			}
 
@@ -404,7 +435,7 @@ foreach ($_GET as &$value) {
 					,GROUP_CONCAT(TSS.pay SEPARATOR '<br>') pay_format
 					,TS.fine
 					#,TS.rate
-					,CONCAT(TST.tariff, '/', IF(TST.type = 1, 'Смена', IF(TST.type = 2, 'Час', IF(TST.type = 3, 'Час (тракторист)', '')))) tariff_type
+					,CONCAT(TST.tariff, '/', IF(TST.type = 1, 'Смена', IF(TST.type = 2, 'Час', IF(TST.type = 3, 'Час (тракторист)', IF(TST.type = 4, 'Месяц', ''))))) tariff_type
 					,SUM(IF(TSS.pay > 0, 1, 0)) shift_cnt
 					,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR '<br>') duration_hm
 					,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR ', ') duration_hm_title
@@ -468,7 +499,7 @@ foreach ($_GET as &$value) {
 					$pay = $subrow["pay"];
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".($holidays[$i] == 1 ? " background: #09f3;" : "").($pay == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' date='{$subrow["ts_date"]}' tomorrow='{$subrow["tomorrow"]}' editable='{$subrow["editable"]}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff_type"]}' shift_cnt='{$subrow["shift_cnt"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay_format"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}' payout='{$subrow["payout"]}' comment='{$subrow["comment"]}'>
+						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".(isset($holidays[$i]) ? " background: #09f3;" : "").($pay == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' date='{$subrow["ts_date"]}' tomorrow='{$subrow["tomorrow"]}' editable='{$subrow["editable"]}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff_type"]}' shift_cnt='{$subrow["shift_cnt"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay_format"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}' payout='{$subrow["payout"]}' comment='{$subrow["comment"]}'>
 							".($man_reg ? "<div style='position: absolute; top: 0px; left: 0px; width: 5px; height: 5px; border-radius: 0 0 5px 0; background: red; box-shadow: 0 0 1px 1px red;'></div>" : "")."
 							".(($subrow["sub_is"] or $subrow["substitute"]) ? "<div style='position: absolute; bottom: 0px; right: 0px; width: 5px; height: 5px; border-radius: 5px 0 0 0; background: blue; box-shadow: 0 0 1px 1px blue;'></div>" : "")."
 							<div title='{$subrow["duration_hm_title"]}'>{$subrow["pay_format"]}</div>
@@ -502,7 +533,7 @@ foreach ($_GET as &$value) {
 					$subsubsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					$subsubsubrow = mysqli_fetch_array($subsubsubres);
 
-					echo "<td style='".($holidays[$i] == 1 ? " background: #09f3;" : "")."' class='tscell' date='{$year}-{$month}-{$d}' tomorrow='{$subsubsubrow["tomorrow"]}' editable='{$subsubsubrow["editable"]}' ts_date='{$year}-{$month}-{$d}' usr_id='{$row["USR_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'></td>";
+					echo "<td style='".(isset($holidays[$i]) ? " background: #09f3;" : "")."' class='tscell' date='{$year}-{$month}-{$d}' tomorrow='{$subsubsubrow["tomorrow"]}' editable='{$subsubsubrow["editable"]}' ts_date='{$year}-{$month}-{$d}' usr_id='{$row["USR_ID"]}' date_format='{$d}.{$month}.{$year}' usr_name='{$row["Name"]}'></td>";
 				}
 				$i++;
 			}
@@ -522,7 +553,7 @@ foreach ($_GET as &$value) {
 
 		// Итог снизу
 		echo "<tr><td colspan='2' style='text-align: center; font-size: 1.5em; background: #3333;'><b>Σ</b></td>";
-		echo "<td colspan='2' class='nowrap' style='text-align: center; background: #3333;'>с-смена<br>ч-час<br>т-час(тракторист)</td>";
+		echo "<td colspan='2' class='nowrap' style='text-align: center; background: #3333;'>с-смена<br>ч-час<br>т-час(тракторист)<br>м-месяц</td>";
 
 		$i = 1;
 		$sigmapay1 = 0;
@@ -595,6 +626,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 								<option value="1">Смена</option>
 								<option value="2">Час</option>
 								<option value="3">Час (тракторист)</option>
+								<option value="4">Месяц</option>
 							</select>
 						</td>
 					</tr>
