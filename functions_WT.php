@@ -194,13 +194,14 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 									WHERE LO.LO_ID = SUB.LO_ID
 								) item
 							FROM (
-								SELECT (SELECT LO_ID FROM list__Opening WHERE F_ID = {$F_ID} AND opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) LO_ID
+								SELECT (SELECT LO_ID FROM list__Opening WHERE F_ID = {$F_ID} AND opening_time < LO.opening_time AND lift IS NULL ORDER BY opening_time DESC LIMIT 1) LO_ID
 									,LO.opening_time end_time
 								FROM list__Opening LO
-								WHERE F_ID = {$F_ID}
+								WHERE LO.F_ID = {$F_ID}
 									AND LO.opening_time > '{$receipt_start}'
-									AND (SELECT opening_time FROM list__Opening WHERE F_ID = {$F_ID} AND opening_time < LO.opening_time ORDER BY opening_time DESC LIMIT 1) <= '{$receipt_end}'
+									AND (SELECT opening_time FROM list__Opening WHERE F_ID = {$F_ID} AND opening_time < LO.opening_time AND lift IS NULL ORDER BY opening_time DESC LIMIT 1) <= '{$receipt_end}'
 									AND '{$receipt_start}' <= LO.opening_time
+									AND LO.lift IS NULL
 								) SUB
 							ORDER BY CW_cnt DESC
 							#LIMIT 1
