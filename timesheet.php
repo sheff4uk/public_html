@@ -358,8 +358,7 @@ foreach ($_GET as &$value) {
 				AND TM.month = {$month}
 				AND TM.USR_ID = USR.USR_ID
 				AND TM.F_ID = {$F_ID}
-			LEFT JOIN TimesheetTariff TST ON valid_to IS NULL
-				AND (SELECT SUM(1) FROM Timesheet WHERE TST_ID = TST.TST_ID) IS NULL
+			LEFT JOIN TimesheetTariff TST ON valid_from > CURDATE()
 				AND TST.USR_ID = USR.USR_ID
 				AND TST.F_ID = {$F_ID}
 			WHERE 1
