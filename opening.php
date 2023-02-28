@@ -175,7 +175,7 @@ if( !$_GET["F_ID"] ) {
 			<select name="CAS[]" class="<?=$_GET["CAS"] ? "filtered" : ""?>" style="width: 350px;" multiple>
 				<?
 				for ($i = 1; $i <= $cassetts; $i++) {
-					$selected = in_array($i, $_GET["CAS"]) ? "selected" : "";
+					$selected = ( isset($_GET["CAS"]) && in_array($i, $_GET["CAS"]) ) ? "selected" : "";
 					echo "<option value='{$i}' {$selected}>{$i}</option>";
 				}
 				?>
@@ -333,7 +333,7 @@ $query = "
 		,LOD.chipped
 		,LOD.def_form
 		,LOD.def_assembly
-		,PB.in_cassette
+		,(PB.in_cassette - LF.underfilling) in_cassette
 		,COUNT(LW.nextID) cnt_weight
 			#,MIN(LW.weight) min_weight
 		,ROUND(AVG(LW.weight)) avg_weight
@@ -350,11 +350,11 @@ $query = "
 		,LB.mix_density
 		,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
 	FROM list__Opening LO
+	JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
+	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
-	LEFT JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
-	LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
-	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	LEFT JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
 	WHERE PB.F_ID = {$_GET["F_ID"]}
 		".($_GET["week"] ? "AND YEARWEEK(LO.opening_time, 1) LIKE '{$_GET["week"]}'" : "")."
