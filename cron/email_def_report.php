@@ -24,23 +24,23 @@ $format_month = $row["format_month"];
 $subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Дефекты {$format_month} {$year}"). "?=";
 
 $message = "
-	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
-		<tr>
-			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
-			<th><n style='font-size: 2em;'>Дефекты форм, сборки</n></th>
-			<th>{$format_month} {$year}</th>
-		</tr>
-	</table>
+	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>\r\n
+		<tr>\r\n
+			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>\r\n
+			<th><n style='font-size: 2em;'>Дефекты форм, сборки</n></th>\r\n
+			<th>{$format_month} {$year}</th>\r\n
+		</tr>\r\n
+	</table>\r\n
 
-	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
-		<thead style='word-wrap: break-word;'>
-			<tr>
-				<th>Мастер</th>
-				<th>Дефект формы</th>
-				<th>Дефект сборки</th>
-			</tr>
-		</thead>
-		<tbody style='text-align: center;'>
+	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>\r\n
+		<thead style='word-wrap: break-word;'>\r\n
+			<tr>\r\n
+				<th>Мастер</th>\r\n
+				<th>Дефект формы</th>\r\n
+				<th>Дефект сборки</th>\r\n
+			</tr>\r\n
+		</thead>\r\n
+		<tbody style='text-align: center;'>\r\n
 ";
 
 $query = "
@@ -58,41 +58,41 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query1: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$message .= "
-		<tr>
-			<td>{$row["master"]}</td>
-			<td>{$row["def_shell"]}</td>
-			<td>{$row["def_assembly"]}</td>
-		</tr>
+		<tr>\r\n
+			<td>{$row["master"]}</td>\r\n
+			<td>{$row["def_shell"]}</td>\r\n
+			<td>{$row["def_assembly"]}</td>\r\n
+		</tr>\r\n
 	";
 }
 
 $message .= "
-		</tbody>
-	</table>
-	<br>
-	<br>
+		</tbody>\r\n
+	</table>\r\n
+	<br>\r\n
+	<br>\r\n
 ";
 
 $message .= "
-	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
-		<tr>
-			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
-			<th><n style='font-size: 2em;'>Непроливы, усадочные трещины</n></th>
-			<th>{$format_month} {$year}</th>
-		</tr>
-	</table>
+	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>\r\n
+		<tr>\r\n
+			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>\r\n
+			<th><n style='font-size: 2em;'>Непроливы, усадочные трещины</n></th>\r\n
+			<th>{$format_month} {$year}</th>\r\n
+		</tr>\r\n
+	</table>\r\n
 
-	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
-		<thead style='word-wrap: break-word;'>
-			<tr>
-				<th>Оператор</th>
-				<th>Непролив</th>
-				<th>Усадочная трещина</th>
-				<th>Легкие детали</th>
-				<th>Тяжелые детали</th>
-			</tr>
-		</thead>
-		<tbody style='text-align: center;'>
+	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>\r\n
+		<thead style='word-wrap: break-word;'>\r\n
+			<tr>\r\n
+				<th>Оператор</th>\r\n
+				<th>Непролив</th>\r\n
+				<th>Усадочная трещина</th>\r\n
+				<th>Легкие детали</th>\r\n
+				<th>Тяжелые детали</th>\r\n
+			</tr>\r\n
+		</thead>\r\n
+		<tbody style='text-align: center;'>\r\n
 ";
 
 $query = "
@@ -115,23 +115,23 @@ $query = "
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query1: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$message .= "
-		<tr>
-			<td>{$row["operator"]}</td>
-			<td>{$row["not_spill"]}</td>
-			<td>{$row["crack_drying"]}</td>
-			<td>{$row["light"]}</td>
-			<td>{$row["heavy"]}</td>
-		</tr>
+		<tr>\r\n
+			<td>{$row["operator"]}</td>\r\n
+			<td>{$row["not_spill"]}</td>\r\n
+			<td>{$row["crack_drying"]}</td>\r\n
+			<td>{$row["light"]}</td>\r\n
+			<td>{$row["heavy"]}</td>\r\n
+		</tr>\r\n
 	";
 }
 
 $message .= "
-		</tbody>
-	</table>
+		</tbody>\r\n
+	</table>\r\n
 ";
 
 //$headers  = "MIME-Version: 1.0\r\n";
-$headers .= "Content-type: text/html; charset=\"utf-8\"\n";
+$headers .= "Content-type: text/html; charset=\"utf-8\"\r\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
 
 mail($to, $subject, $message, $headers);
