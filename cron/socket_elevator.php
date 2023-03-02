@@ -200,16 +200,7 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 							}
 
 							// Если новая расформовка
-							if( $new_opening ) {
-
-								$query = "
-									INSERT INTO list__Assembling
-									SET F_ID = {$F_ID}
-										,cassette = {$DocumentCode}
-										,assembling_time = '{$transactionDate}'
-										,lift = 1
-								";
-								mysqli_query( $mysqli, $query );
+							if( $new_opening == 1 ) {
 
 								// Проверяем, залита ли кассета
 								$query = "
@@ -221,6 +212,17 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 								";
 								$res = mysqli_query( $mysqli, $query );
 								$row = mysqli_fetch_array($res);
+
+								// Делаем запись о сборке. Расформовка триггером т.к. кассета залита.
+								$query = "
+									INSERT INTO list__Assembling
+									SET F_ID = {$F_ID}
+										,cassette = {$DocumentCode}
+										,assembling_time = '{$transactionDate}'
+										,lift = 1
+								";
+								mysqli_query( $mysqli, $query );
+
 								// Если залита
 								if( $row["is_filling"] == 1 ) {
 
