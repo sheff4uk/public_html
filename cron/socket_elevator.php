@@ -212,6 +212,7 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 								";
 								$res = mysqli_query( $mysqli, $query );
 								$row = mysqli_fetch_array($res);
+								$is_filling = $row["is_filling"];
 
 								// Делаем запись о сборке. Расформовка триггером т.к. кассета залита.
 								$query = "
@@ -224,7 +225,7 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 								mysqli_query( $mysqli, $query );
 
 								// Если залита
-								if( $row["is_filling"] == 1 ) {
+								if( $is_filling == 1 ) {
 
 									// Находим LO_ID добавленой кассеты
 									$query = "
@@ -237,6 +238,7 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 										LIMIT 1
 									";
 									$res = mysqli_query( $mysqli, $query );
+									$row = mysqli_fetch_array($res);
 									$LO_ID = $row["LO_ID"];
 								}
 								else {
