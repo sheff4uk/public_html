@@ -358,7 +358,7 @@ foreach ($_GET as &$value) {
 				AND TM.month = {$month}
 				AND TM.USR_ID = USR.USR_ID
 				AND TM.F_ID = {$F_ID}
-			LEFT JOIN TimesheetTariff TST ON valid_from > CURDATE()
+			LEFT JOIN TimesheetTariff TST ON valid_from >= CURDATE()
 				AND TST.USR_ID = USR.USR_ID
 				AND TST.F_ID = {$F_ID}
 			WHERE 1
@@ -617,7 +617,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody>
 					<tr>
-						<td><input type="date" name="valid_from" min="<?=date('Y-m-d', strtotime("+1 day"))?>" required></td>
+						<td><input type="date" name="valid_from" min="<?=date('Y-m-d')?>" required></td>
 						<td><input type="number" name="tariff" min="0" style="width: 100px;" required></td>
 						<td>
 							<select name="type" required>
