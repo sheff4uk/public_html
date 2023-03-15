@@ -72,7 +72,7 @@ if( !in_array('cassettes', $Rights) ) {
 		position: absolute;
 		left: -8px;
 		top: -8px;
-		background: #f00;
+		background: dodgerblue;
 		height: 20px;
 		border-radius: 10px;
 		padding: 2px;
