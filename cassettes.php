@@ -37,10 +37,11 @@ if( !in_array('cassettes', $Rights) ) {
 		padding: 5px 0 0 0;
 		float: left;
 		margin-right: 10px;
-		margin-bottom: 10px;
+/*		margin-bottom: 10px;*/
 		background: #fff;
 		max-height: 200px;
 		overflow: overlay;
+		height: 100%;
 	}
 	.connectedSortable::-webkit-scrollbar {
 		width: 5px;
@@ -66,6 +67,20 @@ if( !in_array('cassettes', $Rights) ) {
 	}
 	fieldset {
 		background: #fdce46;
+	}
+	.cassette_num {
+		position: absolute;
+		left: -8px;
+		top: -8px;
+		background: #f00;
+		height: 20px;
+		border-radius: 10px;
+		padding: 2px;
+		min-width: 20px;
+		color: #fff;
+		line-height: 16px;
+		font-size: 12px;
+		font-weight: normal;
 	}
 </style>
 <script>
@@ -95,26 +110,32 @@ $query = "
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
+	$cassette_num_factory = 0;
 	echo "<fieldset f_id='{$row["F_ID"]}' style='display: flex; justify-content: normal; flex-wrap: wrap; margin-top: 30px; text-align: center;'>";
-	echo "<legend>{$row["f_name"]}</legend>";
 ?>
-
-	<ul cw_id="0" class="connectedSortable" style="width: 100%;">
-		<div class="legend">Резерв</div>
+	<div style="position: relative; width: 100%; margin-bottom: 10px;">
+		<ul cw_id="0" class="connectedSortable" style="width: 100%;">
+			<div class="legend">Резерв</div>
 <?
-		$query = "
-			SELECT cassette
-			FROM Cassettes
-			WHERE F_ID = {$row["F_ID"]}
-				AND CW_ID IS NULL
-			ORDER BY cassette
-		";
-		$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		while( $subrow = mysqli_fetch_array($subres) ) {
-			echo "<li class='cassette'>{$subrow["cassette"]}</li>";
-		}
+			$cassette_num = 0;
+
+			$query = "
+				SELECT cassette
+				FROM Cassettes
+				WHERE F_ID = {$row["F_ID"]}
+					AND CW_ID IS NULL
+				ORDER BY cassette
+			";
+			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $subrow = mysqli_fetch_array($subres) ) {
+				echo "<li class='cassette'>{$subrow["cassette"]}</li>";
+				$cassette_num++;
+				$cassette_num_factory++;
+			}
 ?>
-	</ul>
+		</ul>
+		<span class="cassette_num"><?=$cassette_num?></span>
+	</div>
 
 <?
 	$query = "
@@ -129,10 +150,13 @@ while( $row = mysqli_fetch_array($res) ) {
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
+		echo "<div style='position: relative; margin-bottom: 10px;'>";
 		echo "
 			<ul cw_id='{$subrow["CW_ID"]}' class='connectedSortable' style='width: ".(2 + $subrow["fillings"] * 46)."px;'>\n
-				<div class='legend' title='Заливок с одного замеса: ".($subrow["fillings"]/$subrow["per_batch"])."'>{$subrow["item"]} <i class='fa-solid fa-circle-info'></i></div>
+				<div class='legend' title='Заливок с одного замеса: ".($subrow["fillings"]/$subrow["per_batch"])."'>{$subrow["item"]} <i class='fa-solid fa-circle-info'></i></div>\n
 		";
+
+		$cassette_num = 0;
 
 		$query = "
 			SELECT cassette
@@ -144,10 +168,15 @@ while( $row = mysqli_fetch_array($res) ) {
 		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
 			echo "<li class='cassette'>{$subsubrow["cassette"]}</li>";
+			$cassette_num++;
+			$cassette_num_factory++;
 		}
 
 		echo "</ul>";
+		echo "<span class='cassette_num'>{$cassette_num}</span>";
+		echo "</div>";
 	}
+	echo "<legend style='position: relative;'>{$row["f_name"]}<span class='cassette_num'>{$cassette_num_factory}</span></legend>";
 	echo "</fieldset>";
 }
 ////////////////////////
