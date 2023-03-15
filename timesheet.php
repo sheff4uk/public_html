@@ -702,6 +702,13 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#tariff_form input[name="valid_from"]').val(valid_from);
 			$('#tariff_form input[name="USR_ID"]').val(USR_ID);
 
+			if( valid_from == "<?=date('Y-m-d')?>" ) {
+				$('#tariff_form input[name="valid_from"]').attr("max", "<?=date('Y-m-d')?>");
+			}
+			else {
+				$('#tariff_form input[name="valid_from"]').attr("max", "");
+			}
+
 			$('#tariff_form').dialog({
 				title: name,
 				resizable: false,
