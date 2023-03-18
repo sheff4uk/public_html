@@ -397,7 +397,7 @@ foreach ($_GET as &$value) {
 			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			$list_tariff = "";
 			while( $subrow = mysqli_fetch_array($subres) ) {
-				$type = ($subrow["type"] == 1 ? "с" : ($subrow["type"] == 2 ? "ч" : ($subrow["type"] == 3 ? "т" : ($subrow["type"] == 4 ? "м" : ""))));
+				$type = ($subrow["type"] == 1 ? "с" : ($subrow["type"] == 2 ? "ч" : ($subrow["type"] == 3 ? "ч+" : ($subrow["type"] == 4 ? "м" : ""))));
 				$list_tariff .= "<span title='от {$subrow["valid_from_format"]}' class='nowrap'>{$subrow["tariff"]}/{$type}</span><br>";
 			}
 
