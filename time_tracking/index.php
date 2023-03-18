@@ -170,7 +170,10 @@ if( isset($_POST["cardcode"]) ) {
 					AND (
 						SELECT IFNULL(SUM(1), 0)
 						FROM Timesheet TS
-						WHERE TS.TM_ID = TM.TM_ID
+						WHERE YEAR(TS.ts_date) = TM.year
+							AND MONTH(TS.ts_date) = TM.month
+							AND TS.USR_ID = TM.USR_ID
+							AND TS.F_ID = TM.F_ID
 					) = 0
 			";
 			mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
