@@ -196,13 +196,13 @@ echo "<title>Табель версия для печати</title>";
 			$list_tariff = "";
 			while( $subrow = mysqli_fetch_array($subres) ) {
 				$valid_from = ($subrow["cur_month"] == $subrow["from_month"]) ? "({$subrow["valid_from_format"]})" : "";
-				$type = ($subrow["type"] == 1 ? "с" : ($subrow["type"] == 2 ? "ч" : ($subrow["type"] == 3 ? "т" : "")));
+				$type = ($subrow["type"] == 1 ? "с" : ($subrow["type"] == 2 ? "ч" : ($subrow["type"] == 3 ? "ч+" : ($subrow["type"] == 4 ? "м" : ""))));
 				$list_tariff .= "{$subrow["tariff"]}/{$type}{$valid_from}<br>";
 			}
 
 			echo "<tr><td colspan='2' style='text-align: center; overflow: hidden;'>{$row["Name"]}</td>";
 			?>
-			<td colspan="2" style="overflow: hidden;">
+			<td colspan="2" style="font-size: .8em;" class="nowrap">
 				<?=$list_tariff?>
 			</td>
 			<?
@@ -296,8 +296,8 @@ echo "<title>Табель версия для печати</title>";
 
 		// Итог снизу
 		echo "<tr><td colspan='2' style='font-size: 1.5em;'><b>Σ</b></td>";
-		echo "<td colspan='2' class='nowrap' style='text-align: center;'>";
-		echo "с-смена<br>ч-час<br>т-час(тр-т)";
+		echo "<td colspan='2' class='nowrap' style='text-align: center; font-size: .8em;'>";
+		echo "<b>с</b> смена<br><b>ч</b> час-смена<br><b>ч+</b> час-вход<br><b>м</b> месяц";
 		echo "</td>";
 
 		$i = 1;
