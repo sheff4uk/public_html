@@ -434,7 +434,7 @@ foreach ($_GET as &$value) {
 					,GROUP_CONCAT(TSS.pay SEPARATOR '<br>') pay_format
 					,TS.fine
 					#,TS.rate
-					,CONCAT(TST.tariff, '/', IF(TST.type = 1, 'Смена', IF(TST.type = 2, 'Час', IF(TST.type = 3, 'Час (тракторист)', IF(TST.type = 4, 'Месяц', ''))))) tariff_type
+					,CONCAT(TST.tariff, '/', IF(TST.type = 1, 'Смена', IF(TST.type = 2, 'Час-смена', IF(TST.type = 3, 'Час-вход', IF(TST.type = 4, 'Месяц', ''))))) tariff_type
 					,SUM(IF(TSS.pay > 0, 1, 0)) shift_cnt
 					,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR '<br>') duration_hm
 					,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR ', ') duration_hm_title
@@ -552,7 +552,7 @@ foreach ($_GET as &$value) {
 
 		// Итог снизу
 		echo "<tr><td colspan='2' style='text-align: center; font-size: 1.5em; background: #3333;'><b>Σ</b></td>";
-		echo "<td colspan='2' class='nowrap' style='text-align: center; background: #3333;'>с-смена<br>ч-час<br>т-час(тракторист)<br>м-месяц</td>";
+		echo "<td colspan='2' class='nowrap' style='text-align: center; background: #3333;'><span><b>с</b> смена<br><b>ч</b> час-смена(от начала смены до регистрации выхода)<br><b>ч+</b> час-вход(от регистрации входа до регистрации выхода)<br><b>м</b> месяц(начисление происходит только в рабочие дни)</span></td>";
 
 		$i = 1;
 		$sigmapay1 = 0;
@@ -623,9 +623,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 							<select name="type" required>
 								<option value=""></option>
 								<option value="1">Смена</option>
-								<option value="2">Час</option>
-								<option value="3">Час (тракторист)</option>
-								<option value="4">Месяц</option>
+								<option value="2">Час-смена (от начала смены до регистрации выхода)</option>
+								<option value="3">Час-вход (от регистрации входа до регистрации выхода)</option>
+								<option value="4">Месяц (начисление происходит только в рабочие дни)</option>
 							</select>
 						</td>
 					</tr>
@@ -712,7 +712,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#tariff_form').dialog({
 				title: name,
 				resizable: false,
-				width: 500,
+				width: 800,
 				modal: true,
 				closeText: 'Закрыть'
 			});
