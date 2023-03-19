@@ -91,7 +91,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 		.nowrap {
 			white-space: nowrap;
 		}
-		.cassette {
+		.cassette1 {
 			font-weight: bold;
 			border: 1px solid #333;
 			border-radius: 5px;
@@ -99,6 +99,17 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 			padding: 2px;
 			display: inline-block;
 			width: 28px;
+		}
+		.cassette {
+			background-color: #333;
+			color: #fff;
+			border-radius: 5px;
+			border: 2px solid #333;
+			margin: 0 2px;
+			display: inline-block;
+			font-weight: bold;
+			-webkit-print-color-adjust: exact;
+			print-color-adjust: exact;
 		}
 	</style>
 
@@ -158,6 +169,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 	// Формируем список зарезервированных кассет
 	$query = "
 		SELECT cassette
+			,1 - 0.05 * LEAST(10, IFNULL(last_filling_days(cassette), 99)) opacity
 		FROM Cassettes
 		WHERE F_ID = {$F_ID}
 			AND CW_ID = {$CW_ID}
@@ -165,7 +177,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
-		$cassettes .= "<n class='cassette'>{$row["cassette"]}</n>";
+		$cassettes .= "<n class='cassette' style='opacity: {$row["opacity"]};'>{$row["cassette"]}</n>";
 	}
 ?>
 		<tr>
