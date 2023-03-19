@@ -173,7 +173,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 		FROM Cassettes
 		WHERE F_ID = {$F_ID}
 			AND CW_ID = {$CW_ID}
-		ORDER BY cassette
+		ORDER BY opacity DESC, cassette
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
