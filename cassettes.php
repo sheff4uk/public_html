@@ -121,6 +121,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 			$query = "
 				SELECT cassette
+					,1 - 0.05 * LEAST(10, IFNULL(last_filling_days(cassette), 99)) opacity
 				FROM Cassettes
 				WHERE F_ID = {$row["F_ID"]}
 					AND CW_ID IS NULL
@@ -128,7 +129,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			";
 			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $subrow = mysqli_fetch_array($subres) ) {
-				echo "<li class='cassette'>{$subrow["cassette"]}</li>";
+				echo "<li class='cassette' style='opacity: {$subrow["opacity"]};'>{$subrow["cassette"]}</li>";
 				$cassette_num++;
 				$cassette_num_factory++;
 			}
@@ -160,6 +161,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		$query = "
 			SELECT cassette
+				,1 - 0.05 * LEAST(10, IFNULL(last_filling_days(cassette), 99)) opacity
 			FROM Cassettes
 			WHERE F_ID = {$row["F_ID"]}
 				AND CW_ID = {$subrow["CW_ID"]}
@@ -167,7 +169,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		";
 		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
-			echo "<li class='cassette'>{$subsubrow["cassette"]}</li>";
+			echo "<li class='cassette' style='opacity: {$subsubrow["opacity"]};'>{$subsubrow["cassette"]}</li>";
 			$cassette_num++;
 			$cassette_num_factory++;
 		}
