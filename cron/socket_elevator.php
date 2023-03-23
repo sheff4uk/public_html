@@ -108,7 +108,7 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 					//Документ-основание
 					$DocumentCode = dechex($data[$i+59])."".dechex($data[$i+60])."".dechex($data[$i+61])."".dechex($data[$i+61])."".dechex($data[$i+62])."".dechex($data[$i+63])."".dechex($data[$i+64])."".dechex($data[$i+65])."".dechex($data[$i+66])."".dechex($data[$i+67])."".dechex($data[$i+68])."".dechex($data[$i+69])."".dechex($data[$i+70])."".dechex($data[$i+71])."".dechex($data[$i+72])."".dechex($data[$i+73]);
 					$DocumentCode = hex2bin($DocumentCode);
-					$DocumentCode = intval(substr($DocumentCode, 2));
+					$DocumentCode = intval(substr($DocumentCode, -6));
 
 					//Номер партии
 					$ReceiptNumber = $data[$i+76] + ($data[$i+77] << 8) + ($data[$i+78] << 16) + ($data[$i+79] << 24);
