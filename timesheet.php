@@ -35,6 +35,58 @@ if( isset($_POST["tariff"]) ) {
 				,type = {$type}
 		";
 		mysqli_query( $mysqli, $query );
+		$TST_ID = mysqli_insert_id( $mysqli );
+	}
+
+	// Если изменение тарифа происходит в текущий день
+	if( $valid_from == date('Y-m-d') ) {
+
+		// Узнаем TS_ID
+		$query = "
+			SELECT TS_ID
+			FROM Timesheet
+			WHERE ts_date = CURDATE()
+				AND USR_ID = {$USR_ID}
+				AND F_ID = {$F_ID}
+		";
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		$row = mysqli_fetch_array($res);
+		$TS_ID = $row["TS_ID"];
+
+		// Если ячейка табеля в этот день задействована
+		if( $TS_ID ) {
+			$query = "
+				SELECT COUNT(*) shift_cnt
+					,GROUP_CONCAT(TSS_ID) TSS_IDs
+				FROM TimesheetShift
+				WHERE TS_ID = {$TS_ID}
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			$row = mysqli_fetch_array($res);
+			$shift_cnt = $row["shift_cnt"];
+			$TSS_IDs = $row["TSS_IDs"];
+
+			// Если в этот день есть смена
+			if( $shift_cnt ) {
+
+				// Записываем TST_ID в Timesheet
+				$query = "
+					UPDATE Timesheet
+					SET TST_ID = {$TST_ID}
+					WHERE TS_ID = {$TS_ID}
+				";
+				mysqli_query( $mysqli, $query );
+
+				//Обновляем регистрации чтобы пересчиталось начесление
+				$query = "
+					UPDATE TimeReg
+					SET tr_minute = tr_minute
+					WHERE TSS_ID IN ({$TSS_IDs})
+						AND del_time IS NULL
+				";
+				mysqli_query( $mysqli, $query );
+			}
+		}
 	}
 
 	// Перенаправление в табель
