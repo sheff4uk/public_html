@@ -34,8 +34,6 @@ if( isset($_POST["tariff"]) ) {
 				,tariff = {$tariff}
 				,type = {$type}
 		";
-		echo $query;
-		die();
 		mysqli_query( $mysqli, $query );
 	}
 
