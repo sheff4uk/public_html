@@ -56,6 +56,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			if( $subsubrow["post"] != null ) {
 				$total_by_post[$subsubrow["post"]]++;
 				$total++;
+			}
 		}
 
 		if( $total > 0 ) {
