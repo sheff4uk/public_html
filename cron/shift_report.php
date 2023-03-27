@@ -60,13 +60,12 @@ while( $row = mysqli_fetch_array($res) ) {
 		}
 
 		if( $total > 0 ) {
-			$text = "<b>Смена {$subrow["shift_num"]} {$subrow["ts_date_format"]}</b>\n";
+			$text = "<b>Смена {$subrow["shift_num"]}</b>\n";
 			foreach ($total_by_post as $key => &$value) {
 				$text .= "{$key}: {$value}\n";
 			}
 			$text .= "<b>Всего: {$total}</b>\n";
-			//message_to_telegram($text, $row["notification_group"]);
-			message_to_telegram($text, "217756119");
+			message_to_telegram($text, $row["notification_group"]);
 		}
 	}
 }
