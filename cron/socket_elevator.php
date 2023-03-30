@@ -106,9 +106,10 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 					$goodsID = $data[$i+37] + ($data[$i+38] << 8) + ($data[$i+39] << 16) + ($data[$i+40] << 24);
 
 					//Документ-основание
-					$DocumentCode = dechex($data[$i+59])."".dechex($data[$i+60])."".dechex($data[$i+61])."".dechex($data[$i+61])."".dechex($data[$i+62])."".dechex($data[$i+63])."".dechex($data[$i+64])."".dechex($data[$i+65])."".dechex($data[$i+66])."".dechex($data[$i+67])."".dechex($data[$i+68])."".dechex($data[$i+69])."".dechex($data[$i+70])."".dechex($data[$i+71])."".dechex($data[$i+72])."".dechex($data[$i+73]);
+					$DocumentCode = dechex($data[$i+59])."".dechex($data[$i+60])."".dechex($data[$i+61])."".dechex($data[$i+62])."".dechex($data[$i+63])."".dechex($data[$i+64])."".dechex($data[$i+65])."".dechex($data[$i+66])."".dechex($data[$i+67])."".dechex($data[$i+68])."".dechex($data[$i+69])."".dechex($data[$i+70])."".dechex($data[$i+71])."".dechex($data[$i+72])."".dechex($data[$i+73]);
 					$DocumentCode = hex2bin($DocumentCode);
-					$DocumentCode = substr($DocumentCode, 0, 8);
+					$DocumentCode = intval(substr($DocumentCode, 0, 8));
+					$DocumentCode = str_pad($DocumentCode, 8, "0", STR_PAD_LEFT);
 					$DocumentCode = intval(substr($DocumentCode, -6));
 
 					//Номер партии
