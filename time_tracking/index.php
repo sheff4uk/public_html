@@ -4,12 +4,14 @@ $ip = $_SERVER['REMOTE_ADDR'];
 // Узнаем участок
 $query = "
 	SELECT F_ID
+		,notification_group
 	FROM factory
 	WHERE from_ip = '{$ip}'
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
 $F_ID = $row["F_ID"];
+$notification_group = $row["notification_group"];
 
 if( !$F_ID ) die("Access denied");
 
@@ -211,6 +213,30 @@ if( isset($_POST["cardcode"]) ) {
 			";
 			mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			$TR_ID = mysqli_insert_id( $mysqli );
+
+			// Уведомление, если у работника нет тарифа при регистрации входа
+			if( $prefix == 1 ) {
+				$query = "
+					SELECT TS.TST_ID
+					FROM TimeReg TR
+					JOIN TimesheetShift TSS ON TSS.TSS_ID = TR.TSS_ID
+					JOIN Timesheet TS ON TS.TS_ID = TSS.TS_ID
+					WHERE TR.TR_ID = {$TR_ID}
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				$row = mysqli_fetch_array($res);
+				$TST_ID = $row["TST_ID"];
+
+				if( $TST_ID == null ) {
+					$query = "
+						SELECT USR_Name({$USR_ID}) USR_Name
+					";
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					$row = mysqli_fetch_array($res);
+					$USR_Name = $row["USR_Name"];
+					message_to_telegram("Работнику <b>{$USR_Name}</b> требуется установить тариф в табеле.", $notification_group);
+				}
+			}
 
 			if( isset($duration) ) {
 				exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/?id='.$USR_ID.'&tr_id='.$TR_ID.'&duration='.$duration.'">');
