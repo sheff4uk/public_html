@@ -21,6 +21,7 @@ if( isset($_POST["tariff"]) ) {
 			SET valid_from = '{$valid_from}'
 				,tariff = {$tariff}
 				,type = {$type}
+				,author = {$_SESSION['id']}
 			WHERE TST_ID = {$TST_ID}
 		";
 		mysqli_query( $mysqli, $query );
@@ -33,6 +34,7 @@ if( isset($_POST["tariff"]) ) {
 				,valid_from = '{$valid_from}'
 				,tariff = {$tariff}
 				,type = {$type}
+				,author = {$_SESSION['id']}
 		";
 		mysqli_query( $mysqli, $query );
 		$TST_ID = mysqli_insert_id( $mysqli );
@@ -426,6 +428,7 @@ foreach ($_GET as &$value) {
 					SELECT tariff
 						,type
 						,DATE_FORMAT(valid_from, '%d.%m.%Y') valid_from_format
+						,CONCAT(' (Автор: ', USR_Name(author), ')') author
 					FROM TimesheetTariff
 					WHERE valid_from <= DATE('{$year}-{$month}-01')
 						AND USR_ID = {$row["USR_ID"]}
@@ -438,6 +441,7 @@ foreach ($_GET as &$value) {
 					SELECT tariff
 						,type
 						,DATE_FORMAT(valid_from, '%d.%m.%Y') valid_from_format
+						,CONCAT(' (Автор: ', USR_Name(author), ')') author
 					FROM TimesheetTariff
 					WHERE YEAR(valid_from) = {$year}
 						AND MONTH(valid_from) = {$month}
@@ -450,7 +454,7 @@ foreach ($_GET as &$value) {
 			$list_tariff = "";
 			while( $subrow = mysqli_fetch_array($subres) ) {
 				$type = ($subrow["type"] == 1 ? "с" : ($subrow["type"] == 2 ? "ч" : ($subrow["type"] == 3 ? "ч+" : ($subrow["type"] == 4 ? "м" : ""))));
-				$list_tariff .= "<span title='от {$subrow["valid_from_format"]}' class='nowrap'>{$subrow["tariff"]}/{$type}</span><br>";
+				$list_tariff .= "<span title='от {$subrow["valid_from_format"]}{$subrow["author"]}' class='nowrap'>{$subrow["tariff"]}/{$type}</span><br>";
 			}
 
 			// Заполняем массив файлов

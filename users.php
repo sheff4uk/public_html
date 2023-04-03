@@ -78,6 +78,18 @@ if( isset($_POST["USR_ID"]) ) {
 		}
 	}
 	else {
+		// Узнаем участок до обновления
+		$query = "
+			SELECT F_ID
+				,act
+			FROM Users
+			WHERE USR_ID = {$_POST["USR_ID"]}
+		";
+		$res = mysqli_query( $mysqli, $query );
+		$row = mysqli_fetch_array($res);
+		$before_F_ID = $row["F_ID"];
+		$before_act = $row["act"];
+
 		$query = "
 			UPDATE Users
 			SET Surname = '{$Surname}'
@@ -149,6 +161,17 @@ if( isset($_POST["USR_ID"]) ) {
 				mysqli_query( $mysqli, $query );
 				$i++;
 			}
+		}
+
+		// Если новый работник или восстановленный или смена участка, напоминаем проверить тариф
+		if( $add ) {
+			$_SESSION["alert"][] = "<h1>Не забудьте установить тариф в табеле.</h1>";
+		}
+		elseif( $before_act != $act ) {
+			$_SESSION["alert"][] = "<h1>Не забудьте проверить тариф в табеле.</h1>";
+		}
+		elseif( $before_F_ID != $_POST["F_ID"] ) {
+			$_SESSION["alert"][] = "<h1>Не забудьте проверить тариф в табеле на новом участке.</h1>";
 		}
 	}
 
