@@ -53,21 +53,21 @@ if( isset($_POST["CW_ID"]) ) {
 <style>
 	#formula_form table input,
 	#formula_form table select {
-		font-size: 1.2em;
+		font-size: 1em;
 	}
 </style>
 
-<div id='formula_form' title='Параметры рецепта' style='display:none;'>
+<div id='formula_form' style='display:none;'>
 	<form method='post' action="/forms/mix_formula_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="MF_ID">
 			<input type="hidden" name="F_ID">
+			<input type="hidden" name="CW_ID">
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
-						<th>Противовес</th>
 						<th>Мелкая дробь, кг</th>
 						<th>Крупная дробь, кг</th>
 						<th>Окалина, кг</th>
@@ -84,19 +84,18 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
-						<td><input type="hidden" name="CW_ID"><b id="item"></b></td>
-						<td style="background: "><input type="number" name="s_fraction" min="0" style="width: 80px;"></td>
-						<td style="background: "><input type="number" name="l_fraction" min="0" style="width: 80px;"></td>
-						<td style="background: #a52a2a80;"><input type="number" name="iron_oxide" min="0" style="width: 80px;"></td>
-						<td style="background: #33333380;"><input type="number" name="slag10" min="0" style="width: 80px;"></td>
-						<td style="background: #33333380;"><input type="number" name="slag20" min="0" style="width: 80px;"></td>
-						<td style="background: #33333380;"><input type="number" name="slag020" min="0" style="width: 80px;"></td>
-						<td style="background: #33333380;"><input type="number" name="slag30" min="0" style="width: 80px;"></td>
-						<td style="background: #f4a46082;"><input type="number" name="sand" min="0" style="width: 80px;"></td>
-						<td style="background: #8b45137a;"><input type="number" name="crushed_stone" min="0" style="width: 80px;"></td>
-						<td style="background: #7080906b;"><input type="number" name="cement" min="0" style="width: 80px;" required></td>
-						<td style="background: #80800080;"><input type="number" name="plasticizer" min="0" step="0.01" style="width: 80px;"></td>
-						<td style="background: #1e90ff85;"><input type="number" name="water" min="0" style="width: 80px;" required></td>
+						<td style="background: #7952eb88"><input type="number" name="s_fraction" min="0" style="width: 65px;"></td>
+						<td style="background: #51d5d788"><input type="number" name="l_fraction" min="0" style="width: 56px;"></td>
+						<td style="background: #a52a2a80;"><input type="number" name="iron_oxide" min="0" style="width: 65px;"></td>
+						<td style="background: #33333380;"><input type="number" name="slag10" min="0" style="width: 65px;"></td>
+						<td style="background: #33333380;"><input type="number" name="slag20" min="0" style="width: 65px;"></td>
+						<td style="background: #33333380;"><input type="number" name="slag020" min="0" style="width: 65px;"></td>
+						<td style="background: #33333380;"><input type="number" name="slag30" min="0" style="width: 65px;"></td>
+						<td style="background: #f4a46082;"><input type="number" name="sand" min="0" style="width: 65px;"></td>
+						<td style="background: #8b45137a;"><input type="number" name="crushed_stone" min="0" style="width: 65px;"></td>
+						<td style="background: #7080906b;"><input type="number" name="cement" min="0" style="width: 65px;" required></td>
+						<td style="background: #80800080;"><input type="number" name="plasticizer" min="0" step="0.01" style="width: 65px;"></td>
+						<td style="background: #1e90ff85;"><input type="number" name="water" min="0" style="width: 65px;" required></td>
 					</tr>
 				</tbody>
 			</table>
@@ -148,7 +147,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				resizable: false,
 				width: 1000,
 				modal: true,
-				closeText: 'Закрыть'
+				closeText: 'Закрыть',
+				title: 'Рецепт '+item
 			});
 
 			return false;

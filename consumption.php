@@ -250,22 +250,22 @@ foreach ($_GET as &$value) {
 				<td style="background: #7952eb88;" class="s_fraction"><?=number_format($row["s_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #51d5d788;" class="l_fraction"><?=number_format($row["l_fraction"], 0, ',', ' ')?></td>
 				<td style="background: #51d5d788;" class="l_fraction"><?=number_format($row["l_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #a52a2a88;" class="iron_oxide"><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
-				<td style="background: #a52a2a88;" class="iron_oxide"><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;" class="slag10"><?=number_format($row["slag10"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;" class="slag10"><?=number_format($row["slag10"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;" class="slag20"><?=number_format($row["slag20"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;" class="slag20"><?=number_format($row["slag20"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;" class="slag020"><?=number_format($row["slag020"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;" class="slag020"><?=number_format($row["slag020"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;" class="slag30"><?=number_format($row["slag30"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;" class="slag30"><?=number_format($row["slag30"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #f4a46088;" class="sand"><?=number_format($row["sand"], 0, ',', ' ')?></td>
-				<td style="background: #f4a46088;" class="sand"><?=number_format($row["sand"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #8b451388;" class="crushed_stone"><?=number_format($row["crushed_stone"], 0, ',', ' ')?></td>
-				<td style="background: #8b451388;" class="crushed_stone"><?=number_format($row["crushed_stone"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #70809088;" class="cement"><?=number_format($row["cement"], 0, ',', ' ')?></td>
-				<td style="background: #70809088;" class="cement"><?=number_format($row["cement"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #a52a2a80;" class="iron_oxide"><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
+				<td style="background: #a52a2a80;" class="iron_oxide"><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #33333380;" class="slag10"><?=number_format($row["slag10"], 0, ',', ' ')?></td>
+				<td style="background: #33333380;" class="slag10"><?=number_format($row["slag10"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #33333380;" class="slag20"><?=number_format($row["slag20"], 0, ',', ' ')?></td>
+				<td style="background: #33333380;" class="slag20"><?=number_format($row["slag20"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #33333380;" class="slag020"><?=number_format($row["slag020"], 0, ',', ' ')?></td>
+				<td style="background: #33333380;" class="slag020"><?=number_format($row["slag020"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #33333380;" class="slag30"><?=number_format($row["slag30"], 0, ',', ' ')?></td>
+				<td style="background: #33333380;" class="slag30"><?=number_format($row["slag30"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #f4a46082;" class="sand"><?=number_format($row["sand"], 0, ',', ' ')?></td>
+				<td style="background: #f4a46082;" class="sand"><?=number_format($row["sand"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #8b45137a;" class="crushed_stone"><?=number_format($row["crushed_stone"], 0, ',', ' ')?></td>
+				<td style="background: #8b45137a;" class="crushed_stone"><?=number_format($row["crushed_stone"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #7080906b;" class="cement"><?=number_format($row["cement"], 0, ',', ' ')?></td>
+				<td style="background: #7080906b;" class="cement"><?=number_format($row["cement"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #80800080;" class="plasticizer"><?=number_format($row["plasticizer"], 0, ',', ' ')?></td>
 				<td style="background: #80800080;" class="plasticizer"><?=number_format($row["plasticizer"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #c0c0c088;" class="calcium"><?=number_format($row["calcium"], 0, ',', ' ')?></td>
