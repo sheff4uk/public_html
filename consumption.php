@@ -153,47 +153,47 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th rowspan="2" colspan = "2">Противовес</th>
 			<th rowspan="2">Кол-во залитых деталей</th>
-			<th colspan="2">Мелкая дробь</th>
-			<th colspan="2">Крупная дробь</th>
-			<th colspan="2">Окалина</th>
-			<th colspan="2">Шлак 0-10</th>
-			<th colspan="2">Шлак 10-20</th>
-			<th colspan="2">Шлак 0-20</th>
-			<th colspan="2">Шлак 5-30</th>
-			<th colspan="2">КМП</th>
-			<th colspan="2">Отсев</th>
-			<th colspan="2">Цемент</th>
-			<th colspan="2">Пластификатор</th>
-			<th colspan="2">Кальций</th>
-			<th colspan="2">Арматура</th>
+			<th colspan="2" class="s_fraction">Мелкая дробь</th>
+			<th colspan="2" class="l_fraction">Крупная дробь</th>
+			<th colspan="2" class="iron_oxide">Окалина</th>
+			<th colspan="2" class="slag10">Шлак 0-10</th>
+			<th colspan="2" class="slag20">Шлак 10-20</th>
+			<th colspan="2" class="slag020">Шлак 0-20</th>
+			<th colspan="2" class="slag30">Шлак 5-30</th>
+			<th colspan="2" class="sand">КМП</th>
+			<th colspan="2" class="crushed_stone">Отсев</th>
+			<th colspan="2" class="cement">Цемент</th>
+			<th colspan="2" class="plasticizer">Пластификатор</th>
+			<th colspan="2" class="calcium">Кальций</th>
+			<th colspan="2" class="reinforcement">Арматура</th>
 		</tr>
 		<tr>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
-			<th>Расход, г</th>
-			<th>На деталь, мг</th>
-			<th>Расход, г</th>
-			<th>На деталь, мг</th>
-			<th>Расход, кг</th>
-			<th>На деталь, г</th>
+			<th class="s_fraction">Расход, кг</th>
+			<th class="s_fraction">На деталь, г</th>
+			<th class="l_fraction">Расход, кг</th>
+			<th class="l_fraction">На деталь, г</th>
+			<th class="iron_oxide">Расход, кг</th>
+			<th class="iron_oxide">На деталь, г</th>
+			<th class="slag10">Расход, кг</th>
+			<th class="slag10">На деталь, г</th>
+			<th class="slag20">Расход, кг</th>
+			<th class="slag20">На деталь, г</th>
+			<th class="slag020">Расход, кг</th>
+			<th class="slag020">На деталь, г</th>
+			<th class="slag30">Расход, кг</th>
+			<th class="slag30">На деталь, г</th>
+			<th class="sand">Расход, кг</th>
+			<th class="sand">На деталь, г</th>
+			<th class="crushed_stone">Расход, кг</th>
+			<th class="crushed_stone">На деталь, г</th>
+			<th class="cement">Расход, кг</th>
+			<th class="cement">На деталь, г</th>
+			<th class="plasticizer">Расход, г</th>
+			<th class="plasticizer">На деталь, мг</th>
+			<th class="calcium">Расход, г</th>
+			<th class="calcium">На деталь, мг</th>
+			<th class="reinforcement">Расход, кг</th>
+			<th class="reinforcement">На деталь, г</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;" class="nowrap">
@@ -246,32 +246,32 @@ foreach ($_GET as &$value) {
 			<tr>
 				<td colspan="2" class="nowrap"><span style="font-size: 1.5em; font-weight: bold;"><?=$row["item"]?></span><br><i style="font-size: .8em;"><?=$row["drawing_item"]?></i></td>
 				<td><?=number_format($row["details"], 0, '', ' ')?></td>
-				<td style="background: #7952eb88;"><?=number_format($row["s_fraction"], 0, ',', ' ')?></td>
-				<td style="background: #7952eb88;"><?=number_format($row["s_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #51d5d788;"><?=number_format($row["l_fraction"], 0, ',', ' ')?></td>
-				<td style="background: #51d5d788;"><?=number_format($row["l_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #a52a2a88;"><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
-				<td style="background: #a52a2a88;"><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;"><?=number_format($row["slag10"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;"><?=number_format($row["slag10"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;"><?=number_format($row["slag20"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;"><?=number_format($row["slag20"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;"><?=number_format($row["slag020"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;"><?=number_format($row["slag020"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;"><?=number_format($row["slag30"], 0, ',', ' ')?></td>
-				<td style="background: #33333388;"><?=number_format($row["slag30"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #f4a46088;"><?=number_format($row["sand"], 0, ',', ' ')?></td>
-				<td style="background: #f4a46088;"><?=number_format($row["sand"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #8b451388;"><?=number_format($row["crushed_stone"], 0, ',', ' ')?></td>
-				<td style="background: #8b451388;"><?=number_format($row["crushed_stone"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #70809088;"><?=number_format($row["cement"], 0, ',', ' ')?></td>
-				<td style="background: #70809088;"><?=number_format($row["cement"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #80800080;"><?=number_format($row["plasticizer"], 0, ',', ' ')?></td>
-				<td style="background: #80800080;"><?=number_format($row["plasticizer"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #c0c0c088;"><?=number_format($row["calcium"], 0, ',', ' ')?></td>
-				<td style="background: #c0c0c088;"><?=number_format($row["calcium"] * 1000/$row["details"], 0, ',', ' ')?></td>
-				<td style="background: #ffff6688;"><?=number_format($row["reinforcement"] * $row["details"] / 1000, 0, ',', ' ')?></td>
-				<td style="background: #ffff6688;"><?=number_format($row["reinforcement"], 0, ',', ' ')?></td>
+				<td style="background: #7952eb88;" class="s_fraction"><?=number_format($row["s_fraction"], 0, ',', ' ')?></td>
+				<td style="background: #7952eb88;" class="s_fraction"><?=number_format($row["s_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #51d5d788;" class="l_fraction"><?=number_format($row["l_fraction"], 0, ',', ' ')?></td>
+				<td style="background: #51d5d788;" class="l_fraction"><?=number_format($row["l_fraction"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #a52a2a88;" class="iron_oxide"><?=number_format($row["iron_oxide"], 0, ',', ' ')?></td>
+				<td style="background: #a52a2a88;" class="iron_oxide"><?=number_format($row["iron_oxide"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #33333388;" class="slag10"><?=number_format($row["slag10"], 0, ',', ' ')?></td>
+				<td style="background: #33333388;" class="slag10"><?=number_format($row["slag10"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #33333388;" class="slag20"><?=number_format($row["slag20"], 0, ',', ' ')?></td>
+				<td style="background: #33333388;" class="slag20"><?=number_format($row["slag20"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #33333388;" class="slag020"><?=number_format($row["slag020"], 0, ',', ' ')?></td>
+				<td style="background: #33333388;" class="slag020"><?=number_format($row["slag020"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #33333388;" class="slag30"><?=number_format($row["slag30"], 0, ',', ' ')?></td>
+				<td style="background: #33333388;" class="slag30"><?=number_format($row["slag30"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #f4a46088;" class="sand"><?=number_format($row["sand"], 0, ',', ' ')?></td>
+				<td style="background: #f4a46088;" class="sand"><?=number_format($row["sand"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #8b451388;" class="crushed_stone"><?=number_format($row["crushed_stone"], 0, ',', ' ')?></td>
+				<td style="background: #8b451388;" class="crushed_stone"><?=number_format($row["crushed_stone"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #70809088;" class="cement"><?=number_format($row["cement"], 0, ',', ' ')?></td>
+				<td style="background: #70809088;" class="cement"><?=number_format($row["cement"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #80800080;" class="plasticizer"><?=number_format($row["plasticizer"], 0, ',', ' ')?></td>
+				<td style="background: #80800080;" class="plasticizer"><?=number_format($row["plasticizer"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #c0c0c088;" class="calcium"><?=number_format($row["calcium"], 0, ',', ' ')?></td>
+				<td style="background: #c0c0c088;" class="calcium"><?=number_format($row["calcium"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #ffff6688;" class="reinforcement"><?=number_format($row["reinforcement"] * $row["details"] / 1000, 0, ',', ' ')?></td>
+				<td style="background: #ffff6688;" class="reinforcement"><?=number_format($row["reinforcement"], 0, ',', ' ')?></td>
 			</tr>
 			<?
 		}
@@ -281,32 +281,32 @@ foreach ($_GET as &$value) {
 			<td></td>
 			<td>Итог:</td>
 			<td><?=number_format($details, 0, '', ' ')?></td>
-			<td><?=number_format($s_fraction, 0, ',', ' ')?></td>
-			<td></td>
-			<td><?=number_format($l_fraction, 0, ',', ' ')?></td>
-			<td></td>
-			<td><?=number_format($iron_oxide, 0, ',', ' ')?></td>
-			<td></td>
-			<td><?=number_format($slag10, 0, ',', ' ')?></td>
-			<td></td>
-			<td><?=number_format($slag20, 0, ',', ' ')?></td>
-			<td></td>
-			<td><?=number_format($slag020, 0, ',', ' ')?></td>
-			<td></td>
-			<td><?=number_format($slag30, 0, ',', ' ')?></td>
-			<td></td>
-			<td><?=number_format($sand, 0, ',', ' ')?></td>
-			<td></td>
-			<td><?=number_format($crushed_stone, 0, ',', ' ')?></td>
-			<td></td>
-			<td><?=number_format($cement, 0, ',', ' ')?></td>
-			<td></td>
-			<td><?=number_format($plasticizer, 0, ',', ' ')?></td>
-			<td></td>
-			<td><?=number_format($calcium, 0, ',', ' ')?></td>
-			<td></td>
-			<td><?=number_format($reinforcement/1000, 0, ',', ' ')?></td>
-			<td></td>
+			<td class="s_fraction"><?=number_format($s_fraction, 0, ',', ' ')?></td>
+			<td class="s_fraction"></td>
+			<td class="l_fraction"><?=number_format($l_fraction, 0, ',', ' ')?></td>
+			<td class="l_fraction"></td>
+			<td class="iron_oxide"><?=number_format($iron_oxide, 0, ',', ' ')?></td>
+			<td class="iron_oxide"></td>
+			<td class="slag10"><?=number_format($slag10, 0, ',', ' ')?></td>
+			<td class="slag10"></td>
+			<td class="slag20"><?=number_format($slag20, 0, ',', ' ')?></td>
+			<td class="slag20"></td>
+			<td class="slag020"><?=number_format($slag020, 0, ',', ' ')?></td>
+			<td class="slag020"></td>
+			<td class="slag30"><?=number_format($slag30, 0, ',', ' ')?></td>
+			<td class="slag30"></td>
+			<td class="sand"><?=number_format($sand, 0, ',', ' ')?></td>
+			<td class="sand"></td>
+			<td class="crushed_stone"><?=number_format($crushed_stone, 0, ',', ' ')?></td>
+			<td class="crushed_stone"></td>
+			<td class="cement"><?=number_format($cement, 0, ',', ' ')?></td>
+			<td class="cement"></td>
+			<td class="plasticizer"><?=number_format($plasticizer, 0, ',', ' ')?></td>
+			<td class="plasticizer"></td>
+			<td class="calcium"><?=number_format($calcium, 0, ',', ' ')?></td>
+			<td class="calcium"></td>
+			<td class="reinforcement"><?=number_format($reinforcement/1000, 0, ',', ' ')?></td>
+			<td class="reinforcement"></td>
 		</tr>
 	</tbody>
 </table>
@@ -318,6 +318,22 @@ foreach ($_GET as &$value) {
 		$(".print").printPage();
 	});
 </script>
+
+<style>
+	<?=($s_fraction ? "" : ".s_fraction{ display: none; }")?>
+	<?=($l_fraction ? "" : ".l_fraction{ display: none; }")?>
+	<?=($iron_oxide ? "" : ".iron_oxide{ display: none; }")?>
+	<?=($slag10 ? "" : ".slag10{ display: none; }")?>
+	<?=($slag20 ? "" : ".slag20{ display: none; }")?>
+	<?=($slag020 ? "" : ".slag020{ display: none; }")?>
+	<?=($slag30 ? "" : ".slag30{ display: none; }")?>
+	<?=($sand ? "" : ".sand{ display: none; }")?>
+	<?=($crushed_stone ? "" : ".crushed_stone{ display: none; }")?>
+	<?=($cement ? "" : ".cement{ display: none; }")?>
+	<?=($plasticizer ? "" : ".plasticizer{ display: none; }")?>
+	<?=($calcium ? "" : ".calcium{ display: none; }")?>
+	<?=($reinforcement ? "" : ".reinforcement{ display: none; }")?>
+</style>
 
 <?
 include "footer.php";
