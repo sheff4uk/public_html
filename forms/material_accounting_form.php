@@ -156,7 +156,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="MA_ID">
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 				<span>Дата приемки:</span>
-				<input type="date" name="ma_date" required>
+				<input type="date" name="ma_date" min="<?=date("Y-m-d", strtotime("-1 months"))?>" max="<?=date("Y-m-d")?>" required>
 			</div>
 
 			<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">

@@ -194,6 +194,7 @@ foreach ($_GET as &$value) {
 				,MA.certificate_number
 				,MA.ma_cnt
 				,MA.ma_cost
+				,IF(MA.ma_date < CURDATE() - INTERVAL 1 MONTH, 0, 1) editable
 			FROM material__Arrival MA
 			JOIN factory F ON F.F_ID = MA.F_ID
 			JOIN material__Name MN ON MN.MN_ID = MA.MN_ID
@@ -229,7 +230,13 @@ foreach ($_GET as &$value) {
 				<td><?=$row["certificate_number"]?></td>
 				<td><?=$row["ma_cnt"]?></td>
 				<td><?=$row["ma_cost"]?></td>
-				<td><a href="#" class="add_material_arrival" MA_ID="<?=$row["MA_ID"]?>" title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
+				<td>
+				<?
+					if( $row["editable"] ) {
+						echo "<a href='#' class='add_material_arrival' MA_ID='{$row["MA_ID"]}' title='Редактировать'><i class='fa fa-pencil-alt fa-lg'></i></a>\n";
+					}
+				?>
+				</td>
 			</tr>
 			<?
 		}
