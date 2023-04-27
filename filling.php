@@ -214,6 +214,7 @@ $query = "
 		,PB.sl30_density
 		,PB.sn_density
 		,PB.cs_density
+		,IF( IFNULL(PB.print_time, PB.change_time) < NOW() - INTERVAL 1 MONTH, 0, 1 ) editable
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID
@@ -389,7 +390,11 @@ while( $row = mysqli_fetch_array($res) ) {
 				<?
 				// Выводим общую ячейку с кнопкой редактирования
 				if( $cnt ) {
-					echo "<td rowspan='{$cnt}'><a href='#' class='add_filling' PB_ID='{$row["PB_ID"]}' title='Изменить чеклист оператора'><i class='fa fa-pencil-alt fa-lg'></i></a></td>";
+					echo "<td rowspan='{$cnt}'>\n";
+					if( $row["editable"] ) {
+						echo "<a href='#' class='add_filling' PB_ID='{$row["PB_ID"]}' title='Изменить чеклист оператора'><i class='fa fa-pencil-alt fa-lg'></i></a>\n";
+					}
+					echo "</td>\n";
 					$cnt = 0;
 				}
 				?>
