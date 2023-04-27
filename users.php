@@ -11,8 +11,6 @@ if( isset($_POST["USR_ID"]) ) {
 	$photo = $_POST["photo"] ? '\''.$_POST["photo"].'\'' : 'NULL';
 	$act = $_POST["act"] ? 1 : 0;
 	$cardcode = $_POST["cardcode"];
-	$outsourcer = $_POST["outsourcer"] ? 1 : 0;
-	$official = $_POST["official"] ? 1 : 0;
 	$overalls_issued = $_POST["overalls_issued"] ? '\''.$_POST["overalls_issued"].'\'' : 'NULL';
 
 	// Обработка строк
@@ -22,8 +20,11 @@ if( isset($_POST["USR_ID"]) ) {
 	$Name = mysqli_real_escape_string($mysqli, $Name);
 	$post = convert_str($_POST["post"]);
 	$post = mysqli_real_escape_string($mysqli, $post);
+	$user_type = convert_str($_POST["user_type"]);
+	$user_type = mysqli_real_escape_string($mysqli, $user_type);
 
 	$post = $post ? '\''.$post.'\'' : 'NULL';
+	$user_type = $user_type ? '\''.$user_type.'\'' : 'NULL';
 
 	// Проверка карты на повтор
 	if( $cardcode != '' and $act == 1 ) {
@@ -64,9 +65,8 @@ if( isset($_POST["USR_ID"]) ) {
 				,F_ID = {$_POST["F_ID"]}
 				,RL_ID = {$_POST["RL_ID"]}
 				,cardcode = '{$cardcode}'
-				,outsourcer = {$outsourcer}
-				,official = {$official}
 				,post = {$post}
+				,user_type = {$user_type}
 				,overalls_issued = {$overalls_issued}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -100,9 +100,8 @@ if( isset($_POST["USR_ID"]) ) {
 				,F_ID = {$_POST["F_ID"]}
 				,RL_ID = {$_POST["RL_ID"]}
 				,cardcode = '{$cardcode}'
-				,outsourcer = {$outsourcer}
-				,official = {$official}
 				,post = {$post}
+				,user_type = {$user_type}
 				,overalls_issued = {$overalls_issued}
 			WHERE USR_ID = {$_POST["USR_ID"]}
 		";
@@ -267,11 +266,22 @@ if( !in_array('users', $Rights) ) {
 		</div>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
-			<span>Аутсорсер:</span>
-			<select name="outsrc" class="<?=($_GET["outsrc"] != '') ? "filtered" : ""?>" onchange="this.form.submit()">
+			<span>Тип:</span>
+			<select name="user_type" class="<?=($_GET["user_type"] != '') ? "filtered" : ""?>" onchange="this.form.submit()">
 				<option value=""></option>
-				<option <?=(($_GET["outsrc"] == '1') ? "selected" : "")?> value="1">Да</option>
-				<option <?=(($_GET["outsrc"] == '0') ? "selected" : "")?> value="0">Нет</option>
+			<?
+				$query = "
+					SELECT USR.user_type
+					FROM Users USR
+					WHERE USR.user_type IS NOT NULL
+					GROUP BY USR.user_type
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($_GET["user_type"] == $row["user_type"]) ? "selected" : "";
+					echo "<option {$selected} value='{$row["user_type"]}'>{$row["user_type"]}</option>\n";
+				}
+			?>
 			</select>
 		</div>
 
@@ -343,8 +353,7 @@ foreach ($_GET as &$value) {
 			<th>Роль</th>
 			<th>Пост</th>
 			<th>Номер карты</th>
-			<th>Аутсорсер</th>
-			<th>Официально</th>
+			<th>Тип</th>
 			<th>Дата выдачи спецодежды</th>
 			<th></th>
 		</tr>
@@ -366,10 +375,9 @@ foreach ($_GET as &$value) {
 				,USR.F_ID
 				,RL.Role
 				,USR.post
+				,USR.user_type
 				,F.f_name
 				,USR.act
-				,USR.outsourcer
-				,USR.official
 				,USR.overalls_issued
 				,DATE_FORMAT(USR.overalls_issued, '%d.%m.%Y') overalls_issued_format
 			FROM Users USR
@@ -377,7 +385,7 @@ foreach ($_GET as &$value) {
 			JOIN factory F ON F.F_ID = USR.F_ID
 			WHERE 1
 				".(($_GET["F_ID"] != '') ? "AND USR.F_ID = {$_GET["F_ID"]}" : "")."
-				".(($_GET["outsrc"] != '') ? "AND IFNULL(USR.outsourcer, 0) = {$_GET["outsrc"]}" : "")."
+				".(($_GET["user_type"] != '') ? "AND USR.user_type LIKE '{$_GET["user_type"]}'" : "")."
 				".(($_GET["act"] != '') ? "AND IFNULL(USR.act, 0) = {$_GET["act"]}" : "")."
 			ORDER BY USR.F_ID, USR.RL_ID, USR.Surname, USR.Name
 		";
@@ -419,8 +427,7 @@ foreach ($_GET as &$value) {
 					<td>{$row["Role"]}</td>
 					<td>{$row["post"]}</td>
 					<td>{$row["cardcode"]}</td>
-					<td>".($row["outsourcer"] ? "<i class='fas fa-check'></i>" : "")."</td>
-					<td>".($row["official"] ? "<i class='fas fa-check'></i>" : "")."</td>
+					<td>{$row["user_type"]}</td>
 					<td>{$row["overalls_issued_format"]}</td>
 					<td>
 						<a href='#' class='add_user' usr='{$row["USR_ID"]}' title='Изменить данные пользователя'><i class='fa fa-pencil-alt fa-lg'></i></a>
@@ -520,15 +527,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</div>
 			</div>
 			<div>
-				<label>Аутсорсер:</label>
+				<label>Тип:</label>
 				<div>
-					<input type="checkbox" name="outsourcer" value="1">
-				</div>
-			</div>
-			<div>
-				<label>Официально:</label>
-				<div>
-					<input type="checkbox" name="official" value="1">
+					<input type='text' name='user_type' autocomplete='off'>
 				</div>
 			</div>
 			<div>
@@ -550,6 +551,31 @@ this.subbut.value='Подождите, пожалуйста!';">
 	usr_photo = <?= json_encode($usr_photo); ?>;
 
 	$(function() {
+		// Автокомплит типов в форме
+		<?
+			$query = "
+				SELECT USR.user_type
+				FROM Users USR
+				WHERE USR.user_type IS NOT NULL
+				GROUP BY USR.user_type
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $row = mysqli_fetch_array($res) ) {
+				//формируем массив для JSON данных
+				$user_types[] = $row["user_type"];
+			}
+		?>
+		var user_types = <?= json_encode($user_types); ?>;
+		$('input[name="user_type"]').autocomplete({
+			appendTo: "#user_form",
+			source: user_types,
+			minLength: 0,
+			autoFocus: true
+		});
+		$('input[name="user_type"]').on("focus", function(){
+			$( "input[name='user_type']" ).autocomplete( "search", "" );
+		});
+
 		// Автокомплит постов в форме
 		<?
 			$query = "
@@ -566,7 +592,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 		?>
 		var posts = <?= json_encode($posts); ?>;
 		$('input[name="post"]').autocomplete({
-			source: posts
+			appendTo: "#user_form",
+			source: posts,
+			minLength: 0
+		});
+		$('input[name="post"]').on("focus", function(){
+			$( "input[name='post']" ).autocomplete( "search", "" );
 		});
 
 		// Select2
@@ -628,8 +659,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#user_form select[name="RL_ID"]').val(users_data[usr]['RL_ID']).trigger("change");
 				$('#user_form input[name="post"]').val(users_data[usr]['post']);
 				$('#user_form input[name="cardcode"]').val(users_data[usr]['cardcode']);
-				$('#user_form input[name="outsourcer"]').prop('checked', users_data[usr]['outsourcer'] == 1 );
-				$('#user_form input[name="official"]').prop('checked', users_data[usr]['official'] == 1 );
+				$('#user_form input[name="user_type"]').val(users_data[usr]['user_type']);
 				$('#user_form input[name="overalls_issued"]').val(users_data[usr]['overalls_issued']);
 			}
 

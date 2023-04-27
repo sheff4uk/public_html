@@ -7,7 +7,7 @@ if( isset($_POST["tariff"]) ) {
 	session_start();
 	$F_ID = $_POST["F_ID"];
 	$month = $_POST["month"];
-	$outsrc = $_POST["outsrc"];
+	$user_type = $_POST["user_type"];
 	$USR_ID = $_POST["USR_ID"];
 	$TST_ID = $_POST["TST_ID"];
 	$valid_from = $_POST["valid_from"];
@@ -92,7 +92,7 @@ if( isset($_POST["tariff"]) ) {
 	}
 
 	// Перенаправление в табель
-	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&outsrc='.$outsrc.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&user_type='.$user_type.'">');
 }
 
 ///////////////////////
@@ -102,7 +102,7 @@ if( $_FILES['uploadfile']['name'] ) {
 	session_start();
 	$F_ID = $_POST["F_ID"];
 	$month = $_POST["month"];
-	$outsrc = $_POST["outsrc"];
+	$user_type = $_POST["user_type"];
 
 	$filename = date('U').'_'.$_FILES['uploadfile']['name'];
 	$uploaddir = './uploads/';
@@ -127,7 +127,7 @@ if( $_FILES['uploadfile']['name'] ) {
 		$_SESSION["alert"][] = "Ошибка! Не удалось загрузить файл на сервер!";
 	}
 	// Перенаправление в табель
-	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&outsrc='.$outsrc.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&user_type='.$user_type.'">');
 }
 //////////////////////////////
 
@@ -164,7 +164,7 @@ $strdate = '01.'.$month.'.'.$year;
 $timestamp = strtotime($strdate);
 $days = date('t', $timestamp);
 
-$outsrc = $_GET["outsrc"];
+$user_type = $_GET["user_type"];
 ?>
 
 <!--Фильтр-->
@@ -239,11 +239,22 @@ $outsrc = $_GET["outsrc"];
 		</div>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
-			<span>Аутсорсер:</span>
-			<select name="outsrc" class="<?=($_GET["outsrc"] != '') ? "filtered" : ""?>" onchange="this.form.submit()">
+			<span>Тип:</span>
+			<select name="user_type" class="<?=($_GET["user_type"] != '') ? "filtered" : ""?>" onchange="this.form.submit()">
 				<option value=""></option>
-				<option <?=(($_GET["outsrc"] == '1') ? "selected" : "")?> value="1">Да</option>
-				<option <?=(($_GET["outsrc"] == '0') ? "selected" : "")?> value="0">Нет</option>
+			<?
+				$query = "
+					SELECT USR.user_type
+					FROM Users USR
+					WHERE USR.user_type IS NOT NULL
+					GROUP BY USR.user_type
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($_GET["user_type"] == $row["user_type"]) ? "selected" : "";
+					echo "<option {$selected} value='{$row["user_type"]}'>{$row["user_type"]}</option>\n";
+				}
+			?>
 			</select>
 		</div>
 
@@ -401,7 +412,6 @@ foreach ($_GET as &$value) {
 				,USR_Name(USR.USR_ID) Name
 				,USR_Icon(USR.USR_ID) Icon
 				,USR.act
-				,USR.official
 				,USR.photo
 				,TST.TST_ID
 				,TST.valid_from
@@ -416,7 +426,7 @@ foreach ($_GET as &$value) {
 				AND TST.USR_ID = USR.USR_ID
 				AND TST.F_ID = {$F_ID}
 			WHERE 1
-				".(($outsrc != '') ? "AND IFNULL(USR.outsourcer, 0) = {$outsrc}" : "")."
+				".(($user_type != '') ? "AND USR.user_type LIKE '{$user_type}'" : "")."
 			ORDER BY Name
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -470,7 +480,7 @@ foreach ($_GET as &$value) {
 				$UserAttachments[$row["USR_ID"]][] = array("UA_ID" => $subrow["UA_ID"], "filename" => "{$subrow["filename"]}", "comment" => "{$subrow["comment"]}");
 			}
 
-			echo "<tr><td colspan='2' style='text-align: center; ".($row["official"] ? "background: #0F05;" : "")."'><a href='#' class='usercell' USR_ID='{$row["USR_ID"]}' name='{$row["Name"]}'>{$row["Name"]}</a></td>";
+			echo "<tr><td colspan='2' style='text-align: center;'><a href='#' class='usercell' USR_ID='{$row["USR_ID"]}' name='{$row["Name"]}'>{$row["Name"]}</a></td>";
 			?>
 			<td colspan="2" class='tariff_edit' tst_id='<?=$row["TST_ID"]?>' valid_from='<?=$row["valid_from"]?>' tariff='<?=$row["tariff"]?>' type='<?=$row["type"]?>' USR_ID='<?=$row["USR_ID"]?>' name='<?=$row["Name"]?>' style="overflow: hidden; cursor: pointer;<?=($list_tariff == '' ? " background: #f006;" : "")?>">
 				<a href='#'><?=$list_tariff?></a>
@@ -650,7 +660,7 @@ foreach ($_GET as &$value) {
 	</tbody>
 </table>
 
-<div id="timesheet_report_btn" title="Распечатать табель"><a href="/printforms/timesheet_report.php?F_ID=<?=$_GET["F_ID"]?>&month=<?=$_GET["month"]?>&outsrc=<?=$outsrc?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
+<div id="timesheet_report_btn" title="Распечатать табель"><a href="/printforms/timesheet_report.php?F_ID=<?=$_GET["F_ID"]?>&month=<?=$_GET["month"]?>&user_type=<?=$user_type?>" class="print" style="color: white;"><i class="fas fa-2x fa-print"></i></a></div>
 
 <div id='tariff_form' class="addproduct" style='display:none;'>
 	<form method='post' onsubmit="JavaScript:this.subbut.disabled=true;
@@ -658,7 +668,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="F_ID" value="<?=$F_ID?>">
 			<input type="hidden" name="month" value="<?=$_GET["month"]?>">
-			<input type="hidden" name="outsrc" value="<?=$outsrc?>">
+			<input type="hidden" name="user_type" value="<?=$user_type?>">
 			<input type="hidden" name="USR_ID">
 			<input type="hidden" name="TST_ID">
 
@@ -701,7 +711,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="F_ID" value="<?=$F_ID?>">
 			<input type="hidden" name="month" value="<?=$_GET["month"]?>">
-			<input type="hidden" name="outsrc" value="<?=$outsrc?>">
+			<input type="hidden" name="user_type" value="<?=$user_type?>">
 			<input type="hidden" name="USR_ID">
 
 			<a id="user_edit" href="" target="_blank" class="button">Редактировать данные работника</a>

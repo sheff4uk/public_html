@@ -17,7 +17,7 @@ include "../config.php";
 $year = substr($_GET["month"], 0, 4);
 $month = substr($_GET["month"], 4, 2);
 $F_ID = $_GET["F_ID"];
-$outsrc = $_GET["outsrc"];
+$user_type = $_GET["user_type"];
 
 // Узнаем кол-во дней в выбранном месяце
 $strdate = '01.'.$month.'.'.$year;
@@ -146,7 +146,6 @@ echo "<title>Табель версия для печати</title>";
 				,USR_Name(USR.USR_ID) Name
 				,USR_Icon(USR.USR_ID) Icon
 				,USR.act
-				,USR.official
 				,USR.photo
 			FROM Users USR
 			JOIN TariffMonth TM ON TM.year = {$year}
@@ -154,7 +153,7 @@ echo "<title>Табель версия для печати</title>";
 				AND TM.USR_ID = USR.USR_ID
 				AND TM.F_ID = {$F_ID}
 			WHERE 1
-				".(($outsrc != '') ? "AND IFNULL(USR.outsourcer, 0) = {$outsrc}" : "")."
+				".(($user_type != '') ? "AND USR.user_type LIKE '{$user_type}'" : "")."
 			ORDER BY Name
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

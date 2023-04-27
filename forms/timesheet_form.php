@@ -7,7 +7,7 @@ if( isset($_POST["F_ID"]) ) {
 	session_start();
 	$F_ID = $_POST["F_ID"];
 	$month = $_POST["month"];
-	$outsrc = $_POST["outsrc"];
+	$user_type = $_POST["user_type"];
 
 	if( $_POST["TS_ID"] ) {
 		$TS_ID = $_POST["TS_ID"];
@@ -379,7 +379,7 @@ if( isset($_POST["F_ID"]) ) {
 	}
 
 	// Перенаправление в табель
-	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&outsrc='.$outsrc.'#'.$TS_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&user_type='.$user_type.'#'.$TS_ID.'">');
 }
 ?>
 
@@ -408,7 +408,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="F_ID" value="<?=$F_ID?>">
 			<input type="hidden" name="month" value="<?=$_GET["month"]?>">
-			<input type="hidden" name="outsrc" value="<?=$_GET["outsrc"]?>">
+			<input type="hidden" name="user_type" value="<?=$_GET["user_type"]?>">
 
 			<div id="hide"><!--Формируется скриптом--></div>
 			<div id="summary"><!--Формируется скриптом--></div>
