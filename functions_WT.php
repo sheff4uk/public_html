@@ -372,30 +372,34 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 					//ID товара
 					$goodsID = $data[$i+37] + ($data[$i+38] << 8) + ($data[$i+39] << 16) + ($data[$i+40] << 24);
 
-					// Если количество положительное
-					if( $quantity > 0 ) {
-						// Записываем в базу регистрацию
-						$query = "
-							INSERT INTO list__PackingPallet
-							SET packed_time = '{$transactionDate}'
-								,nextID = {$nextID}
-								,WT_ID = {$deviceID}
-								,CWP_ID = {$goodsID}
-						";
-						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					// Если не рейки
+					if( $goodsID < 99000000 ) {
+						// Если количество положительное
+						if( $quantity > 0 ) {
+							// Записываем в базу регистрацию
+							$query = "
+								INSERT INTO list__PackingPallet
+								SET packed_time = '{$transactionDate}'
+									,nextID = {$nextID}
+									,WT_ID = {$deviceID}
+									,CWP_ID = {$goodsID}
+							";
+							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						}
+						else {
+							// Иначе сторнируем
+							$query = "
+								UPDATE list__PackingPallet
+								SET removal_time = '{$transactionDate}'
+								WHERE CWP_ID = {$goodsID}
+									AND WT_ID = {$deviceID}
+								ORDER BY nextID DESC
+								LIMIT 1
+							";
+							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+						}
 					}
-					else {
-						// Иначе сторнируем
-						$query = "
-							UPDATE list__PackingPallet
-							SET removal_time = '{$transactionDate}'
-							WHERE CWP_ID = {$goodsID}
-								AND WT_ID = {$deviceID}
-							ORDER BY nextID DESC
-							LIMIT 1
-						";
-						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					}
+
 
 					// Запоминаем ID последней регистрации
 					$query = "
@@ -584,12 +588,12 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 
 			// Если это не последняя часть
 			if( $nums > $curnum ) {
-				read_transaction_LPP($ID, ++$curnum, $socket, $mysqli);
+				read_transaction_LA($ID, ++$curnum, $socket, $mysqli);
 			}
 		}
 	}
 	else { //Если CRC не совпали делаем попытку еще
-		read_transaction_LPP($ID, $curnum, $socket, $mysqli);
+		read_transaction_LA($ID, $curnum, $socket, $mysqli);
 	}
 }
 
