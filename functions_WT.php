@@ -165,6 +165,16 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 					$receipt_start = $row["receipt_start"];
 					$F_ID = $row["F_ID"];
 
+					// Узнаем chatID участка
+					$query = "
+						SELECT notification_group
+						FROM factory
+						WHERE F_ID = {$F_ID}
+					";
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					$row = mysqli_fetch_array($res);
+					$notification_group = $row["notification_group"];
+
 					// Узнаем номер закрытой партии
 					$query = "
 						SELECT IFNULL(MAX(RN), 0) RN
@@ -268,7 +278,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 						// Если в партии были трещины или сколы или незакрытие или повторения брака сообщаем в телеграм
 						if( $crack or $chip or $receipt_err or $reject_err ) {
 							$message = "Пост <b>{$post}</b>, кассета: <b>{$cassette}</b>, код: <b>{$item}</b>, партия <b>{$RN}</b>\n".($crack ? "трещина: <b>{$crack}</b>\n" : "").($chip ? "скол: <b>{$chip}</b>\n" : "").($receipt_err ? "<b>Пропущено закрытие партии!</b>\n" : "").($reject_err ? "<b>Подряд идущий одинаковый брак (3 и более)!</b>" : "");
-							message_to_telegram($message, TELEGRAM_CHATID);
+							message_to_telegram($message, $notification_group);
 						}
 					}
 
