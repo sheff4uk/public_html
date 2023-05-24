@@ -81,98 +81,98 @@ $notification_group = $row["notification_group"];
 
 		message_to_telegram("Кассета <b>{$cassette}</b> расформована.", $notification_group);
 
-//		// Список активных весов на конвейере
-//		$query = "
-//			SELECT GROUP_CONCAT(WT.WT_ID) WT_IDs
-//			FROM WeighingTerminal WT
-//			WHERE WT.F_ID = {$F_ID}
-//				AND WT.type = 2
-//				AND WT.act = 1
-//		";
-//		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//		$row = mysqli_fetch_array($res);
-//		$WT_IDs = $row["WT_IDs"];
-//		$i = 0;
-//
-//		// Попытки собрать данные и закрыть кассету
-//		while( $WT_IDs and $i < 16) {
-//			sleep(15); // Ждем 15 секунд
-//
-//			// По этому списку весов собираем данные
-//			$query = "
-//				SELECT WT.WT_ID
-//					,WT.post
-//					,WT.port
-//					,WT.last_transaction
-//				FROM WeighingTerminal WT
-//				WHERE WT.WT_ID IN ({$WT_IDs})
-//			";
-//			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//			while( $row = mysqli_fetch_array($res) ) {
-//				// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
-//				$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-//				if( socket_connect($socket, $from_ip, $row["port"]) ) {
-//					read_transaction_LW($row["last_transaction"]+1, 1, $socket, $mysqli);
-//				}
-//				else {
-//					message_to_telegram("Пост <b>{$row["post"]}</b>\n<b>Нет связи с весами!</b>", $notification_group);
-//				}
-//				socket_close($socket);
-//			}
-//			// Список весов, с которых получены еще не все данные
-//			$query = "
-//				SELECT GROUP_CONCAT(SUB.WT_ID) WT_IDs
-//				FROM (
-//					SELECT WT.WT_ID
-//					FROM list__Weight LW
-//					JOIN WeighingTerminal WT ON WT.WT_ID = LW.WT_ID
-//						AND WT.F_ID = {$F_ID}
-//						AND WT.WT_ID NOT IN (
-//							SELECT WT_ID
-//							FROM list__Weight
-//							WHERE LO_ID = (SELECT LO_ID FROM list__Opening ORDER BY opening_time DESC LIMIT 1,1)
-//							GROUP BY WT_ID
-//						)
-//					WHERE LW.weighing_time > (SELECT opening_time FROM list__Opening ORDER BY opening_time DESC LIMIT 1,1)
-//						AND LW.weighing_time < (SELECT opening_time FROM list__Opening ORDER BY opening_time DESC LIMIT 0,1)
-//						AND LW.LO_ID IS NULL
-//					GROUP BY LW.WT_ID
-//				) SUB
-//			";
-//			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//			$row = mysqli_fetch_array($res);
-//			$WT_IDs = $row["WT_IDs"];
-//			$i++;
-//		}
-//		////////////////////////////////////////////////////////////
-//
-//		// По этому списку терминалов собираем данные по упаковке паллетов
-//		$query = "
-//			SELECT WT.WT_ID
-//				,WT.port
-//				,WT.last_transaction
-//			FROM WeighingTerminal WT
-//			WHERE WT.F_ID = {$F_ID}
-//				AND WT.type = 3
-//				AND WT.act = 1
-//		";
-//		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//		while( $row = mysqli_fetch_array($res) ) {
-//			// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
-//			$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-//			if( socket_connect($socket, $from_ip, $row["port"]) ) {
-//				// Чтение регистраций поддонов
-//				read_transaction_LPP($row["last_transaction"]+1, 1, $socket, $mysqli);
-//
-//				// Запись в терминал даты заливки
-//				set_terminal_text($filling_time_format, $socket, $mysqli);
-//			}
-//			else {
-//				message_to_telegram("<b>Нет связи с терминалом этикетирования паллетов!</b>", $notification_group);
-//			}
-//			socket_close($socket);
-//		}
-//		////////////////////////////////////////////////////////////
+		// Список активных весов на конвейере
+		$query = "
+			SELECT GROUP_CONCAT(WT.WT_ID) WT_IDs
+			FROM WeighingTerminal WT
+			WHERE WT.F_ID = {$F_ID}
+				AND WT.type = 2
+				AND WT.act = 1
+		";
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		$row = mysqli_fetch_array($res);
+		$WT_IDs = $row["WT_IDs"];
+		$i = 0;
+
+		// Попытки собрать данные и закрыть кассету
+		while( $WT_IDs and $i < 16) {
+			sleep(15); // Ждем 15 секунд
+
+			// По этому списку весов собираем данные
+			$query = "
+				SELECT WT.WT_ID
+					,WT.post
+					,WT.port
+					,WT.last_transaction
+				FROM WeighingTerminal WT
+				WHERE WT.WT_ID IN ({$WT_IDs})
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $row = mysqli_fetch_array($res) ) {
+				// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
+				$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+				if( socket_connect($socket, $from_ip, $row["port"]) ) {
+					read_transaction_LW($row["last_transaction"]+1, 1, $socket, $mysqli);
+				}
+				else {
+					message_to_telegram("Пост <b>{$row["post"]}</b>\n<b>Нет связи с весами!</b>", $notification_group);
+				}
+				socket_close($socket);
+			}
+			// Список весов, с которых получены еще не все данные
+			$query = "
+				SELECT GROUP_CONCAT(SUB.WT_ID) WT_IDs
+				FROM (
+					SELECT WT.WT_ID
+					FROM list__Weight LW
+					JOIN WeighingTerminal WT ON WT.WT_ID = LW.WT_ID
+						AND WT.F_ID = {$F_ID}
+						AND WT.WT_ID NOT IN (
+							SELECT WT_ID
+							FROM list__Weight
+							WHERE LO_ID = (SELECT LO_ID FROM list__Opening ORDER BY opening_time DESC LIMIT 1,1)
+							GROUP BY WT_ID
+						)
+					WHERE LW.weighing_time > (SELECT opening_time FROM list__Opening ORDER BY opening_time DESC LIMIT 1,1)
+						AND LW.weighing_time < (SELECT opening_time FROM list__Opening ORDER BY opening_time DESC LIMIT 0,1)
+						AND LW.LO_ID IS NULL
+					GROUP BY LW.WT_ID
+				) SUB
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			$row = mysqli_fetch_array($res);
+			$WT_IDs = $row["WT_IDs"];
+			$i++;
+		}
+		////////////////////////////////////////////////////////////
+
+		// По этому списку терминалов собираем данные по упаковке паллетов
+		$query = "
+			SELECT WT.WT_ID
+				,WT.port
+				,WT.last_transaction
+			FROM WeighingTerminal WT
+			WHERE WT.F_ID = {$F_ID}
+				AND WT.type = 3
+				AND WT.act = 1
+		";
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		while( $row = mysqli_fetch_array($res) ) {
+			// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
+			$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+			if( socket_connect($socket, $from_ip, $row["port"]) ) {
+				// Чтение регистраций поддонов
+				read_transaction_LPP($row["last_transaction"]+1, 1, $socket, $mysqli);
+
+				// Запись в терминал даты заливки
+				set_terminal_text($filling_time_format, $socket, $mysqli);
+			}
+			else {
+				message_to_telegram("<b>Нет связи с терминалом этикетирования паллетов!</b>", $notification_group);
+			}
+			socket_close($socket);
+		}
+		////////////////////////////////////////////////////////////
 
 		// Предупреждаем если долго нет данных по заливкам
 		$query = "
