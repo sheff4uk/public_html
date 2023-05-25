@@ -14,8 +14,6 @@ if( !$_GET["F_ID"] ) {
 	$_GET["F_ID"] = $_SESSION['F_ID'];
 }
 
-$page = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-
 //Удаление регистрации поддона
 if( isset($_GET["remove"]) ) {
 	session_start();
@@ -268,7 +266,7 @@ foreach ($_GET as &$value) {
 					item = $(this).parents("td").attr("item");
 				confirm(
 					"<span style='font-size: 1.2em;'>Подтвердите <font color='red'>удаление</font> регистрации с номером <b>" + nextID + "</b> (комплект противовесов <b>" + item + "</b>).</span>",
-					"<?=$page?>?remove=" + id
+					"stock.php?remove=" + id + "&F_ID=<?=$_GET["F_ID"]?>"
 				);
 			});
 
@@ -280,7 +278,7 @@ foreach ($_GET as &$value) {
 					item = $(this).parents("td").attr("item");
 				confirm(
 					"<span style='font-size: 1.2em;'>Подтвердите <font color='green'>восстановление</font> регистрации с номером <b>" + nextID + "</b> (комплект противовесов <b>" + item + "</b>).</span>",
-					"<?=$page?>?undo=" + id
+					"stock.php?undo=" + id + "&F_ID=<?=$_GET["F_ID"]?>"
 				);
 			});
 
