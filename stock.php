@@ -196,6 +196,7 @@ foreach ($_GET as &$value) {
 					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 90 HOUR AND NOW() - INTERVAL 66 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day1
 					,SUM(IF(LPP.packed_time <= NOW() - INTERVAL 90 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) ready
 					,SUM(IF(LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) total
+					,CWP.in_pallet
 				FROM list__PackingPallet LPP
 				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
 				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
@@ -216,7 +217,7 @@ foreach ($_GET as &$value) {
 				echo "<td style='color: rgb(200,0,0);'>{$row["day2"]}</td>";
 				echo "<td style='color: rgb(250,0,0);'>{$row["day1"]}</td>";
 				echo "<td style='color: orange;'>{$row["ready"]}</td>";
-				echo "<td>{$row["total"]}</td>";
+				echo "<td>{$row["total"]} (".($row["total"] * $row["in_pallet"]).")</td>";
 				echo "<tr>";
 			}
 		?>
