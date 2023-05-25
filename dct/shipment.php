@@ -250,7 +250,7 @@ if( isset($_POST["lpp_id"]) ) {
 			}
 			else {
 				$status = 1;
-				if( $row["duration"] > 0 ) {
+				if( $row["duration"] > 0 and $F_ID == 1) {
 					echo "<span style='color: #f00; font-size: 2em; font-weight: bold;'>Отгрузка запрещена!</span><br>";
 					echo "<span>До полного созревания необходимо <b>{$row["duration"]}</b> ч.</span>";
 				}
