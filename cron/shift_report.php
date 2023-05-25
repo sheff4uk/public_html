@@ -71,12 +71,12 @@ while( $row = mysqli_fetch_array($res) ) {
 				$text .= "{$key}: {$value}\n";
 			}
 			$text .= "<b>Всего: {$total}</b>\n";
-			message_to_telegram($text, $row["notification_group"]);
+			//message_to_telegram($text, $row["notification_group"]);
 		}
 
 		// Выводим список невышедших аутсорсеров
 		if( $aut_list != "0" ) {
-			$text = '<b>Не вышли:</b>\n';
+			$text = "<b>Не вышли:</b>\n";
 			$query = "
 				SELECT USR_Name(USR.USR_ID) `name`
 				FROM Users USR
@@ -90,7 +90,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			while( $subsubrow = mysqli_fetch_array($subsubres) ) {
 				$text .= "{$subsubrow["name"]}\n";
 			}
-			message_to_telegram($text, $row["notification_group"]);
+			//message_to_telegram($text, $row["notification_group"]);
+			message_to_telegram($text, '217756119');
 		}
 	}
 }
