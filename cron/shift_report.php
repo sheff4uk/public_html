@@ -38,6 +38,8 @@ while( $row = mysqli_fetch_array($res) ) {
 				,TR.tr_photo
 				,CONCAT(LPAD((TR.tr_minute DIV 60) % 24, 2, '0'), ':', LPAD(TR.tr_minute % 60, 2, '0')) tr_time
 				,USR.post
+				,USR.user_type
+				,USR.USR_ID
 			FROM TimeReg TR
 			JOIN TimesheetShift TSS ON TSS.TSS_ID = TR.TSS_ID
 				AND TSS.duration IS NULL
@@ -52,10 +54,14 @@ while( $row = mysqli_fetch_array($res) ) {
 		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		$total_by_post = array();
 		$total = 0;
+		$aut_list = "0";
 		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
 			if( $subsubrow["post"] != null ) {
 				$total_by_post[$subsubrow["post"]]++;
 				$total++;
+			}
+			if( $subsubrow["user_type"] == "Аутсорсер" ) {
+				$aut_list .= ",{$subsubrow["USR_ID"]}";
 			}
 		}
 
@@ -65,6 +71,25 @@ while( $row = mysqli_fetch_array($res) ) {
 				$text .= "{$key}: {$value}\n";
 			}
 			$text .= "<b>Всего: {$total}</b>\n";
+			message_to_telegram($text, $row["notification_group"]);
+		}
+
+		// Выводим список невышедших аутсорсеров
+		if( $aut_list != "0" ) {
+			$text = '<b>Не вышли:</b>\n';
+			$query = "
+				SELECT USR_Name(USR.USR_ID) `name`
+				FROM Users USR
+				WHERE USR.USR_ID NOT IN ({$aut_list})
+					AND USR.F_ID = {$row["F_ID"]}
+					AND USR.act = 1
+					AND USR.user_type LIKE 'Аутсорсер'
+				ORDER BY `name`
+			";
+			$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $subsubrow = mysqli_fetch_array($subsubres) ) {
+				$text .= "{$subsubrow["name"]}\n";
+			}
 			message_to_telegram($text, $row["notification_group"]);
 		}
 	}
