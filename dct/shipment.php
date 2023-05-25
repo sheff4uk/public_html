@@ -82,8 +82,7 @@ if( isset($_POST["lpp_id"]) ) {
 		while( $row = mysqli_fetch_array($res) ) {
 			$message .= "\n{$row["item"]} x {$row["cnt"]}";
 		}
-		message_to_telegram($message, '-647915518');
-		//message_to_telegram($message, '{$shipment_group}');
+		message_to_telegram($message, $shipment_group);
 	}
 
 	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php">');
@@ -293,6 +292,7 @@ if( isset($_POST["lpp_id"]) ) {
 			JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 			WHERE LPP.scan_time IS NOT NULL
 				AND LPP.shipment_time IS NULL
+				AND LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$F_ID} AND type = 3)
 			ORDER BY LPP.scan_time
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
