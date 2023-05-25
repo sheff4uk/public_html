@@ -30,7 +30,7 @@ if( isset($_GET["remove"]) ) {
 	";
 	mysqli_query( $mysqli, $query );
 
-	exit ('<meta http-equiv="refresh" content="0; url='.$page.'#'.$LPP_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/stock.php?F_ID='.$_GET["F_ID"].'#'.$LPP_ID.'">');
 }
 
 //Восстановление регистрации поддона
@@ -45,7 +45,8 @@ if( isset($_GET["undo"]) ) {
 	";
 	mysqli_query( $mysqli, $query );
 
-	exit ('<meta http-equiv="refresh" content="0; url='.$page.'#'.$LPP_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/stock.php?F_ID='.$_GET["F_ID"].'#'.$LPP_ID.'">');
+
 }
 
 // Узнаем время упаковки самого старого поддона на складе
