@@ -71,7 +71,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				$text .= "{$key}: {$value}\n";
 			}
 			$text .= "<b>Всего: {$total}</b>\n";
-			//message_to_telegram($text, $row["notification_group"]);
+			message_to_telegram($text, $row["notification_group"]);
 		}
 
 		// Выводим список невышедших аутсорсеров
@@ -90,8 +90,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			while( $subsubrow = mysqli_fetch_array($subsubres) ) {
 				$text .= "{$subsubrow["name"]}\n";
 			}
-			//message_to_telegram($text, $row["notification_group"]);
-			message_to_telegram($text, '217756119');
+			message_to_telegram($text, $row["notification_group"]);
 		}
 	}
 }
