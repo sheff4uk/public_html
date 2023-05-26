@@ -15,7 +15,7 @@ $from_ip = $row["from_ip"];
 $notification_group = $row["notification_group"];
 
 // Проверка доступа и корректность кода (не менее 8 символов)
-//if( $ip == $from_ip ) {
+if( $ip == $from_ip ) {
 	////////////////////////////////////////////////////////
 	// функции сбора данных с весовых терминалов
 	include "functions_WT.php";
@@ -52,7 +52,7 @@ $notification_group = $row["notification_group"];
 		read_transaction_LA($row["last_transaction"]+1, 1, $socket, $mysqli);
 	}
 	else {
-		//message_to_telegram("<b>Нет связи с терминалом расформовки!</b>", $notification_group);
+		message_to_telegram("<b>Нет связи с терминалом расформовки!</b>", $notification_group);
 	}
 	socket_close($socket);
 
@@ -79,7 +79,7 @@ $notification_group = $row["notification_group"];
 	/////////////////////////////////////////////////////////////////////////////////
 	if( $LO_ID_before != $LO_ID_after ) {
 
-		message_to_telegram("Кассета <b>{$cassette}</b> расформована.", $notification_group);
+		//message_to_telegram("Кассета <b>{$cassette}</b> расформована.", $notification_group);
 
 		// Список активных весов на конвейере
 		$query = "
@@ -191,5 +191,5 @@ $notification_group = $row["notification_group"];
 			message_to_telegram("Цикл: <b>{$row["cycle"]}</b>\nКод: <b>{$row["item"]}</b>\n<b>Нет данных по заливкам более 24 часов!</b>", $notification_group);
 		}
 	}
-//}
+}
 ?>
