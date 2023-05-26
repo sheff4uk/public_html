@@ -15,7 +15,7 @@ $from_ip = $row["from_ip"];
 $notification_group = $row["notification_group"];
 
 // Проверка доступа и корректность кода (не менее 8 символов)
-if( $ip == $from_ip ) {
+//if( $ip == $from_ip ) {
 	// Предупреждаем если долго нет данных по заливкам
 	$query = "
 		SELECT PB.cycle
@@ -199,5 +199,5 @@ if( $ip == $from_ip ) {
 		$telegram_text .= "<b>Нет данных по заливкам более 24 часов!</b>\nСбор данных по расформовке приостановлен.";
 		message_to_telegram($telegram_text, $notification_group);
 	}
-}
+//}
 ?>
