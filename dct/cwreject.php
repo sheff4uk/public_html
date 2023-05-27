@@ -1,7 +1,18 @@
 <?
 include_once "../config.php";
 $ip = $_SERVER['REMOTE_ADDR'];
-if( $ip != $from_ip ) die("Access denied");
+
+// Узнаем участок
+$query = "
+	SELECT F_ID
+	FROM factory
+	WHERE from_ip = '{$ip}'
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$F_ID = $row["F_ID"];
+
+if( !$F_ID ) die("Access denied");
 
 //ID противовеса введен вручную
 if( isset($_POST["barcode"]) ) {
