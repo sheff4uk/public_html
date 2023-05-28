@@ -59,7 +59,7 @@ if( isset($_GET["download"]) ) {
 			,WT.port
 			,WT.last_transaction
 		FROM WeighingTerminal WT
-		WHERE WT.F_ID = {$F_ID}
+		WHERE WT.F_ID = {$_GET["F_ID"]}
 			AND WT.type = 3
 			AND WT.act = 1
 	";
