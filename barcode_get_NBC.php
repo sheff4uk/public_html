@@ -185,7 +185,7 @@ $notification_group = $row["notification_group"];
 					read_transaction_LPP($row["last_transaction"]+1, 1, $socket, $mysqli);
 
 					// Запись в терминал даты заливки
-					set_terminal_text($filling_time_format, $socket, $mysqli);
+					//set_terminal_text($filling_time_format, $socket, $mysqli);
 				}
 				else {
 					message_to_telegram("<b>Нет связи с терминалом этикетирования паллетов!</b>", $notification_group);

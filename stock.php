@@ -44,7 +44,44 @@ if( isset($_GET["undo"]) ) {
 	mysqli_query( $mysqli, $query );
 
 	exit ('<meta http-equiv="refresh" content="0; url=/stock.php?F_ID='.$_GET["F_ID"].'#'.$LPP_ID.'">');
+}
 
+//Принудительный сбор данных с терминала упаковки
+if( isset($_GET["download"]) ) {
+	////////////////////////////////////////////////////////
+	// функции сбора данных с весовых терминалов
+	include "functions_WT.php";
+	////////////////////////////////////////////////////////
+
+	// По этому списку терминалов собираем данные по упаковке паллетов
+	$query = "
+		SELECT WT.WT_ID
+			,WT.port
+			,WT.last_transaction
+		FROM WeighingTerminal WT
+		WHERE WT.F_ID = {$F_ID}
+			AND WT.type = 3
+			AND WT.act = 1
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
+		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+		if( socket_connect($socket, $from_ip, $row["port"]) ) {
+			// Чтение регистраций поддонов
+			read_transaction_LPP($row["last_transaction"]+1, 1, $socket, $mysqli);
+
+			// Запись в терминал даты заливки
+			//set_terminal_text($filling_time_format, $socket, $mysqli);
+		}
+		else {
+			message_to_telegram("<b>Нет связи с терминалом этикетирования паллетов!</b>", $notification_group);
+		}
+		socket_close($socket);
+	}
+	////////////////////////////////////////////////////////////
+
+	exit ('<meta http-equiv="refresh" content="0; url=/stock.php?F_ID='.$_GET["F_ID"].'">');
 }
 
 // Узнаем время упаковки самого старого поддона на складе
@@ -169,7 +206,7 @@ foreach ($_GET as &$value) {
 </style>
 
 <div id="wr_stock">
-	<h2>Складской запас</h2>
+	<h2>Складской запас <a href="stock.php?F_ID=<?=$_GET["F_ID"]?>&download" title="Собрать данные из терминала"><i class="fa-solid fa-download"></i></a></h2>
 	<table style="text-align: center; font-weight: bold;">
 		<thead>
 			<tr>
