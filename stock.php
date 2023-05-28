@@ -48,6 +48,17 @@ if( isset($_GET["undo"]) ) {
 
 //Принудительный сбор данных с терминала упаковки
 if( isset($_GET["download"]) ) {
+	$query = "
+		SELECT from_ip
+			,notification_group
+		FROM factory
+		WHERE F_ID = {$_GET["F_ID"]}
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$from_ip = $row["from_ip"];
+	$notification_group = $row["notification_group"];
+
 	////////////////////////////////////////////////////////
 	// функции сбора данных с весовых терминалов
 	include "functions_WT.php";
