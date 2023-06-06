@@ -39,7 +39,7 @@
 $row = 1;
 if (($handle = fopen($_FILES['uploadfile']['tmp_name'], "r")) !== FALSE) {
 	echo "<table class='main_table'>\n";
-	while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+	while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
 		echo "<tr>\n";
 		$num = count($data);
 		//echo "<p> $num полей в строке $row: <br /></p>\n";
