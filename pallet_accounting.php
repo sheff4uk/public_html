@@ -260,7 +260,7 @@ $query = "
 	WHERE PD.pd_cnt > 0
 		".($_GET["date_from"] ? "AND PD.pd_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND PD.pd_date <= '{$_GET["date_to"]}'" : "")."
-		".($_GET["CB_ID"] ? "AND 0" : "")."
+		".($_GET["CB_ID"] ? "AND CB.CB_ID = {$_GET["CB_ID"]}" : "")."
 		".($_GET["PN_ID"] ? "AND PD.PN_ID = {$_GET["PN_ID"]}" : "")."
 		".($_GET["PS_ID"] ? "AND 0" : "")."
 
