@@ -153,7 +153,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	while( $subrow = mysqli_fetch_array($subres) ) {
 		echo "<div style='position: relative; margin-bottom: 10px;'>";
 		echo "
-			<ul cw_id='{$subrow["CW_ID"]}' class='connectedSortable' style='width: ".(2 + $subrow["fillings"] * 46)."px;'>\n
+			<ul cw_id='{$subrow["CW_ID"]}' class='connectedSortable' style='width: ".(7 + $subrow["fillings"] * 46)."px;'>\n
 				<div class='legend' title='Заливок с одного замеса: ".($subrow["fillings"]/$subrow["per_batch"])."'>{$subrow["item"]} <i class='fa-solid fa-circle-info'></i></div>\n
 		";
 
