@@ -40,56 +40,56 @@ if( isset($_POST["tariff"]) ) {
 		$TST_ID = mysqli_insert_id( $mysqli );
 	}
 
-	// Если изменение тарифа происходит в текущий день
-	if( $valid_from == date('Y-m-d') ) {
-
-		// Узнаем TS_ID
-		$query = "
-			SELECT TS_ID
-			FROM Timesheet
-			WHERE ts_date = CURDATE()
-				AND USR_ID = {$USR_ID}
-				AND F_ID = {$F_ID}
-		";
-		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		$row = mysqli_fetch_array($res);
-		$TS_ID = $row["TS_ID"];
-
-		// Если ячейка табеля в этот день задействована
-		if( $TS_ID ) {
-			$query = "
-				SELECT COUNT(*) shift_cnt
-					,GROUP_CONCAT(TSS_ID) TSS_IDs
-				FROM TimesheetShift
-				WHERE TS_ID = {$TS_ID}
-			";
-			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-			$row = mysqli_fetch_array($res);
-			$shift_cnt = $row["shift_cnt"];
-			$TSS_IDs = $row["TSS_IDs"];
-
-			// Если в этот день есть смена
-			if( $shift_cnt ) {
-
-				// Записываем TST_ID в Timesheet
-				$query = "
-					UPDATE Timesheet
-					SET TST_ID = {$TST_ID}
-					WHERE TS_ID = {$TS_ID}
-				";
-				mysqli_query( $mysqli, $query );
-
-				//Обновляем регистрации чтобы пересчиталось начесление
-				$query = "
-					UPDATE TimeReg
-					SET tr_minute = tr_minute
-					WHERE TSS_ID IN ({$TSS_IDs})
-						AND del_time IS NULL
-				";
-				mysqli_query( $mysqli, $query );
-			}
-		}
-	}
+//	// Если изменение тарифа происходит в текущий день
+//	if( $valid_from == date('Y-m-d') ) {
+//
+//		// Узнаем TS_ID
+//		$query = "
+//			SELECT TS_ID
+//			FROM Timesheet
+//			WHERE ts_date = CURDATE()
+//				AND USR_ID = {$USR_ID}
+//				AND F_ID = {$F_ID}
+//		";
+//		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//		$row = mysqli_fetch_array($res);
+//		$TS_ID = $row["TS_ID"];
+//
+//		// Если ячейка табеля в этот день задействована
+//		if( $TS_ID ) {
+//			$query = "
+//				SELECT COUNT(*) shift_cnt
+//					,GROUP_CONCAT(TSS_ID) TSS_IDs
+//				FROM TimesheetShift
+//				WHERE TS_ID = {$TS_ID}
+//			";
+//			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+//			$row = mysqli_fetch_array($res);
+//			$shift_cnt = $row["shift_cnt"];
+//			$TSS_IDs = $row["TSS_IDs"];
+//
+//			// Если в этот день есть смена
+//			if( $shift_cnt ) {
+//
+//				// Записываем TST_ID в Timesheet
+//				$query = "
+//					UPDATE Timesheet
+//					SET TST_ID = {$TST_ID}
+//					WHERE TS_ID = {$TS_ID}
+//				";
+//				mysqli_query( $mysqli, $query );
+//
+//				//Обновляем регистрации чтобы пересчиталось начесление
+//				$query = "
+//					UPDATE TimeReg
+//					SET tr_minute = tr_minute
+//					WHERE TSS_ID IN ({$TSS_IDs})
+//						AND del_time IS NULL
+//				";
+//				mysqli_query( $mysqli, $query );
+//			}
+//		}
+//	}
 
 	// Перенаправление в табель
 	exit ('<meta http-equiv="refresh" content="0; url=/timesheet.php?F_ID='.$F_ID.'&month='.$month.'&user_type='.$user_type.'">');
@@ -422,7 +422,7 @@ foreach ($_GET as &$value) {
 				AND TM.month = {$month}
 				AND TM.USR_ID = USR.USR_ID
 				AND TM.F_ID = {$F_ID}
-			LEFT JOIN TimesheetTariff TST ON valid_from >= CURDATE()
+			LEFT JOIN TimesheetTariff TST ON valid_from > CURDATE()
 				AND TST.USR_ID = USR.USR_ID
 				AND TST.F_ID = {$F_ID}
 			WHERE 1
@@ -496,21 +496,21 @@ foreach ($_GET as &$value) {
 					,DAY(TS.ts_date) Day
 					,SUM(TSS.duration) duration
 					,SUM(TSS.pay) pay
-					#,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.pay) SEPARATOR '<br>') pay_format
+						#,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.pay) SEPARATOR '<br>') pay_format
 					,GROUP_CONCAT(TSS.pay SEPARATOR '<br>') pay_format
 					,TS.fine
-					#,TS.rate
-					,CONCAT(TST.tariff, '/', IF(TST.type = 1, 'Смена', IF(TST.type = 2, 'Час-смена', IF(TST.type = 3, 'Час-вход', IF(TST.type = 4, 'Месяц', ''))))) tariff_type
-					,SUM(IF(TSS.pay > 0, 1, 0)) shift_cnt
-					,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR '<br>') duration_hm
+						#,TS.rate
+					,GROUP_CONCAT(TSS.shift_num SEPARATOR '<br>') shift_num
+					,GROUP_CONCAT(CONCAT(TSS.tss_tariff, '/', IF(TSS.tss_type = 1, 'Смена', IF(TSS.tss_type = 2, 'Час-смена', IF(TSS.tss_type = 3, 'Час-вход', IF(TSS.tss_type = 4, 'Месяц', ''))))) SEPARATOR '<br>') tariff_type
+						#,SUM(IF(TSS.pay > 0, 1, 0)) shift_cnt
+					,GROUP_CONCAT(CONCAT( TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR '<br>') duration_hm
 					,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR ', ') duration_hm_title
 					,TS.status
-					#,(SELECT USR_ID FROM Timesheet WHERE TS_ID = TS.sub_TS_ID) substitute
-					#,(SELECT SUM(1) FROM Timesheet WHERE sub_TS_ID = TS.TS_ID) sub_is
+						#,(SELECT USR_ID FROM Timesheet WHERE TS_ID = TS.sub_TS_ID) substitute
+						#,(SELECT SUM(1) FROM Timesheet WHERE sub_TS_ID = TS.TS_ID) sub_is
 					,TS.payout
 					,TS.comment
 				FROM Timesheet TS
-				LEFT JOIN TimesheetTariff TST ON TST.TST_ID = TS.TST_ID
 				LEFT JOIN TimesheetShift TSS ON TSS.TS_ID = TS.TS_ID
 				WHERE YEAR(TS.ts_date) = {$year}
 					AND MONTH(TS.ts_date) = {$month}
@@ -564,7 +564,7 @@ foreach ($_GET as &$value) {
 					$pay = $subrow["pay"];
 
 					echo "
-						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".(isset($holidays[$i]) ? " background: #09f3;" : "").($pay == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' date='{$subrow["ts_date"]}' tomorrow='{$subrow["tomorrow"]}' editable='{$subrow["editable"]}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' tariff='{$subrow["tariff_type"]}' shift_cnt='{$subrow["shift_cnt"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay_format"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}' payout='{$subrow["payout"]}' comment='{$subrow["comment"]}'>
+						<td id='{$subrow["TS_ID"]}' style='font-size: .9em; overflow: visible; padding: 0px; text-align: center;".(isset($holidays[$i]) ? " background: #09f3;" : "").($pay == '0' ? " background: #f006;" : "")."' class='tscell nowrap' ts_id='{$subrow["TS_ID"]}' date_format='{$d}.{$month}.{$year}' date='{$subrow["ts_date"]}' tomorrow='{$subrow["tomorrow"]}' editable='{$subrow["editable"]}' usr_name='{$row["Name"]}' photo='{$row["photo"]}' shift_num='{$subrow["shift_num"]}' tariff='{$subrow["tariff_type"]}' duration='{$subrow["duration_hm"]}' pay='{$subrow["pay_format"]}' rate='{$subrow["rate"]}' status='{$subrow["status"]}' substitute='{$subrow["substitute"]}' sub_is='{$subrow["sub_is"]}' payout='{$subrow["payout"]}' comment='{$subrow["comment"]}'>
 							".($man_reg ? "<div style='position: absolute; top: 0px; left: 0px; width: 5px; height: 5px; border-radius: 0 0 5px 0; background: red; box-shadow: 0 0 1px 1px red;'></div>" : "")."
 							".(($subrow["sub_is"] or $subrow["substitute"]) ? "<div style='position: absolute; bottom: 0px; right: 0px; width: 5px; height: 5px; border-radius: 5px 0 0 0; background: blue; box-shadow: 0 0 1px 1px blue;'></div>" : "")."
 							<div title='{$subrow["duration_hm_title"]}'>{$subrow["pay_format"]}</div>
@@ -683,7 +683,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody>
 					<tr>
-						<td><input type="date" name="valid_from" min="<?=date('Y-m-d')?>" required></td>
+						<td><input type="date" name="valid_from" min="<?=date('Y-m-d', strtotime("+1 day"))?>" required></td>
 						<td><input type="number" name="tariff" min="0" style="width: 100px;" required></td>
 						<td>
 							<select name="type" required>
@@ -768,12 +768,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#tariff_form input[name="valid_from"]').val(valid_from);
 			$('#tariff_form input[name="USR_ID"]').val(USR_ID);
 
-			if( valid_from == "<?=date('Y-m-d')?>" ) {
-				$('#tariff_form input[name="valid_from"]').attr("max", "<?=date('Y-m-d')?>");
-			}
-			else {
-				$('#tariff_form input[name="valid_from"]').attr("max", "");
-			}
+//			if( valid_from == "<?=date('Y-m-d')?>" ) {
+//				$('#tariff_form input[name="valid_from"]').attr("max", "<?=date('Y-m-d')?>");
+//			}
+//			else {
+//				$('#tariff_form input[name="valid_from"]').attr("max", "");
+//			}
 
 			$('#tariff_form').dialog({
 				title: name,

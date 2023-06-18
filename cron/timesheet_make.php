@@ -7,8 +7,8 @@ if( $key != $script_key ) die('Access denied!');
 
 // Генерация табеля на следующий месяц
 $query = "
-	INSERT INTO TariffMonth(year, month, USR_ID, F_ID, tariff, type)
-	SELECT YEAR(CURDATE()), MONTH(CURDATE()), TM.USR_ID, TM.F_ID, TM.tariff, TM.type
+	INSERT INTO TariffMonth(year, month, USR_ID, F_ID)
+	SELECT YEAR(CURDATE()), MONTH(CURDATE()), TM.USR_ID, TM.F_ID
 	FROM TariffMonth TM
 	WHERE TM.year = YEAR(CURDATE() - INTERVAL 1 MONTH)
 		AND TM.month = MONTH(CURDATE() - INTERVAL 1 MONTH)

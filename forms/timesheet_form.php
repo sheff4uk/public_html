@@ -9,7 +9,7 @@ if( isset($_POST["F_ID"]) ) {
 	$month = $_POST["month"];
 	$user_type = $_POST["user_type"];
 
-	if( $_POST["TS_ID"] ) {
+	if( isset($_POST["TS_ID"]) ) {
 		$TS_ID = $_POST["TS_ID"];
 		// Узнаем ts_date, USD_ID
 		$query = "
@@ -517,8 +517,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 				html_hide = html_hide + "<input type='hidden' name='TS_ID' value='"+ts_id+"'>";
 
 				var arr_reg = TimeReg[ts_id];
-				var tariff = $(this).attr('tariff'),
-					shift_cnt = $(this).attr('shift_cnt'),
+				var shift_num = $(this).attr('shift_num'),
+					tariff = $(this).attr('tariff'),
 					duration = $(this).attr('duration'),
 					pay = $(this).attr('pay'),
 					rate = $(this).attr('rate'),
@@ -539,7 +539,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				}
 
 				if( tariff != '' ) {
-					html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th></th><th>Тариф</th><th>Смен</th><th>Продолжительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.3em;'><tr>";
+					html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th></th><th>Смена</th><th colspan='3'>Тариф</th><th>Длительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.3em;'><tr>";
 
 					var total;
 					if( rate > 1 ) { total = pay+"<br>x"+Math.round(rate*100)/100+"<i class='fas fa-question-circle' title='Коэффициент замещения'></i><br>="+Math.round(pay*rate); }
@@ -547,8 +547,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 					html_summary = html_summary
 						+ "<td>"+html_photo+"</td>"
-						+ "<td>"+tariff+"</td>"
-						+ "<td>"+shift_cnt+"</td>"
+						+ "<td>"+shift_num+"</td>"
+						+ "<td colspan='3'>"+tariff+"</td>"
 						+ "<td>"+duration+"</td>"
 						+ "<td>"+total+"</td>";
 						+ "</tr></tbody></table>";

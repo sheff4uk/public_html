@@ -217,17 +217,15 @@ if( isset($_POST["cardcode"]) ) {
 			// Уведомление, если у работника нет тарифа при регистрации входа
 			if( $prefix == 1 ) {
 				$query = "
-					SELECT TS.TST_ID
-					FROM TimeReg TR
-					JOIN TimesheetShift TSS ON TSS.TSS_ID = TR.TSS_ID
-					JOIN Timesheet TS ON TS.TS_ID = TSS.TS_ID
-					WHERE TR.TR_ID = {$TR_ID}
+					SELECT TSS.tss_type
+					FROM TimesheetShift TSS
+					WHERE TSS.TSS_ID = {$TSS_ID}
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				$row = mysqli_fetch_array($res);
-				$TST_ID = $row["TST_ID"];
+				$tss_type = $row["tss_type"];
 
-				if( $TST_ID == null ) {
+				if( $tss_type == null ) {
 					$query = "
 						SELECT USR_Name({$USR_ID}) USR_Name
 					";
