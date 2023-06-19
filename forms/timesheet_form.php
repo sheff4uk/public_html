@@ -538,7 +538,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					html_photo = "<img src='/time_tracking/upload/"+photo+"' style='width: 100%; border-radius: 5px;'>";
 				}
 
-				if( tariff != '' ) {
+				if( shift_num != '' ) {
 					html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th></th><th>Смена</th><th colspan='3'>Тариф</th><th>Длительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.3em;'><tr>";
 
 					var total;
