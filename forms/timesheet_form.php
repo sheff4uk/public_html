@@ -24,7 +24,7 @@ if( isset($_POST["F_ID"]) ) {
 		$USR_ID = $row["USR_ID"];
 	}
 	else {
-		if( $_POST["tr_time1"] or $_POST["tr_time0"] or $_POST["status"] != '' or $_POST["substitute"] or $_POST["payout"] ) {
+		if( $_POST["tr_time1"] or $_POST["tr_time0"] or $_POST["status"] != '' or $_POST["payout"] ) {
 			// Делаем запись в табеле
 			$ts_date = $_POST["ts_date"];
 			$USR_ID = $_POST["usr_id"];
@@ -37,6 +37,18 @@ if( isset($_POST["F_ID"]) ) {
 			mysqli_query( $mysqli, $query );
 			$TS_ID = mysqli_insert_id( $mysqli );
 		}
+	}
+
+	// Редактирование тарифа смены
+	foreach ($_POST["tss_tariff"] as $key => $value) {
+		$query = "
+			UPDATE TimesheetShift
+			SET tss_tariff = {$value}
+				,tss_type = {$_POST["tss_type"][$key]}
+				,tss_author = {$_SESSION['id']}
+			WHERE TSS_ID = {$key}
+		";
+		mysqli_query( $mysqli, $query );
 	}
 
 	// Проверка можно ли редактировать регистрации
@@ -247,86 +259,6 @@ if( isset($_POST["F_ID"]) ) {
 		}
 		//////////////////////////////
 	}
-	else {
-		$_SESSION["error"][] = 'Не допускается редактирование смен в тот же день или если смена старше 40 дней.';
-	}
-
-	/////////////////////////
-	// Замещение работника //
-	/////////////////////////
-	if( $_POST["substitute"] ) {
-		// Проверяем, чтобы не было замещения самого себя
-		if( $USR_ID == $_POST["substitute"] ) {
-			$_SESSION["error"][] = "Работник не может замещать сам себя.";
-		}
-		else {
-			// Проверяем чтобы у замещаемого не было действительных регистраций
-			$query = "
-				SELECT IFNULL(SUM(1), 0) is_sub_reg
-				FROM TimeReg TR
-				WHERE TR.TS_ID = (SELECT TS_ID FROM Timesheet WHERE ts_date = '{$ts_date}' AND F_ID = {$F_ID} AND USR_ID = {$_POST["substitute"]})
-					AND TR.del_time IS NULL
-			";
-			$res = mysqli_query( $mysqli, $query );
-			$row = mysqli_fetch_array($res);
-			$is_sub_reg = $row["is_sub_reg"];
-
-			if( $is_sub_reg ) {
-				$_SESSION["error"][] = "У замещаемого работника есть действительные регистрации в этот день. Замещение невозможно.";
-			}
-			else {
-				// Делаем запись в табеле у замещаемого и узнаем его TS_ID
-				$query = "
-					INSERT INTO Timesheet
-					SET ts_date = '{$ts_date}'
-						,F_ID = {$F_ID}
-						,USR_ID = {$_POST["substitute"]}
-					ON DUPLICATE KEY UPDATE
-						TS_ID = LAST_INSERT_ID(TS_ID)
-				";
-				mysqli_query( $mysqli, $query );
-				$sub_TS_ID = mysqli_insert_id( $mysqli );
-
-				// Устанавливаем указатель на замещаемого работника
-				$query = "
-					UPDATE Timesheet
-					SET sub_TS_ID = {$sub_TS_ID}
-					WHERE TS_ID = {$TS_ID}
-				";
-				mysqli_query( $mysqli, $query );
-
-				// Вычисляем повышающий коэффициент по числу указателей
-				$query = "
-					SELECT IFNULL(SUM(1), 0) sub_cnt
-					FROM Timesheet
-					WHERE sub_TS_ID = {$sub_TS_ID}
-				";
-				$res = mysqli_query( $mysqli, $query );
-				$row = mysqli_fetch_array($res);
-				$sub_cnt = $row["sub_cnt"];
-
-				if( $sub_cnt > 0 ) {
-					// Обновляем коэффициент у замещающих
-					$query = "
-						UPDATE Timesheet
-						SET rate = 1 + IF({$sub_cnt} = 1, 1/2, 1/{$sub_cnt})
-						WHERE sub_TS_ID = {$sub_TS_ID}
-					";
-					mysqli_query( $mysqli, $query );
-				}
-			}
-		}
-	}
-	else {
-		$query = "
-			UPDATE Timesheet
-			SET sub_TS_ID = NULL
-				,rate = 1
-			WHERE TS_ID = {$TS_ID}
-		";
-		mysqli_query( $mysqli, $query );
-	}
-	/////////////////////////////
 
 	////////////////////////////////////
 	// Помечаем удаленные регистрации //
@@ -442,31 +374,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 						</div>
 					</div>
 				</fieldset>
-<!--
-				<div style="display: flex; margin: 1em 0;">
-					<label style="margin-right: .5em; line-height: 1.8em;">Замещает:</label>
-					<div>
-						<select name="substitute" style="width: 150px;">
-							<option value=""></option>
-								<?
-								$query = "
-									SELECT TM.USR_ID
-										,USR_Name(TM.USR_ID) name
-									FROM TariffMonth TM
-									WHERE TM.year = {$year}
-										AND TM.month = {$month}
-										AND TM.F_ID = {$F_ID}
-									ORDER BY name
-								";
-								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-								while( $row = mysqli_fetch_array($res) ) {
-									echo "<option value='{$row["USR_ID"]}'>{$row["name"]}</option>";
-								}
-								?>
-						</select>
-					</div>
-				</div>
--->
 			</div>
 
 		<span style="color: #911;">Если временной интервал между регистрациями входа и выхода составит меньше 30 минут, то начисление не произойдет при любом типе тарифа!</span>
@@ -498,7 +405,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
 
 			$('#timesheet_form select[name=status]').val('');
-			$('#timesheet_form select[name=substitute]').val('');
 			$('#timesheet_form input[name=payout]').val('');
 			$('#timesheet_form input[name=comment]').val('');
 
@@ -517,19 +423,13 @@ this.subbut.value='Подождите, пожалуйста!';">
 				html_hide = html_hide + "<input type='hidden' name='TS_ID' value='"+ts_id+"'>";
 
 				var arr_reg = TimeReg[ts_id];
-				var shift_num = $(this).attr('shift_num'),
-					tariff = $(this).attr('tariff'),
-					duration = $(this).attr('duration'),
-					pay = $(this).attr('pay'),
-					rate = $(this).attr('rate'),
-					status = $(this).attr('status'),
-					substitute = $(this).attr('substitute'),
+				var arr_shift = TimesheetShift[ts_id];
+				var status = $(this).attr('status'),
 					photo = $(this).attr('photo'),
 					payout = $(this).attr('payout'),
 					comment = $(this).attr('comment');
 
 				$('#timesheet_form select[name=status]').val(status);
-				$('#timesheet_form select[name=substitute]').val(substitute);
 				$('#timesheet_form input[name=payout]').val(payout);
 				$('#timesheet_form input[name=comment]').val(comment);
 
@@ -538,20 +438,47 @@ this.subbut.value='Подождите, пожалуйста!';">
 					html_photo = "<img src='/time_tracking/upload/"+photo+"' style='width: 100%; border-radius: 5px;'>";
 				}
 
-				if( shift_num != '' ) {
-					html_summary = html_summary + "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'><thead><tr><th></th><th>Смена</th><th colspan='3'>Тариф</th><th>Длительность</th><th>Расчет</th></tr></thead><tbody style='text-align: center; font-size: 1.3em;'><tr>";
+				if( arr_shift ) {
+					var shift_num = '',
+						tariff_type = '',
+						duration = '',
+						pay = '';
 
-					var total;
-					if( rate > 1 ) { total = pay+"<br>x"+Math.round(rate*100)/100+"<i class='fas fa-question-circle' title='Коэффициент замещения'></i><br>="+Math.round(pay*rate); }
-					else { total = pay; }
+					$.each(arr_shift, function(key, val){
+						shift_num = shift_num + val["shift_num"] + "<br>";
+						tariff_type = tariff_type
+							+ "<input type='number' name='tss_tariff[" + val["TSS_ID"] + "]' min='0' style='width: 70px;' value='" + val["tss_tariff"] + "' required>"
+							+ "<select name='tss_type[" + val["TSS_ID"] + "]' style='width: 150px;' required>"
+								+ "<option value=''></option>"
+								+ "<option value='1' " + (val["tss_type"] == 1 ? 'selected' : '') + ">Смена</option>"
+								+ "<option value='2' " + (val["tss_type"] == 2 ? 'selected' : '') + ">Час-смена (от начала смены до регистрации выхода)</option>"
+								+ "<option value='3' " + (val["tss_type"] == 3 ? 'selected' : '') + ">Час-вход (от регистрации входа до регистрации выхода)</option>"
+								+ "<option value='4' " + (val["tss_type"] == 4 ? 'selected' : '') + ">Месяц (начисление происходит только в рабочие дни)</option>"
+							+ "</select>"
+							+ (val["last_edit"] ? val["tss_author"] + "<i class='fas fa-clock fa-lg' title='" + val["last_edit"] + "'></i>" : '')
+							+ "<br>";
+						duration = duration + val["duration_hm"] + "<br>";
+						pay = pay + val["pay"] + "<br>";
+
+					});
 
 					html_summary = html_summary
-						+ "<td>"+html_photo+"</td>"
-						+ "<td>"+shift_num+"</td>"
-						+ "<td colspan='3'>"+tariff+"</td>"
-						+ "<td>"+duration+"</td>"
-						+ "<td>"+total+"</td>";
-						+ "</tr></tbody></table>";
+						+ "<table style='width: 100%; table-layout: fixed; margin-bottom: 20px; border: 5px solid #999;'>"
+							+ "<thead><tr>"
+								+ "<th></th>"
+								+ "<th>Смена</th>"
+								+ "<th colspan='3'>Тариф</th>"
+								+"<th>Длительность</th>"
+								+"<th>Расчет</th>"
+							+"</tr></thead>"
+							+"<tbody style='text-align: center; font-size: 1.3em;'><tr>"
+								+ "<td>" + html_photo + "</td>"
+								+ "<td>" + shift_num + "</td>"
+								+ "<td colspan='3' style='font-size: 14px; text-align: left;'>" + tariff_type + "</td>"
+								+ "<td>" + duration + "</td>"
+								+ "<td>" + pay + "</td>"
+							+ "</tr></tbody>"
+						+ "</table>";
 				}
 
 				if( arr_reg ) {
@@ -596,18 +523,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#timesheet_form #hide').html(html_hide);
 			$('#timesheet_form #summary').html(html_summary);
 			$('#timesheet_form #timereg').html(html);
-
-//			// Делаем форму неактивной в случае замещения работника
-//			if( $(this).attr('sub_is') > 0 ) {
-//				$('#timesheet_form input[name="tr_time1"]').attr('disabled', true);
-//				$('#timesheet_form input[name="tr_time2"]').attr('disabled', true);
-//				$('#timesheet_form select[name=substitute]').attr('disabled', true);
-//			}
-//			else {
-//				$('#timesheet_form input[name="tr_time1"]').attr('disabled', false);
-//				$('#timesheet_form input[name="tr_time2"]').attr('disabled', false);
-//				$('#timesheet_form select[name=substitute]').attr('disabled', false);
-//			}
 
 			$('#timesheet_form').dialog({
 				title: date_format + ' | ' + usr_name,

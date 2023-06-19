@@ -133,7 +133,6 @@ echo "<title>Табель версия для печати</title>";
 	<tbody>
 	<?
 		// Суммарные результаты за день
-		$dayduration = array();
 		$daypay = array();
 		$daycnt = array();
 		// Массив регистраций
@@ -210,16 +209,10 @@ echo "<title>Табель версия для печати</title>";
 			$query = "
 				SELECT TS.TS_ID
 					,DAY(TS.ts_date) Day
-					,SUM(TSS.duration) duration
 					,SUM(TSS.pay) pay
-					#,GROUP_CONCAT(CONCAT('&#1012', (TSS.shift_num+1), ';', TSS.pay) SEPARATOR '<br>') pay_format
 					,GROUP_CONCAT(TSS.pay SEPARATOR '<br>') pay_format
 					,TS.fine
-					#,TS.rate
-					#,GROUP_CONCAT(CONCAT(TSS.duration DIV 60, ':', LPAD(TSS.duration % 60, 2, '0')) SEPARATOR ', ') duration_hm
 					,TS.status
-					#,(SELECT USR_ID FROM Timesheet WHERE TS_ID = TS.sub_TS_ID) substitute
-					#,(SELECT SUM(1) FROM Timesheet WHERE sub_TS_ID = TS.TS_ID) sub_is
 					,TS.payout
 					,TS.comment
 				FROM Timesheet TS
@@ -248,7 +241,6 @@ echo "<title>Табель версия для печати</title>";
 				$day_of_week = date('N', strtotime($date));	// День недели 1..7
 				if( $i == $day ) {
 
-					//$pay = ($subrow["pay"] != null) ? round($subrow["pay"] * $subrow["rate"]) : null;
 					$pay = $subrow["pay"];
 
 					echo "
@@ -266,7 +258,6 @@ echo "<title>Табель версия для печати</title>";
 					else {
 						$sigmapay2 += $pay - $subrow["payout"] - $subrow["fine"];
 					}
-					$dayduration[$i] += $subrow["duration"];
 					$daypay[$i] += $pay - $subrow["payout"] - $subrow["fine"];
 					$daycnt[$i] += ($pay > 0 ? 1 : 0);
 
