@@ -204,10 +204,20 @@ if( isset($_POST["F_ID"]) ) {
 				SET TS_ID = {$TS_ID}
 					,shift_num = {$shift_num}
 				ON DUPLICATE KEY UPDATE
-					TSS_ID = LAST_INSERT_ID(TSS_ID)
+					shift_num = shift_num
 			";
 			mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-			$TSS_ID = mysqli_insert_id( $mysqli );
+
+			# Узнаем TSS_ID
+			$query = "
+				SELECT TSS_ID
+				FROM TimesheetShift
+				WHERE TS_ID = {$TS_ID}
+					AND shift_num = {$shift_num}
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			$row = mysqli_fetch_array($res);
+			$TSS_ID = $row["TSS_ID"];
 
 			if( isset($tr_minute1) ) {
 				// Удаляем конфликтующую регистрацию
