@@ -344,15 +344,21 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tr>
 	<?
 }
+	if( isset($_GET["CB_ID"]) && isset($_GET["PN_ID"]) ) {
+		if( $_GET["CB_ID"] && $_GET["PN_ID"] && $pallets_shipment ) {
+			// Высчитываем процент недостачи поддонов
+			$shortfall = round(($pallets_shipment - $pr_cnt + $pr_reject + $pd_cnt) / $pallets_shipment * 100);
+			$shortfall = "Недостача: ".($shortfall >= 30 ? "<n style='color: red;'>{$shortfall}%</>" : "<n>{$shortfall}%</n>");
+		}
+	}
 ?>
-		<tr class="total">
-			<td></td>
-			<td></td>
+		<tr class="total" style="font-size: 1.2em;">
+			<td colspan="2"><?=$shortfall?></td>
 			<td>Итог:</td>
-			<td><b><?=$pallets_shipment?></b></td>
-			<td><b><?=$pd_cnt?></b></td>
-			<td><b><?=$pr_cnt?></b></td>
-			<td><b><?=$pr_reject?></b></td>
+			<td><?=$pallets_shipment?></td>
+			<td><?=$pd_cnt?></td>
+			<td><?=$pr_cnt?></td>
+			<td><?=$pr_reject?></td>
 			<td></td>
 			<td><?=(isset($sum_cost) ? number_format($sum_cost, 0, '', ' ') : "")?></td>
 			<td></td>

@@ -60,7 +60,7 @@ if( isset($_POST["cnt"]) ) {
 		$date_to = max($date_to, $date_edit);
 		$date_from = date_format($date_from, 'Y-m-d');
 		$date_to = date_format($date_to, 'Y-m-d');
-		exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#R'.$PR_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'&CB_ID='.$_POST["CB_ID"].'&PN_ID='.$_POST["PN_ID"].'&PS_ID='.$_POST["PS_ID"].'#R'.$PR_ID.'">');
 	}
 	// Приобретение
 	elseif( $pref == "A" ) {
@@ -116,7 +116,7 @@ if( isset($_POST["cnt"]) ) {
 		$date_to = max($date_to, $date_edit);
 		$date_from = date_format($date_from, 'Y-m-d');
 		$date_to = date_format($date_to, 'Y-m-d');
-		exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#A'.$PA_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'&CB_ID='.$_POST["CB_ID"].'&PN_ID='.$_POST["PN_ID"].'&PS_ID='.$_POST["PS_ID"].'#A'.$PA_ID.'">');
 	}
 	// Из ремонта
 	elseif( $pref == "F" ) {
@@ -166,7 +166,7 @@ if( isset($_POST["cnt"]) ) {
 		$date_to = max($date_to, $date_edit);
 		$date_from = date_format($date_from, 'Y-m-d');
 		$date_to = date_format($date_to, 'Y-m-d');
-		exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#F'.$PD_ID.'">');
+		exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'&CB_ID='.$_POST["CB_ID"].'&PN_ID='.$_POST["PN_ID"].'&PS_ID='.$_POST["PS_ID"].'#F'.$PD_ID.'">');
 	}
 }
 
@@ -222,7 +222,7 @@ if( isset($_POST["pd_cnt"]) ) {
 	$date_to = max($date_to, $date_edit);
 	$date_from = date_format($date_from, 'Y-m-d');
 	$date_to = date_format($date_to, 'Y-m-d');
-	exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#D'.$PD_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/pallet_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'&CB_ID='.$_POST["CB_ID"].'&PN_ID='.$_POST["PN_ID"].'&PS_ID='.$_POST["PS_ID"].'#D'.$PD_ID.'">');
 }
 ?>
 
@@ -242,6 +242,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="incoming_ID">
 			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
 			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
+			<input type="hidden" name="CB_ID" value="<?=$_GET["CB_ID"]?>">
+			<input type="hidden" name="PN_ID" value="<?=$_GET["PN_ID"]?>">
+			<input type="hidden" name="PS_ID" value="<?=$_GET["PS_ID"]?>">
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
@@ -329,6 +332,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="PD_ID">
 			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
 			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
+			<input type="hidden" name="CB_ID" value="<?=$_GET["CB_ID"]?>">
+			<input type="hidden" name="PN_ID" value="<?=$_GET["PN_ID"]?>">
+			<input type="hidden" name="PS_ID" value="<?=$_GET["PS_ID"]?>">
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
