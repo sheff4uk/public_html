@@ -120,15 +120,14 @@ $pallet_balance = $row["pallet_balance"];
 <table class="main_table">
 	<thead>
 		<tr>
-			<th colspan="2"><h1>Pallets report</h1></th>
-			<th colspan="1"><b>Debt in pallets (Vesta): <span style="font-size: 2em; color: red;"><?=$pallet_balance?></span></b></th>
-			<th colspan="1"><b>Debt in rubles: <span style="font-size: 2em; color: red;">&#8381;<?=number_format(( $pallet_balance * $actual_pallet_cost ), 0, '', ' ')?></span></b></th>
+			<th><h1>Pallets report</h1></th>
+			<th><b>Debt in pallets (Vesta): <span style="font-size: 2em; color: red;"><?=$pallet_balance?></span></b></th>
+			<th><b>Debt in rubles: <span style="font-size: 2em; color: red;">&#8381;<?=number_format(( $pallet_balance * $actual_pallet_cost ), 0, '', ' ')?></span></b></th>
 		</tr>
 		<tr>
 			<th>Date</th>
 			<th>Number of pallets shipped</th>
 			<th>Number of pallets returned</th>
-			<th>Number of broken pallets</th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
@@ -138,12 +137,10 @@ $query = "
 	SELECT SUB.date_format
 		,SUM(SUB.pallets_shipment) pallets_shipment
 		,SUM(SUB.pr_cnt) pr_cnt
-		,SUM(SUB.pr_reject) pr_reject
 	FROM (
 		SELECT DATE_FORMAT(PR.pr_date, '%d/%m/%Y') date_format
 			,NULL pallets_shipment
 			,PR.pr_cnt
-			,NULL pr_reject
 			,PR.pr_date date
 		FROM pallet__Return PR
 		WHERE PR.CB_ID = 2
@@ -155,7 +152,6 @@ $query = "
 		SELECT DATE_FORMAT(LS.ls_date, '%d/%m/%Y')
 			,SUM(LS.pallets) pallets_shipment
 			,NULL
-			,NULL
 			,LS.ls_date
 		FROM list__Shipment LS
 		JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LS.CWP_ID
@@ -164,19 +160,6 @@ $query = "
 			".($_GET["date_from"] ? "AND LS.ls_date >= '{$_GET["date_from"]}'" : "")."
 			".($_GET["date_to"] ? "AND LS.ls_date <= '{$_GET["date_to"]}'" : "")."
 		GROUP BY LS.ls_date
-
-		UNION
-
-		SELECT DATE_FORMAT(PD.pd_date, '%d/%m/%Y')
-			,NULL
-			,NULL
-			,PD.pd_cnt
-			,PD.pd_date
-		FROM pallet__Disposal PD
-		WHERE PD.CB_ID = 2
-			".($_GET["date_from"] ? "AND PD.pd_date >= '{$_GET["date_from"]}'" : "")."
-			".($_GET["date_to"] ? "AND PD.pd_date <= '{$_GET["date_to"]}'" : "")."
-		GROUP BY PD.pd_date
 	) SUB
 	GROUP BY SUB.date
 	ORDER BY SUB.date
@@ -185,13 +168,11 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	$pallets_shipment += $row["pallets_shipment"];
 	$pr_cnt += $row["pr_cnt"];
-	$pr_reject += $row["pr_reject"];
 	?>
 	<tr>
 		<td><?=$row["date_format"]?></td>
 		<td><?=$row["pallets_shipment"]?></td>
 		<td><?=$row["pr_cnt"]?></td>
-		<td><n style="color: red;"><?=$row["pr_reject"]?></n></td>
 	</tr>
 	<?
 }
@@ -200,7 +181,6 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td>Total:</td>
 			<td><b><?=$pallets_shipment?></b></td>
 			<td><b><?=$pr_cnt?></b></td>
-			<td><b><?=$pr_reject?></b></td>
 		</tr>
 	</tbody>
 </table>
