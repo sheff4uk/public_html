@@ -507,6 +507,7 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 					}
 					//ID товара
 					$goodsID = $data[$i+37] + ($data[$i+38] << 8) + ($data[$i+39] << 16) + ($data[$i+40] << 24);
+..echo $goodsID;
 
 					// Если количество положительное
 					if( $quantity > 0 ) {
