@@ -151,7 +151,6 @@ while( $row = mysqli_fetch_array($res) ) {
 				?>
 			</select>
 		</div>
-
 	</form>
 </div>
 
@@ -167,6 +166,12 @@ foreach ($_GET as &$value) {
 	$(document).ready(function() {
 		$( "#filter" ).accordion({
 			active: <?=($filter ? "0" : "false")?>,
+			collapsible: true,
+			heightStyle: "content"
+		});
+
+		$( "#summary" ).accordion({
+			active: false,
 			collapsible: true,
 			heightStyle: "content"
 		});
@@ -203,6 +208,7 @@ foreach ($_GET as &$value) {
 		position: fixed;
 		background-color: white;
 		right: -120px;
+		top: 50px;
 		border: 1px solid #bbb;
 		padding: 10px;
 		border-radius: 10px;
@@ -216,12 +222,14 @@ foreach ($_GET as &$value) {
 	}
 </style>
 
-<div id="wr_stock">
-	<h2>Складской запас <a href="stock.php?F_ID=<?=$_GET["F_ID"]?>&download" title="Собрать данные из терминала"><i class="fa-solid fa-download"></i></a></h2>
+<!--<div id="wr_stock">-->
+<div id="summary">
+	<h3>Складской запас</h3>
+	<div>
 	<table style="text-align: center; font-weight: bold;">
 		<thead>
 			<tr>
-				<th rowspan="2">Комплект противовесов</th>
+				<th rowspan="2"><a href="stock.php?F_ID=<?=$_GET["F_ID"]?>&download" title="Собрать данные из терминала"><i class="fa-solid fa-download fa-2x"></i></a> Комплект противовесов</th>
 				<th colspan="7">Кол-во паллетов</th>
 			</tr>
 			<tr>
@@ -327,6 +335,7 @@ foreach ($_GET as &$value) {
 		?>
 		</tbody>
 	</table>
+	</div>
 </div>
 
 <div id="wr_shipment">
