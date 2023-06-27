@@ -197,8 +197,8 @@ echo "<title>Расход сырья {$date_format}</title>";
 				<td class="slag30"><?=number_format($row["slag30"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td class="sand"><?=number_format($row["sand"] ? round($row["sand"] + (0.05 * $row["krv"]) * $row["details"], 2) : 0, 0, ',', ' ')?></td>
 				<td class="sand"><?=number_format($row["sand"] ? ($row["sand"] * 1000/$row["details"] + (50 * $row["krv"])) : 0, 0, ',', ' ')?></td>
-				<td class="crushed_stone"><?=number_format(round($row["crushed_stone"] + (0.1 * $row["krv"]) * $row["details"], 1), 0, ',', ' ')?></td>
-				<td class="crushed_stone"><?=number_format(($row["crushed_stone"] * 1000/$row["details"] + (100 * $row["krv"])) * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td class="crushed_stone"><?=number_format($row["crushed_stone"] ? round($row["crushed_stone"] + (0.1 * $row["krv"]) * $row["details"], 1) : 0, 0, ',', ' ')?></td>
+				<td class="crushed_stone"><?=number_format($row["crushed_stone"] ? ($row["crushed_stone"] * 1000/$row["details"] + (100 * $row["krv"])) : 0, 0, ',', ' ')?></td>
 				<td class="cement"><?=number_format($row["cement"] ? round($row["cement"] + (0.1 * $row["krv"]) * $row["details"], 1) : 0, 0, ',', ' ')?></td>
 				<td class="cement"><?=number_format($row["cement"] ? ($row["cement"] * 1000/$row["details"] + (100 * $row["krv"])) : 0, 0, ',', ' ')?></td>
 				<td class="plasticizer"><?=number_format($row["plasticizer"], 0, ',', ' ')?></td>
