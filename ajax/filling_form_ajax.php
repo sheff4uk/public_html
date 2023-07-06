@@ -187,7 +187,7 @@ if( $row["editable"] ) {
 					<th rowspan='3' width='30'><i class='fas fa-cube' title='Испытание куба'></i></th>
 				</tr>
 				<tr>
-					".($row["sf_cnt"] ? "<th><input type='number' min='3' max='6' step='0.01' value='".($sf_density/1000)."' name='sf_density' style='width: 100%; background-color: #7952eb88;' ></th>" : "")."
+					".($row["sf_cnt"] ? "<th><input type='number' min='2.5' max='6' step='0.01' value='".($sf_density/1000)."' name='sf_density' style='width: 100%; background-color: #7952eb88;' ></th>" : "")."
 					".($row["lf_cnt"] ? "<th><input type='number' min='3' max='6' step='0.01' value='".($lf_density/1000)."' name='lf_density' style='width: 100%; background-color: #51d5d788;' ></th>" : "")."
 					".($row["io_cnt"] ? "<th><input type='number' min='2' max='3' step='0.01' value='".($io_density/1000)."' name='io_density' style='width: 100%; background-color: #a52a2a80;' ></th>" : "")."
 					".($row["sl10_cnt"] ? "<th><input type='number' min='1' max='3' step='0.01' value='".($sl10_density/1000)."' name='sl10_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
