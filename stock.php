@@ -230,9 +230,10 @@ foreach ($_GET as &$value) {
 		<thead>
 			<tr>
 				<th rowspan="2"><a href="stock.php?F_ID=<?=$_GET["F_ID"]?>&download" title="Собрать данные из терминала"><i class="fa-solid fa-download fa-2x"></i></a> Комплект противовесов</th>
-				<th colspan="7">Кол-во паллетов</th>
+				<th colspan="8">Кол-во паллетов</th>
 			</tr>
 			<tr>
+				<th>5д</th>
 				<th>4д</th>
 				<th>3д</th>
 				<th>2д</th>
@@ -247,6 +248,7 @@ foreach ($_GET as &$value) {
 			$query = "
 				SELECT CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
 					,CWP.in_pallet
+					,SUM(SUB.day5) day5
 					,SUM(SUB.day4) day4
 					,SUM(SUB.day3) day3
 					,SUM(SUB.day2) day2
@@ -259,11 +261,12 @@ foreach ($_GET as &$value) {
 				JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 				JOIN (
 					SELECT LPP.CWP_ID
-						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 18 HOUR AND NOW() - INTERVAL 0 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day4
-						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 42 HOUR AND NOW() - INTERVAL 18 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day3
-						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 66 HOUR AND NOW() - INTERVAL 42 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day2
-						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 90 HOUR AND NOW() - INTERVAL 66 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day1
-						,SUM(IF(LPP.packed_time <= NOW() - INTERVAL 90 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) ready
+						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 18 HOUR AND NOW() - INTERVAL 0 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day5
+						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 42 HOUR AND NOW() - INTERVAL 18 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day4
+						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 66 HOUR AND NOW() - INTERVAL 42 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day3
+						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 90 HOUR AND NOW() - INTERVAL 66 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day2
+						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 114 HOUR AND NOW() - INTERVAL 90 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day1
+						,SUM(IF(LPP.packed_time <= NOW() - INTERVAL 114 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) ready
 						,SUM(IF(LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) total
 						#,CWP.in_pallet
 						,0 in_cass
@@ -323,6 +326,7 @@ foreach ($_GET as &$value) {
 			while( $row = mysqli_fetch_array($res) ) {
 				echo "<tr>";
 				echo "<td><span class='nowrap'>{$row["item"]}</span></td>";
+				echo "<td style='color: rgb(50,0,0);'>{$row["day5"]}</td>";
 				echo "<td style='color: rgb(100,0,0);'>{$row["day4"]}</td>";
 				echo "<td style='color: rgb(150,0,0);'>{$row["day3"]}</td>";
 				echo "<td style='color: rgb(200,0,0);'>{$row["day2"]}</td>";
@@ -450,7 +454,7 @@ $query = "
 		,LPP.CWP_ID
 		,CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
 		,LPP.shipment_time
-		,IF(IFNULL(LPP.shipment_time, NOW()) - INTERVAL 90 HOUR < LPP.packed_time, 0, 1) ready
+		,IF(IFNULL(LPP.shipment_time, NOW()) - INTERVAL 114 HOUR < LPP.packed_time, 0, 1) ready
 	FROM list__PackingPallet LPP
 	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
 	JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
