@@ -386,8 +386,25 @@ while( $row = mysqli_fetch_array($res) ) {
 	}
 
 	$cassette = "<b class='cassette' style='".($row["dbl"] > 1 ? "color: red;" : "")."'>{$row["cassette"]}</b>";
+
+	// Итоговая строка в конце дня
+	if( $o_date and $o_date != $row["o_date"] ) {
+		echo "
+			<tr style='background: #333 !important; color: #fff;'>\n
+				<td colspan='6'></td>\n
+				<td style='line-height: 5px;'><b>{$in_cassette} / {$cnt_weight}</b></td>\n
+				<td colspan='4'></td>\n
+			</tr>\n
+		";
+		$in_cassette = 0;
+		$cnt_weight = 0;
+	}
+	$in_cassette += $row["in_cassette"];
+	$cnt_weight += $row["cnt_weight"];
+	$in_cassette_total += $row["in_cassette"];
+	$cnt_weight_total += $row["cnt_weight"];
 	?>
-	<tr id="<?=$row["LO_ID"]?>" style="<?=(($o_date and $o_date != $row["o_date"]) ? "border-top: 10px solid #333;" : "")?>">
+	<tr id="<?=$row["LO_ID"]?>" style="<?=(($o_date and $o_date != $row["o_date"] and 0) ? "border-top: 10px solid #333;" : "")?>">
 		<td><?=$row["o_date"]?></td>
 		<td><?=$row["o_time"]?></td>
 		<td><?=$cassette?></td>
@@ -415,6 +432,28 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tr>
 	<?
 	$o_date = $row["o_date"];
+}
+
+// Вставляем итоговую строку последнего дня
+if( $in_cassette ) {
+	echo "
+		<tr style='background: #333 !important; color: #fff;'>\n
+			<td colspan='6'></td>\n
+			<td style='line-height: 5px;'><b>{$in_cassette} / {$cnt_weight}</b></td>\n
+			<td colspan='4'></td>\n
+		</tr>\n
+	";
+}
+
+// Вставляем итоговую строку конце таблицы
+if( $in_cassette_total ) {
+	echo "
+		<tr class='total'>\n
+			<td colspan='6'></td>\n
+			<td><b>{$in_cassette_total} / {$cnt_weight_total}</b></td>\n
+			<td colspan='4'></td>\n
+		</tr>\n
+	";
 }
 
 // Выводим собранные ошибки вверку экрана
