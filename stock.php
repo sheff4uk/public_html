@@ -455,7 +455,8 @@ $query = "
 		,LPP.CWP_ID
 		,CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
 		,LPP.shipment_time
-		,IF(IFNULL(LPP.shipment_time, NOW()) - INTERVAL 114 HOUR < LPP.packed_time, 0, 1) ready
+		#,IF(IFNULL(LPP.shipment_time, NOW()) - INTERVAL 114 HOUR < LPP.packed_time, 0, 1) ready
+		,1 ready
 	FROM list__PackingPallet LPP
 	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
 	JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
