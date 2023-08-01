@@ -39,7 +39,7 @@ $query = "
 	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
 	JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 	WHERE LPP.shipment_time IS NULL AND LPP.removal_time IS NULL
-		AND LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = 1)
+		AND LPP.F_ID = 1
 	GROUP BY LPP.CWP_ID
 	ORDER BY LPP.CWP_ID ASC
 ";

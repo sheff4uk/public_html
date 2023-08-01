@@ -382,6 +382,7 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 								SET packed_time = '{$transactionDate}'
 									,nextID = {$nextID}
 									,WT_ID = {$deviceID}
+									,F_ID = (SELECT F_ID FROM WeighingTerminal WHERE WT_ID = {$deviceID})
 									,CWP_ID = {$goodsID}
 							";
 							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

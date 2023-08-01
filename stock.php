@@ -101,7 +101,7 @@ $query = "
 	FROM list__PackingPallet LPP
 	WHERE LPP.shipment_time IS NULL
 		AND LPP.removal_time IS NULL
-		AND LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
+		AND LPP.F_ID = {$_GET["F_ID"]}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
@@ -113,7 +113,7 @@ $query = "
 	FROM list__PackingPallet LPP
 	WHERE DATE(LPP.packed_time) >= '{$date_from}'
 		AND LPP.shipment_time IS NOT NULL
-		AND LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
+		AND LPP.F_ID = {$_GET["F_ID"]}
 	GROUP BY LPP.shipment_time
 	ORDER BY LPP.shipment_time DESC
 ";
@@ -272,7 +272,7 @@ foreach ($_GET as &$value) {
 						,0 in_cass
 						,0 in_cassette
 					FROM list__PackingPallet LPP
-					WHERE LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
+					WHERE LPP.F_ID = {$_GET["F_ID"]}
 						AND DATE(LPP.packed_time) >= '{$date_from}'
 					GROUP BY LPP.CWP_ID
 
@@ -303,26 +303,6 @@ foreach ($_GET as &$value) {
 				ORDER BY SUB.CWP_ID ASC
 			";
 
-//			$query = "
-//				SELECT CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
-//					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 18 HOUR AND NOW() - INTERVAL 0 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day4
-//					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 42 HOUR AND NOW() - INTERVAL 18 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day3
-//					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 66 HOUR AND NOW() - INTERVAL 42 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day2
-//					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 90 HOUR AND NOW() - INTERVAL 66 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day1
-//					,SUM(IF(LPP.packed_time <= NOW() - INTERVAL 90 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) ready
-//					,SUM(IF(LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) total
-//					,CWP.in_pallet
-//				FROM list__PackingPallet LPP
-//				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
-//				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
-//				WHERE LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
-//					AND DATE(LPP.packed_time) >= '{$date_from}'
-//					#AND LPP.shipment_time IS NULL
-//					#AND LPP.removal_time IS NULL
-//					#AND CW.CB_ID = 2
-//				GROUP BY LPP.CWP_ID
-//				ORDER BY LPP.CWP_ID ASC
-//			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
 				echo "<tr>";
@@ -357,7 +337,7 @@ foreach ($_GET as &$value) {
 				SELECT DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
 					,LPP.shipment_time
 				FROM list__PackingPallet LPP
-				WHERE LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
+				WHERE LPP.F_ID = {$_GET["F_ID"]}
 				GROUP BY LPP.shipment_time
 				ORDER BY LPP.shipment_time DESC
 				LIMIT 20
@@ -426,7 +406,7 @@ foreach ($_GET as &$value) {
 				FROM list__PackingPallet LPP
 				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
 				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
-				WHERE LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
+				WHERE LPP.F_ID = {$_GET["F_ID"]}
 					AND DATE(LPP.packed_time) >= '{$date_from}'
 					#AND LPP.shipment_time IS NULL
 					#AND LPP.removal_time IS NULL
@@ -461,8 +441,7 @@ $query = "
 	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
 	JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 	WHERE DATE(LPP.packed_time) >= '{$date_from}'
-		AND LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$_GET["F_ID"]})
-		#AND CW.CB_ID = 2
+		AND LPP.F_ID = {$_GET["F_ID"]}
 	ORDER BY LPP.packed_time DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

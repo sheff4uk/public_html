@@ -292,7 +292,7 @@ if( isset($_POST["lpp_id"]) ) {
 			JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 			WHERE LPP.scan_time IS NOT NULL
 				AND LPP.shipment_time IS NULL
-				AND LPP.WT_ID IN (SELECT WT_ID FROM WeighingTerminal WHERE F_ID = {$F_ID} AND type = 3)
+				AND LPP.F_ID = {$F_ID}
 			ORDER BY LPP.scan_time
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
