@@ -97,7 +97,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 					$ReceiptNumber = $data[$i+76] + ($data[$i+77] << 8) + ($data[$i+78] << 16) + ($data[$i+79] << 24);
 
 					// Игнорируем недопустимый вес
-					if( abs($netWeight) >= 7000 and abs($netWeight) <= 14000 ) {
+					if( abs($netWeight) >= 4000 and abs($netWeight) <= 14000 ) {
 						// Отмена регистрации
 						if( $netWeight < 0 ) {
 							$query = "
