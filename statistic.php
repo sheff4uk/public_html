@@ -114,6 +114,7 @@ foreach ($_GET as &$value) {
 			<th>Скол</th>
 			<th>Дефект формы</th>
 			<th>Дефект сборки</th>
+			<th>Брак</th>
 			<th>Всего брака</th>
 			<th>Деталей произведено</th>
 			<th>% брака</th>
@@ -133,6 +134,7 @@ $query = "
 		,SUM(IFNULL(LOD.chipped,0)) chipped
 		,SUM(IFNULL(LOD.def_form,0)) def_form
 		,SUM(IFNULL(LOD.def_assembly,0)) def_assembly
+		,SUM(IFNULL(LOD.reject,0)) reject
 		,SUM(1) cnt
 		,SUM(IF(o_interval(LO.LO_ID) < 24, (PB.in_cassette - LF.underfilling), NULL)) o_interval
 		#,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -164,6 +166,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,IFNULL(SUM(LOD.chipped), '-') chipped
 			,IFNULL(SUM(LOD.def_form), '-') def_form
 			,IFNULL(SUM(LOD.def_assembly), '-') def_assembly
+			,IFNULL(SUM(LOD.reject), '-') reject
 			,SUM(1) cnt
 			,SUM(IF(o_interval(LO.LO_ID) < 24, (PB.in_cassette - LF.underfilling), NULL)) o_interval
 			#,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -203,6 +206,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		echo "<td>{$subrow["chipped"]}</td>";
 		echo "<td>{$subrow["def_form"]}</td>";
 		echo "<td>{$subrow["def_assembly"]}</td>";
+		echo "<td>{$subrow["reject"]}</td>";
 
 		$total = $subrow["not_spill"] + $subrow["crack"] + $subrow["crack_drying"] + $subrow["chipped"] + $subrow["def_form"] + $subrow["def_assembly"];
 		$percent_total = round($total / $subrow["fact"] * 100, 2);
@@ -222,7 +226,8 @@ while( $row = mysqli_fetch_array($res) ) {
 	echo "<td>{$row["chipped"]}</td>";
 	echo "<td>{$row["def_form"]}</td>";
 	echo "<td>{$row["def_assembly"]}</td>";
-	$total = $row["not_spill"] + $row["crack"] + $row["crack_drying"] + $row["chipped"] + $row["def_form"] + $row["def_assembly"];
+	echo "<td>{$row["reject"]}</td>";
+	$total = $row["not_spill"] + $row["crack"] + $row["crack_drying"] + $row["chipped"] + $row["def_form"] + $row["def_assembly"] + $row["reject"];
 	$percent_total = round($total / $row["fact"] * 100, 2);
 	echo "<td>{$total}</td>";
 	echo "<td>{$row["fact"]}</td>";
@@ -242,6 +247,7 @@ if( $filter ) {
 			,SUM(IFNULL(LOD.chipped,0)) chipped
 			,SUM(IFNULL(LOD.def_form,0)) def_form
 			,SUM(IFNULL(LOD.def_assembly,0)) def_assembly
+			,SUM(IFNULL(LOD.reject,0)) reject
 			,SUM(1) cnt
 			,SUM(IF(o_interval(LO.LO_ID) < 24, (PB.in_cassette - LF.underfilling), NULL)) o_interval
 			#,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -271,6 +277,7 @@ if( $filter ) {
 				,IFNULL(SUM(LOD.chipped), 0) chipped
 				,IFNULL(SUM(LOD.def_form), 0) def_form
 				,IFNULL(SUM(LOD.def_assembly), 0) def_assembly
+				,IFNULL(SUM(LOD.reject), 0) reject
 				,SUM(1) cnt
 				,SUM(IF(o_interval(LO.LO_ID) < 24, (PB.in_cassette - LF.underfilling), NULL)) o_interval
 				#,SUM(IF(NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3), 1, NULL)) not_spec
@@ -312,8 +319,9 @@ if( $filter ) {
 			echo "<td>{$subrow["chipped"]}</td>";
 			echo "<td>{$subrow["def_form"]}</td>";
 			echo "<td>{$subrow["def_assembly"]}</td>";
+			echo "<td>{$subrow["reject"]}</td>";
 
-			$total = $subrow["not_spill"] + $subrow["crack"] + $subrow["crack_drying"] + $subrow["chipped"] + $subrow["def_form"] + $subrow["def_assembly"];
+			$total = $subrow["not_spill"] + $subrow["crack"] + $subrow["crack_drying"] + $subrow["chipped"] + $subrow["def_form"] + $subrow["def_assembly"] + $subrow["reject"];
 			$percent_total = round($total / $subrow["fact"] * 100, 2);
 			echo "<td>{$total}</td>";
 			echo "<td>{$subrow["fact"]}</td>";
@@ -331,7 +339,8 @@ if( $filter ) {
 		echo "<td>{$row["chipped"]}</td>";
 		echo "<td>{$row["def_form"]}</td>";
 		echo "<td>{$row["def_assembly"]}</td>";
-		$total = $row["not_spill"] + $row["crack"] + $row["crack_drying"] + $row["chipped"] + $row["def_form"] + $row["def_assembly"];
+		echo "<td>{$row["reject"]}</td>";
+		$total = $row["not_spill"] + $row["crack"] + $row["crack_drying"] + $row["chipped"] + $row["def_form"] + $row["def_assembly"] + $row["reject"];
 		$percent_total = round($total / $row["fact"] * 100, 2);
 		echo "<td>{$total}</td>";
 		echo "<td>{$row["fact"]}</td>";

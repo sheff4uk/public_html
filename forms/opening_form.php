@@ -10,6 +10,7 @@ if( isset($_POST["LO_ID"]) ) {
 	$chipped = $_POST["chipped"] ? $_POST["chipped"] : "NULL";
 	$def_form = $_POST["def_form"] ? $_POST["def_form"] : "NULL";
 	$def_assembly = $_POST["def_assembly"] ? $_POST["def_assembly"] : "NULL";
+	$reject = $_POST["reject"] ? $_POST["reject"] : "NULL";
 
 	if( $_POST["LO_ID"] ) { // Редактируем
 		$query = "
@@ -20,6 +21,7 @@ if( isset($_POST["LO_ID"]) ) {
 				,chipped = {$chipped}
 				,def_form = {$def_form}
 				,def_assembly = {$def_assembly}
+				,reject = {$relect}
 			WHERE LO_ID = {$_POST["LO_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -80,6 +82,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Скол</th>
 						<th>Дефект формы</th>
 						<th>Дефект сборки</th>
+						<th>Брак</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -92,6 +95,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td><input type="number" name="chipped" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="def_form" min="0" style="width: 70px;"></td>
 						<td><input type="number" name="def_assembly" min="0" style="width: 70px;"></td>
+						<td><input type="number" name="reject" min="0" style="width: 70px;"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -150,6 +154,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#opening_form input[name="chipped"]').val(opening_data['chipped']);
 				$('#opening_form input[name="def_form"]').val(opening_data['def_form']);
 				$('#opening_form input[name="def_assembly"]').val(opening_data['def_assembly']);
+				$('#opening_form input[name="reject"]').val(opening_data['reject']);
 			}
 
 			$('#opening_form').dialog({

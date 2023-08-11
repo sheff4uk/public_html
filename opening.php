@@ -334,6 +334,7 @@ $query = "
 		,LOD.chipped
 		,LOD.def_form
 		,LOD.def_assembly
+		,LOD.reject
 		,(PB.in_cassette - LF.underfilling) in_cassette
 		,COUNT(LW.nextID) cnt_weight
 			#,MIN(LW.weight) min_weight
@@ -367,13 +368,14 @@ $query = "
 			".($_GET["not_spec"] ? "OR (NOT WeightSpec(PB.CW_ID, LO.weight1) OR NOT WeightSpec(PB.CW_ID, LO.weight2) OR NOT WeightSpec(PB.CW_ID, LO.weight3))" : "")."
 		)
 		AND (
-			".(($_GET["not_spill"] or $_GET["crack"] or $_GET["crack_drying"] or $_GET["chipped"] or $_GET["def_form"] or $_GET["def_assembly"]) ? "0" : "1")."
+			".(($_GET["not_spill"] or $_GET["crack"] or $_GET["crack_drying"] or $_GET["chipped"] or $_GET["def_form"] or $_GET["def_assembly"] or $_GET["reject"]) ? "0" : "1")."
 			".($_GET["not_spill"] ? "OR LO.not_spill" : "")."
 			".($_GET["crack"] ? "OR LO.crack" : "")."
 			".($_GET["crack_drying"] ? "OR LO.crack_drying" : "")."
 			".($_GET["chipped"] ? "OR LO.chipped" : "")."
 			".($_GET["def_form"] ? "OR LO.def_form" : "")."
 			".($_GET["def_assembly"] ? "OR LO.def_assembly" : "")."
+			".($_GET["reject"] ? "OR LO.reject" : "")."
 		)
 		".($CASs ? "AND LO.cassette IN({$CASs})" : "")."
 	GROUP BY LO.LO_ID
@@ -417,6 +419,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<?=($row["chipped"] ? "<font color='red'>{$row["chipped"]}</font> скол<br>" : "")?>
 			<?=($row["def_form"] ? "<font color='red'>{$row["def_form"]}</font> дефект формы<br>" : "")?>
 			<?=($row["def_assembly"] ? "<font color='red'>{$row["def_assembly"]}</font> дефект сборки<br>" : "")?>
+			<?=($row["reject"] ? "<font color='red'>{$row["reject"]}</font> брак<br>" : "")?>
 		</td>
 		<td <?=(abs($row["in_cassette"] - $row["cnt_weight"]) > $row["in_cassette"] / 2 ? "style='color: red;'" : "")?>><?=$row["in_cassette"]?> / <?=$row["cnt_weight"]?></td>
 <!--		<td><?=($row["min_weight"] ? $row["min_weight"]/1000 : "")?><?=($row["min_diff"] ? "<font class='diff_alert'>".($row["min_diff"] > 0 ? " +" : " ").($row["min_diff"]/1000)."</font>" : "")?></td>-->
