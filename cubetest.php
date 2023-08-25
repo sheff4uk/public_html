@@ -259,8 +259,9 @@ foreach ($_GET as &$value) {
 			<th>Дата испытания</th>
 			<th>Время испытания</th>
 			<th>Масса испытуемого куба, кг</th>
-			<th>Давление, МПа</th>
 			<th>Выдержка в часах</th>
+			<th>Давление, МПа</th>
+			<th>Заключение</th>
 			<th>Автор</th>
 			<th></th>
 		</tr>
@@ -314,8 +315,9 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["test_date"]?></td>
 		<td><?=$row["test_time"]?></td>
 		<td><?=$row["cube_weight"]/1000?></td>
-		<td class="<?=($row["press_error"] ? "error" : "")?>"><?=$row["pressure"]?></td>
 		<td class="<?=($row["delay_fact"] != $row["delay"] ? "error" : "")?>"><?=$row["delay_fact"]?></td>
+		<td><?=$row["pressure"]?></td>
+		<td><?=($row["press_error"] ? "Не соответствует" : "Соответствует")?></td>
 		<td><?=$row["USR_Icon"]?><?=($row["last_edit"] ? "<i class='fas fa-clock' title='Сохранено ".$row["last_edit"]."'.></i>" : "")?></td>
 		<td><a href="#" class="add_cubetest" LCT_ID="<?=$row["LCT_ID"]?>" title="Изменить данные испытания куба"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>

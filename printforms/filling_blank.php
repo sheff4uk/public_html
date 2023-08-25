@@ -192,16 +192,16 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 <?
 // Данные рецепта
 $query = "
-	SELECT IFNULL(CONCAT(MF.s_fraction, ' кг'), 0) s_fraction
-		,IFNULL(CONCAT(MF.l_fraction, ' кг'), 0) l_fraction
-		,IFNULL(CONCAT(MF.iron_oxide, ' кг'), 0) iron_oxide
-		,IFNULL(CONCAT(MF.slag10, ' кг'), 0) slag10
-		,IFNULL(CONCAT(MF.slag20, ' кг'), 0) slag20
-		,IFNULL(CONCAT(MF.slag020, ' кг'), 0) slag020
-		,IFNULL(CONCAT(MF.slag30, ' кг'), 0) slag30
-		,IFNULL(CONCAT(MF.sand, ' кг'), 0) sand
-		,IFNULL(CONCAT(MF.crushed_stone, ' кг'), 0) crushed_stone
-		,IFNULL(CONCAT(MF.cement, ' кг'), 0) cement
+	SELECT IFNULL(CONCAT(MF.s_fraction, '±5 кг'), 0) s_fraction
+		,IFNULL(CONCAT(MF.l_fraction, '±5 кг'), 0) l_fraction
+		,IFNULL(CONCAT(MF.iron_oxide, '±5 кг'), 0) iron_oxide
+		,IFNULL(CONCAT(MF.slag10, '±5 кг'), 0) slag10
+		,IFNULL(CONCAT(MF.slag20, '±5 кг'), 0) slag20
+		,IFNULL(CONCAT(MF.slag020, '±5 кг'), 0) slag020
+		,IFNULL(CONCAT(MF.slag30, '±5 кг'), 0) slag30
+		,IFNULL(CONCAT(MF.sand, '±5 кг'), 0) sand
+		,IFNULL(CONCAT(MF.crushed_stone, '±5 кг'), 0) crushed_stone
+		,IFNULL(CONCAT(MF.cement, '±2 кг'), 0) cement
 		,IFNULL(CONCAT(MF.plasticizer, ' кг'), 0) plasticizer
 		,IFNULL(CONCAT('min ', MF.water, ' л'), 0) water
 		,COUNT(MF.s_fraction) sf_cnt
