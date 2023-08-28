@@ -43,6 +43,9 @@ $i = 0;
 while( $row = mysqli_fetch_array($res) ) {
 	$i++; //Порядковый номер
 	switch ($row["goodsID"]) {
+		case 0:
+			$defect = "брак";
+			break;
 		case 2:
 			$defect = "непролив";
 			break;
