@@ -76,8 +76,8 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 			$curlen = $data[11] + ($data[12] << 8);
 
 			for( $i=13; $i < $curlen; $i=$i+104) {
-				// Этикетирование
-				if( $data[$i+10] == 1 ) {
+				// Регистрации
+				if( ($data[$i+10] >= 1) && ($data[$i+10] <= 6) ) {
 					//Идентификатор
 					$nextID = $data[$i] + ($data[$i+1] << 8) + ($data[$i+2] << 16) + ($data[$i+3] << 24);
 					//Номер терминала
@@ -355,8 +355,8 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 			$curlen = $data[11] + ($data[12] << 8);
 
 			for( $i=13; $i < $curlen; $i=$i+104) {
-				// Этикетирование паллета
-				if( $data[$i+10] == 1 ) {
+				// Регистрации
+				if( ($data[$i+10] >= 1) && ($data[$i+10] <= 6) ) {
 					//Идентификатор
 					$nextID = $data[$i] + ($data[$i+1] << 8) + ($data[$i+2] << 16) + ($data[$i+3] << 24);
 					//Номер терминала
@@ -492,8 +492,8 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 			$curlen = $data[11] + ($data[12] << 8);
 
 			for( $i=13; $i < $curlen; $i=$i+104) {
-				// Регистрация кассеты на карусели (прием товара)
-				if( $data[$i+10] == 2 ) {
+				// Регистрации
+				if( ($data[$i+10] >= 1) && ($data[$i+10] <= 6) ) {
 					//Идентификатор
 					$nextID = $data[$i] + ($data[$i+1] << 8) + ($data[$i+2] << 16) + ($data[$i+3] << 24);
 					//Номер терминала
