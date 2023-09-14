@@ -53,7 +53,7 @@ $query = "
 	JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 	JOIN list__Assembling LA ON LA.LA_ID = LF.LA_ID
 	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
-	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID AND PB.F_ID = 1
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
 	WHERE DATE(LO.opening_time - INTERVAL 7 HOUR) = CURDATE() - INTERVAL 1 DAY
@@ -129,7 +129,7 @@ $query = "
 	FROM list__Opening LO
 	JOIN list__Filling LF ON LF.LF_ID = LO.LF_ID
 	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
-	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID AND PB.F_ID = 1
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
 	WHERE DATE(LO.opening_time - INTERVAL 7 HOUR) = CURDATE() - INTERVAL 1 DAY
