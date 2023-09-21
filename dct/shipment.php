@@ -174,8 +174,8 @@ if( isset($_POST["lpp_id"]) ) {
 					,DATE_FORMAT(LPP.scan_time, '%d.%m.%Y %H:%i:%s') scan_time_format
 					,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i:%s') shipment_time_format
 					,IFNULL(LPP.PN_ID, 0) PN_ID
-					#,(114 - TIMESTAMPDIFF(HOUR, LPP.packed_time, NOW())) duration
-					,0 duration
+					,(114 - TIMESTAMPDIFF(HOUR, LPP.packed_time, NOW())) duration
+					#,0 duration
 				FROM list__PackingPallet LPP
 				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
 				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
