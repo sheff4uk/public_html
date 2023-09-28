@@ -19,36 +19,23 @@ if( !$F_ID ) die("Access denied");
 
 $shipment_group = $row["shipment_group"];
 
-//ID поддона введен вручную
+//ID паллета введен вручную
 if( isset($_POST["barcode"]) ) {
 	$WT_ID = substr($_POST["barcode"], 0, 8);
 	$nextID = substr($_POST["barcode"], -8, 8);
 	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php?WT_ID='.$WT_ID.'&nextID='.$nextID.'">');
 }
 
-//Изменение статуса поддона из формы
+//Изменение статуса паллета из формы
 if( isset($_POST["WT_ID"]) ) {
 	$query = "
 		UPDATE list__PackingPallet
-		SET PN_ID = IF({$_POST["PN_ID"]} = 0, NULL, {$_POST["PN_ID"]})
-			,scan_time = IF({$_POST["PN_ID"]} = 0, NULL, NOW())
+		SET scan_time = IF('{$_POST["subbut"]}' = 'В список', NOW(), NULL)
 		WHERE WT_ID = {$_POST["WT_ID"]} AND nextID = {$_POST["nextID"]}
 	";
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php?WT_ID='.$_POST["WT_ID"].'&nextID='.$_POST["nextID"].'">');
 }
-
-//Изменение статуса поддона сканированием
-//if( isset($_GET["scan"]) ) {
-//	$query = "
-//		UPDATE list__PackingPallet
-//		SET PN_ID = 1
-//			,scan_time = NOW()
-//		WHERE WT_ID = {$_GET["WT_ID"]} AND nextID = {$_GET["nextID"]}
-//	";
-//	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php?WT_ID='.$_GET["WT_ID"].'&nextID='.$_GET["nextID"].'">');
-//}
 
 //Отгрузка машины
 if( isset($_POST["lpp_id"]) ) {
@@ -147,25 +134,25 @@ if( isset($_POST["lpp_id"]) ) {
 		</script>
 	</head>
 	<body>
-		<h3>Отсканируйте поддон</h3>
+		<h3>Отсканируйте паллет</h3>
 			<?
-			if( isset($_GET["WT_ID"]) ) {
+			if( $_GET["WT_ID"] ) {
 				$WT_ID = str_pad($_GET["WT_ID"], 8, "0", STR_PAD_LEFT);
 				$nextID = str_pad($_GET["nextID"], 8, "0", STR_PAD_LEFT);
 			}
 			?>
 
-			<form method="post">
-				<fieldset>
-					<legend><b>ID поддона:</b></legend>
+			<fieldset>
+				<legend><b>ID паллета:</b></legend>
+				<form method="post">
 					<input type="text" name="barcode" style="width: 210px; font-size: 1.4em;" value="<?=$WT_ID?><?=$nextID?>">
 					<input type="submit" style="font-size: 1.4em; background-color: yellow;" value="OK">
-				</fieldset>
-			</form>
+				</form>
+			</fieldset>
 			<br>
 
 		<?
-		if( isset($_GET["WT_ID"]) ) {
+		if( $_GET["WT_ID"] ) {
 			// Если было сканирование
 			$query = "
 				SELECT LPP.LPP_ID
@@ -173,102 +160,71 @@ if( isset($_POST["lpp_id"]) ) {
 					,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i:%s') packed_time_format
 					,DATE_FORMAT(LPP.scan_time, '%d.%m.%Y %H:%i:%s') scan_time_format
 					,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i:%s') shipment_time_format
-					,IFNULL(LPP.PN_ID, 0) PN_ID
 					,(114 - TIMESTAMPDIFF(HOUR, LPP.packed_time, NOW())) duration
 					#,0 duration
 				FROM list__PackingPallet LPP
 				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
 				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
-				WHERE LPP.WT_ID = {$_GET["WT_ID"]} AND LPP.nextID = {$_GET["nextID"]}
+				WHERE LPP.WT_ID = {$_GET["WT_ID"]}
+					AND LPP.nextID = {$_GET["nextID"]}
+					AND LPP.F_ID = {$F_ID}
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			$row = mysqli_fetch_array($res);
 
 			$LPP_ID = $row["LPP_ID"];
 
-			//echo "<h1 style='text-align: center;'>{$WT_ID}{$nextID}</h1>";
-
-			if( $row["packed_time_format"] == "" ) die("<h1 style='color: red;'>Поддон с таким номером не найден!</h1>");
-
-			//Форма изменения статуса поддона
-			?>
-			<fieldset style="display: none;">
-				<legend><b>Статус поддона:</b></legend>
-				<form method="post" style="font-size: 2em;">
-					<input type="hidden" name="WT_ID" value="<?=$_GET["WT_ID"]?>">
-					<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
-					<select name="PN_ID" onchange="this.form.submit()" style="font-size: 1em;">
-						<option value="0">На складе</option>
-						<option value="1">Отгружен</option>
-						<?
-//						$query = "
-//							SELECT PN.PN_ID
-//								,PN.pallet_name
-//							FROM pallet__Name PN
-//							ORDER BY PN.PN_ID
-//						";
-//						$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//						while( $subrow = mysqli_fetch_array($subres) ) {
-//							echo "<option value='{$subrow["PN_ID"]}'>Отгружен ({$subrow["pallet_name"]})</option>";
-//						}
-						?>
-					</select>
-				</form>
-			</fieldset>
-			<script>
-				$(function() {
-					$('select[name="PN_ID"]').val(<?=$row["PN_ID"]?>);
-				});
-			</script>
-			<?
-
-			echo "
-				<span style='display: inline-block; width: 120px;'>Код:</span><b style='font-size: 2em;'>{$row["item"]}</b><br>
-				<span style='display: inline-block; width: 120px;'>Контроль:</span><b>{$row["packed_time_format"]}</b><br>
-				".($row["scan_time_format"] ? "<span style='display: inline-block; width: 120px;'>Сканирование:</span><span style='color: green;'><b>{$row["scan_time_format"]}</b></span><br>" : "")."
-				".($row["shipment_time_format"] ? "<span style='display: inline-block; width: 120px;'>Отгрузка:</span><span style='color: red;'><b>{$row["shipment_time_format"]}</b></span>" : "")."
-				<br>
-			";
-
-			echo "<fieldset id='do'>";
-			echo "<form method='post'>";
-			$status = 0; //Статус поддона
-			if( $row["scan_time_format"] ) {
-				if( $row["shipment_time_format"] ) {
-					echo "<font color='red'>Данный поддон отгружен</font>";
-				}
-				else {
-					?>
-					<font color="red">Данный поддон в списке на отгрузку</font><br><br>
-					<input type="hidden" name="WT_ID" value="<?=$_GET["WT_ID"]?>">
-					<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
-					<input type="hidden" name="PN_ID" value="0">
-					<input type="submit" value="Из списка ✕" style="background-color: red; font-size: 2em; color: white;">
-					<?
-				}
+			if( $row["packed_time_format"] == "" ) {
+				echo "<h1 style='color: red;'>Паллет с таким номером не найден!</h1>";
 			}
 			else {
-				$status = 1;
-				if( $row["duration"] > 0 and $F_ID == 1) {
-					echo "<span style='color: #f00; font-size: 2em; font-weight: bold;'>Отгрузка запрещена!</span><br>";
-					echo "<span>До полного созревания необходимо <b>{$row["duration"]}</b> ч.</span>";
+				echo "
+					<span style='display: inline-block; width: 120px;'>Код:</span><b style='font-size: 2em;'>{$row["item"]}</b><br>
+					<span style='display: inline-block; width: 120px;'>Контроль:</span><b>{$row["packed_time_format"]}</b><br>
+					".($row["scan_time_format"] ? "<span style='display: inline-block; width: 120px;'>Сканирование:</span><span style='color: green;'><b>{$row["scan_time_format"]}</b></span><br>" : "")."
+					".($row["shipment_time_format"] ? "<span style='display: inline-block; width: 120px;'>Отгрузка:</span><span style='color: red;'><b>{$row["shipment_time_format"]}</b></span>" : "")."
+					<br>
+				";
+	
+				echo "<fieldset id='do'>";
+				echo "<form method='post'>";
+				$status = 0; //Статус паллета
+				if( $row["scan_time_format"] ) {
+					if( $row["shipment_time_format"] ) {
+						echo "<font color='red'>Данный паллет отгружен</font>";
+					}
+					else {
+						?>
+						<font color="red">Данный паллет в списке на отгрузку</font><br><br>
+						<input type="hidden" name="WT_ID" value="<?=$_GET["WT_ID"]?>">
+						<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
+						<input type="submit" name="subbut" value="Из списка" style="background-color: red; font-size: 2em; color: white;">
+						<?
+					}
 				}
 				else {
-				?>
-					<input type="hidden" name="WT_ID" value="<?=$_GET["WT_ID"]?>">
-					<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
-					<input type="hidden" name="PN_ID" value="1">
-					<input type="submit" value="В список ⬇" style="background-color: green; font-size: 2em; color: white;">
-				<?
+					$status = 1;
+					if( $row["duration"] > 0 and $F_ID == 1) {
+						echo "<span style='color: #f00; font-size: 2em; font-weight: bold;'>Отгрузка запрещена!</span><br>";
+						echo "<span>До полного созревания необходимо <b>{$row["duration"]}</b> ч.</span>";
+					}
+					else {
+					?>
+						<input type="hidden" name="WT_ID" value="<?=$_GET["WT_ID"]?>">
+						<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
+						<input type="submit" name="subbut" value="В список" style="background-color: green; font-size: 2em; color: white;">
+					<?
+					}
 				}
+				echo "</form>";
+				echo "</fieldset>";
 			}
-			echo "</form>";
-			echo "</fieldset>";
 		}
 
-		// Список подготовленных к отгрузке поддонов
+
+		// Список подготовленных к отгрузке паллетов
 		$i = 0;
-		echo "<fieldset><legend><b>Сканированные поддоны:</b></legend>";
+		echo "<fieldset><legend><b>Сканированные паллеты:</b></legend>";
 		echo "<form method='post'>";
 		echo "
 			<table cellspacing='0' cellpadding='2' border='1'>
@@ -314,10 +270,10 @@ if( isset($_POST["lpp_id"]) ) {
 //		if( $i == LIMIT_PALLETS ) {
 //			echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
 //			echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
-//			if( $status ) { // Если поддон не был в списке
+//			if( $status ) { // Если паллет не был в списке
 //				echo "
 //					<script>
-//						$('#do').html('<h2 style=\'color: red;\'>В списке ".LIMIT_PALLETS." поддона. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
+//						$('#do').html('<h2 style=\'color: red;\'>В списке ".LIMIT_PALLETS." паллета. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
 //					</script>
 //				";
 //			}
@@ -342,10 +298,10 @@ if( isset($_POST["lpp_id"]) ) {
 				if( $i == $limit_pallets ) {
 					echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
 					echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
-					if( $status ) { // Если сканированный поддон еще не в списке
+					if( $status ) { // Если сканированный паллет еще не в списке
 						echo "
 							<script>
-								$('#do').html('<h2 style=\'color: red;\'>В списке ".$limit_pallets." поддона. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
+								$('#do').html('<h2 style=\'color: red;\'>В списке ".$limit_pallets." паллета. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
 							</script>
 						";
 					}

@@ -384,6 +384,7 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 									,WT_ID = {$deviceID}
 									,F_ID = (SELECT F_ID FROM WeighingTerminal WHERE WT_ID = {$deviceID})
 									,CWP_ID = {$goodsID}
+									,PN_ID = (SELECT PN_ID FROM factory WHERE F_ID = (SELECT F_ID FROM WeighingTerminal WHERE WT_ID = {$deviceID}))
 							";
 							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						}
