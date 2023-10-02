@@ -194,6 +194,9 @@ function src_url($src) {
 		if( in_array('stock', $Rights) ) {
 			$menu["Производство"]["<i class='fas fa-pallet fa-lg'></i> Склад продукции"] = "stock.php";
 		}
+		if( in_array('plan_shipment', $Rights) ) {
+			$menu["Производство"]["<i class='fas fa-truck-ramp-box fa-lg'></i> График отгрузки"] = "plan_shipment.php";
+		}
 		if( in_array('shipment', $Rights) ) {
 			$menu["Производство"]["<i class='fas fa-truck fa-lg'></i> Отгрузка"] = "shipment.php";
 		}
@@ -258,7 +261,7 @@ function src_url($src) {
 			$class = "";
 			foreach ($url as $sub_title=>$sub_url) {
 				$pieces = explode("?", $sub_url);
-				if (strpos($_SERVER["REQUEST_URI"], $pieces[0])) {
+				if( strpos($_SERVER["REQUEST_URI"], $pieces[0]) == 1 ) {
 					$sub_class = "active";
 					$class = "active";
 				}
@@ -271,7 +274,7 @@ function src_url($src) {
 		}
 		else {
 			$pieces = explode("?", $url);
-			$class = strpos($_SERVER["REQUEST_URI"], $pieces[0]) ? "active" : "";
+			$class = (strpos($_SERVER["REQUEST_URI"], $pieces[0]) == 1) ? "active" : "";
 			$nav_buttons .= "<li class='{$class}'><a href='{$url}'>{$title}</a></li>";
 		}
 	}
