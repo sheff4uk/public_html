@@ -50,10 +50,20 @@ if( isset($_POST["ps_date"]) ) {
 	// Если новый план, делаем запись в plan__Shipment
 	else {
 		$query = "
-			INSERT INTO plan__Shipment PS
-			SET PS.F_ID = {$_GET["F_ID"]}
-				,PS.ps_date = '{$_POST["ps_date"]}'
-				,PS.priority = (SELECT IFNULL(MAX(priority),0) + 1 FROM plan__Shipment WHERE F_ID = {$_GET["F_ID"]} AND ps_date = '{$_POST["ps_date"]}')
+			SELECT IFNULL(MAX(priority),0) + 1 new_priority
+			FROM plan__Shipment
+			WHERE F_ID = {$_POST["F_ID"]}
+				AND ps_date = '{$_POST["ps_date"]}'
+		";
+		$res = mysqli_query( $mysqli, $query );
+		$row = mysqli_fetch_array($res);
+		$new_priority = $row["new_priority"];
+
+		$query = "
+			INSERT INTO plan__Shipment
+			SET F_ID = {$_POST["F_ID"]}
+				,ps_date = '{$_POST["ps_date"]}'
+				,priority = {$new_priority}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) $_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 		$PS_ID = mysqli_insert_id( $mysqli );
@@ -94,7 +104,7 @@ if( isset($_POST["ps_date"]) ) {
 	$week = $row["week"];
 
 	// Перенаправление в план
-	exit ('<meta http-equiv="refresh" content="0; url=/plan_shipment.php?F_ID='.$_GET["F_ID"].'&week='.$week.'#'.$PS_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/plan_shipment.php?F_ID='.$_POST["F_ID"].'&week='.$week.'#'.$PS_ID.'">');
 }
 ?>
 
