@@ -16,7 +16,13 @@
 	left: 0;
 "></div>
 
-<div style="
+<style type="text/css" media="print">
+	#footer {
+		display: none;
+	}
+</style>
+
+<div id="footer" style="
 	width: 100%;
 	height: 25px;
 	position: fixed;

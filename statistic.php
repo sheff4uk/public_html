@@ -208,7 +208,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		echo "<td>{$subrow["def_assembly"]}</td>";
 		echo "<td>{$subrow["reject"]}</td>";
 
-		$total = $subrow["not_spill"] + $subrow["crack"] + $subrow["crack_drying"] + $subrow["chipped"] + $subrow["def_form"] + $subrow["def_assembly"];
+		$total = (int)$subrow["not_spill"] + (int)$subrow["crack"] + (int)$subrow["crack_drying"] + (int)$subrow["chipped"] + (int)$subrow["def_form"] + (int)$subrow["def_assembly"] + (int)$subrow["reject"];
 		$percent_total = round($total / $subrow["fact"] * 100, 2);
 		echo "<td>{$total}</td>";
 		echo "<td>{$subrow["fact"]}</td>";
