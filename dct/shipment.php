@@ -15,8 +15,6 @@ $F_ID = $row["F_ID"];
 
 if( !$F_ID ) die("Access denied");
 
-//define('LIMIT_PALLETS', 22);
-
 $shipment_group = $row["shipment_group"];
 
 //ID паллета введен вручную
@@ -43,9 +41,27 @@ if( isset($_POST["lpp_id"]) ) {
 	foreach ($_POST["lpp_id"] as $key => $value) {
 		$LPP_IDs .= ",{$value}";
 	}
+
+	// Время отгрузки
+	$query = "
+		SELECT NOW() `now`
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$now = $row["now"];
+
+	if( isset($_POST["ps_id"]) ) {
+		$query = "
+			UPDATE plan__Shipment
+			SET shipment_time = '{$now}'
+			WHERE PS_ID = {$_POST["ps_id"]}
+		";
+		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	}
+
 	$query = "
 		UPDATE list__PackingPallet
-		SET shipment_time = NOW()
+		SET shipment_time = '{$now}'
 			,removal_time = NULL
 		WHERE LPP_ID IN ({$LPP_IDs}) AND shipment_time IS NULL
 	";
@@ -85,29 +101,6 @@ if( isset($_POST["lpp_id"]) ) {
 		<script src="../js/jquery-1.11.3.min.js"></script>
 		<script>
 			$(function() {
-//				var $down = 0;
-//
-//				function soundClick() {
-//					var audio = new Audio(); // Создаём новый элемент Audio
-//					audio.src = 'please_scan_the_cassette.mp3'; // Указываем путь к звуку "клика"
-//					if( $down ) {
-//						audio.autoplay = true; // Автоматически запускаем
-//					}
-//				}
-//
-//				function repeatOnDown() {
-//					setTimeout(function(){
-//						soundClick();
-//						if( $down ) { repeatOnDown(); }
-//					}, 10000);
-//				}
-//
-//				$('body').on('mousedown', function(){
-//					$down = 1;
-//					repeatOnDown();
-//				});
-//				$('body').on('mouseup', function(){ $down = 0; });
-
 				// Считывание штрихкода
 				var barcode="";
 				$(document).keydown(function(e)
@@ -118,7 +111,6 @@ if( isset($_POST["lpp_id"]) ) {
 					{
 						var WT_ID = Number(barcode.substr(0, 8)),
 							nextID = Number(barcode.substr(8, 8));
-						//$(location).attr('href','/dct/shipment.php?WT_ID='+WT_ID+'&nextID='+nextID+'&scan');
 						$(location).attr('href','/dct/shipment.php?WT_ID='+WT_ID+'&nextID='+nextID);
 						barcode="";
 						return false;
@@ -188,7 +180,6 @@ if( isset($_POST["lpp_id"]) ) {
 	
 				echo "<fieldset id='do'>";
 				echo "<form method='post'>";
-				$status = 0; //Статус паллета
 				if( $row["scan_time_format"] ) {
 					if( $row["shipment_time_format"] ) {
 						echo "<font color='red'>Данный паллет отгружен</font>";
@@ -203,7 +194,6 @@ if( isset($_POST["lpp_id"]) ) {
 					}
 				}
 				else {
-					$status = 1;
 					if( $row["duration"] > 0 and $F_ID == 1) {
 						echo "<span style='color: #f00; font-size: 2em; font-weight: bold;'>Отгрузка запрещена!</span><br>";
 						echo "<span>До полного созревания необходимо <b>{$row["duration"]}</b> ч.</span>";
@@ -221,6 +211,108 @@ if( isset($_POST["lpp_id"]) ) {
 			}
 		}
 
+		$validation = 1;
+
+		// График отгрузки
+		if( $F_ID == 2 ) {
+			echo "<fieldset>";
+			echo "<legend><b>График отгрузки:</b></legend>";
+			// Находим очередной график огрузки
+			$query = "
+				SELECT PS.PS_ID
+					,SUM(PSC.quantity) pallets
+				FROM plan__Shipment PS
+				JOIN plan__ShipmentCWP PSC ON PSC.PS_ID = PS.PS_ID
+				WHERE PS.F_ID = {$F_ID}
+					AND PS.shipment_time IS NULL
+					AND PS.ps_date <= CURDATE()
+				GROUP BY PS.PS_ID
+				HAVING pallets > 0
+				ORDER BY PS.ps_date, PS.priority
+				LIMIT 1
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			$row = mysqli_fetch_array($res);
+			$PS_ID = $row["PS_ID"];
+
+			if( !$PS_ID ) {
+				echo "<font color='red'>На сегодня отгрузок не запланировано!</font>";
+				$validation = 0;
+			}
+
+			// Таблица план-факт отгрузки
+			echo "<table cellspacing='0' cellpadding='2' border='1'>";
+			echo "<thead>";
+			echo "<tr>";
+			echo "<th>Код</th>";
+			echo "<th>План</th>";
+			echo "<th>Факт</th>";
+			echo "</tr>";
+			echo "</thead>";
+			echo "<tbody>";
+
+			// Получаем список кодов запланированных и сканированных поддонов
+			$query = "
+				SELECT SUB.CWP_ID
+					,CW.item
+				FROM (
+					SELECT PSC.CWP_ID
+					FROM plan__ShipmentCWP PSC
+					WHERE PSC.PS_ID = ".($PS_ID ? $PS_ID : 0)."
+						AND PSC.quantity > 0
+
+					UNION
+
+					SELECT LPP.CWP_ID
+					FROM list__PackingPallet LPP
+					WHERE LPP.scan_time IS NOT NULL
+						AND LPP.shipment_time IS NULL
+						AND LPP.F_ID = {$F_ID}
+					GROUP BY LPP.CWP_ID
+				) SUB
+				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = SUB.CWP_ID
+				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+				ORDER BY CWP.CW_ID
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $row = mysqli_fetch_array($res) ) {
+				echo "<tr>";
+				echo "<td><b>{$row["item"]}</b></td>";
+				// Построчное получение и вывод данных
+				$query = "
+					SELECT PSC.quantity plan
+					FROM plan__ShipmentCWP PSC
+					WHERE PSC.PS_ID = ".($PS_ID ? $PS_ID : 0)."
+						AND PSC.CWP_ID = {$row["CWP_ID"]}
+				";
+				$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				$subrow = mysqli_fetch_array($subres);
+				$plan = $subrow["plan"];
+				echo "<td>{$plan}</td>";
+
+				$query = "
+					SELECT SUM(1) fact
+					FROM list__PackingPallet LPP
+					WHERE LPP.scan_time IS NOT NULL
+						AND LPP.shipment_time IS NULL
+						AND LPP.F_ID = {$F_ID}
+						AND LPP.CWP_ID = {$row["CWP_ID"]}
+					GROUP BY LPP.CWP_ID
+				";
+				$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				$subrow = mysqli_fetch_array($subres);
+				$fact = $subrow["fact"];
+				if( $plan != $fact ) {
+					$validation = 0;
+				}
+				echo "<td ".($plan == $fact ? "style='background: green;'" : "").">{$fact}</td>";
+
+				echo "</tr>";
+			}
+			echo "</tbody>";
+			echo "</table>";
+			echo "</fieldset>";
+		}
 
 		// Список подготовленных к отгрузке паллетов
 		$i = 0;
@@ -267,17 +359,7 @@ if( isset($_POST["lpp_id"]) ) {
 				</tbody>
 			</table>
 		";
-//		if( $i == LIMIT_PALLETS ) {
-//			echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
-//			echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
-//			if( $status ) { // Если паллет не был в списке
-//				echo "
-//					<script>
-//						$('#do').html('<h2 style=\'color: red;\'>В списке ".LIMIT_PALLETS." паллета. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
-//					</script>
-//				";
-//			}
-//		}
+
 		if( $i > 0 ) {
 			// Узнаем ограничение на количество паллетов в машине
 			$query = "
@@ -288,6 +370,7 @@ if( isset($_POST["lpp_id"]) ) {
 				JOIN ClientBrand CB ON CB.CB_ID = CW.CB_ID
 				WHERE LPP.scan_time IS NOT NULL
 					AND LPP.shipment_time IS NULL
+					AND LPP.F_ID = {$F_ID}
 				GROUP BY CB.CB_ID
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -296,18 +379,17 @@ if( isset($_POST["lpp_id"]) ) {
 
 			if( $limit_pallets > 0 ) {
 				if( $i == $limit_pallets ) {
-					echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
-					echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
-					if( $status ) { // Если сканированный паллет еще не в списке
-						echo "
-							<script>
-								$('#do').html('<h2 style=\'color: red;\'>В списке ".$limit_pallets." паллета. Добавление новых не возможно!</h2><h3>Нажмите \"Отгрузить\", чтобы очистить список.</h3>');
-							</script>
-						";
-					}
+					$validation = 1;
+				}
+				else {
+					$validation = 0;
 				}
 			}
-			else {
+
+			if( $validation == 1 ) {
+				if( $F_ID = 2 ) {
+					echo "<input type='hidden' name='ps_id' value='{$PS_ID}'>";
+				}
 				echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
 				echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
 			}

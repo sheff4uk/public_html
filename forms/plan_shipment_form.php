@@ -22,30 +22,32 @@ if( isset($_POST["ps_date"]) ) {
 		$priority = $row["priority"];
 
 		// Если дата изменена, пересчитываем приоритет и обновляем дату
-		$query = "
-			SELECT IFNULL(MAX(priority),0) + 1 new_priority
-			FROM plan__Shipment
-			WHERE F_ID = {$_POST["F_ID"]}
-				AND ps_date = '{$_POST["ps_date"]}'
-		";
-		$res = mysqli_query( $mysqli, $query );
-		$row = mysqli_fetch_array($res);
-		$new_priority = $row["new_priority"];
+		if( $ps_date != $_POST["ps_date"] ) {
+			$query = "
+				SELECT IFNULL(MAX(priority),0) + 1 new_priority
+				FROM plan__Shipment
+				WHERE F_ID = {$_POST["F_ID"]}
+					AND ps_date = '{$_POST["ps_date"]}'
+			";
+			$res = mysqli_query( $mysqli, $query );
+			$row = mysqli_fetch_array($res);
+			$new_priority = $row["new_priority"];
 
-		$query = "
-			UPDATE plan__Shipment
-			SET ps_date = '{$_POST["ps_date"]}'
-				,priority = {$new_priority}
-			WHERE PS_ID = {$PS_ID}
-		";
-		if( !mysqli_query( $mysqli, $query ) ) $_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+			$query = "
+				UPDATE plan__Shipment
+				SET ps_date = '{$_POST["ps_date"]}'
+					,priority = {$new_priority}
+				WHERE PS_ID = {$PS_ID}
+			";
+			if( !mysqli_query( $mysqli, $query ) ) $_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 
-		$query = "
-			UPDATE plan__Shipment
-			SET priority = priority - 1
-			WHERE ps_date = '{$ps_date}' AND priority > {$priority}
-		";
-		if( !mysqli_query( $mysqli, $query ) ) $_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+			$query = "
+				UPDATE plan__Shipment
+				SET priority = priority - 1
+				WHERE ps_date = '{$ps_date}' AND priority > {$priority}
+			";
+			if( !mysqli_query( $mysqli, $query ) ) $_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
+		}
 	}
 	// Если новый план, делаем запись в plan__Shipment
 	else {
@@ -71,7 +73,7 @@ if( isset($_POST["ps_date"]) ) {
 
 	foreach ($_POST["CWP_ID"] as $key => $value) {
 		// Редактируем
-		if( $_POST["cur_quantity"][$key] ) {
+		if( $_POST["cur_quantity"][$key] >= 0 ) {
 			$query = "
 				UPDATE plan__ShipmentCWP
 				SET quantity = {$_POST["quantity"][$key]}
