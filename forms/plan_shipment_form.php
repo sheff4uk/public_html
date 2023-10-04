@@ -73,7 +73,7 @@ if( isset($_POST["ps_date"]) ) {
 
 	foreach ($_POST["CWP_ID"] as $key => $value) {
 		// Редактируем
-		if( $_POST["cur_quantity"][$key] or $_POST["cur_quantity"][$key] === 0 ) {
+		if( $_POST["cur_quantity"][$key] or $_POST["cur_quantity"][$key] == "0" ) {
 			$query = "
 				UPDATE plan__ShipmentCWP
 				SET quantity = {$_POST["quantity"][$key]}
