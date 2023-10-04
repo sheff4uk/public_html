@@ -22,7 +22,7 @@ if( !$_GET["F_ID"] ) {
 	$_GET["F_ID"] = $_SESSION['F_ID'];
 }
 
-$ps_data = array(); // Список паллетов и их кол-во
+$ps_data = array(); // Список паллет и их кол-во
 ?>
 
 <!--Фильтр-->
@@ -179,7 +179,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		// Выводим общую ячейку с датой
 		if( $ps_date != $row["ps_date"] ) {
 			echo "<tr style='border-top: 2px solid #333;'>";
-			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h2 class='nowrap'>{$row["friendly_ps_date"]}</h2><span class='nowrap'><b>{$row["pallets"]}</b> паллета</span></td>";
+			echo "<td rowspan='{$cnt}' style='background-color: rgba(0, 0, 0, 0.2);'><h2 class='nowrap'>{$row["friendly_ps_date"]}</h2><span class='nowrap'><b>{$row["pallets"]}</b> паллет</span></td>";
 			$priority = 0;
 		}
 		$query = "
@@ -202,7 +202,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				if( $ps_date == $row["ps_date"] ) {
 					echo "<tr style='border-top: 2px solid #333;'>";
 				}
-				echo "<td id='{$subrow["PS_ID"]}' rowspan='{$subcnt}'><h1 class='nowrap'>{$subrow["priority"]}</h1><span class='nowrap'><b>{$subrow["pallets"]}</b> паллета</span></td>";
+				echo "<td id='{$subrow["PS_ID"]}' rowspan='{$subcnt}'><h1 class='nowrap'>{$subrow["priority"]}</h1><span class='nowrap'><b>{$subrow["pallets"]}</b> паллет</span></td>";
 			}
 			else {
 				echo "<tr>";

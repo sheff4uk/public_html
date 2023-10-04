@@ -129,7 +129,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<thead>
 					<tr>
 						<th>Противовес</th>
-						<th>Количество паллетов</th>
+						<th>Количество паллет</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -206,7 +206,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			return false;
 		});
 
-		// При изменении кол-ва паллетов пересчитываем тотал
+		// При изменении кол-ва паллет пересчитываем тотал
 		$('#plan_shipment_form input.quantity').change(function() {
 			var quantity = $(this).val(),
 				total_quantity = 0;
