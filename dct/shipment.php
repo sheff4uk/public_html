@@ -387,7 +387,7 @@ if( isset($_POST["lpp_id"]) ) {
 			}
 
 			if( $validation == 1 ) {
-				if( $F_ID = 2 ) {
+				if( $F_ID == 2 ) {
 					echo "<input type='hidden' name='ps_id' value='{$PS_ID}'>";
 				}
 				echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
