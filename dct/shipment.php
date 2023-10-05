@@ -46,7 +46,7 @@ if( isset($_POST["lpp_id"]) ) {
 	$query = "
 		SELECT NOW() `now`
 	";
-	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query1: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
 	$now = $row["now"];
 
@@ -56,7 +56,7 @@ if( isset($_POST["lpp_id"]) ) {
 			SET shipment_time = '{$now}'
 			WHERE PS_ID = {$_POST["ps_id"]}
 		";
-		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		mysqli_query( $mysqli, $query ) or die("Invalid query2: " .mysqli_error( $mysqli ));
 	}
 
 	$query = "
@@ -65,7 +65,7 @@ if( isset($_POST["lpp_id"]) ) {
 			,removal_time = NULL
 		WHERE LPP_ID IN ({$LPP_IDs}) AND shipment_time IS NULL
 	";
-	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	mysqli_query( $mysqli, $query ) or die("Invalid query3: " .mysqli_error( $mysqli ));
 
 	if( mysqli_affected_rows($mysqli) ) {
 		// Сообщение в телеграм об отгрузке машины
@@ -81,7 +81,7 @@ if( isset($_POST["lpp_id"]) ) {
 			GROUP BY LPP.CWP_ID
 			ORDER BY LPP.CWP_ID
 		";
-		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query4: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
 			$message .= "\n{$row["item"]} x {$row["cnt"]}";
 		}
