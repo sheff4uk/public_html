@@ -356,13 +356,11 @@ $query = "
 	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	LEFT JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
 	WHERE PB.F_ID = {$_GET["F_ID"]}
 		".($_GET["week"] ? "AND YEARWEEK(LO.opening_time, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
 		AND (
 			".(($_GET["int24"] or $_GET["not_spec"]) ? "0" : "1")."
 			".($_GET["int24"] ? "OR o_interval(LO.LO_ID) < 24" : "")."

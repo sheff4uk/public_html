@@ -143,13 +143,12 @@ $query = "
 	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND DATE(LO.opening_time) >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND CW.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
+		".($_GET["CB_ID"] ? "AND CW.CB_ID = {$_GET["CB_ID"]}" : "")."
 	GROUP BY reject_date_format, PB.CW_ID
 	ORDER BY reject_date_sort, PB.CW_ID
 ";

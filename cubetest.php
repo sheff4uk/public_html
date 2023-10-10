@@ -293,15 +293,12 @@ $query = "
 	JOIN list__Batch LB ON LB.LB_ID = LCT.LB_ID
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID AND PB.F_ID = {$_GET["F_ID"]}
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND LCT.test_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND LCT.test_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["batch_date_from"] ? "AND LB.batch_date >= '{$_GET["batch_date_from"]}'" : "")."
 		".($_GET["batch_date_to"] ? "AND LB.batch_date <= '{$_GET["batch_date_to"]}'" : "")."
-		#".($_GET["week"] ? "AND YEARWEEK(LCT.test_date, 1) LIKE '{$_GET["week"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
 		".($_GET["delay"] ? "AND LCT.delay={$_GET["delay"]}" : "")."
 	ORDER BY LCT.test_date DESC, LCT.test_time DESC
 ";

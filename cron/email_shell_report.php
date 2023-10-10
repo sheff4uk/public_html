@@ -53,7 +53,6 @@ $query = "
 		#,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d/%m/%Y') `date_max`
 		,SR.sr_cnt
 	FROM CounterWeight CW
-	JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 	LEFT JOIN (
 		SELECT CW_ID
 			,SUM(sr_cnt) sr_cnt
@@ -80,7 +79,7 @@ $query = "
 		WHERE sr_date BETWEEN '2020-12-04' AND CURDATE() - INTERVAL 1 DAY
 		GROUP BY CW_ID
 	) WR ON WR.CW_ID = CW.CW_ID
-	WHERE CWP.CB_ID = {$CB_ID}
+	WHERE CW.CB_ID = {$CB_ID}
 	GROUP BY CW.CW_ID
 	ORDER BY CW.CW_ID
 ";

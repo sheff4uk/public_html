@@ -217,7 +217,6 @@ foreach ($_GET as &$value) {
 				,CW.reinforcement
 			FROM plan__Batch PB
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-			JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 			JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 			WHERE PB.F_ID = {$_GET["F_ID"]}
 				".($_GET["date_from"] ? "AND LB.batch_date >= '{$_GET["date_from"]}'" : "")."
