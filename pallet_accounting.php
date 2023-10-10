@@ -304,7 +304,7 @@ $query = "
 		,NULL
 		,NULL
 		,LS.ls_date
-		,CW.CB_ID
+		,CWP.CB_ID
 		,YEARWEEK(LS.ls_date, 1)
 		,LS.LS_ID
 	FROM list__Shipment LS
