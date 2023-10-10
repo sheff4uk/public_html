@@ -32,12 +32,12 @@ $message = "
 ";
 
 $query = "
-	SELECT CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
+	SELECT CONCAT(IFNULL(CW.item, CWP.cwp_name), ' (', CWP.in_pallet, 'шт)') item
 		,SUM(1) pallets
 		,SUM(CWP.in_pallet) details
 	FROM list__PackingPallet LPP
 	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
-	JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+	LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 	WHERE LPP.shipment_time IS NULL AND LPP.removal_time IS NULL
 		AND LPP.F_ID = 1
 	GROUP BY LPP.CWP_ID

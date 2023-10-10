@@ -246,7 +246,7 @@ foreach ($_GET as &$value) {
 		<tbody>
 		<?
 			$query = "
-				SELECT CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
+				SELECT CONCAT(IFNULL(CW.item, CWP.cwp_name), ' (', CWP.in_pallet, 'шт)') item
 					,CWP.in_pallet
 					,SUM(SUB.day5) day5
 					,SUM(SUB.day4) day4
@@ -257,12 +257,11 @@ foreach ($_GET as &$value) {
 					,SUM(SUB.total) total
 					,SUM(SUB.in_cass) in_cass
 					,SUM(SUB.in_cassette) in_cassette
-				FROM CounterWeight CW
-				JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
+				FROM CounterWeightPallet CWP
 				JOIN (
 					SELECT LPP.CWP_ID
-						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 18 HOUR AND NOW() - INTERVAL 0 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day5
-						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 42 HOUR AND NOW() - INTERVAL 18 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day4
+					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 18 HOUR AND NOW() - INTERVAL 0 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day5
+					,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 42 HOUR AND NOW() - INTERVAL 18 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day4
 						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 66 HOUR AND NOW() - INTERVAL 42 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day3
 						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 90 HOUR AND NOW() - INTERVAL 66 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day2
 						,SUM(IF(LPP.packed_time BETWEEN NOW() - INTERVAL 114 HOUR AND NOW() - INTERVAL 90 HOUR AND LPP.shipment_time IS NULL AND LPP.removal_time IS NULL, 1, 0)) day1
@@ -271,14 +270,14 @@ foreach ($_GET as &$value) {
 						#,CWP.in_pallet
 						,0 in_cass
 						,0 in_cassette
-					FROM list__PackingPallet LPP
-					WHERE LPP.F_ID = {$_GET["F_ID"]}
+						FROM list__PackingPallet LPP
+						WHERE LPP.F_ID = {$_GET["F_ID"]}
 						AND DATE(LPP.packed_time) >= '{$date_from}'
-					GROUP BY LPP.CWP_ID
-
-					UNION
-
-					SELECT CWP.CWP_ID
+						GROUP BY LPP.CWP_ID
+						
+						UNION
+						
+						SELECT CWP.CWP_ID
 						,0
 						,0
 						,0
@@ -288,17 +287,17 @@ foreach ($_GET as &$value) {
 						,0
 						,ROUND(SUM(IF((SELECT LF_ID FROM list__Filling WHERE cassette = LF.cassette AND filling_time > LF.filling_time LIMIT 1) IS NULL, (PB.in_cassette - LF.underfilling), 0)) / CWP.in_pallet) in_cass
 						,SUM(IF((SELECT LF_ID FROM list__Filling WHERE cassette = LF.cassette AND filling_time > LF.filling_time LIMIT 1) IS NULL, (PB.in_cassette - LF.underfilling), 0)) in_cassette
-					FROM CounterWeight CW
-					JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
-					JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID
-					JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
-					JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
+						FROM CounterWeightPallet CWP
+						JOIN plan__Batch PB ON PB.CW_ID = CWP.CW_ID
+						JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
+						JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 						AND LF.filling_time > NOW() - INTERVAL 2 WEEK
-					LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
-					WHERE PB.F_ID = {$_GET["F_ID"]}
+						LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
+						WHERE PB.F_ID = {$_GET["F_ID"]}
 						AND LO.LO_ID IS NULL
-					GROUP BY CWP.CWP_ID
-				) SUB ON SUB.CWP_ID = CWP.CWP_ID
+						GROUP BY CWP.CWP_ID
+					) SUB ON SUB.CWP_ID = CWP.CWP_ID
+					LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 				GROUP BY SUB.CWP_ID
 				ORDER BY SUB.CWP_ID ASC
 			";
@@ -402,15 +401,12 @@ foreach ($_GET as &$value) {
 			<?
 			$query = "
 				SELECT LPP.CWP_ID
-					,CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
+					,CONCAT(IFNULL(CW.item, CWP.cwp_name), ' (', CWP.in_pallet, 'шт)') item
 				FROM list__PackingPallet LPP
 				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
-				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+				LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 				WHERE LPP.F_ID = {$_GET["F_ID"]}
 					AND DATE(LPP.packed_time) >= '{$date_from}'
-					#AND LPP.shipment_time IS NULL
-					#AND LPP.removal_time IS NULL
-					#AND CW.CB_ID = 2
 				GROUP BY LPP.CWP_ID
 				ORDER BY LPP.CWP_ID ASC
 			";
@@ -433,13 +429,13 @@ $query = "
 		,DATE_FORMAT(LPP.removal_time, '%d.%m.%Y %H:%i') removal_time_format
 		,LPP.nextID
 		,LPP.CWP_ID
-		,CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
+		,CONCAT(IFNULL(CW.item, CWP.cwp_name), ' (', CWP.in_pallet, 'шт)') item
 		,LPP.shipment_time
 		#,IF(IFNULL(LPP.shipment_time, NOW()) - INTERVAL 114 HOUR < LPP.packed_time, 0, 1) ready
 		,1 ready
 	FROM list__PackingPallet LPP
 	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
-	JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+	LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 	WHERE DATE(LPP.packed_time) >= '{$date_from}'
 		AND LPP.F_ID = {$_GET["F_ID"]}
 	ORDER BY LPP.packed_time DESC

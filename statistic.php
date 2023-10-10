@@ -142,6 +142,7 @@ $query = "
 	FROM list__Batch LB
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 	JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
@@ -149,7 +150,7 @@ $query = "
 		".($_GET["date_from"] ? "AND DATE(LO.opening_time) >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
 	GROUP BY DATE(LO.opening_time)
 	ORDER BY DATE(LO.opening_time) DESC
 ";
@@ -174,12 +175,13 @@ while( $row = mysqli_fetch_array($res) ) {
 		FROM list__Batch LB
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 		WHERE DATE(LO.opening_time) LIKE '{$row["opening_date"]}'
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+			".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
 		GROUP BY PB.CW_ID
 		ORDER BY PB.CW_ID
 	";
@@ -255,6 +257,7 @@ if( $filter ) {
 		FROM list__Batch LB
 		JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 		JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+		JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 		JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 		LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
@@ -262,7 +265,7 @@ if( $filter ) {
 			".($_GET["date_from"] ? "AND DATE(LO.opening_time) >= '{$_GET["date_from"]}'" : "")."
 			".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-			".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+			".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
@@ -285,6 +288,7 @@ if( $filter ) {
 			FROM list__Batch LB
 			JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 			JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+			JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 			JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 			JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 			LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
@@ -292,7 +296,7 @@ if( $filter ) {
 				".($_GET["date_from"] ? "AND DATE(LO.opening_time) >= '{$_GET["date_from"]}'" : "")."
 				".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."
 				".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-				".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+				".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
 			GROUP BY PB.CW_ID
 			ORDER BY PB.CW_ID
 		";

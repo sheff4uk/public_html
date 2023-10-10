@@ -53,6 +53,7 @@ $query = "
 		#,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d/%m/%Y') `date_max`
 		,SR.sr_cnt
 	FROM CounterWeight CW
+	JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 	LEFT JOIN (
 		SELECT CW_ID
 			,SUM(sr_cnt) sr_cnt
@@ -79,7 +80,7 @@ $query = "
 		WHERE sr_date BETWEEN '2020-12-04' AND CURDATE() - INTERVAL 1 DAY
 		GROUP BY CW_ID
 	) WR ON WR.CW_ID = CW.CW_ID
-	WHERE CW.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$CB_ID})
+	WHERE CWP.CB_ID = {$CB_ID}
 	GROUP BY CW.CW_ID
 	ORDER BY CW.CW_ID
 ";
@@ -126,45 +127,6 @@ $message .= "
 		<tbody style='text-align: center;'>
 			<tr>
 ";
-
-//$query = "
-//	SELECT SUM(pallets) shipped
-//	FROM list__Shipment LS
-//	JOIN CounterWeight CW ON CW.CW_ID = LS.CW_ID
-//	WHERE LS.ls_date = CURDATE()
-//		AND CW.CB_ID = {$CB_ID}
-//";
-//$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//$row = mysqli_fetch_array($res);
-//$message .= "
-//	<td>{$row["shipped"]}</td>
-//";
-//
-//// Возвращенные поддоны
-//$query = "
-//	SELECT SUM(PR.pr_cnt) pr_cnt
-//	FROM pallet__Return PR
-//	WHERE PR.pr_date = CURDATE()
-//		AND PR.CB_ID = {$CB_ID}
-//";
-//$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//$row = mysqli_fetch_array($res);
-//$message .= "
-//	<td>{$row["pr_cnt"]}</td>
-//";
-//
-//// Сломанные поддоны
-//$query = "
-//	SELECT SUM(PD.pd_cnt) pd_cnt
-//	FROM pallet__Disposal PD
-//	WHERE PD.pd_date = CURDATE()
-//		AND PD.CB_ID = {$CB_ID}
-//";
-//$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//$row = mysqli_fetch_array($res);
-//$message .= "
-//	<td>{$row["pd_cnt"]}</td>
-//";
 
 // Узнаем актуальную стоимость поддона (дерево)
 $query = "

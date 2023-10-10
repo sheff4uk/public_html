@@ -199,11 +199,12 @@ $query = "
 		,1 edit
 	FROM shell__Arrival SA
 	JOIN CounterWeight CW ON CW.CW_ID = SA.CW_ID
+	JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND SA.sa_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND SA.sa_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND SA.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND SA.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
 
 	UNION
 
@@ -226,11 +227,12 @@ $query = "
 	FROM shell__Reject SR
 	LEFT JOIN shell__Arrival SA ON SA.SA_ID = SR.SA_ID
 	JOIN CounterWeight CW ON CW.CW_ID = IFNULL(SR.CW_ID, SA.CW_ID)
+	JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND SR.sr_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND SR.sr_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND IFNULL(SR.CW_ID, SA.CW_ID) = {$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND IFNULL(SR.CW_ID, SA.CW_ID) IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
 
 	ORDER BY date, type, CW_ID
 ";
@@ -318,6 +320,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					#,DATE_FORMAT(CURDATE() + INTERVAL ROUND((CW.shell_balance - MAX(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) / (WR.sr_cnt / DATEDIFF(CURDATE() - INTERVAL 1 DAY, '2020-12-04'))) DAY, '%d/%m/%Y') `date_max`
 					,SR.sr_cnt
 				FROM CounterWeight CW
+				JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 				LEFT JOIN (
 					SELECT CW_ID
 						,SUM(sr_cnt) sr_cnt
@@ -346,7 +349,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				) WR ON WR.CW_ID = CW.CW_ID
 				WHERE 1
 					".($_GET["CW_ID"] ? "AND CW.CW_ID={$_GET["CW_ID"]}" : "")."
-					".($_GET["CB_ID"] ? "AND CW.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+					".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
 				GROUP BY CW.CW_ID
 				ORDER BY CW.CW_ID
 			";

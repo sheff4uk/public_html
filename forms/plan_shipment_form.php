@@ -136,11 +136,15 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<?
 					$query = "
 						SELECT CWP.CWP_ID
-                            ,CW.item
-						FROM CounterWeightPallet CWP
-                        JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
-						JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = {$_GET["F_ID"]}
-						ORDER BY CW.CW_ID
+							,IFNULL(CW.item, CWP.cwp_name) item
+						FROM list__PackingPallet LPP
+						JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+						LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+						WHERE LPP.F_ID = {$_GET["F_ID"]}
+							AND LPP.shipment_time IS NULL
+							AND LPP.removal_time IS NULL
+						GROUP BY CWP.CWP_ID
+						ORDER BY CWP.CWP_ID;
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) ) {

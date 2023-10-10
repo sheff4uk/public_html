@@ -83,7 +83,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Комплект противовесов</th>
 						<th>Поддон</th>
 						<th>Паллетов</th>
-						<th>Деталей паллете</th>
+						<th>Деталей в паллете</th>
 						<th>Всего деталей</th>
 					</tr>
 				</thead>
@@ -95,9 +95,11 @@ this.subbut.value='Подождите, пожалуйста!';">
 								<option value=""></option>
 								<?
 								$query = "
-									SELECT CWP.CWP_ID, CW.item, CWP.in_pallet
-									FROM CounterWeight CW
-									JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
+									SELECT CWP.CWP_ID
+										,IFNULL(CW.item, CWP.cwp_name) item
+										,CWP.in_pallet
+									FROM CounterWeightPallet CWP
+									LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 									ORDER BY CWP.CWP_ID
 								";
 								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

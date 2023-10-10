@@ -142,9 +142,10 @@ $query = "
 	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID AND PB.F_ID = {$_GET["F_ID"]}
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID
 	WHERE LB.prod_day BETWEEN '{$_GET["date_from"]}' AND '{$_GET["date_to"]}'
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND PB.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		".($_GET["CB_ID"] ? "AND CWP.CB_ID  {$_GET["CB_ID"]}" : "")."
 	GROUP BY LB.prod_day
 	ORDER BY LB.prod_day
 ";

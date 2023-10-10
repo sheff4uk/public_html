@@ -80,7 +80,7 @@ if( !$_GET["date_to"] ) {
 						$query = "
 							SELECT CW.CW_ID, CW.item
 							FROM CounterWeight CW
-							WHERE CW.CB_ID = 2
+							JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID AND CWP.CB_ID = 2
 							ORDER BY CW.CW_ID
 						";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -142,7 +142,8 @@ $query = "
 		,SA.sa_date date
 		,SA.CW_ID
 	FROM shell__Arrival SA
-	JOIN CounterWeight CW ON CW.CW_ID = SA.CW_ID AND CW.CB_ID = 2
+	JOIN CounterWeight CW ON CW.CW_ID = SA.CW_ID
+	JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID AND CWP.CB_ID = 2
 	WHERE 1
 		".($_GET["date_from"] ? "AND SA.sa_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND SA.sa_date <= '{$_GET["date_to"]}'" : "")."
@@ -163,7 +164,8 @@ $query = "
 		,SR.sr_date date
 		,SR.CW_ID
 	FROM shell__Reject SR
-	JOIN CounterWeight CW ON CW.CW_ID = SR.CW_ID AND CW.CB_ID = 2
+	JOIN CounterWeight CW ON CW.CW_ID = SR.CW_ID
+	JOIN CounterWeightPallet CWP ON CWP.CW_ID = CW.CW_ID AND CWP.CB_ID = 2
 	WHERE 1
 		".($_GET["date_from"] ? "AND SR.sr_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND SR.sr_date <= '{$_GET["date_to"]}'" : "")."

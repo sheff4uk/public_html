@@ -72,11 +72,11 @@ if( isset($_POST["lpp_id"]) ) {
 		//$message = "🚛";
 		$message = "";
 		$query = "
-			SELECT CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
+			SELECT CONCAT(IFNULL(CW.item, CWP.cwp_name), ' (', CWP.in_pallet, 'шт)') item
 				,SUM(1) cnt
 			FROM list__PackingPallet LPP
 			JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
-			JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+			LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 			WHERE LPP.LPP_ID IN ({$LPP_IDs})
 			GROUP BY LPP.CWP_ID
 			ORDER BY LPP.CWP_ID
@@ -148,7 +148,7 @@ if( isset($_POST["lpp_id"]) ) {
 			// Если было сканирование
 			$query = "
 				SELECT LPP.LPP_ID
-					,CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
+					,CONCAT(IFNULL(CW.item, CWP.cwp_name), ' (', CWP.in_pallet, 'шт)') item
 					,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i:%s') packed_time_format
 					,DATE_FORMAT(LPP.scan_time, '%d.%m.%Y %H:%i:%s') scan_time_format
 					,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i:%s') shipment_time_format
@@ -156,7 +156,7 @@ if( isset($_POST["lpp_id"]) ) {
 					#,0 duration
 				FROM list__PackingPallet LPP
 				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
-				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+				LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 				WHERE LPP.WT_ID = {$_GET["WT_ID"]}
 					AND LPP.nextID = {$_GET["nextID"]}
 					AND LPP.F_ID = {$F_ID}
@@ -214,7 +214,7 @@ if( isset($_POST["lpp_id"]) ) {
 		$validation = 1;
 
 		// График отгрузки
-		if( $F_ID == 2 ) {
+		//if( $F_ID == 2 ) {
 			echo "<fieldset>";
 			echo "<legend><b>График отгрузки:</b></legend>";
 			// Находим очередной график огрузки
@@ -254,7 +254,7 @@ if( isset($_POST["lpp_id"]) ) {
 			// Получаем список кодов запланированных и сканированных поддонов
 			$query = "
 				SELECT SUB.CWP_ID
-					,CW.item
+					,IFNULL(CW.item, CWP.cwp_name) item
 				FROM (
 					SELECT PSC.CWP_ID
 					FROM plan__ShipmentCWP PSC
@@ -271,8 +271,8 @@ if( isset($_POST["lpp_id"]) ) {
 					GROUP BY LPP.CWP_ID
 				) SUB
 				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = SUB.CWP_ID
-				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
-				ORDER BY CWP.CW_ID
+				LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+				ORDER BY CWP.CWP_ID
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
@@ -312,7 +312,7 @@ if( isset($_POST["lpp_id"]) ) {
 			echo "</tbody>";
 			echo "</table>";
 			echo "</fieldset>";
-		}
+		//}
 
 		// Список подготовленных к отгрузке паллетов
 		$i = 0;
@@ -332,12 +332,12 @@ if( isset($_POST["lpp_id"]) ) {
 		";
 		$query = "
 			SELECT LPP.LPP_ID
-				,CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
+				,CONCAT(IFNULL(CW.item, CWP.cwp_name), ' (', CWP.in_pallet, 'шт)') item
 				,DATE_FORMAT(LPP.scan_time, '%d.%m %H:%i:%s') scan_time_format
 				,substr(lpad(LPP.nextID, 8, '0'), -4, 4) last4dig
 			FROM list__PackingPallet LPP
 			JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
-			JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+			LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 			WHERE LPP.scan_time IS NOT NULL
 				AND LPP.shipment_time IS NULL
 				AND LPP.F_ID = {$F_ID}
@@ -361,35 +361,34 @@ if( isset($_POST["lpp_id"]) ) {
 		";
 
 		if( $i > 0 ) {
-			// Узнаем ограничение на количество паллетов в машине
-			$query = "
-				SELECT CB.limit_pallets
-				FROM list__PackingPallet LPP
-				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
-				JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
-				JOIN ClientBrand CB ON CB.CB_ID = CW.CB_ID
-				WHERE LPP.scan_time IS NOT NULL
-					AND LPP.shipment_time IS NULL
-					AND LPP.F_ID = {$F_ID}
-				GROUP BY CB.CB_ID
-			";
-			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-			$row = mysqli_fetch_array($res);
-			$limit_pallets = $row["limit_pallets"];
+			// // Узнаем ограничение на количество паллетов в машине
+			// $query = "
+			// 	SELECT CB.limit_pallets
+			// 	FROM list__PackingPallet LPP
+			// 	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+			// 	JOIN ClientBrand CB ON CB.CB_ID = CWP.CB_ID
+			// 	WHERE LPP.scan_time IS NOT NULL
+			// 		AND LPP.shipment_time IS NULL
+			// 		AND LPP.F_ID = {$F_ID}
+			// 	GROUP BY CB.CB_ID
+			// ";
+			// $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			// $row = mysqli_fetch_array($res);
+			// $limit_pallets = $row["limit_pallets"];
 
-			if( $limit_pallets > 0 ) {
-				if( $i == $limit_pallets ) {
-					$validation = 1;
-				}
-				else {
-					$validation = 0;
-				}
-			}
+			// if( $limit_pallets > 0 ) {
+			// 	if( $i == $limit_pallets ) {
+			// 		$validation = 1;
+			// 	}
+			// 	else {
+			// 		$validation = 0;
+			// 	}
+			// }
 
 			if( $validation == 1 ) {
-				if( $F_ID == 2 ) {
+				//if( $F_ID == 2 ) {
 					echo "<input type='hidden' name='ps_id' value='{$PS_ID}'>";
-				}
+				//}
 				echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
 				echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
 			}

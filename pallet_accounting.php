@@ -309,8 +309,7 @@ $query = "
 		,LS.LS_ID
 	FROM list__Shipment LS
 	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LS.CWP_ID
-	JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
-	JOIN ClientBrand CB ON CB.CB_ID = CW.CB_ID
+	JOIN ClientBrand CB ON CB.CB_ID = CWP.CB_ID
 	JOIN pallet__Name PN ON PN.PN_ID = LS.PN_ID
 	WHERE 1
 		".($_GET["date_from"] ? "AND LS.ls_date >= '{$_GET["date_from"]}'" : "")."

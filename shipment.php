@@ -41,9 +41,11 @@ if( !$_GET["date_to"] ) {
 				<option value=""></option>
 				<?
 				$query = "
-					SELECT CWP.CWP_ID, CW.item, CWP.in_pallet
+					SELECT CWP.CWP_ID
+						,IFNULL(CW.item, CWP.cwp_name) item
+						,CWP.in_pallet
 					FROM CounterWeightPallet CWP
-					JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+					LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 					ORDER BY CWP.CWP_ID
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -136,7 +138,7 @@ $query = "
 		".($_GET["date_from"] ? "AND LS.ls_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND LS.ls_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CWP_ID"] ? "AND LS.CWP_ID={$_GET["CWP_ID"]}" : "")."
-		".($_GET["CB_ID"] ? "AND CWP.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+		".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
 	GROUP BY LS.ls_date
 	ORDER BY LS.ls_date, LS.CWP_ID
 ";
@@ -147,20 +149,20 @@ while( $row = mysqli_fetch_array($res) ) {
 	$query = "
 		SELECT LS.LS_ID
 			,LS.ls_date
-			,CONCAT(CW.item, ' (', CWP.in_pallet, 'шт)') item
+			,CONCAT(IFNULL(CW.item, CWP.cwp_name), ' (', CWP.in_pallet, 'шт)') item
 			,LS.CWP_ID
 			,LS.pallets
 			,LS.in_pallet
 			,LS.pallets * LS.in_pallet details
 			,PN.pallet_name
 		FROM list__Shipment LS
-		JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LS.CWP_ID
-		JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 		JOIN pallet__Name PN ON PN.PN_ID = LS.PN_ID
+		JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LS.CWP_ID
+		LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 		WHERE 1
 			AND LS.ls_date = '{$row["ls_date"]}'
 			".($_GET["CWP_ID"] ? "AND LS.CWP_ID={$_GET["CWP_ID"]}" : "")."
-			".($_GET["CB_ID"] ? "AND CWP.CW_ID IN (SELECT CW_ID FROM CounterWeight WHERE CB_ID = {$_GET["CB_ID"]})" : "")."
+			".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
 		ORDER BY LS.ls_date DESC, LS.CWP_ID
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

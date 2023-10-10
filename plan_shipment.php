@@ -183,13 +183,13 @@ while( $row = mysqli_fetch_array($res) ) {
 			$priority = 0;
 		}
 		$query = "
-			SELECT CW.item
+			SELECT IFNULL(CW.item, CWP.cwp_name) item
 				,PSC.quantity
 				,PSC.CWP_ID
 			FROM plan__Shipment PS
 			JOIN plan__ShipmentCWP PSC ON PSC.PS_ID = PS.PS_ID
 			JOIN CounterWeightPallet CWP ON CWP.CWP_ID = PSC.CWP_ID
-			JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+			LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 			WHERE PS.ps_date = '{$row["ps_date"]}'
 				AND PS.F_ID = {$_GET["F_ID"]}
 				AND PS.priority = {$subrow["priority"]}
