@@ -74,9 +74,10 @@ if( isset($_POST["ps_date"]) ) {
 	foreach ($_POST["CWP_ID"] as $key => $value) {
 		// Редактируем
 		if( $_POST["cur_quantity"][$key] or $_POST["cur_quantity"][$key] == "0" ) {
+			$quantity = ($_POST["quantity"][$key] == "") ? 0 : $_POST["quantity"][$key];
 			$query = "
 				UPDATE plan__ShipmentCWP
-				SET quantity = {$_POST["quantity"][$key]}
+				SET quantity = {$quantity}
 					,author = {$_SESSION['id']}
 				WHERE PS_ID = {$PS_ID} AND CWP_ID = {$value}
 			";
@@ -130,6 +131,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr>
 						<th>Противовес</th>
 						<th>Количество паллет</th>
+						<th>Всего деталей</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -137,6 +139,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					$query = "
 						SELECT CWP.CWP_ID
 							,IFNULL(CW.item, CWP.cwp_name) item
+							,CWP.in_pallet
 						FROM list__PackingPallet LPP
 						JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
 						LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
@@ -152,9 +155,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<tr class="data_row">
 							<td><b style="font-size: 1.5em;"><?=$row["item"]?></b><input type="hidden" name="CWP_ID[<?=$row["CWP_ID"]?>]" value="<?=$row["CWP_ID"]?>"></td>
 							<td>
-								<input type="number" name="quantity[<?=$row["CWP_ID"]?>]" class="quantity" min="0" max="24" tabindex="<?=(++$index)?>" style="width: 70px;">
+								<input type="number" name="quantity[<?=$row["CWP_ID"]?>]" in_pallet="<?=$row["in_pallet"]?>" class="quantity" min="0" max="24" tabindex="<?=(++$index)?>" style="width: 70px;">
 								<input type="hidden" name="cur_quantity[<?=$row["CWP_ID"]?>]" class="cur_quantity">
 							</td>
+							<td><input type="number" class="amount" style="width: 70px;" readonly></td>
 						</tr>
 						<?
 					}
@@ -162,6 +166,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<tr class="total">
 						<td>Всего:</td>
 						<td id="total_quantity"><span></span></td>
+						<td></td>
 					</tr>
 				</tbody>
 			</table>
@@ -190,6 +195,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 			// Очищаем форму
 			$('#plan_shipment_form .data_row input.quantity').val('');
+			$('#plan_shipment_form .data_row input.amount').val('');
 			$('#plan_shipment_form .data_row input.cur_quantity').val('');
 			$('#plan_shipment_form .total span').html('');
 
@@ -210,10 +216,13 @@ this.subbut.value='Подождите, пожалуйста!';">
 			return false;
 		});
 
-		// При изменении кол-ва паллет пересчитываем тотал
+		// При изменении кол-ва паллет пересчитываем тотал и число деталей справа
 		$('#plan_shipment_form input.quantity').change(function() {
 			var quantity = $(this).val(),
-				total_quantity = 0;
+				total_quantity = 0,
+				in_pallet = $(this).attr('in_pallet');
+
+			$(this).parents('tr').find('.amount').val(quantity * in_pallet);
 
 			// Вычисляем тотал
 			$('.data_row').each(function(){

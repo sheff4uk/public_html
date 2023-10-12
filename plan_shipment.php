@@ -137,6 +137,7 @@ foreach ($_GET as &$value) {
 			<th>Очередь</th>
 			<th>Противовес</th>
 			<th>Количество</th>
+			<th>Всего деталей</th>
 			<th>Отгрузка состоялась</th>
 			<th></th>
 		</tr>
@@ -186,6 +187,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			SELECT IFNULL(CW.item, CWP.cwp_name) item
 				,PSC.quantity
 				,PSC.CWP_ID
+				,CWP.in_pallet
 			FROM plan__Shipment PS
 			JOIN plan__ShipmentCWP PSC ON PSC.PS_ID = PS.PS_ID
 			JOIN CounterWeightPallet CWP ON CWP.CWP_ID = PSC.CWP_ID
@@ -211,7 +213,8 @@ while( $row = mysqli_fetch_array($res) ) {
 			$ps_data[ $subrow["PS_ID"] ][] = array( "CWP_ID"=>$subsubrow["CWP_ID"], "quantity"=>$subsubrow["quantity"] );
 
 			echo "<td>{$subsubrow["item"]}</td>";
-			echo "<td>{$subsubrow["quantity"]}</td>";
+			echo "<td><b>{$subsubrow["quantity"]}</b></td>";
+			echo "<td>".($subsubrow["quantity"] * $subsubrow["in_pallet"])."</td>";
 			// Выводим общую ячейку с отгрузкой и кнопками действий
 			if( $priority != $subrow["priority"] ) {
 				echo "<td rowspan='{$subcnt}'>{$subrow["friendly_shipment_time"]}</td>";
