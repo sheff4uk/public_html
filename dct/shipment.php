@@ -57,7 +57,7 @@ if( isset($_POST["lpp_id"]) ) {
 			SET shipment_time = '{$now}'
 			WHERE PS_ID = {$_POST["ps_id"]}
 		";
-//		mysqli_query( $mysqli, $query ) or die("Invalid query2: " .mysqli_error( $mysqli ));
+		mysqli_query( $mysqli, $query ) or die("Invalid query2: " .mysqli_error( $mysqli ));
 //	}
 
 	$query = "
@@ -66,8 +66,6 @@ if( isset($_POST["lpp_id"]) ) {
 			,removal_time = NULL
 		WHERE LPP_ID IN ({$LPP_IDs}) AND shipment_time IS NULL
 	";
-	echo $query;
-	die();
 	mysqli_query( $mysqli, $query ) or die("Invalid query3: " .mysqli_error( $mysqli ));
 
 	if( mysqli_affected_rows($mysqli) ) {
