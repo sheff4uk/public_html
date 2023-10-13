@@ -1,6 +1,7 @@
 <?
 include_once "../config.php";
 $ip = $_SERVER['REMOTE_ADDR'];
+$ip = "78.138.173.64";
 
 // Узнаем участок
 $query = "
@@ -50,14 +51,14 @@ if( isset($_POST["lpp_id"]) ) {
 	$row = mysqli_fetch_array($res);
 	$now = $row["now"];
 
-	if( isset($_POST["ps_id"]) ) {
+//	if( isset($_POST["ps_id"]) ) {
 		$query = "
 			UPDATE plan__Shipment
 			SET shipment_time = '{$now}'
 			WHERE PS_ID = {$_POST["ps_id"]}
 		";
-		mysqli_query( $mysqli, $query ) or die("Invalid query2: " .mysqli_error( $mysqli ));
-	}
+//		mysqli_query( $mysqli, $query ) or die("Invalid query2: " .mysqli_error( $mysqli ));
+//	}
 
 	$query = "
 		UPDATE list__PackingPallet
@@ -65,6 +66,8 @@ if( isset($_POST["lpp_id"]) ) {
 			,removal_time = NULL
 		WHERE LPP_ID IN ({$LPP_IDs}) AND shipment_time IS NULL
 	";
+	echo $query;
+	die();
 	mysqli_query( $mysqli, $query ) or die("Invalid query3: " .mysqli_error( $mysqli ));
 
 	if( mysqli_affected_rows($mysqli) ) {
