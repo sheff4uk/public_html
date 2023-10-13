@@ -1,7 +1,11 @@
 <?
 include_once "../config.php";
-$ip = $_SERVER['REMOTE_ADDR'];
-$ip = "78.138.173.64";
+if( isset($_GET["ip"]) ) {
+	$ip = $_GET["ip"];
+}
+else {
+	$ip = $_SERVER['REMOTE_ADDR'];
+}
 
 // Узнаем участок
 $query = "
