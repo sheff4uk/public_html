@@ -143,7 +143,7 @@ echo "<title>Накладная №{$PS_ID}</title>";
         $blank .= "
                     </tbody>\n
                 </table>\n
-                <div class='page'>\n
+                <div class='page' style='margin-top: 30px;'>\n
                     <div class='blank'>\n
                         <p style='margin-bottom: 0px;'>Сдал: _________ / ____________</p>\n
                         <p style='margin-top: 0px;'><sup style='margin-left: 55px;'>подпись</sup><sup style='margin-left: 55px;'>Ф.И.О.</sup></p>\n
