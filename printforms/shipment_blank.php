@@ -77,6 +77,7 @@ echo "<title>Накладная №{$PS_ID}</title>";
         JOIN CounterWeightPallet CWP ON CWP.CWP_ID = PSC.CWP_ID
         JOIN Manufacturer M ON M.M_ID = CWP.M_ID
         WHERE PSC.PS_ID = {$PS_ID}
+        GROUP BY M.M_ID
     ";
     $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
     while( $row = mysqli_fetch_array($res) ) {
