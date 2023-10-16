@@ -217,11 +217,16 @@ while( $row = mysqli_fetch_array($res) ) {
 			echo "<td>".($subsubrow["quantity"] * $subsubrow["in_pallet"])."</td>";
 			// Выводим общую ячейку с отгрузкой и кнопками действий
 			if( $priority != $subrow["priority"] ) {
-				echo "<td rowspan='{$subcnt}'>{$subrow["friendly_shipment_time"]}</td>";
+				echo "<td rowspan='{$subcnt}'>";
+				if( $subrow["friendly_shipment_time"] ) {
+				 	echo "{$subrow["friendly_shipment_time"]}<br><b>Накладная №{$subrow["PS_ID"]} / {$subrow["priority"]}</b>";
+				}
+				echo "</td>";
 				echo "<td rowspan='{$subcnt}'>";
 				echo "<a href='printforms/shipment_blank.php?PS_ID={$subrow["PS_ID"]}' class='print' style='margin-right: 20px;' title='Бланк накладной'><i class='fas fa-print fa-lg'></i></a>";
-				if( !$subrow["friendly_shipment_time"] )
+				if( !$subrow["friendly_shipment_time"] ) {
 					echo "<a href='#' class='add_ps' ps_id='{$subrow["PS_ID"]}' ps_date='{$row["ps_date"]}' priority='{$subrow["priority"]}' title='Изменить запланированную отгрузку'><i class='fa fa-pencil-alt fa-lg'></i></a>";
+				}
 				echo "</td>";
 			}
 			echo "</tr>";

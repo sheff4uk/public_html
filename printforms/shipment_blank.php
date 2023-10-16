@@ -109,7 +109,7 @@ echo "<title>Накладная №{$PS_ID}</title>";
                         <th>Кол-во</th>\n
                     </tr>\n
                 </thead>\n
-                <tbody>\n
+                <tbody style='text-align: center;'>\n
         ";
 
         $query = "
