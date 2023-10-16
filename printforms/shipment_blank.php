@@ -186,7 +186,7 @@ echo "<title>Накладная №{$PS_ID}</title>";
                 {$statics}
             </div>\n
             <div style='position: relative; height: 333px;'>\n
-                <div style='position: absolute; top: 20px; border: 2px solid; width: 150px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>водителя</div>\n
+                <div style='position: absolute; top: 20px; border: 2px solid; width: 200px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>водителя</div>\n
                 {$statics}
             </div>\n
         ";
