@@ -41,19 +41,11 @@ echo "<title>Накладная №{$PS_ID}</title>";
 		.nowrap {
 			white-space: nowrap;
 		}
-        .blank {
-            /* width: 47%; */
-        }
-        .page {
-            /* display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap; */
-        }
-        /* @media print {
+        @media print {
             .page {
                 page-break-after: always;
             } 
-        }  */
+        } 
 	</style>
 </head>
 <body>
@@ -176,22 +168,22 @@ echo "<title>Накладная №{$PS_ID}</title>";
         ";
 
         // Формируем бланк
-        $blank = "
-            <div style='border-bottom: 1px dotted; position: relative; height: 333px;'>\n
-                <div style='position: absolute; top: 20px; border: 2px solid; width: 200px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>охраны</div>\n
-                {$statics}
-            </div>\n
-            <div style='border-bottom: 1px dotted; position: relative; height: 333px;'>\n
-                <div style='position: absolute; top: 20px; border: 2px solid; width: 200px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>{$CB_company}</div>\n
-                {$statics}
-            </div>\n
-            <div style='position: relative; height: 333px;'>\n
-                <div style='position: absolute; top: 20px; border: 2px solid; width: 200px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>водителя</div>\n
-                {$statics}
+        echo "
+            <div class='page'>\n
+                <div style='border-bottom: 1px dotted; position: relative; height: 333px;'>\n
+                    <div style='position: absolute; top: 20px; border: 2px solid; width: 200px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>охраны</div>\n
+                    {$statics}
+                </div>\n
+                <div style='border-bottom: 1px dotted; position: relative; height: 333px;'>\n
+                    <div style='position: absolute; top: 20px; border: 2px solid; width: 200px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>{$CB_company}</div>\n
+                    {$statics}
+                </div>\n
+                <div style='position: relative; height: 333px;'>\n
+                    <div style='position: absolute; top: 20px; border: 2px solid; width: 200px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>водителя</div>\n
+                    {$statics}
+                </div>\n
             </div>\n
         ";
-        
-        echo $blank;
     }
 ?>
 </html>
