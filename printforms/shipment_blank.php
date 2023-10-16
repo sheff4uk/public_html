@@ -171,15 +171,15 @@ echo "<title>Накладная №{$PS_ID}</title>";
         echo "
             <div class='page'>\n
                 <div style='border-bottom: 1px dotted; position: relative; height: 333px;'>\n
-                    <div style='position: absolute; top: 20px; border: 2px solid; width: 200px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>охраны</div>\n
+                    <div style='position: absolute; top: 20px; border: 2px solid; padding: 0 20px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>охраны</div>\n
                     {$statics}
                 </div>\n
                 <div style='border-bottom: 1px dotted; position: relative; height: 333px;'>\n
-                    <div style='position: absolute; top: 20px; border: 2px solid; width: 200px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>{$CB_company}</div>\n
+                    <div style='position: absolute; top: 20px; border: 2px solid; padding: 0 20px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>{$CB_company}</div>\n
                     {$statics}
                 </div>\n
                 <div style='position: relative; height: 333px;'>\n
-                    <div style='position: absolute; top: 20px; border: 2px solid; width: 200px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>водителя</div>\n
+                    <div style='position: absolute; top: 20px; border: 2px solid; padding: 0 20px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>водителя</div>\n
                     {$statics}
                 </div>\n
             </div>\n
