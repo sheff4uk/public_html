@@ -16,7 +16,7 @@ echo "<title>Накладная №{$PS_ID}</title>";
 	<style>
 		@media print {
 			@page {
-				size: landscape;
+				size: portrait;
 			}
 		}
 
@@ -42,18 +42,18 @@ echo "<title>Накладная №{$PS_ID}</title>";
 			white-space: nowrap;
 		}
         .blank {
-            width: 47%;
+            /* width: 47%; */
         }
         .page {
-            display: flex;
+            /* display: flex;
             justify-content: space-between;
-            flex-wrap: wrap;
+            flex-wrap: wrap; */
         }
-        @media print {
+        /* @media print {
             .page {
                 page-break-after: always;
             } 
-        } 
+        }  */
 	</style>
 </head>
 <body>
@@ -62,12 +62,14 @@ echo "<title>Накладная №{$PS_ID}</title>";
     // Получаем дату планируемой отгрузки
     $query = "
         SELECT DATE_FORMAT(PS.ps_date, '%d.%m.%Y') ps_date_format
+            ,PS.priority
         FROM plan__Shipment PS
         WHERE PS.PS_ID = {$PS_ID}
     ";
     $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
     $ps_date_format = $row["ps_date_format"];
+    $priority = $row["priority"];
 
     // Цикл по списку грузоотправителей
     $query = "
@@ -97,28 +99,30 @@ echo "<title>Накладная №{$PS_ID}</title>";
         $subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
         $subrow = mysqli_fetch_array($subres);
         $CB_company = $subrow["company"];
-    
-    
-        $blank = "
-            <div class='blank'>\n
-                <p style='text-align: right;'>от {$ps_date_format} г.</p>\n
-                <p style='text-align: center; font-size: 1.3em;'>Накладная №{$PS_ID}</p>\n
-                <p style='font-size: 1.1em;'>Грузоотправитель: <span style='text-decoration: underline;'>{$M_company}</span></p>\n
-                <p style='font-size: 1.1em;'>Грузополучатель: <span style='text-decoration: underline;'>{$CB_company}</span></p>\n
-                <table>\n
-                    <thead>\n
-                        <tr>\n
-                            <th>№ п-п</th>\n
-                            <th>Наименование</th>\n
-                            <th>Ед. изм.</th>\n
-                            <th>Кол-во</th>\n
-                        </tr>\n
-                    </thead>\n
-                    <tbody>\n
+ 
+        // Статические данные
+        $statics = "
+            <p style='font-size: 1.1em; float: left; margin: 0px;'>Грузоотправитель: <span style='text-decoration: underline;'>{$M_company}</span></p>\n
+            <p style='text-align: right;'>от {$ps_date_format} г.</p>\n
+            <p style='text-align: center; font-size: 1.3em;'><b style='text-decoration: underline;'>Накладная №{$PS_ID} / {$priority}</b></p>\n
+            <!--<p style='font-size: 1.1em;'>Грузоотправитель: <span style='text-decoration: underline;'>{$M_company}</span></p>\n-->
+            <table>\n
+                <thead>\n
+                    <tr>\n
+                        <th>№ п-п</th>\n
+                        <th>Наименование</th>\n
+                        <th>Ед. изм.</th>\n
+                        <th>Кол-во</th>\n
+                        <th>Ед. изм.</th>\n
+                        <th>Кол-во</th>\n
+                    </tr>\n
+                </thead>\n
+                <tbody>\n
         ";
-    
+
         $query = "
             SELECT IFNULL(CW.drawing_item, CWP.cwp_name) item
+                ,PSC.quantity
                 ,PSC.quantity * CWP.in_pallet amount
             FROM plan__ShipmentCWP PSC
             JOIN CounterWeightPallet CWP ON CWP.CWP_ID = PSC.CWP_ID
@@ -129,37 +133,65 @@ echo "<title>Накладная №{$PS_ID}</title>";
         $subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
         $i = 1;
         while( $subrow = mysqli_fetch_array($subres) ) {
-            $blank .= "
+            $statics .= "
                 <tr>
                     <td>{$i}</td>\n
                     <td>{$subrow["item"]}</td>\n
+                    <td>паллет</td>\n
+                    <td>{$subrow["quantity"]}</td>\n
                     <td>шт.</td>\n
                     <td>{$subrow["amount"]}</td>\n
                 </tr>\n
             ";
             $i++;
         }
+
+        // Дополнение пустыми строками  
+        for( $i; $i<=8; $i++ ) {
+            $statics .= "
+                <tr>
+                    <td>{$i}</td>\n
+                    <td></td>\n
+                    <td></td>\n
+                    <td></td>\n
+                    <td></td>\n
+                    <td></td>\n
+                </tr>\n
+            ";
+        }
     
-        $blank .= "
-                    </tbody>\n
-                </table>\n
-                <div class='page' style='margin-top: 30px;'>\n
-                    <div class='blank'>\n
-                        <p style='margin-bottom: 0px;'>Сдал: _________ / ____________</p>\n
-                        <p style='margin-top: 0px;'><sup style='margin-left: 55px;'>подпись</sup><sup style='margin-left: 55px;'>Ф.И.О.</sup></p>\n
-                    </div>\n
-                    <div class='blank'>\n
-                        <p style='margin-bottom: 0px;'>Принял: _________ / ____________</p>\n
-                        <p style='margin-top: 0px;'><sup style='margin-left: 70px;'>подпись</sup><sup style='margin-left: 55px;'>Ф.И.О.</sup></p>\n
-                    </div>\n
+        $statics .= "
+                </tbody>\n
+            </table>\n
+            <div style='margin-top: 20px; display: flex; justify-content: space-between; flex-wrap: wrap;'>\n
+                <div style='width: 47%;'>\n
+                    <p style='margin-bottom: 0px;'>Сдал: _______________ / _______________</p>\n
+                    <p style='margin-top: 0px;'><sup style='margin-left: 75px;'>подпись</sup><sup style='margin-left: 85px;'>Ф.И.О.</sup></p>\n
+                </div>\n
+                <div style='width: 47%;'>\n
+                    <p style='margin-bottom: 0px;'>Принял: _______________ / _______________</p>\n
+                    <p style='margin-top: 0px;'><sup style='margin-left: 90px;'>подпись</sup><sup style='margin-left: 85px;'>Ф.И.О.</sup></p>\n
                 </div>\n
             </div>\n
         ";
-    
-        echo "<div class='page'>\n";
+
+        // Формируем бланк
+        $blank = "
+            <div style='border-bottom: 1px dotted; position: relative; height: 333px;'>\n
+                <div style='position: absolute; top: 20px; border: 2px solid; width: 200px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>охраны</div>\n
+                {$statics}
+            </div>\n
+            <div style='border-bottom: 1px dotted; position: relative; height: 333px;'>\n
+                <div style='position: absolute; top: 20px; border: 2px solid; width: 200px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>{$CB_company}</div>\n
+                {$statics}
+            </div>\n
+            <div style='position: relative; height: 333px;'>\n
+                <div style='position: absolute; top: 20px; border: 2px solid; width: 150px; height: 33px; text-align: center; font-weight: bold;'>ЭКЗЕМПЛЯР<br>водителя</div>\n
+                {$statics}
+            </div>\n
+        ";
+        
         echo $blank;
-        echo $blank;
-        echo "</div>\n";
     }
 ?>
 </html>
