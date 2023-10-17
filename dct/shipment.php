@@ -104,6 +104,8 @@ if( isset($_POST["lpp_id"]) ) {
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Отгрузка</title>
 		<script src="../js/jquery-1.11.3.min.js"></script>
+		<script src="https://kit.fontawesome.com/020f21ae61.js" crossorigin="anonymous"></script>
+		<script src="../js/jquery.printPage.js" type="text/javascript"></script>
 		<script>
 			$(function() {
 				// Считывание штрихкода
@@ -172,22 +174,22 @@ if( isset($_POST["lpp_id"]) ) {
 			$LPP_ID = $row["LPP_ID"];
 
 			if( $row["packed_time_format"] == "" ) {
-				echo "<h1 style='color: red;'>Паллет с таким номером не найден!</h1>";
+				echo "<h1 style='color: red;'>Паллет с таким номером не найден!</h1>\n";
 			}
 			else {
 				echo "
-					<span style='display: inline-block; width: 120px;'>Код:</span><b style='font-size: 2em;'>{$row["item"]}</b><br>
-					<span style='display: inline-block; width: 120px;'>Контроль:</span><b>{$row["packed_time_format"]}</b><br>
-					".($row["scan_time_format"] ? "<span style='display: inline-block; width: 120px;'>Сканирование:</span><span style='color: green;'><b>{$row["scan_time_format"]}</b></span><br>" : "")."
-					".($row["shipment_time_format"] ? "<span style='display: inline-block; width: 120px;'>Отгрузка:</span><span style='color: red;'><b>{$row["shipment_time_format"]}</b></span>" : "")."
-					<br>
+					<span style='display: inline-block; width: 120px;'>Код:</span><b style='font-size: 2em;'>{$row["item"]}</b><br>\n
+					<span style='display: inline-block; width: 120px;'>Контроль:</span><b>{$row["packed_time_format"]}</b><br>\n
+					".($row["scan_time_format"] ? "<span style='display: inline-block; width: 120px;'>Сканирование:</span><span style='color: green;'><b>{$row["scan_time_format"]}</b></span><br>\n" : "")."
+					".($row["shipment_time_format"] ? "<span style='display: inline-block; width: 120px;'>Отгрузка:</span><span style='color: red;'><b>{$row["shipment_time_format"]}</b></span>\n" : "")."
+					<br>\n
 				";
 	
-				echo "<fieldset id='do'>";
-				echo "<form method='post'>";
+				echo "<fieldset id='do'>\n";
+				echo "<form method='post'>\n";
 				if( $row["scan_time_format"] ) {
 					if( $row["shipment_time_format"] ) {
-						echo "<font color='red'>Данный паллет отгружен</font>";
+						echo "<font color='red'>Данный паллет отгружен</font>\n";
 					}
 					else {
 						?>
@@ -200,8 +202,8 @@ if( isset($_POST["lpp_id"]) ) {
 				}
 				else {
 					if( $row["duration"] > 0 and $F_ID == 1) {
-						echo "<span style='color: #f00; font-size: 2em; font-weight: bold;'>Отгрузка запрещена!</span><br>";
-						echo "<span>До полного созревания необходимо <b>{$row["duration"]}</b> ч.</span>";
+						echo "<span style='color: #f00; font-size: 2em; font-weight: bold;'>Отгрузка запрещена!</span><br>\n";
+						echo "<span>До полного созревания необходимо <b>{$row["duration"]}</b> ч.</span>\n";
 					}
 					else {
 					?>
@@ -211,8 +213,8 @@ if( isset($_POST["lpp_id"]) ) {
 					<?
 					}
 				}
-				echo "</form>";
-				echo "</fieldset>";
+				echo "</form>\n";
+				echo "</fieldset>\n";
 			}
 		}
 
@@ -220,8 +222,8 @@ if( isset($_POST["lpp_id"]) ) {
 
 		// График отгрузки
 		//if( $F_ID == 2 ) {
-			echo "<fieldset>";
-			echo "<legend><b>График отгрузки:</b></legend>";
+			echo "<fieldset>\n";
+			echo "<legend><b>График отгрузки:</b></legend>\n";
 			// Находим очередной график огрузки
 			$query = "
 				SELECT PS.PS_ID
@@ -241,20 +243,20 @@ if( isset($_POST["lpp_id"]) ) {
 			$PS_ID = $row["PS_ID"];
 
 			if( !$PS_ID ) {
-				echo "<font color='red'>На сегодня отгрузок не запланировано!</font>";
+				echo "<font color='red'>На сегодня отгрузок не запланировано!</font>\n";
 				$validation = 0;
 			}
 
 			// Таблица план-факт отгрузки
-			echo "<table cellspacing='0' cellpadding='2' border='1'>";
-			echo "<thead>";
-			echo "<tr>";
-			echo "<th>Код</th>";
-			echo "<th>План</th>";
-			echo "<th>Факт</th>";
-			echo "</tr>";
-			echo "</thead>";
-			echo "<tbody>";
+			echo "<table cellspacing='0' cellpadding='2' border='1'>\n";
+			echo "<thead>\n";
+			echo "<tr>\n";
+			echo "<th>Код</th>\n";
+			echo "<th>План</th>\n";
+			echo "<th>Факт</th>\n";
+			echo "</tr>\n";
+			echo "</thead>\n";
+			echo "<tbody>\n";
 
 			// Получаем список кодов запланированных и сканированных поддонов
 			$query = "
@@ -281,8 +283,8 @@ if( isset($_POST["lpp_id"]) ) {
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $row = mysqli_fetch_array($res) ) {
-				echo "<tr>";
-				echo "<td><b>{$row["item"]}</b></td>";
+				echo "<tr>\n";
+				echo "<td><b>{$row["item"]}</b></td>\n";
 				// Построчное получение и вывод данных
 				$query = "
 					SELECT PSC.quantity plan
@@ -293,7 +295,7 @@ if( isset($_POST["lpp_id"]) ) {
 				$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				$subrow = mysqli_fetch_array($subres);
 				$plan = $subrow["plan"];
-				echo "<td>{$plan}</td>";
+				echo "<td>{$plan}</td>\n";
 
 				$query = "
 					SELECT SUM(1) fact
@@ -310,30 +312,30 @@ if( isset($_POST["lpp_id"]) ) {
 				if( $plan != $fact ) {
 					$validation = 0;
 				}
-				echo "<td ".($plan == $fact ? "style='background: green;'" : "").">{$fact}</td>";
+				echo "<td ".($plan == $fact ? "style='background: green;'" : "").">{$fact}</td>\n";
 
-				echo "</tr>";
+				echo "</tr>\n";
 			}
-			echo "</tbody>";
-			echo "</table>";
-			echo "</fieldset>";
+			echo "</tbody>\n";
+			echo "</table>\n";
+			echo "</fieldset>\n";
 		//}
 
 		// Список подготовленных к отгрузке паллетов
 		$i = 0;
-		echo "<fieldset><legend><b>Сканированные паллеты:</b></legend>";
-		echo "<form method='post'>";
+		echo "<fieldset><legend><b>Сканированные паллеты:</b></legend>\n";
+		echo "<form method='post'>\n";
 		echo "
-			<table cellspacing='0' cellpadding='2' border='1'>
-				<thead>
-					<tr>
-						<th>№ п/п</th>
-						<th>Код</th>
-						<th>Время сканирования</th>
-						<th>Последние 4 цифры штрих-кода</th>
-					</tr>
-				</thead>
-				<tbody>
+			<table cellspacing='0' cellpadding='2' border='1'>\n
+				<thead>\n
+					<tr>\n
+						<th>№ п/п</th>\n
+						<th>Код</th>\n
+						<th>Время сканирования</th>\n
+						<th>Последние 4 цифры штрих-кода</th>\n
+					</tr>\n
+				</thead>\n
+				<tbody>\n
 		";
 		$query = "
 			SELECT LPP.LPP_ID
@@ -352,17 +354,17 @@ if( isset($_POST["lpp_id"]) ) {
 		while( $row = mysqli_fetch_array($res) ) {
 			$i++;
 			echo "
-				<tr".($row["LPP_ID"] == $LPP_ID ? " style='background-color: yellow;'" : "").">
-					<td><input type='hidden' name='lpp_id[]' value='{$row["LPP_ID"]}'>{$i}</td>
-					<td>{$row["item"]}</td>
-					<td>{$row["scan_time_format"]}</td>
-					<td>{$row["last4dig"]}</td>
-				</tr>
+				<tr".($row["LPP_ID"] == $LPP_ID ? " style='background-color: yellow;'" : "").">\n
+					<td><input type='hidden' name='lpp_id[]' value='{$row["LPP_ID"]}'>{$i}</td>\n
+					<td>{$row["item"]}</td>\n
+					<td>{$row["scan_time_format"]}</td>\n
+					<td>{$row["last4dig"]}</td>\n
+				</tr>\n
 			";
 		}
 		echo "
-				</tbody>
-			</table>
+				</tbody>\n
+			</table>\n
 		";
 
 		if( $i > 0 ) {
@@ -391,15 +393,21 @@ if( isset($_POST["lpp_id"]) ) {
 			// }
 
 			if( $validation == 1 ) {
-				//if( $F_ID == 2 ) {
-					echo "<input type='hidden' name='ps_id' value='{$PS_ID}'>";
-				//}
-				echo "<br><input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>";
-				echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>";
+				echo "<br><input type='hidden' name='ps_id' value='{$PS_ID}'>\n";
+				if( $F_ID == 2 ) {
+					echo "<a href='../printforms/shipment_blank.php?PS_ID={$PS_ID}' class='print' style='font-size: 1.5em;'><i class='fas fa-print fa-lg'></i> Накладная</a>\n";
+				}
+				echo "<input type='submit' value='Отгрузить' style='background-color: red; font-size: 2em; color: white;'>\n";
+				echo "<br><br><font color='red'>ВНИМАНИЕ! Отменить это действие не возможно.</font>\n";
 			}
 		}
-		echo "</form>";
-		echo "</fieldset>";
+		echo "</form>\n";
+		echo "</fieldset>\n";
 		?>
+		<script>
+			$(function() {
+				$(".print").printPage();
+			});
+		</script>
 	</body>
 </html>
