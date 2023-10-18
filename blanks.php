@@ -92,6 +92,30 @@ if( !in_array('blanks', $Rights) ) {
 <fieldset class="files_wrap">
 	<legend>Этикетки</legend>
 	<section class="cell">
+		<a href="/files/0020301136%20E.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>0020301136 E</p>
+		</a>
+	</section>
+	<section class="cell">
+		<a href="/files/0020301136%20H.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>0020301136 H</p>
+		</a>
+	</section>
+	<section class="cell">
+		<a href="/files/0020301136%20M.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>0020301136 M</p>
+		</a>
+	</section>
+	<section class="cell">
+		<a href="/files/0020301136%20L.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>0020301136 L</p>
+		</a>
+	</section>
+	<!-- <section class="cell">
 		<a href="/files/41008883.pdf" class='print'>
 			<p><i class="fas fa-file-pdf fa-5x"></i></p>
 			<p>41008883</p>
@@ -150,7 +174,7 @@ if( !in_array('blanks', $Rights) ) {
 			<p><i class="fas fa-file-pdf fa-5x"></i></p>
 			<p>20301558</p>
 		</a>
-	</section>
+	</section> -->
 </fieldset>
 
 <script>
