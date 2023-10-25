@@ -129,7 +129,7 @@ echo "<title>Накладная №{$PS_ID}</title>";
                 <tr>
                     <td>{$i}</td>\n
                     <td>{$subrow["item"]}</td>\n
-                    <td>паллет</td>\n
+                    <td>упаковка</td>\n
                     <td>{$subrow["quantity"]}</td>\n
                     <td>шт.</td>\n
                     <td>{$subrow["amount"]}</td>\n
