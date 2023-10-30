@@ -58,6 +58,26 @@ if( !$_GET["date_to"] ) {
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>Продукт:</span>
+			<select name="product" class="<?=$_GET["product"] ? "filtered" : ""?>" style="width: 200px;">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT CWP.product
+					FROM CounterWeightPallet CWP
+					GROUP BY CWP.product
+					ORDER BY CWP.product
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["product"] == $_GET["product"]) ? "selected" : "";
+					echo "<option value='{$row["product"]}' {$selected}>{$row["product"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Клиент:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
@@ -139,6 +159,7 @@ $query = "
 		".($_GET["date_to"] ? "AND LS.ls_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CWP_ID"] ? "AND LS.CWP_ID={$_GET["CWP_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
+		".($_GET["product"] ? "AND CWP.product LIKE '{$_GET["product"]}'" : "")."
 	GROUP BY LS.ls_date
 	ORDER BY LS.ls_date, LS.CWP_ID
 ";
@@ -163,6 +184,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			AND LS.ls_date = '{$row["ls_date"]}'
 			".($_GET["CWP_ID"] ? "AND LS.CWP_ID={$_GET["CWP_ID"]}" : "")."
 			".($_GET["CB_ID"] ? "AND CWP.CB_ID = {$_GET["CB_ID"]}" : "")."
+			".($_GET["product"] ? "AND CWP.product LIKE '{$_GET["product"]}'" : "")."
 		ORDER BY LS.ls_date DESC, LS.CWP_ID
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
