@@ -64,7 +64,7 @@ if( !$_GET["date_to"] ) {
 				$query = "
 					SELECT MN.MN_ID, MN.material_name
 					FROM material__Name MN
-					ORDER BY MN.MN_ID
+					ORDER BY MN.material_name
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
@@ -83,7 +83,7 @@ if( !$_GET["date_to"] ) {
 				$query = "
 					SELECT MS.MS_ID, MS.supplier
 					FROM material__Supplier MS
-					ORDER BY MS.MS_ID
+					ORDER BY MS.supplier
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
@@ -102,7 +102,7 @@ if( !$_GET["date_to"] ) {
 				$query = "
 					SELECT MC.MC_ID, MC.carrier
 					FROM material__Carrier MC
-					ORDER BY MC.MC_ID
+					ORDER BY MC.carrier
 				";
 				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				while( $row = mysqli_fetch_array($res) ) {
