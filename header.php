@@ -189,7 +189,7 @@ function src_url($src) {
 		if( in_array('filling_opening', $Rights) ) {
 			$menu["Производство"]["<i class='fas fa-fill-drip fa-lg'></i> Чек листы операторов"] = "filling.php";
 			$menu["Производство"]["<i class='fas fa-expand fa-lg'></i> Расформовка"] = "opening.php";
-			$menu["Производство"]["<i class='fas fa-industry fa-lg'></i> Стадии производства"] = "manufacturing.php";
+			//$menu["Производство"]["<i class='fas fa-industry fa-lg'></i> Стадии производства"] = "manufacturing.php";
 		}
 		if( in_array('stock', $Rights) ) {
 			$menu["Производство"]["<i class='fas fa-pallet fa-lg'></i> Склад продукции"] = "stock.php";

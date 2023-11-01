@@ -99,7 +99,7 @@ $notification_group = $row["notification_group"];
 		/////////////////////////////////////////////////////////////////////////////////
 		if( $LO_ID_before != $LO_ID_after ) {
 
-			message_to_telegram("Кассета <b>{$cassette}</b> расформована.", $notification_group);
+			//message_to_telegram("Кассета <b>{$cassette}</b> расформована.", $notification_group);
 
 			// Список активных весов на конвейере
 			$query = "
