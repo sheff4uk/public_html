@@ -14,11 +14,23 @@ $date_to = date("d.m.Y", strtotime($_GET["date_to"]));
 $date = date_create();
 $date_format = date_format($date, 'd.m.Y');
 
-// Название участка
-$query = "SELECT f_name FROM factory WHERE F_ID = {$_GET["F_ID"]}";
+// Название участка и должностные лица
+$query = "
+	SELECT f_name
+		,job_title_1
+		,full_name_1
+		,job_title_2
+		,full_name_2
+	FROM factory
+	WHERE F_ID = {$_GET["F_ID"]}
+";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
 $f_name = $row["f_name"];
+$job_title_1 = $row["job_title_1"];
+$full_name_1 = $row["full_name_1"];
+$job_title_2 = $row["job_title_2"];
+$full_name_2 = $row["full_name_2"];
 
 echo "<title>Расход сырья {$date_format}</title>";
 ?>
@@ -56,8 +68,6 @@ echo "<title>Расход сырья {$date_format}</title>";
 </head>
 <body>
 
-<br>
-<br>
 <br>
 <br>
 <br>
@@ -246,9 +256,8 @@ echo "<title>Расход сырья {$date_format}</title>";
 </table>
 
 <br>
-<h3>Начальник производства: ____________________________/____________</h3>
-<br>
-<h3>Начальник отдела качества: ____________________________/____________</h3>
+<h3 style="float: left;"><?=$job_title_1?>: ____________________ / <?=$full_name_1?></h3>
+<h3 style="float: right;"><?=$job_title_2?>: ____________________ / <?=$full_name_2?></h3>
 
 <style>
 	<?=($s_fraction ? "" : ".s_fraction{ display: none; }")?>
