@@ -26,7 +26,7 @@ $query = "
 		,PB.sn_density
 		,PB.cs_density
 		,PB.calcium
-		,IF( IFNULL(PB.print_time, PB.change_time) < NOW() - INTERVAL 1 MONTH, 0, 1 ) editable
+		,IF( IFNULL(PB.print_time, PB.change_time) < NOW() - INTERVAL 10 DAY, 0, 1 ) editable
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID
@@ -131,18 +131,18 @@ if( $row["editable"] ) {
 
 	// Данные рецепта
 	$query = "
-		SELECT IFNULL(MF.s_fraction, 0) s_fraction
-			,IFNULL(MF.l_fraction, 0) l_fraction
-			,IFNULL(MF.iron_oxide, 0) iron_oxide
-			,IFNULL(MF.slag10, 0) slag10
-			,IFNULL(MF.slag20, 0) slag20
-			,IFNULL(MF.slag020, 0) slag020
-			,IFNULL(MF.slag30, 0) slag30
-			,IFNULL(MF.sand, 0) sand
-			,IFNULL(MF.crushed_stone, 0) crushed_stone
-			,IFNULL(MF.cement, 0) cement
-			,IFNULL(MF.plasticizer, 0) plasticizer
-			,IFNULL(MF.water, 0) water
+		SELECT MF.s_fraction
+			,MF.l_fraction
+			,MF.iron_oxide
+			,MF.slag10
+			,MF.slag20
+			,MF.slag020
+			,MF.slag30
+			,MF.sand
+			,MF.crushed_stone
+			,MF.cement
+			,MF.plasticizer
+			,MF.water
 			,COUNT(MF.s_fraction) sf_cnt
 			,COUNT(MF.l_fraction) lf_cnt
 			,COUNT(MF.iron_oxide) io_cnt
@@ -360,7 +360,7 @@ if( $row["editable"] ) {
 	echo "$('input[name=subbut]').show('fast');";
 }
 else {
-	$html = "<p>Записи старше 1 месяца не редактируются!</p>";
+	$html = "<p>Записи старше 10 дней не редактируются!</p>";
 	echo "$('input[name=subbut]').attr('disabled', true);";
 	echo "$('input[name=subbut]').hide('fast');";
 }
