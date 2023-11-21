@@ -1,4 +1,4 @@
-<?
+<?php
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
@@ -20,8 +20,7 @@ $from_date = date_create( '-1 days' );
 $from_format = date_format($from_date, 'd.m.Y');
 $to_date = date_create();
 $to_format = date_format($to_date, 'd.m.Y');
-//$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Производственный отчет за {$from_format}"). "?=";
-$subject = "[KONSTANTA] Производственный отчет за {$from_format}";
+$subject = "Производственный отчет за {$from_format}";
 
 $message = "
 	<html>
@@ -176,30 +175,23 @@ $message .= "
 	</html>
 ";
 
-// $headers  = "Content-type: text/html; charset=\"utf-8\"\n";
-// $headers .= "From: Konstanta <planner@konstanta.ltd>\r\n";
-
-// mail($to, $subject, $message, $headers);
-// $headers[] = 'MIME-Version: 1.0';
-// $headers[] = 'Content-type: text/html; charset=iso-8859-1';
-// $headers[] = 'From: Konstanta <planner@konstanta.ltd>';
-// $headers[] = 'Reply-To: Konstanta <planner@konstanta.ltd>';
-// $headers[] = 'X-Mailer: PHP/' . phpversion();
-
-// mail($to, $subject, $message, implode("\r\n", $headers));
-
 $mail = new PHPMailer();
 
 $mail->isSMTP();
 $mail->Host			= 'exchange.atservers.net'; 
 $mail->SMTPAuth		= true;
-$mail->Username		= 'planner@konstanta.ltd';
-$mail->Password		= 'PASSWORD';
+$mail->Username		= $phpmailer_email;
+$mail->Password		= $phpmailer_secret;
 $mail->SMTPSecure	= 'tls';
 $mail->Port			= 587;
 
-$mail->setFrom('planner@konstanta.ltd', 'Konstanta');
-$mail->addAddress($to); 
+$mail->setFrom($phpmailer_email, 'KONSTANTA');
+
+foreach (explode(",", $to) as &$value) {
+	$mail->addBCC($value);
+}
+
+$mail->CharSet = 'UTF-8';
 $mail->isHTML(true);
 $mail->Subject = $subject;
 $mail->Body    = $message;
