@@ -13,25 +13,25 @@ $sr_date_format = date_format($date, 'd/m/Y');
 $subject = "[KONSTANTA] Shell/Pallets report on {$sr_date_format}";
 
 $message = "
-	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
-		<tr>
-			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
-			<th><n style='font-size: 2em;'>Shell report</n><br><a href='https://kis.konstanta.ltd/online_shell_report.php'>Click here to open the online report</a></th>
-			<th>Report date: <n style='font-size: 2em;'>{$sr_date_format}</n></th>
-		</tr>
-	</table>
+	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>\n
+		<tr>\n
+			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>\n
+			<th><n style='font-size: 2em;'>Shell report</n><br><a href='https://kis.konstanta.ltd/online_shell_report.php'>Click here to open the online report</a></th>\n
+			<th>Report date: <n style='font-size: 2em;'>{$sr_date_format}</n></th>\n
+		</tr>\n
+	</table>\n
 
-	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
-		<thead style='word-wrap: break-word;'>
-			<tr>
-				<th>Part-number</th>
-				<th>Number of OK shells</th>
-				<th>Shell scrap on the past day</th>
-				<th>Current need for shells</th>
-				<th>Shortage of shells</th>
-			</tr>
-		</thead>
-		<tbody style='text-align: center;'>
+	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>\n
+		<thead style='word-wrap: break-word;'>\n
+			<tr>\n
+				<th>Part-number</th>\n
+				<th>Number of OK shells</th>\n
+				<th>Shell scrap on the past day</th>\n
+				<th>Current need for shells</th>\n
+				<th>Shortage of shells</th>\n
+			</tr>\n
+		</thead>\n
+		<tbody style='text-align: center;'>\n
 ";
 
 $query = "
@@ -87,21 +87,21 @@ $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $
 while( $row = mysqli_fetch_array($res) ) {
 	$need = $row["current_need"] - $row["shell_balance"];
 	$message .= "
-		<tr>
-			<td>{$row["drawing_item"]}</td>
-			<td>{$row["shell_balance"]}</td>
-			<td>{$row["sr_cnt"]}</td>
-			<td>{$row["current_need"]}</td>
-			<td style='color: red;'>".($need > 0 ? $need : "")."</td>
-		</tr>
+		<tr>\n
+			<td>{$row["drawing_item"]}</td>\n
+			<td>{$row["shell_balance"]}</td>\n
+			<td>{$row["sr_cnt"]}</td>\n
+			<td>{$row["current_need"]}</td>\n
+			<td style='color: red;'>".($need > 0 ? $need : "")."</td>\n
+		</tr>\n
 	";
 }
 
 $message .= "
-		</tbody>
-	</table>
-	<br>
-	<br>
+		</tbody>\n
+	</table>\n
+	<br>\n
+	<br>\n
 ";
 
 // $message .= "
