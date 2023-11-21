@@ -1,4 +1,8 @@
-<?
+<?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 $path = dirname(dirname($argv[0]));
 $key = $argv[1];
 $CB_ID = $argv[2];
@@ -8,15 +12,16 @@ include $path."/config.php";
 // Проверка доступа
 if( $key != $script_key ) die('Access denied!');
 
+require $path.'/PHPMailer/PHPMailer.php';
+require $path.'/PHPMailer/SMTP.php';
+require $path.'/PHPMailer/Exception.php';
+
 $date = date_create();
 $sr_date_format = date_format($date, 'd/m/Y');
-$subject = "[KONSTANTA] Shell/Pallets report on {$sr_date_format}";
+$subject = "Shell/Pallets report on {$sr_date_format}";
 
 $message = "
 	<html>
-	<head>
-		<title>[KONSTANTA] Shell/Pallets report on {$sr_date_format}</title>
-	</head>
 	<body>
 		<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 			<tr>
@@ -172,11 +177,27 @@ $message .= "
 	</html>
 ";
 
-$headers[] = 'MIME-Version: 1.0';
-$headers[] = 'Content-type: text/html; charset=iso-8859-1';
-$headers[] = 'From: Konstanta <planner@konstanta.ltd>';
-$headers[] = 'Reply-To: Konstanta <planner@konstanta.ltd>';
-$headers[] = 'X-Mailer: PHP/' . phpversion();
+$mail = new PHPMailer();
 
-mail($to, $subject, $message, implode("\r\n", $headers));
+$mail->isSMTP();
+$mail->Host			= 'exchange.atservers.net'; 
+$mail->SMTPAuth		= true;
+$mail->Username		= $phpmailer_email;
+$mail->Password		= $phpmailer_secret;
+$mail->SMTPSecure	= 'tls';
+$mail->Port			= 587;
+
+$mail->setFrom($phpmailer_email, 'KONSTANTA');
+
+foreach (explode(",", $to) as &$value) {
+	$mail->addBCC($value);
+	//$mail->addAddress($value);
+}
+
+$mail->CharSet = 'UTF-8';
+$mail->isHTML(true);
+$mail->Subject = $subject;
+$mail->Body    = $message;
+
+$mail->send();
 ?>
