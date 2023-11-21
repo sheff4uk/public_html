@@ -170,7 +170,7 @@ $message .= "
 ";
 
 $headers  = "Content-type: text/html; charset=\"utf-8\"\n";
-$headers .= "From: planner@konstanta.ltd\r\n";
+$headers .= "From: info@konstanta.ltd\r\n";
 
 mail($to, $subject, $message, $headers);
 // $headers[] = 'MIME-Version: 1.0';
