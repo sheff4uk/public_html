@@ -11,7 +11,7 @@ if( $key != $script_key ) die('Access denied!');
 $date = date_create();
 $sr_date_format = date_format($date, 'd/m/Y');
 //$subject = "[KONSTANTA] Shell/Pallets report on {$sr_date_format}";
-$subject = "[KONSTANTA] Shell/Pallets report on ";
+$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Shell/Pallets report on {$sr_date_format}"). "?=";
 
 $message = "Report date: <n style='font-size: 2em;'></n>";
 // $message = "
@@ -167,8 +167,8 @@ $message = "Report date: <n style='font-size: 2em;'></n>";
 // 	<p>This letter is generated automatically. Please do not answer it. If you have any questions, you can contact us by e-mail info@konstanta.ltd.</p>
 // ";
 
-$headers  = "Content-type: text/html; charset=utf-8 \r\n";
-$headers .= "From: planner@konstanta.ltd\r\n";
+$headers  = "Content-type: text/html; charset=utf-8 \n";
+$headers .= "From: planner@konstanta.ltd\n";
 
 mail($to, $subject, $message, $headers);
 ?>
