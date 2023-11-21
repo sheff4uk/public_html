@@ -170,15 +170,15 @@ $message .= "
 	</html>
 ";
 
-// $headers  = "Content-type: text/html; charset=\"utf-8\"\n";
-// $headers .= "From: planner@konstanta.ltd\r\n";
+$headers  = "Content-type: text/html; charset=\"utf-8\"\n";
+$headers .= "From: planner@konstanta.ltd\r\n";
 
-// mail($to, $subject, $message, $headers);
-$headers[] = 'MIME-Version: 1.0';
-$headers[] = 'Content-type: text/html; charset="utf-8"';
-$headers[] = 'From: Konstanta <planner@konstanta.ltd>';
-$headers[] = 'Reply-To: Konstanta <planner@konstanta.ltd>';
-$headers[] = 'X-Mailer: PHP/' . phpversion();
+mail($to, $subject, $message, $headers);
+// $headers[] = 'MIME-Version: 1.0';
+// $headers[] = 'Content-type: text/html; charset="utf-8"';
+// $headers[] = 'From: Konstanta <planner@konstanta.ltd>';
+// $headers[] = 'Reply-To: Konstanta <planner@konstanta.ltd>';
+// $headers[] = 'X-Mailer: PHP/' . phpversion();
 
-mail($to, $subject, $message, implode("\r\n", $headers));
+// mail($to, $subject, $message, implode("\r\n", $headers));
 ?>
