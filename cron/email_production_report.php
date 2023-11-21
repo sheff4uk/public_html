@@ -188,7 +188,8 @@ $mail->Port			= 587;
 $mail->setFrom($phpmailer_email, 'KONSTANTA');
 
 foreach (explode(",", $to) as &$value) {
-	$mail->addBCC($value);
+	//$mail->addBCC($value);
+	$mail->addAddress($value);
 }
 
 $mail->CharSet = 'UTF-8';
