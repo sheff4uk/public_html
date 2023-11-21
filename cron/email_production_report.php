@@ -179,5 +179,5 @@ $headers[] = 'From: Konstanta <info@konstanta.ltd>';
 $headers[] = 'Reply-To: Konstanta <info@konstanta.ltd>';
 $headers[] = 'X-Mailer: PHP/' . phpversion();
 
-// mail($to, $subject, $message, implode("\r\n", $headers));
+mail($to, $subject, $message, implode("\r\n", $headers));
 ?>
