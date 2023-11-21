@@ -18,17 +18,24 @@ $subject = "[KONSTANTA]";
 $message = "
 	<html>
 		<head>
-			<title>[KONSTANTA] Производственный отчет за {$from_format}</title>
+			<title>[KONSTANTA]</title>
 		</head>
 		<body>
-			<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
-				<tr>
-					<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
-					<th><n style='font-size: 2em;'>Ответственность мастеров</n></th>
-					<th>Производственные сутки:<br>c 07:00 {$from_format} до 07:00 {$to_format}</th>
-				</tr>
-			</table>
 ";
+// $message = "
+// 	<html>
+// 		<head>
+// 			<title>[KONSTANTA] Производственный отчет за {$from_format}</title>
+// 		</head>
+// 		<body>
+// 			<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
+// 				<tr>
+// 					<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
+// 					<th><n style='font-size: 2em;'>Ответственность мастеров</n></th>
+// 					<th>Производственные сутки:<br>c 07:00 {$from_format} до 07:00 {$to_format}</th>
+// 				</tr>
+// 			</table>
+// ";
 // $message .= "
 // 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 // 		<thead style='word-wrap: break-word;'>
@@ -176,7 +183,7 @@ $message .= "
 
 // mail($to, $subject, $message, $headers);
 //$headers[] = 'MIME-Version: 1.0';
-$headers[] = 'Content-type: text/html ';
+$headers[] = 'Content-type: text/html';
 $headers[] = 'From: Konstanta <planner@konstanta.ltd>';
 //$headers[] = 'Reply-To: Konstanta <planner@konstanta.ltd>';
 //$headers[] = 'X-Mailer: PHP/' . phpversion();
