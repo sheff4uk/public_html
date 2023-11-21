@@ -11,7 +11,6 @@ if( $key != $script_key ) die('Access denied!');
 $date = date_create();
 $sr_date_format = date_format($date, 'd/m/Y');
 $subject = "[KONSTANTA] Shell/Pallets report on {$sr_date_format}";
-//$subject = "=?utf-8?b?". base64_encode("КОНСТАНТА"). "?=";
 
 $message = "
 	<html>
@@ -173,23 +172,11 @@ $message .= "
 	</html>
 ";
 
-//$headers  = "Content-type: text/html; charset=\"utf-8\"\r\n";
-//$headers .= "From: planner@konstanta.ltd\r\n";
-
-// $headers = 'From: planner@konstanta.ltd' . "\r\n" .
-//     'Reply-To: planner@konstanta.ltd' . "\r\n" .
-//     'X-Mailer: PHP/' . phpversion();
-
 $headers[] = 'MIME-Version: 1.0';
 $headers[] = 'Content-type: text/html; charset=iso-8859-1';
-	
-// Дополнительные заголовки
-//$headers[] = 'To: Mary <mary@example.com>, Kelly <kelly@example.com>';
 $headers[] = 'From: Konstanta <planner@konstanta.ltd>';
 $headers[] = 'Reply-To: Konstanta <planner@konstanta.ltd>';
 $headers[] = 'X-Mailer: PHP/' . phpversion();
-//$headers[] = 'Cc: birthdayarchive@example.com';
-//$headers[] = 'Bcc: birthdaycheck@example.com';
 
 mail($to, $subject, $message, implode("\r\n", $headers));
 ?>
