@@ -10,9 +10,10 @@ if( $key != $script_key ) die('Access denied!');
 
 $date = date_create();
 $sr_date_format = date_format($date, 'd/m/Y');
-$subject = "[KONSTANTA] Shell/Pallets report on {$sr_date_format}";
+//$subject = "[KONSTANTA] Shell/Pallets report on {$sr_date_format}";
+$subject = "[KONSTANTA] Shell/Pallets report on ";
 
-$message = "Report date: <n style='font-size: 2em;'>{$sr_date_format}</n>";
+$message = "Report date: <n style='font-size: 2em;'></n>";
 // $message = "
 // 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>\n
 // 		<tr>\n
