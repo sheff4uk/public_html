@@ -10,8 +10,8 @@ if( $key != $script_key ) die('Access denied!');
 
 $date = date_create();
 $sr_date_format = date_format($date, 'd/m/Y');
-//$subject = "[KONSTANTA] Shell/Pallets report on {$sr_date_format}";
-$subject = "=?utf-8?b?". base64_encode("КОНСТАНТА"). "?=";
+$subject = "[KONSTANTA] Shell/Pallets report on {$sr_date_format}";
+//$subject = "=?utf-8?b?". base64_encode("КОНСТАНТА"). "?=";
 
 $message = "Report date: <n style='font-size: 2em;'></n>";
 // $message = "
@@ -167,8 +167,23 @@ $message = "Report date: <n style='font-size: 2em;'></n>";
 // 	<p>This letter is generated automatically. Please do not answer it. If you have any questions, you can contact us by e-mail info@konstanta.ltd.</p>
 // ";
 
-$headers  = "Content-type: text/html; charset=utf-8 \n";
-$headers .= "From: planner@konstanta.ltd\n";
+//$headers  = "Content-type: text/html; charset=\"utf-8\"\r\n";
+//$headers .= "From: planner@konstanta.ltd\r\n";
 
-mail($to, $subject, $message, $headers);
+// $headers = 'From: planner@konstanta.ltd' . "\r\n" .
+//     'Reply-To: planner@konstanta.ltd' . "\r\n" .
+//     'X-Mailer: PHP/' . phpversion();
+
+$headers[] = 'MIME-Version: 1.0';
+$headers[] = 'Content-type: text/html; charset=iso-8859-1';
+	
+// Дополнительные заголовки
+//$headers[] = 'To: Mary <mary@example.com>, Kelly <kelly@example.com>';
+$headers[] = 'From: Konstanta <planner@konstanta.ltd>';
+$headers[] = 'Reply-To: Konstanta <planner@konstanta.ltd>';
+$headers[] = 'X-Mailer: PHP/' . phpversion();
+//$headers[] = 'Cc: birthdayarchive@example.com';
+//$headers[] = 'Bcc: birthdaycheck@example.com';
+
+mail($to, $subject, $message, implode("\r\n", $headers));
 ?>
