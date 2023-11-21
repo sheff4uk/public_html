@@ -100,19 +100,29 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 					//ID товара
 					$goodsID = $data[$i+37] + ($data[$i+38] << 8) + ($data[$i+39] << 16) + ($data[$i+40] << 24);
 
+					//Документ-основание
+					$DocumentCode = dechex($data[$i+59])."".dechex($data[$i+60])."".dechex($data[$i+61])."".dechex($data[$i+62])."".dechex($data[$i+63])."".dechex($data[$i+64])."".dechex($data[$i+65])."".dechex($data[$i+66])."".dechex($data[$i+67])."".dechex($data[$i+68])."".dechex($data[$i+69])."".dechex($data[$i+70])."".dechex($data[$i+71])."".dechex($data[$i+72])."".dechex($data[$i+73]);
+					$DocumentCode = hex2bin($DocumentCode);
+					$DocumentCode = intval(substr($DocumentCode, 0, 8));
+					$DocumentCode = str_pad($DocumentCode, 8, "0", STR_PAD_LEFT);
+					$DocumentCode = intval(substr($DocumentCode, -6));
+					
 					//Номер партии
 					$ReceiptNumber = $data[$i+76] + ($data[$i+77] << 8) + ($data[$i+78] << 16) + ($data[$i+79] << 24);
 
 					$AddrGoods = $data[$i+96] + ($data[$i+97] << 8) + ($data[$i+98] << 16) + ($data[$i+99] << 24);
 
+//					if( $goodsID == 8 ) {
 					echo $nextID." ";
 					echo $deviceID." ";
 					echo $transactionDate." ";
 					echo $netWeight." ";
 					echo $quantity." ";
 					echo $goodsID." ";
+					echo $DocumentCode." ";
 					echo $ReceiptNumber." ";
 					echo $AddrGoods."\r\n";
+//					}
 
 //					// Игнорируем недопустимый вес
 //					if( abs($netWeight) >= 7000 and abs($netWeight) <= 14000 ) {
@@ -214,8 +224,8 @@ function read_transaction($ID, $curnum, $socket, $mysqli) {
 //die();
 /////////////////////////////
 
-if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5003)) ) {
-//if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, "192.168.0.20", 5001)) ) {
+//if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, $from_ip, 5003)) ) {
+if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect($socket, "91.144.175.13", 5001)) ) {
 	//read_transaction(52445, 1, $socket, 0, $mysqli);
 //////////////////////////////
 //	$in = "\xF8\x55\xCE\x02\x00\x91\x04";
@@ -228,7 +238,7 @@ if( ($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) and (socket_connect
 //	echo dechex($data[5])."\r\n";
 //	//echo $result;
 ////////////////////////////////////////
-	read_transaction(549870, 1, $socket, $mysqli);
+	read_transaction(1006597, 1, $socket, $mysqli);
 	//read_transaction(114735, 1, $socket, $mysqli);
 	socket_close($socket);
 }

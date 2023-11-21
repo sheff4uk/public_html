@@ -20,9 +20,9 @@ include "../config.php";
 			-moz-box-sizing: border-box;
 		}
 		.page {
-			width: 21cm;
-			min-height: 29.7cm;
-			padding: 2.09cm .77cm;
+			width: 29.7cm;
+			min-height: 21cm;
+			padding: 1cm 1cm;
 			margin: 1cm auto;
 			border: 1px #D3D3D3 solid;
 			border-radius: 5px;
@@ -40,17 +40,17 @@ include "../config.php";
 				background: initial;
 				page-break-after: always;
 			}
-		}
-		@page {
-			size: portrait;
-			size: A4;
-			margin: 0;
+			@page {
+				size: landscape;
+/*				size: A4;*/
+				margin: 0;
+			}
 		}
 
 		.label {
-			width: 48mm;
-			height: 40mm;
-			border: 1px dotted #999;
+			width: 276mm;
+			height: 185mm;
+/*			border: 1px dotted #999;*/
 			padding: 4px;
 			box-sizing: border-box;
 			font-size: 16px;
@@ -61,7 +61,7 @@ include "../config.php";
 <body>
 <?
 	$count = 0;
-	for ($i = 1; $i <= 371; $i++) {
+	for ($i = 1; $i <= 100; $i++) {
 		if( $count == 0 ) {
 			echo "<div class='page'>";
 		}
@@ -69,11 +69,11 @@ include "../config.php";
 		$code = '11'.str_pad($i, 6, "0", STR_PAD_LEFT);
 		?>
 		<span class="label" style="position: relative;">
-			<img src="../barcode.php?code=<?=$code?>&w=170&h=124" alt="barcode" style="position: absolute; top: 12px;">
-			<span style="position: absolute; left: calc(50% - 30px); bottom: 5px; width: 60px; text-align: center; font-weight: bold; background: #fff; font-size: 20px;"><?=$i?></span>
+			<span style="position: absolute; left: calc(50% - 150px); top: 0px; width: 300px; text-align: center; font-weight: bold; background: #fff; font-size: 60px; letter-spacing: 50px;"><?=$i?></span>
+			<img src="../barcode.php?code=<?=$code?>&w=1020&h=650" alt="barcode" style="position: absolute; top: 60px;">
 		</span>
 		<?
-		if( $count == 24 ) {
+		if( $count == 1 ) {
 			$count = 0;
 			echo "</div>";
 		}

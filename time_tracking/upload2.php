@@ -12,7 +12,7 @@ if( move_uploaded_file($_FILES['webcam']['tmp_name'],'upload/'.$filename) ){
 		SET tr_photo = '{$filename}'
 		WHERE TR_ID = {$_GET["tr_id"]}
 	";
-	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	mysqli_query( $mysqli, $query );
 }
 
 // Return image url

@@ -57,7 +57,10 @@ if( isset($_POST["cardcode"]) ) {
 //				AND (
 //					SELECT IFNULL(SUM(1), 0)
 //					FROM Timesheet TS
-//					WHERE TS.TM_ID = TM.TM_ID
+//					WHERE YEAR(TS.ts_date) = TM.year
+//						AND MONTH(TS.ts_date) = TM.month
+//						AND TS.USR_ID = TM.USR_ID
+//						AND TS.F_ID = TM.F_ID
 //				) = 0
 //		";
 //		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -83,7 +86,7 @@ if( isset($_POST["cardcode"]) ) {
 //				,tr_time = DATE_FORMAT(NOW(), '%H:%i:00')
 //		";
 //		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//		$TR_ID = mysqli_insert_id( $mysqli );
+		$TR_ID = mysqli_insert_id( $mysqli );
 
 		exit ('<meta http-equiv="refresh" content="0; url=/time_tracking/index2.php?id='.$USR_ID.'&tr_id='.$TR_ID.'">');
 	}

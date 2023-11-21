@@ -55,7 +55,7 @@ if( isset($_GET["print_confirm"]) ) {
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
 	// Перенаправление в план
-	exit ('<meta http-equiv="refresh" content="0; url='.$page.'?F_ID='.$F_ID.'&year='.$year.'#'.$PB_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/plan_batch.php?F_ID='.$F_ID.'&year='.$year.'#'.$PB_ID.'">');
 }
 
 // Если в фильтре не установлен год, показываем текущий год
