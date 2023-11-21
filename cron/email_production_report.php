@@ -176,7 +176,7 @@ $message .= "
 
 // mail($to, $subject, $message, $headers);
 $headers[] = 'MIME-Version: 1.0';
-$headers[] = 'Content-type: text/html; charset=iso-8859-1';
+$headers[] = 'Content-type: text/html; charset=windows-1251 ';
 $headers[] = 'From: Konstanta <planner@konstanta.ltd>';
 $headers[] = 'Reply-To: Konstanta <planner@konstanta.ltd>';
 $headers[] = 'X-Mailer: PHP/' . phpversion();
