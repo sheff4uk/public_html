@@ -11,8 +11,9 @@ $from_date = date_create( '-1 days' );
 $from_format = date_format($from_date, 'd.m.Y');
 $to_date = date_create();
 $to_format = date_format($to_date, 'd.m.Y');
-$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Производственный отчет за {$from_format}"). "?=";
+//$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Производственный отчет за {$from_format}"). "?=";
 //$subject = "[KONSTANTA] Производственный отчет за {$from_format}";
+$subject = "[KONSTANTA]";
 
 $message = "
 	<html>
