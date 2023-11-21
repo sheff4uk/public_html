@@ -160,9 +160,9 @@ $message .= "
 	</table>
 ";
 
-$message .= "
-	<p>This letter is generated automatically. Please do not answer it. If you have any questions, you can contact us by e-mail info@konstanta.ltd.</p>
-";
+// $message .= "
+// 	<p>This letter is generated automatically. Please do not answer it. If you have any questions, you can contact us by e-mail info@konstanta.ltd.</p>
+// ";
 
 $headers  = "Content-type: text/html; charset=utf-8 \r\n";
 $headers .= "From: planner@konstanta.ltd\r\n";
