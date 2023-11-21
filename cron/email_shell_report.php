@@ -11,7 +11,7 @@ if( $key != $script_key ) die('Access denied!');
 $date = date_create();
 $sr_date_format = date_format($date, 'd/m/Y');
 //$subject = "[KONSTANTA] Shell/Pallets report on {$sr_date_format}";
-$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Shell/Pallets report on {$sr_date_format}"). "?=";
+$subject = "=?utf-8?b?". base64_encode("КОНСТАНТА"). "?=";
 
 $message = "Report date: <n style='font-size: 2em;'></n>";
 // $message = "
