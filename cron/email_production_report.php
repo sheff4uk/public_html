@@ -1,23 +1,30 @@
 <?
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 $path = dirname(dirname($argv[0]));
 $key = $argv[1];
 $to = $argv[2];
 
 include $path."/config.php";
+
 // Проверка доступа
 if( $key != $script_key ) die('Access denied!');
+
+require $path.'/PHPMailer/PHPMailer.php';
+require $path.'/PHPMailer/SMTP.php';
+require $path.'/PHPMailer/Exception.php';
 
 $from_date = date_create( '-1 days' );
 $from_format = date_format($from_date, 'd.m.Y');
 $to_date = date_create();
 $to_format = date_format($to_date, 'd.m.Y');
-$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Производственный отчет за {$from_format}"). "?=";
+//$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Производственный отчет за {$from_format}"). "?=";
+$subject = "[KONSTANTA] Производственный отчет за {$from_format}";
 
 $message = "
 	<html>
-		<head>
-			<title>[KONSTANTA] Производственный отчет за {$from_format}</title>
-		</head>
 		<body>
 			<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 				<tr>
@@ -169,10 +176,10 @@ $message .= "
 	</html>
 ";
 
-$headers  = "Content-type: text/html; charset=\"utf-8\"\n";
-$headers .= "From: Konstanta <planner@konstanta.ltd>\r\n";
+// $headers  = "Content-type: text/html; charset=\"utf-8\"\n";
+// $headers .= "From: Konstanta <planner@konstanta.ltd>\r\n";
 
-mail($to, $subject, $message, $headers);
+// mail($to, $subject, $message, $headers);
 // $headers[] = 'MIME-Version: 1.0';
 // $headers[] = 'Content-type: text/html; charset=iso-8859-1';
 // $headers[] = 'From: Konstanta <planner@konstanta.ltd>';
@@ -180,4 +187,22 @@ mail($to, $subject, $message, $headers);
 // $headers[] = 'X-Mailer: PHP/' . phpversion();
 
 // mail($to, $subject, $message, implode("\r\n", $headers));
+
+$mail = new PHPMailer();
+
+$mail->isSMTP();
+$mail->Host			= 'exchange.atservers.net'; 
+$mail->SMTPAuth		= true;
+$mail->Username		= 'planner@konstanta.ltd';
+$mail->Password		= 'PASSWORD';
+$mail->SMTPSecure	= 'tls';
+$mail->Port			= 587;
+
+$mail->setFrom('planner@konstanta.ltd', 'Konstanta');
+$mail->addAddress($to); 
+$mail->isHTML(true);
+$mail->Subject = $subject;
+$mail->Body    = $message;
+
+$mail->send();
 ?>
