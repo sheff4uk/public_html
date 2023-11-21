@@ -104,61 +104,61 @@ $message .= "
 	<br>
 ";
 
-$message .= "
-	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
-		<tr>
-			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
-			<th><n style='font-size: 2em;'>Pallets report</n><br><a href='https://kis.konstanta.ltd/online_pallet_report.php'>Click here to open the online report</a></th>
-			<th>Report date: <n style='font-size: 2em;'>{$sr_date_format}</n></th>
-		</tr>
-	</table>
+// $message .= "
+// 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
+// 		<tr>
+// 			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
+// 			<th><n style='font-size: 2em;'>Pallets report</n><br><a href='https://kis.konstanta.ltd/online_pallet_report.php'>Click here to open the online report</a></th>
+// 			<th>Report date: <n style='font-size: 2em;'>{$sr_date_format}</n></th>
+// 		</tr>
+// 	</table>
 
-	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
-		<thead style='word-wrap: break-word;'>
-			<tr>
-				<!--<th>Number of pallets shipped today</th>-->
-				<!--<th>Pallets returned today</th>-->
-				<!--<th>Broken pallets found today</th>-->
-				<th>Debt in pallets (Vesta)</th>
-				<th>Debt in rubles</th>
-			</tr>
-		</thead>
-		<tbody style='text-align: center;'>
-			<tr>
-";
+// 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
+// 		<thead style='word-wrap: break-word;'>
+// 			<tr>
+// 				<!--<th>Number of pallets shipped today</th>-->
+// 				<!--<th>Pallets returned today</th>-->
+// 				<!--<th>Broken pallets found today</th>-->
+// 				<th>Debt in pallets (Vesta)</th>
+// 				<th>Debt in rubles</th>
+// 			</tr>
+// 		</thead>
+// 		<tbody style='text-align: center;'>
+// 			<tr>
+// ";
 
-// Узнаем актуальную стоимость поддона (дерево)
-$query = "
-	SELECT PA.pallet_cost
-	FROM pallet__Arrival PA
-	JOIN pallet__Supplier PS ON PS.PS_ID = PA.PS_ID AND PS.PN_ID = 1
-	WHERE PA.pallet_cost > 0
-	ORDER BY PA.pa_date DESC, PA.PA_ID DESC
-	LIMIT 1
-";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-$row = mysqli_fetch_array($res);
-$actual_pallet_cost = $row["pallet_cost"];
+// // Узнаем актуальную стоимость поддона (дерево)
+// $query = "
+// 	SELECT PA.pallet_cost
+// 	FROM pallet__Arrival PA
+// 	JOIN pallet__Supplier PS ON PS.PS_ID = PA.PS_ID AND PS.PN_ID = 1
+// 	WHERE PA.pallet_cost > 0
+// 	ORDER BY PA.pa_date DESC, PA.PA_ID DESC
+// 	LIMIT 1
+// ";
+// $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+// $row = mysqli_fetch_array($res);
+// $actual_pallet_cost = $row["pallet_cost"];
 
-// Узнаем долг в поддонах (дерево)
-$query = "
-	SELECT PCB.pallet_balance
-	FROM pallet__ClientBalance PCB
-	WHERE PCB.CB_ID = {$CB_ID}
-		AND PCB.PN_ID = 1
-";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-$row = mysqli_fetch_array($res);
-$message .= "
-	<td style='color: red;'>{$row["pallet_balance"]}</td>
-	<td style='color: red;'><b>&#8381;".number_format(( $row["pallet_balance"] * $actual_pallet_cost ), 0, '', ' ')."</b></td>
-";
+// // Узнаем долг в поддонах (дерево)
+// $query = "
+// 	SELECT PCB.pallet_balance
+// 	FROM pallet__ClientBalance PCB
+// 	WHERE PCB.CB_ID = {$CB_ID}
+// 		AND PCB.PN_ID = 1
+// ";
+// $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+// $row = mysqli_fetch_array($res);
+// $message .= "
+// 	<td style='color: red;'>{$row["pallet_balance"]}</td>
+// 	<td style='color: red;'><b>&#8381;".number_format(( $row["pallet_balance"] * $actual_pallet_cost ), 0, '', ' ')."</b></td>
+// ";
 
-$message .= "
-			</tr>
-		</tbody>
-	</table>
-";
+// $message .= "
+// 			</tr>
+// 		</tbody>
+// 	</table>
+// ";
 
 // $message .= "
 // 	<p>This letter is generated automatically. Please do not answer it. If you have any questions, you can contact us by e-mail info@konstanta.ltd.</p>
