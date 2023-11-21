@@ -175,10 +175,10 @@ $message .= "
 // $headers .= "From: planner@konstanta.ltd\r\n";
 
 // mail($to, $subject, $message, $headers);
-$headers[] = 'MIME-Version: 1.0';
-$headers[] = 'Content-type: text/html; charset=windows-1251 ';
+//$headers[] = 'MIME-Version: 1.0';
+$headers[] = 'Content-type: text/html; charset=iso-8859-1 ';
 $headers[] = 'From: Konstanta <planner@konstanta.ltd>';
-$headers[] = 'Reply-To: Konstanta <planner@konstanta.ltd>';
+//$headers[] = 'Reply-To: Konstanta <planner@konstanta.ltd>';
 $headers[] = 'X-Mailer: PHP/' . phpversion();
 
 mail($to, $subject, $message, implode("\r\n", $headers));
