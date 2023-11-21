@@ -11,17 +11,24 @@ $from_date = date_create( '-1 days' );
 $from_format = date_format($from_date, 'd.m.Y');
 $to_date = date_create();
 $to_format = date_format($to_date, 'd.m.Y');
-$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Производственный отчет за {$from_format}"). "?=";
+//$subject = "=?utf-8?b?". base64_encode("[KONSTANTA] Производственный отчет за {$from_format}"). "?=";
+$subject = "[KONSTANTA] Производственный отчет за {$from_format}";
 
 $message = "
-	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
-		<tr>
-			<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
-			<th><n style='font-size: 2em;'>Ответственность мастеров</n></th>
-			<th>Производственные сутки:<br>c 07:00 {$from_format} до 07:00 {$to_format}</th>
-		</tr>
-	</table>
-
+	<html>
+		<head>
+			<title>[KONSTANTA] Производственный отчет за {$from_format}</title>
+		</head>
+		<body>
+			<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
+				<tr>
+					<th><img src='https://konstanta.ltd/assets/images/logo.png' alt='KONSTANTA' style='width: 200px; margin: 5px;'></th>
+					<th><n style='font-size: 2em;'>Ответственность мастеров</n></th>
+					<th>Производственные сутки:<br>c 07:00 {$from_format} до 07:00 {$to_format}</th>
+				</tr>
+			</table>
+";
+$message .= "
 	<table cellspacing='0' cellpadding='2' border='1' style='table-layout: fixed; width: 100%;'>
 		<thead style='word-wrap: break-word;'>
 			<tr>
@@ -157,12 +164,21 @@ while( $row = mysqli_fetch_array($res) ) {
 }
 
 $message .= "
-		</tbody>
-	</table>
+				</tbody>
+			</table>
+		</body>
+	</html>
 ";
 
-$headers  = "Content-type: text/html; charset=\"utf-8\"\n";
-$headers .= "From: planner@konstanta.ltd\r\n";
+// $headers  = "Content-type: text/html; charset=\"utf-8\"\n";
+// $headers .= "From: planner@konstanta.ltd\r\n";
 
-mail($to, $subject, $message, $headers);
+// mail($to, $subject, $message, $headers);
+$headers[] = 'MIME-Version: 1.0';
+$headers[] = 'Content-type: text/html; charset=iso-8859-1';
+$headers[] = 'From: Konstanta <planner@konstanta.ltd>';
+$headers[] = 'Reply-To: Konstanta <planner@konstanta.ltd>';
+$headers[] = 'X-Mailer: PHP/' . phpversion();
+
+mail($to, $subject, $message, implode("\r\n", $headers));
 ?>
