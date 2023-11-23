@@ -108,6 +108,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<th colspan="2" class="slag30">Шлак 5-30</th>
 			<th colspan="2" class="sand">КМП</th>
 			<th colspan="2" class="crushed_stone">Отсев</th>
+			<th colspan="2" class="crushed_stone515">Отсев 5-15</th>
 			<th colspan="2" class="cement">Цемент</th>
 			<th colspan="2" class="plasticizer">Пластификатор</th>
 			<th colspan="2" class="calcium">Кальций</th>
@@ -132,6 +133,8 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<th class="sand">На деталь, г</th>
 			<th class="crushed_stone">Расход, кг</th>
 			<th class="crushed_stone">На деталь, г</th>
+			<th class="crushed_stone515">Расход, кг</th>
+			<th class="crushed_stone515">На деталь, г</th>
 			<th class="cement">Расход, кг</th>
 			<th class="cement">На деталь, г</th>
 			<th class="plasticizer">Расход, г</th>
@@ -157,6 +160,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 				,SUM(LB.slag30) slag30
 				,SUM(LB.sand) sand
 				,SUM(LB.crushed_stone) crushed_stone
+				,SUM(LB.crushed_stone515) crushed_stone515
 				,SUM(LB.cement) cement
 				,SUM(LB.plasticizer) * 1000 / 10 plasticizer
 				,SUM(LB.water * PB.calcium) calcium
@@ -183,6 +187,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 			$slag30 += $row["slag30"];
 			$sand += $row["sand"] ? round($row["sand"] + (0.05 * $row["krv"]) * $row["details"], 2) : 0;
 			$crushed_stone += $row["crushed_stone"] ? round($row["crushed_stone"] + (0.1 * $row["krv"]) * $row["details"], 2) : 0;
+			$crushed_stone515 += $row["crushed_stone515"] ? round($row["crushed_stone515"] + (0.1 * $row["krv"]) * $row["details"], 2) : 0;
 			$cement += $row["cement"] ? round($row["cement"] + (0.1 * $row["krv"]) * $row["details"], 2) : 0;
 			$plasticizer += $row["plasticizer"];
 			$calcium += $row["calcium"];
@@ -209,6 +214,8 @@ echo "<title>Расход сырья {$date_format}</title>";
 				<td class="sand"><?=number_format($row["sand"] ? ($row["sand"] * 1000/$row["details"] + (50 * $row["krv"])) : 0, 0, ',', ' ')?></td>
 				<td class="crushed_stone"><?=number_format($row["crushed_stone"] ? round($row["crushed_stone"] + (0.1 * $row["krv"]) * $row["details"], 2) : 0, 2, ',', ' ')?></td>
 				<td class="crushed_stone"><?=number_format($row["crushed_stone"] ? ($row["crushed_stone"] * 1000/$row["details"] + (100 * $row["krv"])) : 0, 0, ',', ' ')?></td>
+				<td class="crushed_stone515"><?=number_format($row["crushed_stone515"] ? round($row["crushed_stone515"] + (0.1 * $row["krv"]) * $row["details"], 2) : 0, 2, ',', ' ')?></td>
+				<td class="crushed_stone515"><?=number_format($row["crushed_stone515"] ? ($row["crushed_stone515"] * 1000/$row["details"] + (100 * $row["krv"])) : 0, 0, ',', ' ')?></td>
 				<td class="cement"><?=number_format($row["cement"] ? round($row["cement"] + (0.1 * $row["krv"]) * $row["details"], 2) : 0, 2, ',', ' ')?></td>
 				<td class="cement"><?=number_format($row["cement"] ? ($row["cement"] * 1000/$row["details"] + (100 * $row["krv"])) : 0, 0, ',', ' ')?></td>
 				<td class="plasticizer"><?=number_format($row["plasticizer"], 0, ',', ' ')?></td>
@@ -243,6 +250,8 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<td class="sand"></td>
 			<td class="crushed_stone"><?=number_format($crushed_stone, 2, ',', ' ')?></td>
 			<td class="crushed_stone"></td>
+			<td class="crushed_stone515"><?=number_format($crushed_stone515, 2, ',', ' ')?></td>
+			<td class="crushed_stone515"></td>
 			<td class="cement"><?=number_format($cement, 2, ',', ' ')?></td>
 			<td class="cement"></td>
 			<td class="plasticizer"><?=number_format($plasticizer, 0, ',', ' ')?></td>
@@ -269,6 +278,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 	<?=($slag30 ? "" : ".slag30{ display: none; }")?>
 	<?=($sand ? "" : ".sand{ display: none; }")?>
 	<?=($crushed_stone ? "" : ".crushed_stone{ display: none; }")?>
+	<?=($crushed_stone515 ? "" : ".crushed_stone515{ display: none; }")?>
 	<?=($cement ? "" : ".cement{ display: none; }")?>
 	<?=($plasticizer ? "" : ".plasticizer{ display: none; }")?>
 	<?=($calcium ? "" : ".calcium{ display: none; }")?>

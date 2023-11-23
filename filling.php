@@ -182,6 +182,7 @@ foreach ($_GET as &$value) {
 			<th class="slag30">Шлак 5-30,<br>кг</th>
 			<th class="sand">КМП,<br>кг</th>
 			<th class="crushed_stone">Отсев,<br>кг</th>
+			<th class="crushed_stone515">Отсев 5-15,<br>кг</th>
 			<th>Цемент,<br>кг</th>
 			<th class="plasticizer">Пластификатор,<br>кг</th>
 			<th>Вода, л</th>
@@ -215,6 +216,7 @@ $query = "
 		,PB.sl30_density
 		,PB.sn_density
 		,PB.cs_density
+		,PB.cs515_density
 		,IF( IFNULL(PB.print_time, PB.change_time) < NOW() - INTERVAL 10 DAY, 0, 1 ) editable
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
@@ -268,6 +270,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$sl30_density = $row["sl30_density"]/1000;
 	$sn_density = $row["sn_density"]/1000;
 	$cs_density = $row["cs_density"]/1000;
+	$cs515_density = $row["cs515_density"]/1000;
 	$j = 0;
 
 	$query = "
@@ -288,6 +291,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.slag30
 			,LB.sand
 			,LB.crushed_stone
+			,LB.crushed_stone515
 			,LB.cement
 			,LB.plasticizer
 			,LB.water
@@ -303,6 +307,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,mix_sl30_diff({$row["MF_ID"]}, LB.slag30) sl30_diff
 			,mix_sn_diff({$row["MF_ID"]}, LB.sand) sn_diff
 			,mix_cs_diff({$row["MF_ID"]}, LB.crushed_stone) cs_diff
+			,mix_cs515_diff({$row["MF_ID"]}, LB.crushed_stone515) cs515_diff
 			,mix_cm_diff({$row["MF_ID"]}, LB.cement) cm_diff
 			,mix_pl_diff({$row["MF_ID"]}, LB.plasticizer) pl_diff
 			,mix_wt_diff({$row["MF_ID"]}, LB.water) wt_diff
@@ -324,6 +329,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		$slag30 += $subrow["slag30"];
 		$sand += $subrow["sand"];
 		$crushed_stone += $subrow["crushed_stone"];
+		$crushed_stone515 += $subrow["crushed_stone515"];
 		$plasticizer += $subrow["plasticizer"];
 
 		// Получаем список кассет
@@ -367,6 +373,7 @@ while( $row = mysqli_fetch_array($res) ) {
 					".($sl30_density ? "<span class='nowrap'><b>{$sl30_density}</b>кг шлак 5-30</span>" : "")."
 					".($sn_density ? "<span class='nowrap'><b>{$sn_density}</b>кг КМП</span>" : "")."
 					".($cs_density ? "<span class='nowrap'><b>{$cs_density}</b>кг отсев</span>" : "")."
+					".($cs515_density ? "<span class='nowrap'><b>{$cs515_density}</b>кг отсев 5-15</span>" : "")."
 				</td>
 			";
 		}
@@ -383,6 +390,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td class="slag30" style="background: #33333380;"><?=$subrow["slag30"]?><?=($subrow["sl30_diff"] ? "<font class='diff_alert'>".($subrow["sl30_diff"] > 0 ? " +" : " ").($subrow["sl30_diff"])."</font>" : "")?></td>
 				<td class="sand" style="background: #f4a46082;"><?=$subrow["sand"]?><?=($subrow["sn_diff"] ? "<font class='diff_alert'>".($subrow["sn_diff"] > 0 ? " +" : " ").($subrow["sn_diff"])."</font>" : "")?></td>
 				<td class="crushed_stone" style="background: #8b45137a;"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font class='diff_alert'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
+				<td class="crushed_stone515" style="background: #8b45137a;"><?=$subrow["crushed_stone515"]?><?=($subrow["cs515_diff"] ? "<font class='diff_alert'>".($subrow["cs515_diff"] > 0 ? " +" : " ").($subrow["cs515_diff"])."</font>" : "")?></td>
 				<td style="background: #7080906b;"><?=$subrow["cement"]?><?=($subrow["cm_diff"] ? "<font class='diff_alert'>".($subrow["cm_diff"] > 0 ? " +" : " ").($subrow["cm_diff"])."</font>" : "")?></td>
 				<td class="plasticizer" style="background: #80800080;"><?=$subrow["plasticizer"]?><?=($subrow["pl_diff"] ? "<font class='diff_alert'>".($subrow["pl_diff"] > 0 ? " +" : " ").($subrow["pl_diff"])."</font>" : "")?></td>
 				<td style="background: #1e90ff85;"><?=$subrow["water"]?><?=($subrow["wt_diff"] ? "<font class='diff_alert'>".($subrow["wt_diff"])."</font>" : "")?></td>
@@ -419,6 +427,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	<?=($slag30 ? "" : ".slag30{ display: none; }")?>
 	<?=($sand ? "" : ".sand{ display: none; }")?>
 	<?=($crushed_stone ? "" : ".crushed_stone{ display: none; }")?>
+	<?=($crushed_stone515 ? "" : ".crushed_stone515{ display: none; }")?>
 	<?=($plasticizer ? "" : ".plasticizer{ display: none; }")?>
 </style>
 

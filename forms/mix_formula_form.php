@@ -13,6 +13,7 @@ if( isset($_POST["CW_ID"]) ) {
 	$slag30 = ($_POST["slag30"] != '') ? $_POST["slag30"] : "NULL";
 	$sand = ($_POST["sand"] != '') ? $_POST["sand"] : "NULL";
 	$crushed_stone = ($_POST["crushed_stone"] != '') ? $_POST["crushed_stone"] : "NULL";
+	$crushed_stone515 = ($_POST["crushed_stone515"] != '') ? $_POST["crushed_stone515"] : "NULL";
 	$cement = ($_POST["cement"] != '') ? $_POST["cement"] : "NULL";
 	$plasticizer = ($_POST["plasticizer"] != '') ? $_POST["plasticizer"] : "NULL";
 	$water = ($_POST["water"] != '') ? $_POST["water"] : "NULL";
@@ -29,6 +30,7 @@ if( isset($_POST["CW_ID"]) ) {
 				,slag30 = {$slag30}
 				,sand = {$sand}
 				,crushed_stone = {$crushed_stone}
+				,crushed_stone515 = {$crushed_stone515}
 				,cement = {$cement}
 				,plasticizer = {$plasticizer}
 				,water = {$water}
@@ -77,6 +79,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Шлак 5-30, кг</th>
 						<th>КМП, кг</th>
 						<th>Отсев, кг</th>
+						<th>Отсев 5-15, кг</th>
 						<th>Цемент, кг</th>
 						<th>Пластификатор, кг</th>
 						<th>Вода, кг</th>
@@ -93,6 +96,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td style="background: #33333380;"><input type="number" name="slag30" min="0" style="width: 65px;"></td>
 						<td style="background: #f4a46082;"><input type="number" name="sand" min="0" style="width: 65px;"></td>
 						<td style="background: #8b45137a;"><input type="number" name="crushed_stone" min="0" style="width: 65px;"></td>
+						<td style="background: #8b45137a;"><input type="number" name="crushed_stone515" min="0" style="width: 65px;"></td>
 						<td style="background: #7080906b;"><input type="number" name="cement" min="0" style="width: 65px;" required></td>
 						<td style="background: #80800080;"><input type="number" name="plasticizer" min="0" step="0.01" style="width: 65px;"></td>
 						<td style="background: #1e90ff85;"><input type="number" name="water" min="0" style="width: 65px;" required></td>
@@ -139,6 +143,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#formula_form input[name="slag30"]').val(mf_data['slag30']);
 			$('#formula_form input[name="sand"]').val(mf_data['sand']);
 			$('#formula_form input[name="crushed_stone"]').val(mf_data['crushed_stone']);
+			$('#formula_form input[name="crushed_stone515"]').val(mf_data['crushed_stone515']);
 			$('#formula_form input[name="cement"]').val(mf_data['cement']);
 			$('#formula_form input[name="plasticizer"]').val(mf_data['plasticizer']);
 			$('#formula_form input[name="water"]').val(mf_data['water']);

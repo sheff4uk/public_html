@@ -83,6 +83,7 @@ foreach ($_GET as &$value) {
 			<th class="slag30">Шлак 5-30, кг</th>
 			<th class="sand">КМП, кг</th>
 			<th class="crushed_stone">Отсев, кг</th>
+			<th class="crushed_stone515">Отсев 5-15, кг</th>
 			<th class="cement">Цемент, кг</th>
 			<th class="plasticizer">Пластификатор, кг</th>
 			<th>Вода, кг</th>
@@ -105,6 +106,7 @@ $query = "
 		,MF.slag30
 		,MF.sand
 		,MF.crushed_stone
+		,MF.crushed_stone515
 		,MF.cement
 		,MF.plasticizer
 		,MF.water
@@ -123,6 +125,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	$slag30 += $row["slag30"];
 	$sand += $row["sand"];
 	$crushed_stone += $row["crushed_stone"];
+	$crushed_stone515 += $row["crushed_stone515"];
 	$cement += $row["cement"];
 	$plasticizer += $row["plasticizer"];
 	?>
@@ -137,6 +140,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td style="background: #33333380;" class="slag30"><?=$row["slag30"]?></td>
 		<td style="background: #f4a46082;" class="sand"><?=$row["sand"]?></td>
 		<td style="background: #8b45137a;" class="crushed_stone"><?=$row["crushed_stone"]?></td>
+		<td style="background: #8b45137a;" class="crushed_stone515"><?=$row["crushed_stone515"]?></td>
 		<td style="background: #7080906b;" class="cement"><?=$row["cement"]?></td>
 		<td style="background: #80800080;" class="plasticizer"><?=$row["plasticizer"]?></td>
 		<td style="background: #1e90ff85;"><?=$row["water"]?></td>
@@ -159,6 +163,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	<?=($slag30 ? "" : ".slag30{ display: none; }")?>
 	<?=($sand ? "" : ".sand{ display: none; }")?>
 	<?=($crushed_stone ? "" : ".crushed_stone{ display: none; }")?>
+	<?=($crushed_stone515 ? "" : ".crushed_stone515{ display: none; }")?>
 	<?=($cement ? "" : ".cement{ display: none; }")?>
 	<?=($plasticizer ? "" : ".plasticizer{ display: none; }")?>
 </style>

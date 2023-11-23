@@ -25,6 +25,7 @@ $query = "
 		,PB.sl30_density
 		,PB.sn_density
 		,PB.cs_density
+		,PB.cs515_density
 		,PB.calcium
 		,IF( IFNULL(PB.print_time, PB.change_time) < NOW() - INTERVAL 10 DAY, 0, 1 ) editable
 	FROM plan__Batch PB
@@ -59,6 +60,7 @@ if( $row["editable"] ) {
 	$sl30_density = $row["sl30_density"];
 	$sn_density = $row["sn_density"];
 	$cs_density = $row["cs_density"];
+	$cs515_density = $row["cs515_density"];
 	$calcium = $row["calcium"];
 
 	$html = "
@@ -140,6 +142,7 @@ if( $row["editable"] ) {
 			,MF.slag30
 			,MF.sand
 			,MF.crushed_stone
+			,MF.crushed_stone515
 			,MF.cement
 			,MF.plasticizer
 			,MF.water
@@ -152,6 +155,7 @@ if( $row["editable"] ) {
 			,COUNT(MF.slag30) sl30_cnt
 			,COUNT(MF.sand) sn_cnt
 			,COUNT(MF.crushed_stone) cs_cnt
+			,COUNT(MF.crushed_stone515) cs515_cnt
 			,COUNT(MF.cement) cm_cnt
 			,COUNT(MF.plasticizer) pl_cnt
 			,COUNT(MF.water) wt_cnt
@@ -179,6 +183,7 @@ if( $row["editable"] ) {
 					".($row["sl30_cnt"] ? "<th>Шлак 5-30, кг</th>" : "")."
 					".($row["sn_cnt"] ? "<th>КМП, кг</th>" : "")."
 					".($row["cs_cnt"] ? "<th>Отсев, кг</th>" : "")."
+					".($row["cs515_cnt"] ? "<th>Отсев 5-15, кг</th>" : "")."
 					".($row["cm_cnt"] ? "<th rowspan='2'>Цемент, кг</th>" : "")."
 					".($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор, кг</th>" : "")."
 					".($row["wt_cnt"] ? "<th>Вода, кг</th>" : "")."
@@ -196,6 +201,7 @@ if( $row["editable"] ) {
 					".($row["sl30_cnt"] ? "<th><input type='number' min='1' max='3' step='0.01' value='".($sl30_density/1000)."' name='sl30_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
 					".($row["sn_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($sn_density/1000)."' name='sn_density' style='width: 100%; background-color: #f4a46082;' ></th>" : "")."
 					".($row["cs_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($cs_density/1000)."' name='cs_density' style='width: 100%; background-color: #8b45137a;' ></th>" : "")."
+					".($row["cs515_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($cs515_density/1000)."' name='cs515_density' style='width: 100%; background-color: #8b45137a;' ></th>" : "")."
 					<th><input type='number' min='0' max='100' value='".($calcium)."' name='calcium' style='width: 100%; background-color: #1e90ff85;' required></th>
 				</tr>
 				<tr>
@@ -209,6 +215,7 @@ if( $row["editable"] ) {
 					".($row["sl30_cnt"] ? "<th class='nowrap'>{$row["slag30"]}</th>" : "")."
 					".($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")."
 					".($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")."
+					".($row["cs515_cnt"] ? "<th class='nowrap'>{$row["crushed_stone515"]}</th>" : "")."
 					".($row["cm_cnt"] ? "<th class='nowrap'>{$row["cement"]}</th>" : "")."
 					".($row["pl_cnt"] ? "<th class='nowrap'>{$row["plasticizer"]}</th>" : "")."
 					".($row["wt_cnt"] ? "<th class='nowrap'>{$row["water"]}</th>" : "")."
@@ -235,6 +242,7 @@ if( $row["editable"] ) {
 				,IFNULL(LB.slag30, 0) slag30
 				,IFNULL(LB.sand, 0) sand
 				,IFNULL(LB.crushed_stone, 0) crushed_stone
+				,IFNULL(LB.crushed_stone515, 0) crushed_stone515
 				,IFNULL(LB.cement, 0) cement
 				,IFNULL(LB.plasticizer, 0) plasticizer
 				,IFNULL(LB.water, 0) water
@@ -285,6 +293,7 @@ if( $row["editable"] ) {
 					".($row["sl30_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag30[{$subrow["LB_ID"]}]' value='{$subrow["slag30"]}' style='width: 100%;' required></td>" : "")."
 					".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[{$subrow["LB_ID"]}]' value='{$subrow["sand"]}' style='width: 100%;' required></td>" : "")."
 					".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone"]}' style='width: 100%;' required></td>" : "")."
+					".($row["cs515_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone515[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone515"]}' style='width: 100%;' required></td>" : "")."
 					".($row["cm_cnt"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[{$subrow["LB_ID"]}]' value='{$subrow["cement"]}' style='width: 100%;' required></td>" : "")."
 					".($row["pl_cnt"] ? "<td style='background: #80800080;'><input type='number' min='0' step='0.01' name='plasticizer[{$subrow["LB_ID"]}]' value='{$subrow["plasticizer"]}' style='width: 100%;' required></td>" : "")."
 					".($row["wt_cnt"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[{$subrow["LB_ID"]}]' value='{$subrow["water"]}' style='width: 100%;' required></td>" : "")."
@@ -324,6 +333,7 @@ if( $row["editable"] ) {
 				".($row["sl30_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag30[n_{$i}]' style='width: 100%;' required></td>" : "")."
 				".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[n_{$i}]' style='width: 100%;' required></td>" : "")."
 				".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[n_{$i}]' style='width: 100%;' required></td>" : "")."
+				".($row["cs515_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone515[n_{$i}]' style='width: 100%;' required></td>" : "")."
 				".($row["cm_cnt"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[n_{$i}]' style='width: 100%;' required></td>" : "")."
 				".($row["pl_cnt"] ? "<td style='background: #80800080;'><input type='number' min='0' step='0.01' name='plasticizer[n_{$i}]' style='width: 100%;' required></td>" : "")."
 				".($row["wt_cnt"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[n_{$i}]' style='width: 100%;' required></td>" : "")."

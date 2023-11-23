@@ -162,6 +162,7 @@ foreach ($_GET as &$value) {
 			<th colspan="2" class="slag30">Шлак 5-30</th>
 			<th colspan="2" class="sand">КМП</th>
 			<th colspan="2" class="crushed_stone">Отсев</th>
+			<th colspan="2" class="crushed_stone515">Отсев 5-15</th>
 			<th colspan="2" class="cement">Цемент</th>
 			<th colspan="2" class="plasticizer">Пластификатор</th>
 			<th colspan="2" class="calcium">Кальций</th>
@@ -186,6 +187,8 @@ foreach ($_GET as &$value) {
 			<th class="sand">На деталь, г</th>
 			<th class="crushed_stone">Расход, кг</th>
 			<th class="crushed_stone">На деталь, г</th>
+			<th class="crushed_stone515">Расход, кг</th>
+			<th class="crushed_stone515">На деталь, г</th>
 			<th class="cement">Расход, кг</th>
 			<th class="cement">На деталь, г</th>
 			<th class="plasticizer">Расход, г</th>
@@ -211,6 +214,7 @@ foreach ($_GET as &$value) {
 				,SUM(LB.slag30) slag30
 				,SUM(LB.sand) sand
 				,SUM(LB.crushed_stone) crushed_stone
+				,SUM(LB.crushed_stone515) crushed_stone515
 				,SUM(LB.cement) cement
 				,SUM(LB.plasticizer) * 1000 / 10 plasticizer
 				,SUM(LB.water * PB.calcium) calcium
@@ -238,6 +242,7 @@ foreach ($_GET as &$value) {
 			$slag30 += $row["slag30"];
 			$sand += $row["sand"];
 			$crushed_stone += $row["crushed_stone"];
+			$crushed_stone515 += $row["crushed_stone515"];
 			$cement += $row["cement"];
 			$plasticizer += $row["plasticizer"];
 			$calcium += $row["calcium"];
@@ -264,6 +269,8 @@ foreach ($_GET as &$value) {
 				<td style="background: #f4a46082;" class="sand"><?=number_format($row["sand"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #8b45137a;" class="crushed_stone"><?=number_format($row["crushed_stone"], 0, ',', ' ')?></td>
 				<td style="background: #8b45137a;" class="crushed_stone"><?=number_format($row["crushed_stone"] * 1000/$row["details"], 0, ',', ' ')?></td>
+				<td style="background: #8b45137a;" class="crushed_stone515"><?=number_format($row["crushed_stone515"], 0, ',', ' ')?></td>
+				<td style="background: #8b45137a;" class="crushed_stone515"><?=number_format($row["crushed_stone515"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #7080906b;" class="cement"><?=number_format($row["cement"], 0, ',', ' ')?></td>
 				<td style="background: #7080906b;" class="cement"><?=number_format($row["cement"] * 1000/$row["details"], 0, ',', ' ')?></td>
 				<td style="background: #80800080;" class="plasticizer"><?=number_format($row["plasticizer"], 0, ',', ' ')?></td>
@@ -299,6 +306,8 @@ foreach ($_GET as &$value) {
 			<td class="sand"></td>
 			<td class="crushed_stone"><?=number_format($crushed_stone, 0, ',', ' ')?></td>
 			<td class="crushed_stone"></td>
+			<td class="crushed_stone515"><?=number_format($crushed_stone515, 0, ',', ' ')?></td>
+			<td class="crushed_stone515"></td>
 			<td class="cement"><?=number_format($cement, 0, ',', ' ')?></td>
 			<td class="cement"></td>
 			<td class="plasticizer"><?=number_format($plasticizer, 0, ',', ' ')?></td>
@@ -329,6 +338,7 @@ foreach ($_GET as &$value) {
 	<?=($slag30 ? "" : ".slag30{ display: none; }")?>
 	<?=($sand ? "" : ".sand{ display: none; }")?>
 	<?=($crushed_stone ? "" : ".crushed_stone{ display: none; }")?>
+	<?=($crushed_stone515 ? "" : ".crushed_stone515{ display: none; }")?>
 	<?=($cement ? "" : ".cement{ display: none; }")?>
 	<?=($plasticizer ? "" : ".plasticizer{ display: none; }")?>
 	<?=($calcium ? "" : ".calcium{ display: none; }")?>
