@@ -87,6 +87,12 @@ if( !in_array('blanks', $Rights) ) {
 			<p>Cube Test Report</p>
 		</a>
 	</section>
+	<section class="cell">
+		<a href="/files/чек-лист приемки с Весты.pdf" class='print'>
+			<p><i class="fas fa-file-pdf fa-5x"></i></p>
+			<p>Чек-лист приемки с Весты</p>
+		</a>
+	</section>
 </fieldset>
 
 <fieldset class="files_wrap">
