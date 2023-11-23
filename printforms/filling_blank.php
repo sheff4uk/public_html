@@ -212,6 +212,7 @@ $query = "
 		,COUNT(MF.slag020) sl020_cnt
 		,COUNT(MF.slag30) sl30_cnt
 		,COUNT(MF.sand) sn_cnt
+		,COUNT(MF.crushed_stone) cs_cnt
 		,COUNT(MF.crushed_stone515) cs515_cnt
 		,COUNT(MF.cement) cm_cnt
 		,COUNT(MF.plasticizer) pl_cnt
