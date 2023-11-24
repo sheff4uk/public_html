@@ -61,6 +61,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
+						<th>Клиент</th>
 						<th>Противовес</th>
 						<th>Замесов</th>
 						<th>Кассет</th>
@@ -70,15 +71,21 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<tbody style="text-align: center;">
 					<?
 					$query = "
-						SELECT CW.CW_ID, CW.item
+						SELECT CW.CW_ID
+							,CW.item
+							,CB.brand
 						FROM CounterWeight CW
-						JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = {$_GET["F_ID"]}
-						ORDER BY CW.CW_ID
+						JOIN ClientBrand CB ON CB.CB_ID = CW.CB_ID
+						JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID
+							AND MF.F_ID = {$_GET["F_ID"]}
+						WHERE TIMESTAMPDIFF(MONTH, MF.last_batch, NOW()) = 0
+						ORDER BY CW.CB_ID, CW.item
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) ) {
 						?>
 						<tr class="data_row">
+							<td><?=$row["brand"]?></td>
 							<td><b style="font-size: 1.5em;"><?=$row["item"]?></b><input type="hidden" name="CW_ID[<?=$row["CW_ID"]?>]" value="<?=$row["CW_ID"]?>"><input type="hidden" name="PB_ID[<?=$row["CW_ID"]?>]"></td>
 							<td><input type="number" name="batches[<?=$row["CW_ID"]?>]" class="batches" min="0" max="80" fillings="" per_batch="" in_cassette="" tabindex="<?=(++$index)?>" style="width: 70px;"><i class="fas fa-question-circle" title="Не редактируется. Заливки уже состоялись."></i></td>
 							<td><input type="number" name="fillings" class="fillings" style="width: 70px;" readonly></td>
@@ -88,6 +95,36 @@ this.subbut.value='Подождите, пожалуйста!';">
 					}
 					?>
 					<tr class="total">
+						<td colspan="5"><b>Архив</b></td>
+					</tr>
+					<?
+					$query = "
+						SELECT CW.CW_ID
+							,CW.item
+							,CB.brand
+						FROM CounterWeight CW
+						JOIN ClientBrand CB ON CB.CB_ID = CW.CB_ID
+						JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID
+							AND MF.F_ID = {$_GET["F_ID"]}
+						WHERE TIMESTAMPDIFF(MONTH, MF.last_batch, NOW()) != 0
+							OR MF.last_batch IS NULL
+						ORDER BY CW.CB_ID, CW.item
+					";
+					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $row = mysqli_fetch_array($res) ) {
+						?>
+						<tr class="data_row">
+							<td><?=$row["brand"]?></td>
+							<td><b style="font-size: 1.5em;"><?=$row["item"]?></b><input type="hidden" name="CW_ID[<?=$row["CW_ID"]?>]" value="<?=$row["CW_ID"]?>"><input type="hidden" name="PB_ID[<?=$row["CW_ID"]?>]"></td>
+							<td><input type="number" name="batches[<?=$row["CW_ID"]?>]" class="batches" min="0" max="80" fillings="" per_batch="" in_cassette="" tabindex="<?=(++$index)?>" style="width: 70px;"><i class="fas fa-question-circle" title="Не редактируется. Заливки уже состоялись."></i></td>
+							<td><input type="number" name="fillings" class="fillings" style="width: 70px;" readonly></td>
+							<td><input type="number" name="details" class="details" style="width: 70px;" readonly></td>
+						</tr>
+						<?
+					}
+					?>
+					<tr class="total">
+						<td></td>
 						<td>Всего:</td>
 						<td id="total_batches"><span></span></td>
 						<td id="total_fillings"><span></span></td>
