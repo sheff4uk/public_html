@@ -13,7 +13,17 @@ $query = "
 		,IFNULL(PB.per_batch, MF.per_batch) per_batch
 		,IFNULL(PB.in_cassette, MF.in_cassette) in_cassette
 		,PB.PB_ID
-		,IFNULL(PB.batches, (SELECT batches FROM plan__Batch WHERE CW_ID = CW.CW_ID AND year = {$year} AND cycle < {$cycle} ORDER BY cycle DESC LIMIT 1)) `placeholder`
+		,IFNULL(PB.batches, (
+			SELECT batches
+			FROM plan__Batch
+			WHERE F_ID = {$F_ID}
+				AND CW_ID = CW.CW_ID
+				AND year = {$year}
+				AND cycle < {$cycle}
+				AND batches > 0
+			ORDER BY cycle DESC
+			LIMIT 1
+		)) `placeholder`
 	FROM MixFormula MF
 	JOIN CounterWeight CW ON CW.CW_ID = MF.CW_ID
 	LEFT JOIN plan__Batch PB ON PB.CW_ID = CW.CW_ID AND PB.year = {$year} AND PB.cycle = {$cycle} AND PB.F_ID = MF.F_ID
