@@ -79,7 +79,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID
 							AND MF.F_ID = {$_GET["F_ID"]}
 						WHERE TIMESTAMPDIFF(MONTH, MF.last_batch, NOW()) = 0
-						ORDER BY CW.CB_ID, CW.item
+						ORDER BY CW.CB_ID, CW.CW_ID
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) ) {
@@ -108,7 +108,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							AND MF.F_ID = {$_GET["F_ID"]}
 						WHERE TIMESTAMPDIFF(MONTH, MF.last_batch, NOW()) != 0
 							OR MF.last_batch IS NULL
-						ORDER BY CW.CB_ID, CW.item
+						ORDER BY CW.CB_ID, CW.CW_ID
 					";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) ) {
