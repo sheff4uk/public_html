@@ -200,6 +200,7 @@ $query = "
 		,IFNULL(CONCAT(MF.slag020, '±5 кг'), 0) slag020
 		,IFNULL(CONCAT(MF.slag30, '±5 кг'), 0) slag30
 		,IFNULL(CONCAT(MF.sand, '±5 кг'), 0) sand
+		,IFNULL(CONCAT(MF.crushed_stone, '±5 кг'), 0) crushed_stone
 		,IFNULL(CONCAT(MF.crushed_stone515, '±5 кг'), 0) crushed_stone515
 		,IFNULL(CONCAT(MF.cement, '±2 кг'), 0) cement
 		,IFNULL(CONCAT(MF.plasticizer, ' кг'), 0) plasticizer
