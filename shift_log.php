@@ -19,6 +19,12 @@ if( !$_GET["week"] ) {
 	$row = mysqli_fetch_array($res);
 	$_GET["week"] = $row["week"];
 }
+
+// Если не выбран участок, берем из сессии
+if( !$_GET["F_ID"] ) {
+	$_GET["F_ID"] = $_SESSION['F_ID'];
+}
+$F_ID = $_GET["F_ID"];
 ?>
 
 <!--Фильтр-->
@@ -26,6 +32,25 @@ if( !$_GET["week"] ) {
 	<h3>Фильтр</h3>
 	<form method="get" style="position: relative;">
 		<a href="/shift_log.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
+
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Участок:</span>
+			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT F_ID
+						,f_name
+					FROM factory
+					ORDER BY F_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["F_ID"] == $_GET["F_ID"]) ? "selected" : "";
+					echo "<option value='{$row["F_ID"]}' {$selected}>{$row["f_name"]}</option>";
+				}
+				?>
+			</select>
+		</div>
 
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Неделя:</span>
@@ -110,7 +135,7 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th>День</th>
-			<th>Смена<br>1 (07:00-18:59)<br>2 (19:00-06:59)</th>
+			<th>Смена</th>
 			<th>Мастер</th>
 			<th>Оператор</th>
 			<th></th>
@@ -124,7 +149,8 @@ foreach ($_GET as &$value) {
 		UNION
 		SELECT ADDDATE(working_day, 0-WEEKDAY(working_day)) first_day
 		FROM ShiftLog
-		WHERE YEARWEEK(working_day, 1) LIKE '{$_GET["week"]}'
+		WHERE F_ID = {$F_ID}
+			AND YEARWEEK(working_day, 1) LIKE '{$_GET["week"]}'
 		ORDER BY first_day
 		LIMIT 1
 	";
@@ -136,61 +162,69 @@ foreach ($_GET as &$value) {
 	$query = "
 		SELECT ADDDATE('{$first_day}', 0) next_day
 			,DATE_FORMAT(ADDDATE('{$first_day}', 0), '%d.%m.%Y') next_day_format
+			,DATEDIFF(ADDDATE('{$first_day}', 0), CURDATE()) date_diff
 		UNION
 		SELECT ADDDATE('{$first_day}', 1) next_day
 			,DATE_FORMAT(ADDDATE('{$first_day}', 1), '%d.%m.%Y') next_day_format
+			,DATEDIFF(ADDDATE('{$first_day}', 1), CURDATE()) date_diff
 		UNION
 		SELECT ADDDATE('{$first_day}', 2) next_day
 			,DATE_FORMAT(ADDDATE('{$first_day}', 2), '%d.%m.%Y') next_day_format
+			,DATEDIFF(ADDDATE('{$first_day}', 2), CURDATE()) date_diff
 		UNION
 		SELECT ADDDATE('{$first_day}', 3) next_day
 			,DATE_FORMAT(ADDDATE('{$first_day}', 3), '%d.%m.%Y') next_day_format
+			,DATEDIFF(ADDDATE('{$first_day}', 3), CURDATE()) date_diff
 		UNION
 		SELECT ADDDATE('{$first_day}', 4) next_day
 			,DATE_FORMAT(ADDDATE('{$first_day}', 4), '%d.%m.%Y') next_day_format
+			,DATEDIFF(ADDDATE('{$first_day}', 4), CURDATE()) date_diff
 		UNION
 		SELECT ADDDATE('{$first_day}', 5) next_day
 			,DATE_FORMAT(ADDDATE('{$first_day}', 5), '%d.%m.%Y') next_day_format
+			,DATEDIFF(ADDDATE('{$first_day}', 5), CURDATE()) date_diff
 		UNION
 		SELECT ADDDATE('{$first_day}', 6) next_day
 			,DATE_FORMAT(ADDDATE('{$first_day}', 6), '%d.%m.%Y') next_day_format
+			,DATEDIFF(ADDDATE('{$first_day}', 6), CURDATE()) date_diff
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
-		// Первая смена
 		$query = "
-			SELECT USR_Icon(SL.master) master
+			SELECT SL.shift
+				,USR_Icon(SL.master) master
 				,USR_Icon(SL.operator) operator
 			FROM ShiftLog SL
-			WHERE SL.working_day LIKE '{$row["next_day"]}' AND SL.shift = 1
+			WHERE SL.F_ID = {$F_ID}
+				AND SL.working_day LIKE '{$row["next_day"]}'
 		";
 		$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		$num_rows = mysqli_num_rows($subres);
 		$subrow = mysqli_fetch_array($subres);
 		?>
 		<tr style="border-top: 2px solid;">
-			<td rowspan = "2"><?=$row["next_day_format"]?></td>
-			<td><b>1</b></td>
+			<td rowspan="<?=($num_rows ? $num_rows : 1)?>"><?=$row["next_day_format"]?></td>
+			<td><b><?=$subrow["shift"]?></b></td>
 			<td><?=$subrow["master"]?></td>
 			<td><?=$subrow["operator"]?></td>
-			<td rowspan = "2"><a href="#" class="add_shift_log" day="<?=$row["next_day_format"]?>" week="<?=$_GET["week"]?>" title="Редактировать смены"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
+			<td rowspan="<?=($num_rows ? $num_rows : 1)?>">
+				<?
+				if ($row["date_diff"] <= 0) {
+					echo "<a href='#' class='add_shift_log' f_id='{$F_ID}' day='{$row["next_day_format"]}' week='{$_GET["week"]}' title='Редактировать смены'><i class='fa fa-pencil-alt fa-lg'></i></a>";
+				}
+				?>
+			</td>
 		</tr>
 		<?
-		// Вторая смена
-		$query = "
-			SELECT USR_Icon(SL.master) master
-				,USR_Icon(SL.operator) operator
-			FROM ShiftLog SL
-			WHERE SL.working_day LIKE '{$row["next_day"]}' AND SL.shift = 2
-		";
-		$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		$subrow = mysqli_fetch_array($subres);
-		?>
-		<tr>
-			<td><b>2</b></td>
-			<td><?=$subrow["master"]?></td>
-			<td><?=$subrow["operator"]?></td>
-		</tr>
-		<?
+		while( $subrow = mysqli_fetch_array($subres) ) {
+			?>
+			<tr>
+				<td><b><?=$subrow["shift"]?></b></td>
+				<td><?=$subrow["master"]?></td>
+				<td><?=$subrow["operator"]?></td>
+			</tr>
+			<?	
+		}
 	}
 	?>
 	</tbody>
