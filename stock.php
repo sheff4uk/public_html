@@ -99,9 +99,12 @@ if( isset($_GET["download"]) ) {
 $query = "
 	SELECT IFNULL(DATE(MIN(LPP.packed_time)), CURDATE()) date_from
 	FROM list__PackingPallet LPP
+	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+	LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 	WHERE LPP.shipment_time IS NULL
 		AND LPP.removal_time IS NULL
 		AND LPP.F_ID = {$_GET["F_ID"]}
+		AND IFNULL(CW.CB_ID, 0) != 5
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
