@@ -298,7 +298,7 @@ foreach ($_GET as &$value) {
 					GROUP BY CWP.CWP_ID
 				) SUB ON SUB.CWP_ID = CWP.CWP_ID
 				LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
-				WHERE CW.CB_ID != 5
+				WHERE IFNULL(CW.CB_ID, 0) != 5
 				GROUP BY SUB.CWP_ID
 				ORDER BY SUB.CWP_ID ASC
 			";
@@ -408,6 +408,7 @@ foreach ($_GET as &$value) {
 				LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 				WHERE LPP.F_ID = {$_GET["F_ID"]}
 					AND DATE(LPP.packed_time) >= '{$date_from}'
+					AND IFNULL(CW.CB_ID, 0) != 5
 				GROUP BY LPP.CWP_ID
 				ORDER BY LPP.CWP_ID ASC
 			";
@@ -439,7 +440,7 @@ $query = "
 	LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 	WHERE DATE(LPP.packed_time) >= '{$date_from}'
 		AND LPP.F_ID = {$_GET["F_ID"]}
-		AND CW.CB_ID != 5
+		AND IFNULL(CW.CB_ID, 0) != 5
 	ORDER BY LPP.packed_time DESC
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
