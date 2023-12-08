@@ -9,63 +9,19 @@ if( isset($_POST["ps_date"]) ) {
 	if( $_POST["PS_ID"] ) {
 		$PS_ID = $_POST["PS_ID"];
 
-		// Узнаем текущую дату и приоритет
 		$query = "
-			SELECT ps_date
-				,priority
-			FROM plan__Shipment
+			UPDATE plan__Shipment
+			SET ps_date = '{$_POST["ps_date"]}'
 			WHERE PS_ID = {$PS_ID}
 		";
-		$res = mysqli_query( $mysqli, $query );
-		$row = mysqli_fetch_array($res);
-		$ps_date = $row["ps_date"];
-		$priority = $row["priority"];
-
-		// Если дата изменена, пересчитываем приоритет и обновляем дату
-		if( $ps_date != $_POST["ps_date"] ) {
-			$query = "
-				SELECT IFNULL(MAX(priority),0) + 1 new_priority
-				FROM plan__Shipment
-				WHERE F_ID = {$_POST["F_ID"]}
-					AND ps_date = '{$_POST["ps_date"]}'
-			";
-			$res = mysqli_query( $mysqli, $query );
-			$row = mysqli_fetch_array($res);
-			$new_priority = $row["new_priority"];
-
-			$query = "
-				UPDATE plan__Shipment
-				SET ps_date = '{$_POST["ps_date"]}'
-					,priority = {$new_priority}
-				WHERE PS_ID = {$PS_ID}
-			";
-			if( !mysqli_query( $mysqli, $query ) ) $_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
-
-			$query = "
-				UPDATE plan__Shipment
-				SET priority = priority - 1
-				WHERE ps_date = '{$ps_date}' AND priority > {$priority}
-			";
-			if( !mysqli_query( $mysqli, $query ) ) $_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
-		}
+		if( !mysqli_query( $mysqli, $query ) ) $_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 	}
 	// Если новый план, делаем запись в plan__Shipment
 	else {
 		$query = "
-			SELECT IFNULL(MAX(priority),0) + 1 new_priority
-			FROM plan__Shipment
-			WHERE F_ID = {$_POST["F_ID"]}
-				AND ps_date = '{$_POST["ps_date"]}'
-		";
-		$res = mysqli_query( $mysqli, $query );
-		$row = mysqli_fetch_array($res);
-		$new_priority = $row["new_priority"];
-
-		$query = "
 			INSERT INTO plan__Shipment
 			SET F_ID = {$_POST["F_ID"]}
 				,ps_date = '{$_POST["ps_date"]}'
-				,priority = {$new_priority}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) $_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
 		$PS_ID = mysqli_insert_id( $mysqli );
@@ -125,7 +81,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="PS_ID">
 			<input type="hidden" name="F_ID" value="<?=$_GET["F_ID"]?>">
 
-            <h2>Планируемая дата отгрузки: <input type="date" name="ps_date" required></h2>
+            <h2>Планируемая дата отгрузки: <input type="date" name="ps_date" min="<?=date('Y-m-d')?>" required></h2>
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>

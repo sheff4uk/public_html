@@ -54,7 +54,8 @@ echo "<title>Накладная №{$PS_ID}</title>";
     // Получаем дату планируемой отгрузки
     $query = "
         SELECT DATE_FORMAT(PS.ps_date, '%d.%m.%Y') ps_date_format
-            ,PS.priority
+            ,IFNULL(PS.prior, (SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
+            + (SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE PS_ID <= PS.PS_ID AND F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NULL)) priority
         FROM plan__Shipment PS
         WHERE PS.PS_ID = {$PS_ID}
     ";

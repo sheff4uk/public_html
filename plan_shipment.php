@@ -165,14 +165,15 @@ while( $row = mysqli_fetch_array($res) ) {
 		SELECT PS.PS_ID
 			,SUM(1) cnt
 			,SUM(PSC.quantity) pallets
-			,PS.priority
+			,IFNULL(PS.prior, (SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
+    		+ (SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE PS_ID <= PS.PS_ID AND F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NULL)) priority
 			,DATE_FORMAT(PS.shipment_time, '%d.%m.%Y %H:%i') friendly_shipment_time
 		FROM plan__Shipment PS
 		JOIN plan__ShipmentCWP PSC ON PSC.PS_ID = PS.PS_ID
 		WHERE PS.ps_date = '{$row["ps_date"]}'
 			AND PS.F_ID = {$_GET["F_ID"]}
-		GROUP BY PS.priority
-		ORDER BY PS.priority
+		GROUP BY priority
+		ORDER BY priority
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
@@ -194,7 +195,10 @@ while( $row = mysqli_fetch_array($res) ) {
 			LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 			WHERE PS.ps_date = '{$row["ps_date"]}'
 				AND PS.F_ID = {$_GET["F_ID"]}
-				AND PS.priority = {$subrow["priority"]}
+				AND IFNULL(PS.prior,
+						(SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
+						+ (SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE PS_ID <= PS.PS_ID AND F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NULL)
+					) = {$subrow["priority"]}
 			ORDER BY PSC.CWP_ID
 		";
 		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));

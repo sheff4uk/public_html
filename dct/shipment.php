@@ -42,55 +42,70 @@ if( isset($_POST["WT_ID"]) ) {
 
 //Отгрузка машины
 if( isset($_POST["lpp_id"]) ) {
-	$LPP_IDs = "0";
-	foreach ($_POST["lpp_id"] as $key => $value) {
-		$LPP_IDs .= ",{$value}";
-	}
-
-	// Время отгрузки
+	// Узнаем приоритет чтобы сохранить его
 	$query = "
-		SELECT NOW() `now`
+		SELECT PS.prior
+			,(SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
+			+ (SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE PS_ID <= PS.PS_ID AND F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NULL) priority
+		FROM plan__Shipment PS
+		WHERE PS.PS_ID = {$_POST["ps_id"]}
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query1: " .mysqli_error( $mysqli ));
 	$row = mysqli_fetch_array($res);
-	$now = $row["now"];
+	$prior = $row["prior"];
+	$priority = $row["priority"];
+	
+	// Если отгрузки не было
+	if( $prior == null ) {
+		$LPP_IDs = "0";
+		foreach ($_POST["lpp_id"] as $key => $value) {
+			$LPP_IDs .= ",{$value}";
+		}
+	
+		// Время отгрузки
+		$query = "
+			SELECT NOW() `now`
+		";
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query1: " .mysqli_error( $mysqli ));
+		$row = mysqli_fetch_array($res);
+		$now = $row["now"];
 
-//	if( isset($_POST["ps_id"]) ) {
 		$query = "
 			UPDATE plan__Shipment
 			SET shipment_time = '{$now}'
+				,prior = {$priority}
 			WHERE PS_ID = {$_POST["ps_id"]}
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query2: " .mysqli_error( $mysqli ));
-//	}
-
-	$query = "
-		UPDATE list__PackingPallet
-		SET shipment_time = '{$now}'
-			,removal_time = NULL
-		WHERE LPP_ID IN ({$LPP_IDs}) AND shipment_time IS NULL
-	";
-	mysqli_query( $mysqli, $query ) or die("Invalid query3: " .mysqli_error( $mysqli ));
-
-	if( mysqli_affected_rows($mysqli) ) {
-		// Сообщение в телеграм об отгрузке машины
-		//$message = "🚛";
-		$message = "";
+	
 		$query = "
-			SELECT CONCAT(IFNULL(CW.item, CWP.cwp_name), ' (', CWP.in_pallet, 'шт)') item
-				,SUM(1) cnt
-			FROM list__PackingPallet LPP
-			JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
-			LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
-			WHERE LPP.LPP_ID IN ({$LPP_IDs})
-			GROUP BY LPP.CWP_ID
-			ORDER BY LPP.CWP_ID
+			UPDATE list__PackingPallet
+			SET shipment_time = '{$now}'
+				,removal_time = NULL
+			WHERE LPP_ID IN ({$LPP_IDs}) AND shipment_time IS NULL
 		";
-		$res = mysqli_query( $mysqli, $query ) or die("Invalid query4: " .mysqli_error( $mysqli ));
-		while( $row = mysqli_fetch_array($res) ) {
-			$message .= "\n{$row["item"]} x {$row["cnt"]}";
+		mysqli_query( $mysqli, $query ) or die("Invalid query3: " .mysqli_error( $mysqli ));
+	
+		if( mysqli_affected_rows($mysqli) ) {
+			// Сообщение в телеграм об отгрузке машины
+			//$message = "🚛";
+			$message = "";
+			$query = "
+				SELECT CONCAT(IFNULL(CW.item, CWP.cwp_name), ' (', CWP.in_pallet, 'шт)') item
+					,SUM(1) cnt
+				FROM list__PackingPallet LPP
+				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+				LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+				WHERE LPP.LPP_ID IN ({$LPP_IDs})
+				GROUP BY LPP.CWP_ID
+				ORDER BY LPP.CWP_ID
+			";
+			$res = mysqli_query( $mysqli, $query ) or die("Invalid query4: " .mysqli_error( $mysqli ));
+			while( $row = mysqli_fetch_array($res) ) {
+				$message .= "\n{$row["item"]} x {$row["cnt"]}";
+			}
+			message_to_telegram($message, $shipment_group);
 		}
-		message_to_telegram($message, $shipment_group);
 	}
 
 	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php">');
@@ -235,7 +250,9 @@ if( isset($_POST["lpp_id"]) ) {
 					AND PS.ps_date <= CURDATE()
 				GROUP BY PS.PS_ID
 				HAVING pallets > 0
-				ORDER BY PS.ps_date, PS.priority
+				ORDER BY PS.ps_date
+					,(SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
+					+ (SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE PS_ID <= PS.PS_ID AND F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NULL)
 				LIMIT 1
 			";
 			$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
