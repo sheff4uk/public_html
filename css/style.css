@@ -125,7 +125,7 @@ a:hover .cassette {
 .txtleft {
 	text-align: left;
 }
-.addproduct > form > fieldset > div > label,
+.addproduct > form > fieldset div > label,
 .addproduct fieldset#Client > div > label,
 .addproduct > form > fieldset label.ui-button {
 	display: block;

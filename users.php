@@ -12,6 +12,9 @@ if( isset($_POST["USR_ID"]) ) {
 	$act = $_POST["act"] ? 1 : 0;
 	$cardcode = $_POST["cardcode"];
 	$overalls_issued = $_POST["overalls_issued"] ? '\''.$_POST["overalls_issued"].'\'' : 'NULL';
+	$suit_date = $_POST["suit_date"] ? '\''.$_POST["suit_date"].'\'' : 'NULL';
+	$jacket_date = $_POST["jacket_date"] ? '\''.$_POST["jacket_date"].'\'' : 'NULL';
+	$shoes_date = $_POST["shoes_date"] ? '\''.$_POST["shoes_date"].'\'' : 'NULL';
 
 	// Обработка строк
 	$Surname = convert_str($_POST["Surname"]);
@@ -68,6 +71,9 @@ if( isset($_POST["USR_ID"]) ) {
 				,post = {$post}
 				,user_type = {$user_type}
 				,overalls_issued = {$overalls_issued}
+				,suit_date = {$suit_date}
+				,jacket_date = {$jacket_date}
+				,shoes_date = {$shoes_date}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -103,6 +109,9 @@ if( isset($_POST["USR_ID"]) ) {
 				,post = {$post}
 				,user_type = {$user_type}
 				,overalls_issued = {$overalls_issued}
+				,suit_date = {$suit_date}
+				,jacket_date = {$jacket_date}
+				,shoes_date = {$shoes_date}
 			WHERE USR_ID = {$_POST["USR_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -354,7 +363,7 @@ foreach ($_GET as &$value) {
 			<th>Пост</th>
 			<th>Номер карты</th>
 			<th>Тип</th>
-			<th>Дата выдачи спецодежды</th>
+			<th colspan="2">Дата выдачи спецодежды</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -379,7 +388,13 @@ foreach ($_GET as &$value) {
 				,F.f_name
 				,USR.act
 				,USR.overalls_issued
-				,DATE_FORMAT(USR.overalls_issued, '%d.%m.%Y') overalls_issued_format
+				,CONCAT(DATE_FORMAT(USR.overalls_issued, '%d.%m.%Y'), '<br>') overalls_issued_format
+				,USR.suit_date
+				,CONCAT('Костюм: ', DATE_FORMAT(USR.suit_date, '%d.%m.%Y'), '<br>') suit_date_format
+				,USR.jacket_date
+				,CONCAT('Куртка: ', DATE_FORMAT(USR.jacket_date, '%d.%m.%Y'), '<br>') jacket_date_format
+				,USR.shoes_date
+				,CONCAT('Ботинки: ', DATE_FORMAT(USR.shoes_date, '%d.%m.%Y'), '<br>') shoes_date_format
 			FROM Users USR
 			JOIN Roles RL ON RL.RL_ID = USR.RL_ID
 			JOIN factory F ON F.F_ID = USR.F_ID
@@ -428,7 +443,7 @@ foreach ($_GET as &$value) {
 					<td>{$row["post"]}</td>
 					<td>{$row["cardcode"]}</td>
 					<td>{$row["user_type"]}</td>
-					<td>{$row["overalls_issued_format"]}</td>
+					<td colspan='2'>{$row["overalls_issued_format"]}{$row["suit_date_format"]}{$row["jacket_date_format"]}{$row["shoes_date_format"]}</td>
 					<td>
 						<a href='#' class='add_user' usr='{$row["USR_ID"]}' title='Изменить данные пользователя'><i class='fa fa-pencil-alt fa-lg'></i></a>
 						<a href='/printforms/card_label.php?USR_ID={$row["USR_ID"]}' class='print' title='Печать этикетки на карту'><i class='fa-solid fa-address-card fa-lg'></i></a>
@@ -538,6 +553,27 @@ this.subbut.value='Подождите, пожалуйста!';">
 					<input type="date" name="overalls_issued" max="<?=date('Y-m-d')?>">
 				</div>
 			</div>
+			<fieldset>
+				<legend>Даты выдачи спецодежды</legend>
+			<div>
+				<label>костюм:</label>
+				<div>
+					<input type="date" name="suit_date" max="<?=date('Y-m-d')?>">
+				</div>
+			</div>
+			<div>
+				<label>куртка:</label>
+				<div>
+					<input type="date" name="jacket_date" max="<?=date('Y-m-d')?>">
+				</div>
+			</div>
+			<div>
+				<label>обувь:</label>
+				<div>
+					<input type="date" name="shoes_date" max="<?=date('Y-m-d')?>">
+				</div>
+			</div>
+			</fieldset>
 		</fieldset>
 		<div>
 			<hr>
@@ -661,6 +697,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#user_form input[name="cardcode"]').val(users_data[usr]['cardcode']);
 				$('#user_form input[name="user_type"]').val(users_data[usr]['user_type']);
 				$('#user_form input[name="overalls_issued"]').val(users_data[usr]['overalls_issued']);
+				$('#user_form input[name="suit_date"]').val(users_data[usr]['suit_date']);
+				$('#user_form input[name="jacket_date"]').val(users_data[usr]['jacket_date']);
+				$('#user_form input[name="shoes_date"]').val(users_data[usr]['shoes_date']);
 			}
 
 			$('#user_form').dialog({
