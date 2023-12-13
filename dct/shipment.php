@@ -45,7 +45,7 @@ if( isset($_POST["lpp_id"]) ) {
 	// Узнаем приоритет чтобы сохранить его
 	$query = "
 		SELECT PS.prior
-			,(SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
+			,(SELECT IFNULL(MAX(prior), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
 			+ (SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE PS_ID <= PS.PS_ID AND F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NULL) priority
 		FROM plan__Shipment PS
 		WHERE PS.PS_ID = {$_POST["ps_id"]}
@@ -251,7 +251,7 @@ if( isset($_POST["lpp_id"]) ) {
 				GROUP BY PS.PS_ID
 				HAVING pallets > 0
 				ORDER BY PS.ps_date
-					,(SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
+					,(SELECT IFNULL(MAX(prior), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
 					+ (SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE PS_ID <= PS.PS_ID AND F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NULL)
 				LIMIT 1
 			";

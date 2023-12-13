@@ -165,7 +165,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		SELECT PS.PS_ID
 			,SUM(1) cnt
 			,SUM(PSC.quantity) pallets
-			,IFNULL(PS.prior, (SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
+			,IFNULL(PS.prior, (SELECT IFNULL(MAX(prior), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
     		+ (SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE PS_ID <= PS.PS_ID AND F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NULL)) priority
 			,DATE_FORMAT(PS.shipment_time, '%d.%m.%Y %H:%i') friendly_shipment_time
 		FROM plan__Shipment PS
@@ -196,7 +196,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			WHERE PS.ps_date = '{$row["ps_date"]}'
 				AND PS.F_ID = {$_GET["F_ID"]}
 				AND IFNULL(PS.prior,
-						(SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
+						(SELECT IFNULL(MAX(prior), 0) FROM plan__Shipment WHERE F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NOT NULL)
 						+ (SELECT IFNULL(SUM(1), 0) FROM plan__Shipment WHERE PS_ID <= PS.PS_ID AND F_ID = PS.F_ID AND ps_date = PS.ps_date AND shipment_time IS NULL)
 					) = {$subrow["priority"]}
 			ORDER BY PSC.CWP_ID
