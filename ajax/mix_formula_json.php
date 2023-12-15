@@ -38,8 +38,8 @@ $MF_data = array(
 	"cement"=>$row["cement"],
 	"plasticizer"=>$row["plasticizer"],
 	"water"=>$row["water"],
-	"min_density"=>$row["min_density"],
-	"max_density"=>$row["max_density"]
+	"min_density"=>$row["min_density"]/1000,
+	"max_density"=>$row["max_density"]/1000
 );
 
 echo json_encode($MF_data);

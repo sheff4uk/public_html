@@ -17,8 +17,8 @@ if( isset($_POST["MF_ID"]) ) {
 	$cement = ($_POST["cement"] != '') ? $_POST["cement"] : "0";
 	$plasticizer = ($_POST["plasticizer"] != '') ? $_POST["plasticizer"] : "NULL";
 	$water = ($_POST["water"] != '') ? $_POST["water"] : "0";
-	$min_density = ($_POST["min_density"] != '') ? $_POST["min_density"] : "0";
-	$max_density = ($_POST["max_density"] != '') ? $_POST["max_density"] : "0";
+	$min_density = ($_POST["min_density"] != '') ? $_POST["min_density"]*1000 : "0";
+	$max_density = ($_POST["max_density"] != '') ? $_POST["max_density"]*1000 : "0";
 
 	if( $_POST["MF_ID"] ) { // Редактируем
 		$query = "
@@ -108,15 +108,15 @@ this.subbut.value='Подождите, пожалуйста!';">
 			</table>
 
 			<div>
-				<label>Мин. плотность раствора г/л:</label>
+				<label>Мин. плотность раствора кг/л:</label>
 				<div>
-					<input type="number" name="min_density" min="0" max="6000" step="10" style="width: 100px;" autocomplete="off" required>
+					<input type="number" name="min_density" min="2" max="5.5" step="0.01" style="width: 100px;" autocomplete="off" required>
 				</div>
 			</div>
 			<div>
-				<label>Макс. плотность раствора г/л:</label>
+				<label>Макс. плотность раствора кг/л:</label>
 				<div>
-					<input type="number" name="max_density" min="0" max="6000" step="10" style="width: 100px;" autocomplete="off" required>
+					<input type="number" name="max_density" min="2" max="5.5" step="0.01" style="width: 100px;" autocomplete="off" required>
 				</div>
 			</div>
 		</fieldset>
