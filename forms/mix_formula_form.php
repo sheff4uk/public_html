@@ -108,14 +108,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 			</table>
 
 			<div>
-				<label>Мин. плотность раствора кг/л:</label>
+				<label>Плотность раствора кг/л:</label>
 				<div>
 					<input type="number" name="min_density" min="2" max="5.5" step="0.01" style="width: 100px;" autocomplete="off" required>
-				</div>
-			</div>
-			<div>
-				<label>Макс. плотность раствора кг/л:</label>
-				<div>
+					-
 					<input type="number" name="max_density" min="2" max="5.5" step="0.01" style="width: 100px;" autocomplete="off" required>
 				</div>
 			</div>
