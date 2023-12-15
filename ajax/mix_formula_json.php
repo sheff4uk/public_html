@@ -17,12 +17,30 @@ $query = "
 		,MF.cement
 		,MF.plasticizer
 		,MF.water
+		,MF.min_density
+		,MF.max_density
 	FROM MixFormula MF
 	WHERE MF.MF_ID = {$MF_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
-$MF_data = array( "s_fraction"=>$row["s_fraction"], "l_fraction"=>$row["l_fraction"], "iron_oxide"=>$row["iron_oxide"], "slag10"=>$row["slag10"], "slag20"=>$row["slag20"], "slag020"=>$row["slag020"], "slag30"=>$row["slag30"], "sand"=>$row["sand"], "crushed_stone"=>$row["crushed_stone"], "crushed_stone515"=>$row["crushed_stone515"], "cement"=>$row["cement"], "plasticizer"=>$row["plasticizer"], "water"=>$row["water"] );
+$MF_data = array(
+	"s_fraction"=>$row["s_fraction"],
+	"l_fraction"=>$row["l_fraction"],
+	"iron_oxide"=>$row["iron_oxide"],
+	"slag10"=>$row["slag10"],
+	"slag20"=>$row["slag20"],
+	"slag020"=>$row["slag020"],
+	"slag30"=>$row["slag30"],
+	"sand"=>$row["sand"],
+	"crushed_stone"=>$row["crushed_stone"],
+	"crushed_stone515"=>$row["crushed_stone515"],
+	"cement"=>$row["cement"],
+	"plasticizer"=>$row["plasticizer"],
+	"water"=>$row["water"],
+	"min_density"=>$row["min_density"],
+	"max_density"=>$row["max_density"]
+);
 
 echo json_encode($MF_data);
 ?>

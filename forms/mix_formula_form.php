@@ -2,7 +2,7 @@
 include_once "../config.php";
 
 // Сохранение/редактирование рецепта
-if( isset($_POST["CW_ID"]) ) {
+if( isset($_POST["MF_ID"]) ) {
 	session_start();
 	$s_fraction = ($_POST["s_fraction"] != '') ? $_POST["s_fraction"] : "NULL";
 	$l_fraction = ($_POST["l_fraction"] != '') ? $_POST["l_fraction"] : "NULL";
@@ -14,9 +14,11 @@ if( isset($_POST["CW_ID"]) ) {
 	$sand = ($_POST["sand"] != '') ? $_POST["sand"] : "NULL";
 	$crushed_stone = ($_POST["crushed_stone"] != '') ? $_POST["crushed_stone"] : "NULL";
 	$crushed_stone515 = ($_POST["crushed_stone515"] != '') ? $_POST["crushed_stone515"] : "NULL";
-	$cement = ($_POST["cement"] != '') ? $_POST["cement"] : "NULL";
+	$cement = ($_POST["cement"] != '') ? $_POST["cement"] : "0";
 	$plasticizer = ($_POST["plasticizer"] != '') ? $_POST["plasticizer"] : "NULL";
-	$water = ($_POST["water"] != '') ? $_POST["water"] : "NULL";
+	$water = ($_POST["water"] != '') ? $_POST["water"] : "0";
+	$min_density = ($_POST["min_density"] != '') ? $_POST["min_density"] : "0";
+	$max_density = ($_POST["max_density"] != '') ? $_POST["max_density"] : "0";
 
 	if( $_POST["MF_ID"] ) { // Редактируем
 		$query = "
@@ -34,6 +36,8 @@ if( isset($_POST["CW_ID"]) ) {
 				,cement = {$cement}
 				,plasticizer = {$plasticizer}
 				,water = {$water}
+				,min_density = {$min_density}
+				,max_density = {$max_density}
 			WHERE MF_ID = {$_POST["MF_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -59,13 +63,12 @@ if( isset($_POST["CW_ID"]) ) {
 	}
 </style>
 
-<div id='formula_form' style='display:none;'>
+<div id='formula_form' class='addproduct' style='display:none;'>
 	<form method='post' action="/forms/mix_formula_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="MF_ID">
 			<input type="hidden" name="F_ID">
-			<input type="hidden" name="CW_ID">
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
@@ -103,6 +106,19 @@ this.subbut.value='Подождите, пожалуйста!';">
 					</tr>
 				</tbody>
 			</table>
+
+			<div>
+				<label>Мин. плотность раствора г/л:</label>
+				<div>
+					<input type="number" name="min_density" min="0" max="6000" style="width: 100px;" autocomplete="off" required>
+				</div>
+			</div>
+			<div>
+				<label>Макс. плотность раствора г/л:</label>
+				<div>
+					<input type="number" name="max_density" min="0" max="6000" style="width: 100px;" autocomplete="off" required>
+				</div>
+			</div>
 		</fieldset>
 		<div>
 			<hr>
@@ -147,6 +163,8 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#formula_form input[name="cement"]').val(mf_data['cement']);
 			$('#formula_form input[name="plasticizer"]').val(mf_data['plasticizer']);
 			$('#formula_form input[name="water"]').val(mf_data['water']);
+			$('#formula_form input[name="min_density"]').val(mf_data['min_density']);
+			$('#formula_form input[name="max_density"]').val(mf_data['max_density']);
 
 			$('#formula_form').dialog({
 				resizable: false,

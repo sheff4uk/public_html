@@ -297,7 +297,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.water
 			,SUM(LF.underfilling) underfilling
 			,LB.test
-			,mix_diff({$row["CW_ID"]}, LB.mix_density) mix_diff
+			,mix_diff({$row["MF_ID"]}, LB.mix_density) mix_diff
 			,mix_sf_diff({$row["MF_ID"]}, LB.s_fraction) sf_diff
 			,mix_lf_diff({$row["MF_ID"]}, LB.l_fraction) lf_diff
 			,mix_io_diff({$row["MF_ID"]}, LB.iron_oxide) io_diff

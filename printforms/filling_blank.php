@@ -22,7 +22,7 @@ $query = "
 		,MF.fillings
 		,MF.per_batch
 		,MF.cubetests
-		,CONCAT(ROUND(CW.min_density/1000, 2), '&ndash;', ROUND(CW.max_density/1000, 2)) spec
+		,CONCAT(ROUND(MF.min_density/1000, 2), '&ndash;', ROUND(MF.max_density/1000, 2)) spec
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID

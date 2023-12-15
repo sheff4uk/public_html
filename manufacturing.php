@@ -181,7 +181,7 @@ $query = "
 		,LB.LB_ID
 		,CW.item
 		,LB.mix_density
-		,mix_diff(PB.CW_ID, LB.mix_density) mix_diff
+		,mix_diff(MF.MF_ID, LB.mix_density) mix_diff
 		,USR_Icon(LB.operator) operator
 
 		,LO.LO_ID
@@ -201,9 +201,10 @@ $query = "
 		,LOD.def_assembly
 	FROM list__Assembling LA
 	JOIN list__Filling LF ON LF.LA_ID = LA.LA_ID
-	LEFT JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
-	LEFT JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
-	LEFT JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
+	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID
 	LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	WHERE YEARWEEK(LA.assembling_time, 1) LIKE '{$_GET["week"]}'

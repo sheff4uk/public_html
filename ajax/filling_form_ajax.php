@@ -14,7 +14,7 @@ $query = "
 		,IFNULL(PB.fillings, MF.fillings) fillings
 		,IFNULL(PB.per_batch, MF.per_batch) per_batch
 		,IFNULL(PB.in_cassette, MF.in_cassette) in_cassette
-		,CONCAT(ROUND(CW.min_density/1000, 2), '&ndash;', ROUND(CW.max_density/1000, 2)) spec
+		,CONCAT(ROUND(MF.min_density/1000, 2), '&ndash;', ROUND(MF.max_density/1000, 2)) spec
 		,MIN(LB.batch_date) batch_date
 		,PB.sf_density
 		,PB.lf_density
