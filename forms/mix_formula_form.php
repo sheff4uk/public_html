@@ -110,13 +110,13 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<div>
 				<label>Мин. плотность раствора г/л:</label>
 				<div>
-					<input type="number" name="min_density" min="0" max="6000" style="width: 100px;" autocomplete="off" required>
+					<input type="number" name="min_density" min="0" max="6000" step="10" style="width: 100px;" autocomplete="off" required>
 				</div>
 			</div>
 			<div>
 				<label>Макс. плотность раствора г/л:</label>
 				<div>
-					<input type="number" name="max_density" min="0" max="6000" style="width: 100px;" autocomplete="off" required>
+					<input type="number" name="max_density" min="0" max="6000" step="10" style="width: 100px;" autocomplete="off" required>
 				</div>
 			</div>
 		</fieldset>
