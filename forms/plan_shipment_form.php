@@ -111,7 +111,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<tr class="data_row">
 							<td><b style="font-size: 1.5em;"><?=$row["item"]?></b><input type="hidden" name="CWP_ID[<?=$row["CWP_ID"]?>]" value="<?=$row["CWP_ID"]?>"></td>
 							<td>
-								<input type="number" name="quantity[<?=$row["CWP_ID"]?>]" in_pallet="<?=$row["in_pallet"]?>" class="quantity" min="0" max="24" tabindex="<?=(++$index)?>" style="width: 70px;">
+								<input type="number" name="quantity[<?=$row["CWP_ID"]?>]" in_pallet="<?=$row["in_pallet"]?>" class="quantity" min="0" max="99" tabindex="<?=(++$index)?>" style="width: 70px;">
 								<input type="hidden" name="cur_quantity[<?=$row["CWP_ID"]?>]" class="cur_quantity">
 							</td>
 							<td><input type="number" class="amount" style="width: 70px;" readonly></td>
