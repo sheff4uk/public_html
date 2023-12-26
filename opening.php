@@ -357,6 +357,7 @@ $query = "
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID
+		AND MF.F_ID = PB.F_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	LEFT JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
 	WHERE PB.F_ID = {$_GET["F_ID"]}

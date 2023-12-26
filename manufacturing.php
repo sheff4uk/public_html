@@ -205,6 +205,7 @@ $query = "
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID
+		AND MF.F_ID = PB.F_ID
 	LEFT JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
 	LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	WHERE YEARWEEK(LA.assembling_time, 1) LIKE '{$_GET["week"]}'
