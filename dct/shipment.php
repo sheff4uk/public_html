@@ -1,5 +1,7 @@
 <?
 include_once "../config.php";
+$title = 'Отгрузка';
+
 if( isset($_GET["ip"]) ) {
 	$ip = $_GET["ip"];
 }
@@ -110,17 +112,9 @@ if( isset($_POST["lpp_id"]) ) {
 
 	exit ('<meta http-equiv="refresh" content="0; url=/dct/shipment.php">');
 }
+include "header.php";
 ?>
 
-<!DOCTYPE html>
-<html lang="ru">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Отгрузка</title>
-		<script src="../js/jquery-1.11.3.min.js"></script>
-		<script src="https://kit.fontawesome.com/020f21ae61.js" crossorigin="anonymous"></script>
-		<script src="../js/jquery.printPage.js" type="text/javascript"></script>
 		<script>
 			$(function() {
 				// Считывание штрихкода
@@ -146,8 +140,6 @@ if( isset($_POST["lpp_id"]) ) {
 				});
 			});
 		</script>
-	</head>
-	<body>
 		<h3>Отсканируйте паллет</h3>
 			<?
 			if( $_GET["WT_ID"] ) {

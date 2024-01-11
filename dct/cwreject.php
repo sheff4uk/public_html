@@ -1,5 +1,7 @@
 <?
 include_once "../config.php";
+$title = 'Брак';
+
 $ip = $_SERVER['REMOTE_ADDR'];
 
 // Узнаем участок
@@ -31,15 +33,9 @@ if( isset($_POST["WT_ID"]) ) {
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	exit ('<meta http-equiv="refresh" content="0; url=/dct/cwreject.php?WT_ID='.$_POST["WT_ID"].'&nextID='.$_POST["nextID"].'">');
 }
+include "header.php";
 ?>
 
-<!DOCTYPE html>
-<html lang="ru">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Статус противовеса</title>
-		<script src="../js/jquery-1.11.3.min.js"></script>
 		<script>
 			$(function() {
 				// Считывание штрихкода
@@ -65,8 +61,6 @@ if( isset($_POST["WT_ID"]) ) {
 				});
 			});
 		</script>
-	</head>
-	<body>
 		<h3>Отсканируйте противовес</h3>
 		<?
 		if( isset($_GET["WT_ID"]) ) {
