@@ -243,7 +243,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							</select>
 						</td>
 						<td><input type='text' name='invoice_number' style="width: 100%;"></td>
-						<td><input type='text' name='car_number' style="width: 100%;"></td>
+						<td><input type='text' id='car_number' name='car_number' style="width: 100%;" oninput="this.value = this.value.toUpperCase()"></td>
 						<td><input type='text' name='batch_number' style="width: 100%;"></td>
 						<td><input type='text' name='certificate_number' style="width: 100%;"></td>
 						<td><input type='number' min='0' step='0.01' name='ma_cnt' style="width: 100%;" required></td>
@@ -470,5 +470,9 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 			return false;
 		});
+	});
+
+	$(function() {
+		$("#car_number").mask("А000АА", {translation:  {'А': {pattern: /[АВЕКМНОРСТУХ]/}}, placeholder: "А000АА"});
 	});
 </script>

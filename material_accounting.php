@@ -57,7 +57,7 @@ if( !$_GET["date_to"] ) {
 		</div>
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span><a href="#" id="add_material_list">Наименование продукции:</a></span>
+			<span>Наименование продукции:</span>
 			<select name="MN" class="<?=$_GET["MN"] ? "filtered" : ""?>">
 				<option value=""></option>
 				<?
