@@ -23,6 +23,7 @@ $query = "
 		,MF.per_batch
 		,MF.cubetests
 		,CONCAT(ROUND(MF.min_density/1000, 2), '&ndash;', ROUND(MF.max_density/1000, 2)) spec
+		,MF.water
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID
@@ -41,6 +42,7 @@ $per_batch = $row["per_batch"];
 $cubetests = $row["cubetests"];
 $CW_ID = $row["CW_ID"];
 $spec = $row["spec"];
+$water = $row["water"];
 
 // Массив с номерами контрольных замесов (кубы)
 if( $batches > 1 ) {
@@ -145,27 +147,6 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 			</th>
 		</tr>
 <?
-//	// Формируем список вероятных номеров кассет
-//	$query = "
-//		SELECT LF.cassette
-//		FROM list__Batch LB
-//		JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-//		WHERE LB.PB_ID = (
-//			SELECT PB_ID
-//			FROM plan__Batch
-//			WHERE CW_ID = {$CW_ID}
-//				AND F_ID = {$F_ID}
-//				AND fact_batches > 0
-//				AND PB_ID < {$PB_ID}
-//			ORDER BY PB_ID DESC
-//			LIMIT 1
-//		)
-//		ORDER BY LF.cassette
-//	";
-//	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-//	while( $row = mysqli_fetch_array($res) ) {
-//		$cassettes .= "<n class='cassette'>{$row["cassette"]}</n>";
-//	}
 	// Формируем список зарезервированных кассет
 	$query = "
 		SELECT cassette
@@ -192,38 +173,23 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 <?
 // Данные рецепта
 $query = "
-	SELECT IFNULL(CONCAT(MF.s_fraction, '±5 кг'), 0) s_fraction
-		,IFNULL(CONCAT(MF.l_fraction, '±5 кг'), 0) l_fraction
-		,IFNULL(CONCAT(MF.iron_oxide, '±5 кг'), 0) iron_oxide
-		,IFNULL(CONCAT(MF.slag10, '±5 кг'), 0) slag10
-		,IFNULL(CONCAT(MF.slag20, '±5 кг'), 0) slag20
-		,IFNULL(CONCAT(MF.slag020, '±5 кг'), 0) slag020
-		,IFNULL(CONCAT(MF.slag30, '±5 кг'), 0) slag30
-		,IFNULL(CONCAT(MF.sand, '±5 кг'), 0) sand
-		,IFNULL(CONCAT(MF.crushed_stone, '±5 кг'), 0) crushed_stone
-		,IFNULL(CONCAT(MF.crushed_stone515, '±5 кг'), 0) crushed_stone515
-		,IFNULL(CONCAT(MF.cement, '±2 кг'), 0) cement
-		,IFNULL(CONCAT(MF.plasticizer, ' кг'), 0) plasticizer
-		,IFNULL(CONCAT('min ', MF.water, ' л'), 0) water
-		,COUNT(MF.s_fraction) sf_cnt
-		,COUNT(MF.l_fraction) lf_cnt
-		,COUNT(MF.iron_oxide) io_cnt
-		,COUNT(MF.slag10) sl10_cnt
-		,COUNT(MF.slag20) sl20_cnt
-		,COUNT(MF.slag020) sl020_cnt
-		,COUNT(MF.slag30) sl30_cnt
-		,COUNT(MF.sand) sn_cnt
-		,COUNT(MF.crushed_stone) cs_cnt
-		,COUNT(MF.crushed_stone515) cs515_cnt
-		,COUNT(MF.cement) cm_cnt
-		,COUNT(MF.plasticizer) pl_cnt
-		,COUNT(MF.water) wt_cnt
-	FROM MixFormula MF
-	WHERE MF.F_ID = {$F_ID}
-		AND MF.CW_ID = {$CW_ID}
+	SELECT MN.material_name
+		,MFM.quantity
+		,2 - MN.checkbox_density rowspan
+		,PBD.density
+		,MN.checkbox_density
+		,MN.MN_ID
+		,MN.color
+		,MN.admission
+	FROM plan__Batch PB
+	JOIN MixFormula MF ON MF.CW_ID = PB.CW_ID AND MF.F_ID = PB.F_ID
+	JOIN MixFormulaMaterial MFM ON MFM.MF_ID = MF.MF_ID
+	JOIN material__Name MN ON MN.MN_ID = MFM.MN_ID
+	LEFT JOIN plan__BatchDensity PBD ON PBD.PB_ID = PB.PB_ID
+		AND PBD.MN_ID = MFM.MN_ID
+	WHERE PB.PB_ID = {$PB_ID}
+	ORDER BY MN.material_name
 ";
-$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-$row = mysqli_fetch_array($res);
 ?>
 
 <table>
@@ -233,51 +199,43 @@ $row = mysqli_fetch_array($res);
 			<th rowspan="2"><sup style="float: left;">Дата замеса:</sup><br>__________</th>
 			<th  rowspan="2">Масса куба раствора</th>
 			<th rowspan="3" width="30" style="border-right: 4px solid;">t, ℃ 22±8</th>
-			<?=($row["sf_cnt"] ? "<th>Мелкая дробь</th>" : "")?>
-			<?=($row["lf_cnt"] ? "<th>Крупная дробь</th>" : "")?>
-			<?=($row["io_cnt"] ? "<th>Окалина</th>" : "")?>
-			<?=($row["sl10_cnt"] ? "<th>Шлак 0-10</th>" : "")?>
-			<?=($row["sl20_cnt"] ? "<th>Шлак 10-20</th>" : "")?>
-			<?=($row["sl020_cnt"] ? "<th>Шлак 0-20</th>" : "")?>
-			<?=($row["sl30_cnt"] ? "<th>Шлак 5-30</th>" : "")?>
-			<?=($row["sn_cnt"] ? "<th>КМП</th>" : "")?>
-			<?=($row["cs_cnt"] ? "<th>Отсев</th>" : "")?>
-			<?=($row["cs515_cnt"] ? "<th>Отсев 5-15</th>" : "")?>
-			<?=($row["cm_cnt"] ? "<th rowspan='2'>Цемент</th>" : "")?>
-			<?=($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор</th>" : "")?>
-			<?=($row["wt_cnt"] ? "<th rowspan='2'>Вода</th>" : "")?>
+
+<?
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		echo "<th rowspan='{$row["rowspan"]}'>{$row["material_name"]}, кг</th>";
+	}
+?>
+
+			<th>Вода, л</th>
 			<th rowspan="3" colspan="<?=$fillings?>" width="<?=($fillings * 50)?>" style="border-left: 4px solid;">№ кассеты</th>
 			<th rowspan="3" width="40">Недолив</th>
 			<th rowspan="3" width="20"><i class="fas fa-cube"></i></th>
 		</tr>
 		<tr>
-			<?=($row["sf_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
-			<?=($row["lf_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
-			<?=($row["io_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
-			<?=($row["sl10_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
-			<?=($row["sl20_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
-			<?=($row["sl020_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
-			<?=($row["sl30_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
-			<?=($row["sn_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
-			<?=($row["cs_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
-			<?=($row["cs515_cnt"] ? "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>" : "")?>
+
+<?
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		if ($row["checkbox_density"]) {
+			echo "<th style='text-align: left; border: dashed;'><sup>куб:</sup></th>";
+		}
+	}
+
+?>
+			<th style='text-align: left; border: dashed;'></th>
 		</tr>
 		<tr>
 			<th>Время<br>замеса</th>
 			<th class="nowrap"><?=$spec?> кг</th>
-			<?=($row["sf_cnt"] ? "<th class='nowrap'>{$row["s_fraction"]}</th>" : "")?>
-			<?=($row["lf_cnt"] ? "<th class='nowrap'>{$row["l_fraction"]}</th>" : "")?>
-			<?=($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")?>
-			<?=($row["sl10_cnt"] ? "<th class='nowrap'>{$row["slag10"]}</th>" : "")?>
-			<?=($row["sl20_cnt"] ? "<th class='nowrap'>{$row["slag20"]}</th>" : "")?>
-			<?=($row["sl020_cnt"] ? "<th class='nowrap'>{$row["slag020"]}</th>" : "")?>
-			<?=($row["sl30_cnt"] ? "<th class='nowrap'>{$row["slag30"]}</th>" : "")?>
-			<?=($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")?>
-			<?=($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")?>
-			<?=($row["cs515_cnt"] ? "<th class='nowrap'>{$row["crushed_stone515"]}</th>" : "")?>
-			<?=($row["cm_cnt"] ? "<th class='nowrap'>{$row["cement"]}</th>" : "")?>
-			<?=($row["pl_cnt"] ? "<th class='nowrap'>{$row["plasticizer"]}</th>" : "")?>
-			<?=($row["wt_cnt"] ? "<th class='nowrap'>{$row["water"]}</th>" : "")?>
+<?
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		echo "<th class='nowrap'>{$row["quantity"]}±{$row["admission"]}</th>";
+	}
+
+?>
+			<th class='nowrap'>min <?=$water?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -296,19 +254,22 @@ for ($i = 1; $i <= $batches; $i++) {
 			<td style='text-align: center;'>__:__</td>
 			<td></td>
 			<td style='border-right: 4px solid;'></td>
-			".($row["sf_cnt"] ? "<td></td>" : "")."
-			".($row["lf_cnt"] ? "<td></td>" : "")."
-			".($row["io_cnt"] ? "<td></td>" : "")."
-			".($row["sl10_cnt"] ? "<td></td>" : "")."
-			".($row["sl20_cnt"] ? "<td></td>" : "")."
-			".($row["sl020_cnt"] ? "<td></td>" : "")."
-			".($row["sl30_cnt"] ? "<td></td>" : "")."
-			".($row["sn_cnt"] ? "<td></td>" : "")."
-			".($row["cs_cnt"] ? "<td></td>" : "")."
-			".($row["cs515_cnt"] ? "<td></td>" : "")."
-			".($row["cm_cnt"] ? "<td></td>" : "")."
-			".($row["pl_cnt"] ? "<td></td>" : "")."
-			".($row["wt_cnt"] ? "<td></td>" : "")."
+	";
+
+	$query = "
+		SELECT MFM.MN_ID
+		FROM MixFormula MF
+		JOIN MixFormulaMaterial MFM ON MFM.MF_ID = MF.MF_ID
+		WHERE MF.F_ID = {$F_ID}
+			AND MF.CW_ID = {$CW_ID}
+	";
+	$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $subsubrow = mysqli_fetch_array($subsubres) ) {
+		echo "<td></td>";
+	}
+
+	echo "
+			<td></td>
 			".($j == 0 ? $fillings_cell : "")."
 			<td style='text-align: center;'>".(in_array($i, $tests) ? "<b style='font-size: 1.4em;'>&#10065;</b>" : "&#10065;")."</td>
 		</tr>

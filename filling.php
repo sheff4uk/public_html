@@ -173,18 +173,31 @@ foreach ($_GET as &$value) {
 			<th>Дата время замеса</th>
 			<th>Куб раствора, кг</th>
 			<th>t, ℃ 22±8</th>
-			<th class="s_fraction">Мелкая дробь,<br>кг</th>
-			<th class="l_fraction">Крупная дробь,<br>кг</th>
-			<th class="iron_oxide">Окалина,<br>кг</th>
-			<th class="slag10">Шлак 0-10,<br>кг</th>
-			<th class="slag20">Шлак 10-20,<br>кг</th>
-			<th class="slag020">Шлак 0-20,<br>кг</th>
-			<th class="slag30">Шлак 5-30,<br>кг</th>
-			<th class="sand">КМП,<br>кг</th>
-			<th class="crushed_stone">Отсев,<br>кг</th>
-			<th class="crushed_stone515">Отсев 5-15,<br>кг</th>
-			<th>Цемент,<br>кг</th>
-			<th class="plasticizer">Пластификатор,<br>кг</th>
+
+			<?
+				$query = "
+					SELECT MN.MN_ID
+						,MN.material_name
+						,MN.admission
+					FROM plan__Batch PB
+					JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
+					JOIN list__BatchMaterial LBM ON LBM.LB_ID = LB.LB_ID
+					JOIN material__Name MN ON MN.MN_ID = LBM.MN_ID
+					WHERE LBM.quantity
+						AND PB.F_ID = {$_GET["F_ID"]}
+						AND PB.PB_ID IN (SELECT PB_ID FROM list__Batch WHERE YEARWEEK(batch_date, 1) LIKE '{$_GET["week"]}' GROUP BY PB_ID)
+						".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
+					GROUP BY MN.material_name
+					ORDER BY MN.material_name
+				";
+				$MN_IDs = "0";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					echo "<th>{$row["material_name"]},<br>±{$row["admission"]} кг</th>";
+					$MN_IDs .= ",".$row["MN_ID"];
+				}
+			?>
+
 			<th>Вода, л</th>
 			<th colspan="2">№ кассеты</th>
 			<th>Недолив</th>
@@ -207,17 +220,8 @@ $query = "
 		,MIN(TIMESTAMP(LB.batch_date, LB.batch_time)) time
 		,IF(COUNT(LCT24.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT24.LCT_ID) * 2 / 3), 0) `24tests`
 		,IF(COUNT(LCT72.LCT_ID)=COUNT(IF(LB.test = 1, LB.LB_ID, NULL)), CEIL(COUNT(LCT72.LCT_ID) * 2 / 3), 0) `72tests`
-		,PB.sf_density
-		,PB.lf_density
-		,PB.io_density
-		,PB.sl10_density
-		,PB.sl20_density
-		,PB.sl020_density
-		,PB.sl30_density
-		,PB.sn_density
-		,PB.cs_density
-		,PB.cs515_density
-		,IF( IFNULL(PB.print_time, PB.change_time) < NOW() - INTERVAL 10 DAY, 0, 1 ) editable
+		#,IF( IFNULL(PB.print_time, PB.change_time) < NOW() - INTERVAL 10 DAY, 0, 1 ) editable
+		,1 editable
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID
@@ -261,16 +265,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	$cnt = $row["fact_batches"];
 	echo "<tbody id='PB{$row["PB_ID"]}' style='text-align: center; border-bottom: 2px solid #333; ".(($cycle and $cycle != $row["cycle"]) ? " border-top: 10px solid #333;" : "")."'>";
 	$cycle = $row["cycle"];
-	$sf_density = $row["sf_density"]/1000;
-	$lf_density = $row["lf_density"]/1000;
-	$io_density = $row["io_density"]/1000;
-	$sl10_density = $row["sl10_density"]/1000;
-	$sl20_density = $row["sl20_density"]/1000;
-	$sl020_density = $row["sl020_density"]/1000;
-	$sl30_density = $row["sl30_density"]/1000;
-	$sn_density = $row["sn_density"]/1000;
-	$cs_density = $row["cs_density"]/1000;
-	$cs515_density = $row["cs515_density"]/1000;
 	$j = 0;
 
 	$query = "
@@ -282,34 +276,10 @@ while( $row = mysqli_fetch_array($res) ) {
 			,LB.temp
 			,IF(ABS(22 - LB.temp) <= 8, NULL, IF(LB.temp - 22 > 8, LB.temp - 30, LB.temp - 14)) temp_diff
 			,PB.per_batch
-			,LB.s_fraction
-			,LB.l_fraction
-			,LB.iron_oxide
-			,LB.slag10
-			,LB.slag20
-			,LB.slag020
-			,LB.slag30
-			,LB.sand
-			,LB.crushed_stone
-			,LB.crushed_stone515
-			,LB.cement
-			,LB.plasticizer
 			,LB.water
 			,SUM(LF.underfilling) underfilling
 			,LB.test
 			,mix_diff({$row["MF_ID"]}, LB.mix_density) mix_diff
-			,mix_sf_diff({$row["MF_ID"]}, LB.s_fraction) sf_diff
-			,mix_lf_diff({$row["MF_ID"]}, LB.l_fraction) lf_diff
-			,mix_io_diff({$row["MF_ID"]}, LB.iron_oxide) io_diff
-			,mix_sl10_diff({$row["MF_ID"]}, LB.slag10) sl10_diff
-			,mix_sl20_diff({$row["MF_ID"]}, LB.slag20) sl20_diff
-			,mix_sl020_diff({$row["MF_ID"]}, LB.slag020) sl020_diff
-			,mix_sl30_diff({$row["MF_ID"]}, LB.slag30) sl30_diff
-			,mix_sn_diff({$row["MF_ID"]}, LB.sand) sn_diff
-			,mix_cs_diff({$row["MF_ID"]}, LB.crushed_stone) cs_diff
-			,mix_cs515_diff({$row["MF_ID"]}, LB.crushed_stone515) cs515_diff
-			,mix_cm_diff({$row["MF_ID"]}, LB.cement) cm_diff
-			,mix_pl_diff({$row["MF_ID"]}, LB.plasticizer) pl_diff
 			,mix_wt_diff({$row["MF_ID"]}, LB.water) wt_diff
 		FROM plan__Batch PB
 		JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
@@ -320,17 +290,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $subrow = mysqli_fetch_array($subres) ) {
-		$s_fraction += $subrow["s_fraction"];
-		$l_fraction += $subrow["l_fraction"];
-		$iron_oxide += $subrow["iron_oxide"];
-		$slag10 += $subrow["slag10"];
-		$slag20 += $subrow["slag20"];
-		$slag020 += $subrow["slag020"];
-		$slag30 += $subrow["slag30"];
-		$sand += $subrow["sand"];
-		$crushed_stone += $subrow["crushed_stone"];
-		$crushed_stone515 += $subrow["crushed_stone515"];
-		$plasticizer += $subrow["plasticizer"];
 
 		// Получаем список кассет
 		$query = "
@@ -358,41 +317,51 @@ while( $row = mysqli_fetch_array($res) ) {
 
 		// Выводим общую ячейку с датой кодом
 		if( $cnt ) {
+			echo "<td rowspan='{$cnt}' class='bg-gray'>";
 			echo "
-				<td rowspan='{$cnt}' class='bg-gray'>
-					<h2 class='nowrap'>{$row["year"]}-{$row["cycle"]}</h2>
-					<b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>
-					<i class='fas fa-cube'></i>24: <b>{$test24}</b>МПа<br>
-					<i class='fas fa-cube'></i>72: <b>{$test72}</b>МПа<br>
-					".($sf_density ? "<span class='nowrap'><b>{$sf_density}</b>кг мел. дробь</span>" : "")."
-					".($lf_density ? "<span class='nowrap'><b>{$lf_density}</b>кг круп. дробь</span>" : "")."
-					".($io_density ? "<span class='nowrap'><b>{$io_density}</b>кг окалина</span>" : "")."
-					".($sl10_density ? "<span class='nowrap'><b>{$sl10_density}</b>кг шлак 0-10</span>" : "")."
-					".($sl20_density ? "<span class='nowrap'><b>{$sl20_density}</b>кг шлак 10-20</span>" : "")."
-					".($sl020_density ? "<span class='nowrap'><b>{$sl020_density}</b>кг шлак 0-20</span>" : "")."
-					".($sl30_density ? "<span class='nowrap'><b>{$sl30_density}</b>кг шлак 5-30</span>" : "")."
-					".($sn_density ? "<span class='nowrap'><b>{$sn_density}</b>кг КМП</span>" : "")."
-					".($cs_density ? "<span class='nowrap'><b>{$cs_density}</b>кг отсев</span>" : "")."
-					".($cs515_density ? "<span class='nowrap'><b>{$cs515_density}</b>кг отсев 5-15</span>" : "")."
-				</td>
+				<h2 class='nowrap'>{$row["year"]}-{$row["cycle"]}</h2>
+				<b>{$row["item"]}</b><br>Замесов: <b>{$cnt}</b><br>
+				<i class='fas fa-cube'></i>24: <b>{$test24}</b>МПа<br>
+				<i class='fas fa-cube'></i>72: <b>{$test72}</b>МПа<br>
 			";
+
+			$query = "
+				SELECT MN.material_name
+					,PBD.density
+				FROM plan__BatchDensity PBD
+				JOIN material__Name MN ON MN.MN_ID = PBD.MN_ID
+				WHERE PBD.PB_ID = {$row["PB_ID"]}
+				ORDER BY MN.material_name
+			";
+			$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $subsubrow = mysqli_fetch_array($subsubres) ) {
+				$density = $subsubrow["density"] / 1000;
+				echo "<span class='nowrap'><b>{$density}</b>кг {$subsubrow["material_name"]}</span><br>";
+			}
+
+			echo "</td>";
 		}
 		?>
-		<td><?=$subrow["batch_date_format"]?> <?=$subrow["batch_time_format"]?></td>
+				<td><?=$subrow["batch_date_format"]?> <?=$subrow["batch_time_format"]?></td>
 				<td><?=$subrow["mix_density"]/1000?> <?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?><?=($subrow["mix_diff"] ? "<font class='diff_alert'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
 				<td><?=$subrow["temp"]?><?=($subrow["temp_diff"] ? "<font class='diff_alert'>".($subrow["temp_diff"] > 0 ? " +" : " ").($subrow["temp_diff"])."</font>" : "")?></td>
-				<td class="s_fraction" style="background: #7952eb88;"><?=$subrow["s_fraction"]?><?=($subrow["sf_diff"] ? "<font class='diff_alert'>".($subrow["sf_diff"] > 0 ? " +" : " ").($subrow["sf_diff"])."</font>" : "")?></td>
-				<td class="l_fraction" style="background: #51d5d788;"><?=$subrow["l_fraction"]?><?=($subrow["lf_diff"] ? "<font class='diff_alert'>".($subrow["lf_diff"] > 0 ? " +" : " ").($subrow["lf_diff"])."</font>" : "")?></td>
-				<td class="iron_oxide" style="background: #a52a2a80;"><?=$subrow["iron_oxide"]?><?=($subrow["io_diff"] ? "<font class='diff_alert'>".($subrow["io_diff"] > 0 ? " +" : " ").($subrow["io_diff"])."</font>" : "")?></td>
-				<td class="slag10" style="background: #33333380;"><?=$subrow["slag10"]?><?=($subrow["sl10_diff"] ? "<font class='diff_alert'>".($subrow["sl10_diff"] > 0 ? " +" : " ").($subrow["sl10_diff"])."</font>" : "")?></td>
-				<td class="slag20" style="background: #33333380;"><?=$subrow["slag20"]?><?=($subrow["sl20_diff"] ? "<font class='diff_alert'>".($subrow["sl20_diff"] > 0 ? " +" : " ").($subrow["sl20_diff"])."</font>" : "")?></td>
-				<td class="slag020" style="background: #33333380;"><?=$subrow["slag020"]?><?=($subrow["sl020_diff"] ? "<font class='diff_alert'>".($subrow["sl020_diff"] > 0 ? " +" : " ").($subrow["sl020_diff"])."</font>" : "")?></td>
-				<td class="slag30" style="background: #33333380;"><?=$subrow["slag30"]?><?=($subrow["sl30_diff"] ? "<font class='diff_alert'>".($subrow["sl30_diff"] > 0 ? " +" : " ").($subrow["sl30_diff"])."</font>" : "")?></td>
-				<td class="sand" style="background: #f4a46082;"><?=$subrow["sand"]?><?=($subrow["sn_diff"] ? "<font class='diff_alert'>".($subrow["sn_diff"] > 0 ? " +" : " ").($subrow["sn_diff"])."</font>" : "")?></td>
-				<td class="crushed_stone" style="background: #8b45137a;"><?=$subrow["crushed_stone"]?><?=($subrow["cs_diff"] ? "<font class='diff_alert'>".($subrow["cs_diff"] > 0 ? " +" : " ").($subrow["cs_diff"])."</font>" : "")?></td>
-				<td class="crushed_stone515" style="background: #8b45137a;"><?=$subrow["crushed_stone515"]?><?=($subrow["cs515_diff"] ? "<font class='diff_alert'>".($subrow["cs515_diff"] > 0 ? " +" : " ").($subrow["cs515_diff"])."</font>" : "")?></td>
-				<td style="background: #7080906b;"><?=$subrow["cement"]?><?=($subrow["cm_diff"] ? "<font class='diff_alert'>".($subrow["cm_diff"] > 0 ? " +" : " ").($subrow["cm_diff"])."</font>" : "")?></td>
-				<td class="plasticizer" style="background: #80800080;"><?=$subrow["plasticizer"]?><?=($subrow["pl_diff"] ? "<font class='diff_alert'>".($subrow["pl_diff"] > 0 ? " +" : " ").($subrow["pl_diff"])."</font>" : "")?></td>
+
+		<?
+			$query = "
+				SELECT LBM.quantity
+					,mix_ingredient_diff({$row["MF_ID"]}, MN.MN_ID, LBM.quantity) diff
+					,MN.color
+				FROM material__Name MN
+				LEFT JOIN list__BatchMaterial LBM ON LBM.MN_ID = MN.MN_ID
+				AND LBM.LB_ID = {$subrow["LB_ID"]}
+				WHERE MN.MN_ID IN ({$MN_IDs})
+				ORDER BY MN.material_name
+			";
+			$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $subsubrow = mysqli_fetch_array($subsubres) ) {
+				echo "<td style='background: #{$subsubrow["color"]};'>{$subsubrow["quantity"]}".($subsubrow["diff"] ? "<font class='diff_alert'>".($subsubrow["diff"] > 0 ? " +" : " ").($subsubrow["diff"])."</font>" : "")."</td>";
+			}
+		?>
 				<td style="background: #1e90ff85;"><?=$subrow["water"]?><?=($subrow["wt_diff"] ? "<font class='diff_alert'>".($subrow["wt_diff"])."</font>" : "")?></td>
 				<?=($j == 0 ? $cassette : "")?>
 				<td><?=$subrow["name"]?></td>
@@ -416,20 +385,6 @@ while( $row = mysqli_fetch_array($res) ) {
 }
 ?>
 </table>
-
-<style>
-	<?=($s_fraction ? "" : ".s_fraction{ display: none; }")?>
-	<?=($l_fraction ? "" : ".l_fraction{ display: none; }")?>
-	<?=($iron_oxide ? "" : ".iron_oxide{ display: none; }")?>
-	<?=($slag10 ? "" : ".slag10{ display: none; }")?>
-	<?=($slag20 ? "" : ".slag20{ display: none; }")?>
-	<?=($slag020 ? "" : ".slag020{ display: none; }")?>
-	<?=($slag30 ? "" : ".slag30{ display: none; }")?>
-	<?=($sand ? "" : ".sand{ display: none; }")?>
-	<?=($crushed_stone ? "" : ".crushed_stone{ display: none; }")?>
-	<?=($crushed_stone515 ? "" : ".crushed_stone515{ display: none; }")?>
-	<?=($plasticizer ? "" : ".plasticizer{ display: none; }")?>
-</style>
 
 <?
 include "footer.php";

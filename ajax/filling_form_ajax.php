@@ -15,23 +15,13 @@ $query = "
 		,IFNULL(PB.per_batch, MF.per_batch) per_batch
 		,IFNULL(PB.in_cassette, MF.in_cassette) in_cassette
 		,CONCAT(ROUND(MF.min_density/1000, 2), '&ndash;', ROUND(MF.max_density/1000, 2)) spec
-		,MIN(LB.batch_date) batch_date
-		,PB.sf_density
-		,PB.lf_density
-		,PB.io_density
-		,PB.sl10_density
-		,PB.sl20_density
-		,PB.sl020_density
-		,PB.sl30_density
-		,PB.sn_density
-		,PB.cs_density
-		,PB.cs515_density
+		,MF.water
 		,PB.calcium
-		,IF( IFNULL(PB.print_time, PB.change_time) < NOW() - INTERVAL 10 DAY, 0, 1 ) editable
+		#,IF( IFNULL(PB.print_time, PB.change_time) < NOW() - INTERVAL 10 DAY, 0, 1 ) editable
+		,1 editable
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID
-	LEFT JOIN list__Batch LB ON LB.PB_ID = PB.PB_ID
 	WHERE PB.PB_ID = {$PB_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -50,17 +40,7 @@ if( $row["editable"] ) {
 	$in_cassette = $row["in_cassette"];
 	$CW_ID = $row["CW_ID"];
 	$spec = $row["spec"];
-	$batch_date = $row["batch_date"];
-	$sf_density = $row["sf_density"];
-	$lf_density = $row["lf_density"];
-	$io_density = $row["io_density"];
-	$sl10_density = $row["sl10_density"];
-	$sl20_density = $row["sl20_density"];
-	$sl020_density = $row["sl020_density"];
-	$sl30_density = $row["sl30_density"];
-	$sn_density = $row["sn_density"];
-	$cs_density = $row["cs_density"];
-	$cs515_density = $row["cs515_density"];
+	$water = $row["water"];
 	$calcium = $row["calcium"];
 
 	$html = "
@@ -95,29 +75,6 @@ if( $row["editable"] ) {
 		</table>
 	";
 
-	//// Формируем список вероятных номеров кассет
-	//$query = "
-	//	SELECT LF.cassette
-	//	FROM list__Batch LB
-	//	JOIN list__Filling LF ON LF.LB_ID = LB.LB_ID
-	//	WHERE LB.PB_ID = (
-	//		SELECT PB_ID
-	//		FROM plan__Batch
-	//		WHERE CW_ID = {$CW_ID}
-	//			AND F_ID = {$F_ID}
-	//			AND fact_batches > 0
-	//			AND PB_ID < {$PB_ID}
-	//		ORDER BY PB_ID DESC
-	//		LIMIT 1
-	//	)
-	//	ORDER BY LF.cassette
-	//";
-	//$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-	//while( $row = mysqli_fetch_array($res) ) {
-	//	$cassettes .= "<b class='cassette' id='c_{$row["cassette"]}'>{$row["cassette"]}</b>";
-	//}
-	//$html .= "<div style='width: 100%; border: 1px solid; padding: 10px;'><span>Вероятные номера кассет:</span> {$cassettes}</div>";
-
 	// Формируем список зарезервированных кассет
 	$query = "
 		SELECT cassette
@@ -133,38 +90,23 @@ if( $row["editable"] ) {
 
 	// Данные рецепта
 	$query = "
-		SELECT MF.s_fraction
-			,MF.l_fraction
-			,MF.iron_oxide
-			,MF.slag10
-			,MF.slag20
-			,MF.slag020
-			,MF.slag30
-			,MF.sand
-			,MF.crushed_stone
-			,MF.crushed_stone515
-			,MF.cement
-			,MF.plasticizer
-			,MF.water
-			,COUNT(MF.s_fraction) sf_cnt
-			,COUNT(MF.l_fraction) lf_cnt
-			,COUNT(MF.iron_oxide) io_cnt
-			,COUNT(MF.slag10) sl10_cnt
-			,COUNT(MF.slag20) sl20_cnt
-			,COUNT(MF.slag020) sl020_cnt
-			,COUNT(MF.slag30) sl30_cnt
-			,COUNT(MF.sand) sn_cnt
-			,COUNT(MF.crushed_stone) cs_cnt
-			,COUNT(MF.crushed_stone515) cs515_cnt
-			,COUNT(MF.cement) cm_cnt
-			,COUNT(MF.plasticizer) pl_cnt
-			,COUNT(MF.water) wt_cnt
-		FROM MixFormula MF
-		WHERE MF.CW_ID = {$CW_ID}
-			AND MF.F_ID = {$F_ID}
+		SELECT MN.material_name
+			,MFM.quantity
+			,2 - MN.checkbox_density rowspan
+			,PBD.density
+			,MN.checkbox_density
+			,MN.MN_ID
+			,MN.color
+			,MN.admission
+		FROM plan__Batch PB
+		JOIN MixFormula MF ON MF.CW_ID = PB.CW_ID AND MF.F_ID = PB.F_ID
+		JOIN MixFormulaMaterial MFM ON MFM.MF_ID = MF.MF_ID
+		JOIN material__Name MN ON MN.MN_ID = MFM.MN_ID
+		LEFT JOIN plan__BatchDensity PBD ON PBD.PB_ID = PB.PB_ID
+			AND PBD.MN_ID = MFM.MN_ID
+		WHERE PB.PB_ID = {$PB_ID}
+		ORDER BY MN.material_name
 	";
-	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-	$row = mysqli_fetch_array($res);
 
 	$html .= "
 		<table style='font-size: .85em; table-layout: fixed; width: 100%; border-collapse: collapse; border-spacing: 0px; text-align: center;'>
@@ -174,51 +116,43 @@ if( $row["editable"] ) {
 					<th rowspan='3' width='180'>Дата и время замеса</th>
 					<th rowspan='2'>Масса куба раствора, кг</th>
 					<th rowspan='3' width='50'>t, ℃ 22±8</th>
-					".($row["sf_cnt"] ? "<th>Мелкая дробь, кг</th>" : "")."
-					".($row["lf_cnt"] ? "<th>Крупная дробь, кг</th>" : "")."
-					".($row["io_cnt"] ? "<th>Окалина, кг</th>" : "")."
-					".($row["sl10_cnt"] ? "<th>Шлак 0-10, кг</th>" : "")."
-					".($row["sl20_cnt"] ? "<th>Шлак 10-20, кг</th>" : "")."
-					".($row["sl020_cnt"] ? "<th>Шлак 0-20, кг</th>" : "")."
-					".($row["sl30_cnt"] ? "<th>Шлак 5-30, кг</th>" : "")."
-					".($row["sn_cnt"] ? "<th>КМП, кг</th>" : "")."
-					".($row["cs_cnt"] ? "<th>Отсев, кг</th>" : "")."
-					".($row["cs515_cnt"] ? "<th>Отсев 5-15, кг</th>" : "")."
-					".($row["cm_cnt"] ? "<th rowspan='2'>Цемент, кг</th>" : "")."
-					".($row["pl_cnt"] ? "<th rowspan='2'>Пластификатор, кг</th>" : "")."
-					".($row["wt_cnt"] ? "<th>Вода, кг</th>" : "")."
+	";
+
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		$html .= "<th rowspan='{$row["rowspan"]}'>{$row["material_name"]}, кг</th>";
+	}
+
+	$html .= "
+					<th>Вода, л</th>
 					<th rowspan='3' colspan='{$fillings}' width='".($fillings * 50)."'>№ кассеты</th>
 					<th rowspan='3' width='50'>Недолив</th>
 					<th rowspan='3' width='30'><i class='fas fa-cube' title='Испытание куба'></i></th>
 				</tr>
 				<tr>
-					".($row["sf_cnt"] ? "<th><input type='number' min='2.5' max='6' step='0.01' value='".($sf_density/1000)."' name='sf_density' style='width: 100%; background-color: #7952eb88;' ></th>" : "")."
-					".($row["lf_cnt"] ? "<th><input type='number' min='3' max='6' step='0.01' value='".($lf_density/1000)."' name='lf_density' style='width: 100%; background-color: #51d5d788;' ></th>" : "")."
-					".($row["io_cnt"] ? "<th><input type='number' min='2' max='3' step='0.01' value='".($io_density/1000)."' name='io_density' style='width: 100%; background-color: #a52a2a80;' ></th>" : "")."
-					".($row["sl10_cnt"] ? "<th><input type='number' min='1' max='3' step='0.01' value='".($sl10_density/1000)."' name='sl10_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
-					".($row["sl20_cnt"] ? "<th><input type='number' min='1' max='3' step='0.01' value='".($sl20_density/1000)."' name='sl20_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
-					".($row["sl020_cnt"] ? "<th><input type='number' min='1' max='3' step='0.01' value='".($sl020_density/1000)."' name='sl020_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
-					".($row["sl30_cnt"] ? "<th><input type='number' min='1' max='3' step='0.01' value='".($sl30_density/1000)."' name='sl30_density' style='width: 100%; background-color: #33333380;' ></th>" : "")."
-					".($row["sn_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($sn_density/1000)."' name='sn_density' style='width: 100%; background-color: #f4a46082;' ></th>" : "")."
-					".($row["cs_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($cs_density/1000)."' name='cs_density' style='width: 100%; background-color: #8b45137a;' ></th>" : "")."
-					".($row["cs515_cnt"] ? "<th><input type='number' min='1' max='2' step='0.01' value='".($cs515_density/1000)."' name='cs515_density' style='width: 100%; background-color: #8b45137a;' ></th>" : "")."
+	";
+
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		if ($row["checkbox_density"]) {
+			$html .= "<th><input type='number' min='1' max='6' step='0.01' value='".($row["density"]/1000)."' name='density[{$row["MN_ID"]}]' style='width: 100%; background-color: #{$row["color"]};' ></th>";
+		}
+	}
+
+	$html .= "
 					<th><input type='number' min='0' max='100' value='".($calcium)."' name='calcium' style='width: 100%; background-color: #1e90ff85;' required></th>
 				</tr>
 				<tr>
 					<th class='nowrap'>{$spec}</th>
-					".($row["sf_cnt"] ? "<th class='nowrap'>{$row["s_fraction"]}</th>" : "")."
-					".($row["lf_cnt"] ? "<th class='nowrap'>{$row["l_fraction"]}</th>" : "")."
-					".($row["io_cnt"] ? "<th class='nowrap'>{$row["iron_oxide"]}</th>" : "")."
-					".($row["sl10_cnt"] ? "<th class='nowrap'>{$row["slag10"]}</th>" : "")."
-					".($row["sl20_cnt"] ? "<th class='nowrap'>{$row["slag20"]}</th>" : "")."
-					".($row["sl020_cnt"] ? "<th class='nowrap'>{$row["slag020"]}</th>" : "")."
-					".($row["sl30_cnt"] ? "<th class='nowrap'>{$row["slag30"]}</th>" : "")."
-					".($row["sn_cnt"] ? "<th class='nowrap'>{$row["sand"]}</th>" : "")."
-					".($row["cs_cnt"] ? "<th class='nowrap'>{$row["crushed_stone"]}</th>" : "")."
-					".($row["cs515_cnt"] ? "<th class='nowrap'>{$row["crushed_stone515"]}</th>" : "")."
-					".($row["cm_cnt"] ? "<th class='nowrap'>{$row["cement"]}</th>" : "")."
-					".($row["pl_cnt"] ? "<th class='nowrap'>{$row["plasticizer"]}</th>" : "")."
-					".($row["wt_cnt"] ? "<th class='nowrap'>{$row["water"]}</th>" : "")."
+	";
+
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		$html .= "<th class='nowrap'>{$row["quantity"]}±{$row["admission"]}</th>";
+	}
+
+	$html .= "
+					<th class='nowrap'>min {$water}</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -233,18 +167,6 @@ if( $row["editable"] ) {
 				,DATE_FORMAT(LB.batch_time, '%H:%i') batch_time_format
 				,LB.mix_density
 				,LB.temp
-				,IFNULL(LB.s_fraction, 0) s_fraction
-				,IFNULL(LB.l_fraction, 0) l_fraction
-				,IFNULL(LB.iron_oxide, 0) iron_oxide
-				,IFNULL(LB.slag10, 0) slag10
-				,IFNULL(LB.slag20, 0) slag20
-				,IFNULL(LB.slag020, 0) slag020
-				,IFNULL(LB.slag30, 0) slag30
-				,IFNULL(LB.sand, 0) sand
-				,IFNULL(LB.crushed_stone, 0) crushed_stone
-				,IFNULL(LB.crushed_stone515, 0) crushed_stone515
-				,IFNULL(LB.cement, 0) cement
-				,IFNULL(LB.plasticizer, 0) plasticizer
 				,IFNULL(LB.water, 0) water
 				,SUM(LF.underfilling) underfilling
 				,LB.test
@@ -284,19 +206,29 @@ if( $row["editable"] ) {
 					<td><input type='datetime-local' name='batch_time[{$subrow["LB_ID"]}]' style='width: 100%;' value='{$subrow["batch_date"]}T{$subrow["batch_time_format"]}' required></td>
 					<td><input type='number' min='2' max='5.5' step='0.01' name='mix_density[{$subrow["LB_ID"]}]' value='".($subrow["mix_density"]/1000)."' style='width: 100%;' required></td>
 					<td><input type='number' min='5' max='45' name='temp[{$subrow["LB_ID"]}]' value='{$subrow["temp"]}' style='width: 100%;' required></td>
-					".($row["sf_cnt"] ? "<td style='background: #7952eb88;'><input type='number' min='0' name='s_fraction[{$subrow["LB_ID"]}]' value='{$subrow["s_fraction"]}' style='width: 100%;' required></td>" : "")."
-					".($row["lf_cnt"] ? "<td style='background: #51d5d788;'><input type='number' min='0' name='l_fraction[{$subrow["LB_ID"]}]' value='{$subrow["l_fraction"]}' style='width: 100%;' required></td>" : "")."
-					".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[{$subrow["LB_ID"]}]' value='{$subrow["iron_oxide"]}' style='width: 100%;' required></td>" : "")."
-					".($row["sl10_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag10[{$subrow["LB_ID"]}]' value='{$subrow["slag10"]}' style='width: 100%;' required></td>" : "")."
-					".($row["sl20_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag20[{$subrow["LB_ID"]}]' value='{$subrow["slag20"]}' style='width: 100%;' required></td>" : "")."
-					".($row["sl020_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag020[{$subrow["LB_ID"]}]' value='{$subrow["slag020"]}' style='width: 100%;' required></td>" : "")."
-					".($row["sl30_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag30[{$subrow["LB_ID"]}]' value='{$subrow["slag30"]}' style='width: 100%;' required></td>" : "")."
-					".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[{$subrow["LB_ID"]}]' value='{$subrow["sand"]}' style='width: 100%;' required></td>" : "")."
-					".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone"]}' style='width: 100%;' required></td>" : "")."
-					".($row["cs515_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone515[{$subrow["LB_ID"]}]' value='{$subrow["crushed_stone515"]}' style='width: 100%;' required></td>" : "")."
-					".($row["cm_cnt"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[{$subrow["LB_ID"]}]' value='{$subrow["cement"]}' style='width: 100%;' required></td>" : "")."
-					".($row["pl_cnt"] ? "<td style='background: #80800080;'><input type='number' min='0' step='0.01' name='plasticizer[{$subrow["LB_ID"]}]' value='{$subrow["plasticizer"]}' style='width: 100%;' required></td>" : "")."
-					".($row["wt_cnt"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[{$subrow["LB_ID"]}]' value='{$subrow["water"]}' style='width: 100%;' required></td>" : "")."
+			";
+
+			$query = "
+				SELECT LBM.quantity
+					,MN.color
+					,MN.MN_ID
+					,MN.step
+				FROM MixFormula MF
+				JOIN MixFormulaMaterial MFM ON MFM.MF_ID = MF.MF_ID
+				JOIN material__Name MN ON MN.MN_ID = MFM.MN_ID
+				LEFT JOIN list__BatchMaterial LBM ON LBM.MN_ID = MN.MN_ID
+					AND LBM.LB_ID = {$subrow["LB_ID"]}
+				WHERE MF.F_ID = {$F_ID}
+					AND MF.CW_ID = {$CW_ID}
+				ORDER BY MN.material_name
+			";
+			$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $subsubrow = mysqli_fetch_array($subsubres) ) {
+				$html .= "<td style='background: #{$subsubrow["color"]};'><input type='number' min='0' step='{$subsubrow["step"]}' name='material[{$subrow["LB_ID"]}][{$subsubrow["MN_ID"]}]' value='{$subsubrow["quantity"]}' style='width: 100%;' required></td>";
+			}
+
+			$html .= "
+					<td style='background: #1e90ff85;'><input type='number' min='0' name='water[{$subrow["LB_ID"]}]' value='{$subrow["water"]}' style='width: 100%;' required></td>
 					".($k == 0 ? $fillings_cell : "")."
 					<td class='nowrap'><input type='checkbox' name='test[{$subrow["LB_ID"]}]' ".($subrow["test"] ? "checked" : "")." ".($subrow["is_test"] ? "onclick='return false;'" : "")." value='1'>".($subrow["is_test"] ? "<i id='test_notice' class='fas fa-question-circle' title='Не редактируется так как есть связанные испытания куба.'></i>" : "")."</td>
 				</tr>
@@ -324,19 +256,26 @@ if( $row["editable"] ) {
 				<td><input type='datetime-local' name='batch_time[n_{$i}]' style='width: 100%;' required></td>
 				<td><input type='number' min='2' max='5.5' step='0.01' name='mix_density[n_{$i}]' style='width: 100%;' required></td>
 				<td><input type='number' min='5' max='45' name='temp[n_{$i}]' style='width: 100%;' required></td>
-				".($row["sf_cnt"] ? "<td style='background: #7952eb88;'><input type='number' min='0' name='s_fraction[n_{$i}]' style='width: 100%;' required></td>" : "")."
-				".($row["lf_cnt"] ? "<td style='background: #51d5d788;'><input type='number' min='0' name='l_fraction[n_{$i}]' style='width: 100%;' required></td>" : "")."
-				".($row["io_cnt"] ? "<td style='background: #a52a2a80;'><input type='number' min='0' name='iron_oxide[n_{$i}]' style='width: 100%;' required></td>" : "")."
-				".($row["sl10_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag10[n_{$i}]' style='width: 100%;' required></td>" : "")."
-				".($row["sl20_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag20[n_{$i}]' style='width: 100%;' required></td>" : "")."
-				".($row["sl020_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag020[n_{$i}]' style='width: 100%;' required></td>" : "")."
-				".($row["sl30_cnt"] ? "<td style='background: #33333380;'><input type='number' min='0' name='slag30[n_{$i}]' style='width: 100%;' required></td>" : "")."
-				".($row["sn_cnt"] ? "<td style='background: #f4a46082;'><input type='number' min='0' name='sand[n_{$i}]' style='width: 100%;' required></td>" : "")."
-				".($row["cs_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone[n_{$i}]' style='width: 100%;' required></td>" : "")."
-				".($row["cs515_cnt"] ? "<td style='background: #8b45137a;'><input type='number' min='0' name='crushed_stone515[n_{$i}]' style='width: 100%;' required></td>" : "")."
-				".($row["cm_cnt"] ? "<td style='background: #7080906b;'><input type='number' min='0' name='cement[n_{$i}]' style='width: 100%;' required></td>" : "")."
-				".($row["pl_cnt"] ? "<td style='background: #80800080;'><input type='number' min='0' step='0.01' name='plasticizer[n_{$i}]' style='width: 100%;' required></td>" : "")."
-				".($row["wt_cnt"] ? "<td style='background: #1e90ff85;'><input type='number' min='0' name='water[n_{$i}]' style='width: 100%;' required></td>" : "")."
+		";
+
+		$query = "
+			SELECT MN.color
+				,MN.MN_ID
+				,MN.step
+			FROM MixFormula MF
+			JOIN MixFormulaMaterial MFM ON MFM.MF_ID = MF.MF_ID
+			JOIN material__Name MN ON MN.MN_ID = MFM.MN_ID
+			WHERE MF.F_ID = {$F_ID}
+				AND MF.CW_ID = {$CW_ID}
+			ORDER BY MN.material_name
+		";
+		$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		while( $subsubrow = mysqli_fetch_array($subsubres) ) {
+			$html .= "<td style='background: #{$subsubrow["color"]};'><input type='number' min='0' step='{$subsubrow["step"]}' name='material[n_{$i}][{$subsubrow["MN_ID"]}]' style='width: 100%;' required></td>";
+		}
+
+		$html .= "
+				<td style='background: #1e90ff85;'><input type='number' min='0' name='water[n_{$i}]' style='width: 100%;' required></td>
 				".($k == 0 ? $fillings_cell : "")."
 				<td><input type='checkbox' name='test[n_{$i}]' value='1'></td>
 			</tr>
@@ -351,19 +290,16 @@ if( $row["editable"] ) {
 		<datalist id='defaultNumbers'>
 	";
 
-	//	$query = "
-	//		SELECT cassette FROM Cassettes WHERE F_ID = {$F_ID}
-	//	";
-		$query = "
-			SELECT cassette
-			FROM plan__BatchCassette
-			WHERE PB_ID = {$PB_ID}
-			ORDER BY cassette
-		";
-		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-		while( $row = mysqli_fetch_array($res) ) {
-			$html .= "<option value='{$row["cassette"]}'>";
-		}
+	$query = "
+		SELECT cassette
+		FROM plan__BatchCassette
+		WHERE PB_ID = {$PB_ID}
+		ORDER BY cassette
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		$html .= "<option value='{$row["cassette"]}'>";
+	}
 
 	$html .= "</datalist>";
 	echo "$('input[name=subbut]').attr('disabled', false);";

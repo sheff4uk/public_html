@@ -23,18 +23,6 @@ if( isset($_POST["PB_ID"]) ) {
 			$batch_time = substr($value, -5);
 			$mix_density = $_POST["mix_density"][$key]*1000;
 			$temp = $_POST["temp"][$key] ? $_POST["temp"][$key] : "NULL";
-			$s_fraction = $_POST["s_fraction"][$key] ? $_POST["s_fraction"][$key] : "NULL";
-			$l_fraction = $_POST["l_fraction"][$key] ? $_POST["l_fraction"][$key] : "NULL";
-			$iron_oxide = $_POST["iron_oxide"][$key] ? $_POST["iron_oxide"][$key] : "NULL";
-			$slag10 = $_POST["slag10"][$key] ? $_POST["slag10"][$key] : "NULL";
-			$slag20 = $_POST["slag20"][$key] ? $_POST["slag20"][$key] : "NULL";
-			$slag020 = $_POST["slag020"][$key] ? $_POST["slag020"][$key] : "NULL";
-			$slag30 = $_POST["slag30"][$key] ? $_POST["slag30"][$key] : "NULL";
-			$sand = $_POST["sand"][$key] ? $_POST["sand"][$key] : "NULL";
-			$crushed_stone = $_POST["crushed_stone"][$key] ? $_POST["crushed_stone"][$key] : "NULL";
-			$crushed_stone515 = $_POST["crushed_stone515"][$key] ? $_POST["crushed_stone515"][$key] : "NULL";
-			$cement = $_POST["cement"][$key];
-			$plasticizer = $_POST["plasticizer"][$key] ? $_POST["plasticizer"][$key] : "NULL";
 			$water = $_POST["water"][$key];
 			$underfilling = $_POST["underfilling"][$key] ? $_POST["underfilling"][$key] : 0;
 			$test = $_POST["test"][$key] ? 1 : 0;
@@ -47,24 +35,24 @@ if( isset($_POST["PB_ID"]) ) {
 						,batch_time = '{$batch_time}'
 						,mix_density = {$mix_density}
 						,temp = {$temp}
-						,s_fraction = {$s_fraction}
-						,l_fraction = {$l_fraction}
-						,iron_oxide = {$iron_oxide}
-						,slag10 = {$slag10}
-						,slag20 = {$slag20}
-						,slag020 = {$slag020}
-						,slag30 = {$slag30}
-						,sand = {$sand}
-						,crushed_stone = {$crushed_stone}
-						,crushed_stone515 = {$crushed_stone515}
-						,cement = {$cement}
-						,plasticizer = {$plasticizer}
 						,water = {$water}
 						,test = {$test}
 				";
 				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
 				$LB_ID = mysqli_insert_id( $mysqli );
+
+				// Считывание ингредиентов в замесе
+				foreach ($_POST["material"][$key] as $subkey => $subvalue) {
+					$quantity = $subvalue ? $subvalue : "NULL";
+					$query = "
+						INSERT INTO list__BatchMaterial
+						SET LB_ID = {$LB_ID}
+							,MN_ID = {$subkey}
+							,quantity = {$quantity}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				}
 
 				// Записываем номера кассет
 				foreach ($_POST["cassette"][$key] as $k => $v) {
@@ -95,23 +83,23 @@ if( isset($_POST["PB_ID"]) ) {
 						,batch_time = '{$batch_time}'
 						,mix_density = {$mix_density}
 						,temp = {$temp}
-						,s_fraction = {$s_fraction}
-						,l_fraction = {$l_fraction}
-						,iron_oxide = {$iron_oxide}
-						,slag10 = {$slag10}
-						,slag20 = {$slag20}
-						,slag020 = {$slag020}
-						,slag30 = {$slag30}
-						,sand = {$sand}
-						,crushed_stone = {$crushed_stone}
-						,crushed_stone515 = {$crushed_stone515}
-						,cement = {$cement}
-						,plasticizer = {$plasticizer}
 						,water = {$water}
 						,test = {$test}
 					WHERE LB_ID = {$key}
 				";
 				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+				// Считывание ингредиентов в замесе
+				foreach ($_POST["material"][$key] as $subkey => $subvalue) {
+					$quantity = $subvalue ? $subvalue : "NULL";
+					$query = "
+						UPDATE list__BatchMaterial
+						SET quantity = {$quantity}
+						WHERE LB_ID = {$key}
+							AND MN_ID = {$subkey}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				}
 
 				// Редактируем номера кассет
 				foreach ($_POST["cassette"][$key] as $k => $v) {
@@ -138,16 +126,6 @@ if( isset($_POST["PB_ID"]) ) {
 			}
 		}
 		// Обновляем фактическое число замесов и число заливок на замес
-		$sf_density = $_POST["sf_density"] ? $_POST["sf_density"]*1000 : "NULL";
-		$lf_density = $_POST["lf_density"] ? $_POST["lf_density"]*1000 : "NULL";
-		$io_density = $_POST["io_density"] ? $_POST["io_density"]*1000 : "NULL";
-		$sl10_density = $_POST["sl10_density"] ? $_POST["sl10_density"]*1000 : "NULL";
-		$sl20_density = $_POST["sl20_density"] ? $_POST["sl20_density"]*1000 : "NULL";
-		$sl020_density = $_POST["sl020_density"] ? $_POST["sl020_density"]*1000 : "NULL";
-		$sl30_density = $_POST["sl30_density"] ? $_POST["sl30_density"]*1000 : "NULL";
-		$sn_density = $_POST["sn_density"] ? $_POST["sn_density"]*1000 : "NULL";
-		$cs_density = $_POST["cs_density"] ? $_POST["cs_density"]*1000 : "NULL";
-		$cs515_density = $_POST["cs515_density"] ? $_POST["cs515_density"]*1000 : "NULL";
 		$calcium = $_POST["calcium"];
 
 		$query = "
@@ -156,20 +134,24 @@ if( isset($_POST["PB_ID"]) ) {
 				,fillings = {$_POST["fillings"]}
 				,per_batch = {$_POST["per_batch"]}
 				,in_cassette = {$_POST["in_cassette"]}
-				,sf_density = {$sf_density}
-				,lf_density = {$lf_density}
-				,io_density = {$io_density}
-				,sl10_density = {$sl10_density}
-				,sl20_density = {$sl20_density}
-				,sl020_density = {$sl020_density}
-				,sl30_density = {$sl30_density}
-				,sn_density = {$sn_density}
-				,cs_density = {$cs_density}
-				,cs515_density = {$cs515_density}
 				,calcium = {$calcium}
 			WHERE PB_ID = {$_POST["PB_ID"]}
 		";
 		mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+		// Обновляем плотности ингредиентов
+		foreach ($_POST["density"] as $key => $value) {
+			$density = $value ? $value*1000 : "NULL";
+			$query = "
+				INSERT INTO plan__BatchDensity
+				SET PB_ID = {$_POST["PB_ID"]}
+					,MN_ID = {$key}
+					,density = {$density}
+				ON DUPLICATE KEY UPDATE
+					density = {$density}
+			";
+			mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		}
 	}
 	else {
 		$_SESSION["error"][] = "Что-то пошло не так. Пожалуйста, повторите попытку.";
