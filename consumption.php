@@ -153,6 +153,7 @@ foreach ($_GET as &$value) {
 		<tr>
 			<th rowspan="2" colspan = "2">Противовес</th>
 			<th rowspan="2">Кол-во залитых деталей</th>
+			<th rowspan="2">Объем деталей, л</th>
 <?
 	$query = "
 		SELECT MN.MN_ID
@@ -199,6 +200,7 @@ foreach ($_GET as &$value) {
 				,CW.item
 				,CW.drawing_item
 				,SUM((SELECT SUM(PB.in_cassette - underfilling) FROM list__Filling WHERE LB_ID = LB.LB_ID)) details
+				,CW.drawing_volume
 				,LB.LB_ID
 				,SUM(LB.water * PB.calcium / 1000) calcium
 				,MAX(CW.reinforcement / 1000) reinforcement
@@ -216,12 +218,14 @@ foreach ($_GET as &$value) {
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 		while( $row = mysqli_fetch_array($res) ) {
 			$details += $row["details"];
+			$drawing_volume += $row["details"] * $row["drawing_volume"];
 			$calcium += $row["calcium"];
 			$reinforcement += $row["reinforcement"] * $row["details"];
 			?>
 			<tr>
 				<td colspan="2" class="nowrap"><span style="font-size: 1.5em; font-weight: bold;"><?=$row["item"]?></span><br><i style="font-size: .8em;"><?=$row["drawing_item"]?></i></td>
 				<td><?=$row["details"]?></td>
+				<td><?=round($row["details"] * $row["drawing_volume"] / 1000, 3)?></td>
 			<?
 			$query = "
 				SELECT SUM(LBM.quantity) * MN.adjustment quantity
@@ -261,6 +265,7 @@ foreach ($_GET as &$value) {
 			<td></td>
 			<td>Итог:</td>
 			<td><?=$details?></td>
+			<td><?=round($drawing_volume / 1000, 3)?></td>
 		<?
 		foreach ($quantity as $subvalue) {
 			echo "<td>".round($subvalue, 3)."</td>";
