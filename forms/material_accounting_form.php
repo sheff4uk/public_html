@@ -473,6 +473,10 @@ this.subbut.value='Подождите, пожалуйста!';">
 	});
 
 	$(function() {
-		$("#car_number").mask("А000АА", {translation:  {'А': {pattern: /[АВЕКМНОРСТУХ]/}}, placeholder: "А000АА"});
+		$("#car_number").mask("А000АА", {
+			translation:  {'А': {pattern: /[АВЕКМНОРСТУХ]/}},
+			placeholder: "А000АА",
+			clearIfNotMatch: true
+		});
 	});
 </script>
