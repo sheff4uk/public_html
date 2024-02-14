@@ -49,7 +49,7 @@ if( isset($_POST["PB_ID"]) ) {
 						INSERT INTO list__BatchMaterial
 						SET LB_ID = {$LB_ID}
 							,MN_ID = {$subkey}
-							,quantity = {$quantity}
+							,quantity = {$subvalue}
 					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				}
@@ -94,7 +94,7 @@ if( isset($_POST["PB_ID"]) ) {
 					//$quantity = $subvalue ? $subvalue : "NULL";
 					$query = "
 						UPDATE list__BatchMaterial
-						SET quantity = {$quantity}
+						SET quantity = {$subvalue}
 						WHERE LB_ID = {$key}
 							AND MN_ID = {$subkey}
 					";
