@@ -44,7 +44,7 @@ if( isset($_POST["PB_ID"]) ) {
 
 				// Считывание ингредиентов в замесе
 				foreach ($_POST["material"][$key] as $subkey => $subvalue) {
-					$quantity = $subvalue ? $subvalue : "NULL";
+					//$quantity = $subvalue ? $subvalue : "NULL";
 					$query = "
 						INSERT INTO list__BatchMaterial
 						SET LB_ID = {$LB_ID}
@@ -91,7 +91,7 @@ if( isset($_POST["PB_ID"]) ) {
 
 				// Считывание ингредиентов в замесе
 				foreach ($_POST["material"][$key] as $subkey => $subvalue) {
-					$quantity = $subvalue ? $subvalue : "NULL";
+					//$quantity = $subvalue ? $subvalue : "NULL";
 					$query = "
 						UPDATE list__BatchMaterial
 						SET quantity = {$quantity}
