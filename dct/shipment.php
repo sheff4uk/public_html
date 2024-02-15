@@ -166,7 +166,8 @@ include "header.php";
 					,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i:%s') packed_time_format
 					,DATE_FORMAT(LPP.scan_time, '%d.%m.%Y %H:%i:%s') scan_time_format
 					,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i:%s') shipment_time_format
-					,IF(CWP.M_ID = 1, (114 - TIMESTAMPDIFF(HOUR, LPP.packed_time, NOW())), 0) duration
+					#,IF(CWP.M_ID = 1, (114 - TIMESTAMPDIFF(HOUR, LPP.packed_time, NOW())), 0) duration
+					,0 duration
 				FROM list__PackingPallet LPP
 				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
 				LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
