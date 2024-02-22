@@ -152,6 +152,12 @@ foreach ($_GET as &$value) {
 			collapsible: true,
 			heightStyle: "content"
 		});
+		
+		$( "#summary" ).accordion({
+			active: false,
+			collapsible: true,
+			heightStyle: "content"
+		});
 
 		// При скроле сворачивается фильтр
 		$(window).scroll(function(){
@@ -161,6 +167,56 @@ foreach ($_GET as &$value) {
 		});
 	});
 </script>
+
+<div id="summary">
+	<h3>Остатки сырья</h3>
+	<div>
+		<?
+		$query = "
+			SELECT F_ID
+				,f_name
+			FROM factory
+		";
+		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+		while( $row = mysqli_fetch_array($res) ) {
+			?>
+			<div style="display: inline-block; padding: 0 20px;">
+			<h2><?=$row["f_name"]?>:</h2>
+			<table style="text-align: center; font-weight: bold;">
+				<thead>
+					<tr>
+						<th>Наименование</th>
+						<th>Количество, т</th>
+					</tr>
+				</thead>
+				<tbody>
+			<?
+			$query = "
+				SELECT MN.material_name
+					,ROUND(mb_balance, 3) balance
+				FROM material__Balance MB
+				JOIN material__Name MN ON MN.MN_ID = MB.MN_ID
+				WHERE F_ID = {$row["F_ID"]}
+				ORDER BY MN.material_name
+			";
+			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+			while( $subrow = mysqli_fetch_array($subres) ) {
+				echo "
+					<tr>\n
+						<td>{$subrow["material_name"]}</td>\n
+						<td>{$subrow["balance"]}</td>\n
+					</tr>\n
+				";
+			}
+			?>
+				</tbody>
+			</table>
+			</div>
+			<?
+		}
+		?>
+	</div>
+</div>
 
 <table class="main_table">
 	<thead>
@@ -174,7 +230,7 @@ foreach ($_GET as &$value) {
 			<th>№ автомобиля</th>
 			<th>№ партии</th>
 			<th>№ сертификата качества</th>
-			<th>Кол-во</th>
+			<th>Кол-во, т</th>
 			<th>Стоимость</th>
 			<th></th>
 		</tr>
