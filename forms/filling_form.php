@@ -44,7 +44,6 @@ if( isset($_POST["PB_ID"]) ) {
 
 				// Считывание ингредиентов в замесе
 				foreach ($_POST["material"][$key] as $subkey => $subvalue) {
-					//$quantity = $subvalue ? $subvalue : "NULL";
 					$query = "
 						INSERT INTO list__BatchMaterial
 						SET LB_ID = {$LB_ID}
@@ -89,14 +88,28 @@ if( isset($_POST["PB_ID"]) ) {
 				";
 				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
+				// Обнуляем замес чтобы сработал триггер
+				$query = "
+					UPDATE list__BatchMaterial
+					SET quantity = 0
+					WHERE LB_ID = {$key}
+				";
+				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+				// Удаляем замес чтобы добавить вновь
+				$query = "
+					DELETE FROM list__BatchMaterial
+					WHERE LB_ID = {$key}
+				";
+				mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
 				// Считывание ингредиентов в замесе
 				foreach ($_POST["material"][$key] as $subkey => $subvalue) {
-					//$quantity = $subvalue ? $subvalue : "NULL";
 					$query = "
-						UPDATE list__BatchMaterial
-						SET quantity = {$subvalue}
-						WHERE LB_ID = {$key}
-							AND MN_ID = {$subkey}
+						INSERT INTO list__BatchMaterial
+						SET LB_ID = {$key}
+							,MN_ID = {$subkey}
+							,quantity = {$subvalue}
 					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				}
@@ -154,7 +167,7 @@ if( isset($_POST["PB_ID"]) ) {
 		}
 	}
 	else {
-		$_SESSION["error"][] = "Что-то пошло не так. Пожалуйста, повторите попытку.";
+		$_SESSION["error"][] = "Число замесов отличается от запланированного. Пожалуйста, повторите попытку.";
 	}
 
 	if( !isset($_SESSION["error"]) ) {
