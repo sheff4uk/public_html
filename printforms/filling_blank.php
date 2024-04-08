@@ -47,13 +47,13 @@ $water = $row["water"];
 // Массив с номерами контрольных замесов (кубы)
 if( $batches > 1 ) {
 	if( $cubetests == 1 ) {
-		$tests = array(round($batches/2));
+		$tests = array(round($batches/2)+1);
 	}
 	elseif( $cubetests == 2 ) {
-		$tests = array(2, round($batches/2));
+		$tests = array(2, round($batches/2)+1);
 	}
 	elseif( $cubetests == 3 ) {
-		$tests = array(2, round($batches/2), $batches);
+		$tests = array(2, round($batches/2)+1, $batches);
 	}
 }
 else {
