@@ -166,10 +166,10 @@ include "header.php";
 					,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i:%s') packed_time_format
 					,DATE_FORMAT(LPP.scan_time, '%d.%m.%Y %H:%i:%s') scan_time_format
 					,DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i:%s') shipment_time_format
-					#,IF(CWP.M_ID = 1, (114 - TIMESTAMPDIFF(HOUR, LPP.packed_time, NOW())), 0) duration
-					,0 duration
+					,IF(CWP.CW_ID IS NOT NULL, (CB.holding_time - TIMESTAMPDIFF(HOUR, LPP.packed_time, NOW())), 0) duration
 				FROM list__PackingPallet LPP
 				JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+				JOIN ClientBrand CB ON CB.CB_ID = CWP.CB_ID
 				LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 				WHERE LPP.WT_ID = {$_GET["WT_ID"]}
 					AND LPP.nextID = {$_GET["nextID"]}
@@ -208,7 +208,7 @@ include "header.php";
 					}
 				}
 				else {
-					if( $row["duration"] > 0 and $F_ID == 1) {
+					if( $row["duration"] > 0 ) {
 						echo "<span style='color: #f00; font-size: 2em; font-weight: bold;'>Отгрузка запрещена!</span><br>\n";
 						echo "<span>До полного созревания необходимо <b>{$row["duration"]}</b> ч.</span>\n";
 					}
