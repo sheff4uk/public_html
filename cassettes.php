@@ -16,7 +16,7 @@ if( isset($_GET["cassette"]) ) {
 	die();
 }
 
-$title = 'КИС Константа главная';
+$title = 'Кассеты';
 include "header.php";
 
 // Проверка прав на доступ к экрану
