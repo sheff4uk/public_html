@@ -427,7 +427,6 @@ foreach ($_GET as &$value) {
 				$usr_photo[$row["USR_ID"]][] = "{$subrow["tr_photo"]}";
 			}
 
-			$rowstyle = $row["act"] ? "" : "background: rgb(150,0,0, .3);";
 			echo "
 				<tr id='{$row["USR_ID"]}' class='".($row["act"] ? "" : "not_act")."'>
 					<td style='position: relative;'>

@@ -252,6 +252,9 @@ function src_url($src) {
 		if( in_array('settings', $Rights) ) {
 			$menu["<i class='fas fa-cog fa-lg'></i>"]["Настройки"] = "settings.php";
 		}
+		if( in_array('migrants', $Rights) ) {
+			$menu["<i class='fas fa-cog fa-lg'></i>"]["Мигранты"] = "migrants.php";
+		}
 		$menu["Выход {$USR_Icon}"] = "exit.php";
 	}
 
