@@ -17,7 +17,7 @@ function src_url($src) {
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title><?=$title?></title>
-	<!-- <link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?3"> -->
+	<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?3">
 	<link rel='stylesheet' type='text/css' href='css/style.css?35'>
 	<link rel='stylesheet' type='text/css' href='css/buttons.css'>
 	<link rel='stylesheet' type='text/css' href='css/animate.css'>
