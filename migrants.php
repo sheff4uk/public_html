@@ -151,8 +151,7 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
             <th rowspan="2"></th>
-			<th rowspan="2">Фамилия</th>
-			<th rowspan="2">Имя</th>
+			<th rowspan="2">Работник</th>
 			<th>Паспорт</th>
             <th rowspan="2">Гражданство</th>
             <th colspan="2">Миг. карта</th>
@@ -228,21 +227,20 @@ while( $row = mysqli_fetch_array($res) ) {
             <div style="position: absolute; top: 10px; left: 5px;"><?=$row["icon"]?></div>
             <?=(($row["passport"] ? "<a style='position: absolute; bottom: 10px; right: 5px;' href='/uploads/{$row["passport"]}' target='_blank' title='Паспорт'><i class='fa-solid fa-passport fa-2x' style='filter: drop-shadow(0px 0px 2px #000);'></i></a>" : ""))?>
         </td>
-        <td><?=$row["Surname"]?></td>
-        <td><?=$row["Name"]?></td>
-        <td><?=$row["passport_valid_format"]?></td>
-        <td><?=$row["citizenship"]?></td>
-        <td><?=$row["mig_card_from_format"]?></td>
-        <td><?=$row["mig_card_valid_format"]?></td>
-        <td><?=$row["mig_reg_valid_format"]?></td>
-        <td><?=$row["patent_from_format"]?></td>
-        <td><?=$row["patent_valid_format"]?></td>
-        <td><?=$row["contract_from_format"]?></td>
-        <td><?=$row["contract_valid_format"]?></td>
-        <td><?=$row["post"]?></td>
-        <td><?=$row["DMS_format"]?></td>
-        <td><?=$row["certificate_format"]?></td>
-        <td colspan="2"><?=$row["comment"]?></td>
+        <td><span><a href="users.php?USR_ID=<?=$row["USR_ID"]?>" target="_blank"><?=$row["Surname"]?> <?=$row["Name"]?></a></span></td>
+        <td><span><?=$row["passport_valid_format"]?></span></td>
+        <td><span><?=$row["citizenship"]?></span></td>
+        <td><span><?=$row["mig_card_from_format"]?></span></td>
+        <td><span><?=$row["mig_card_valid_format"]?></span></td>
+        <td><span><?=$row["mig_reg_valid_format"]?></span></td>
+        <td><span><?=$row["patent_from_format"]?></span></td>
+        <td><span><?=$row["patent_valid_format"]?></span></td>
+        <td><span><?=$row["contract_from_format"]?></span></td>
+        <td><span><?=$row["contract_valid_format"]?></span></td>
+        <td><span><?=$row["post"]?></span></td>
+        <td><span><?=$row["DMS_format"]?></span></td>
+        <td><span><?=$row["certificate_format"]?></span></td>
+        <td colspan="2"><span><?=$row["comment"]?></span></td>
 		<td><a href="#" class="edit_migrant" usr="<?=$row["USR_ID"]?>" title='Изменить данные'><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
 	<?
