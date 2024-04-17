@@ -203,7 +203,7 @@ $query = "
         ,MG.contract_from
         ,DATE_FORMAT(MG.contract_from, '%d.%m.%y') contract_from_format
         ,MG.contract_valid
-        ,DATE_FORMAT(MG.contract_valid, '%d.%m.%y') contract_valid_format
+        ,IF(MG.contract_from IS NOT NULL AND MG.contract_valid IS NULL, 'бессроч', DATE_FORMAT(MG.contract_valid, '%d.%m.%y')) contract_valid_format
         ,MG.post
         ,MG.DMS
         ,DATE_FORMAT(MG.DMS, '%d.%m.%y') DMS_format
