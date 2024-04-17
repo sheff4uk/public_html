@@ -215,7 +215,7 @@ $query = "
     LEFT JOIN Migrants MG ON MG.USR_ID = USR.USR_ID
     WHERE USR.F_ID = {$_GET["F_ID"]}
         AND USR.RL_ID = 4
-	ORDER BY USR.F_ID, USR.RL_ID, USR.Surname, USR.Name
+	ORDER BY USR.act DESC, USR.Surname, USR.Name
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
