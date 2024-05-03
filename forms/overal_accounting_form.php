@@ -24,6 +24,7 @@ if( isset($_POST["oa_cnt"]) ) {
 			INSERT INTO overal__Accounting
 			SET oa_date = '{$_POST["oa_date"]}'
 				,OI_ID = {$_POST["OI_ID"]}
+				,F_ID = {$_POST["F_ID"]}
 				,oa_cnt = {$_POST["oa_cnt"]} * {$_POST["sign"]}
 				,correction = ".($_POST["correction"] ? "1" : "NULL")."
 		";
@@ -48,11 +49,11 @@ if( isset($_POST["oa_cnt"]) ) {
 	$date_to = max($date_to, $date_edit);
 	$date_from = date_format($date_from, 'Y-m-d');
 	$date_to = date_format($date_to, 'Y-m-d');
-	exit ('<meta http-equiv="refresh" content="0; url=/overal_accounting.php?date_from='.$date_from.'&date_to='.$date_to.'#'.$OA_ID.'">');
+	exit ('<meta http-equiv="refresh" content="0; url=/overal_accounting.php?F_ID='.$_POST["F_ID"].'&date_from='.$date_from.'&date_to='.$date_to.'#'.$OA_ID.'">');
 }
 ?>
 
-<div id='outcoming_form' title='Выдача СИЗ' style='display:none;'>
+<div id='outcoming_form' title='Выдача СИЗ в <?=$f_name?>' style='display:none;'>
 	<form method='post' action="/forms/overal_accounting_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset style="background: #db443788;">
@@ -60,10 +61,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="sign" value="-1">
 			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
 			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
+			<input type="hidden" name="F_ID" value="<?=$F_ID?>">
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
+						<th>Участок</th>
 						<th>Дата выдачи</th>
 						<th>Наименование СИЗ</th>
 						<th>Количество</th>
@@ -72,6 +75,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
+						<td><b><?=$f_name?></b></td>
 						<td><input type="date" name="oa_date" max="<?=date('Y-m-d')?>" required></td>
 						<td>
 							<select name="OI_ID" style="width: 100%;" required>
@@ -103,7 +107,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 	</form>
 </div>
 
-<div id='incoming_form' title='Приход СИЗ' style='display:none;'>
+<div id='incoming_form' title='Приход СИЗ в <?=$f_name?>' style='display:none;'>
 	<form method='post' action="/forms/overal_accounting_form.php" onsubmit="JavaScript:this.subbut.disabled=true;
 this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset style="background: #16A08588;">
@@ -111,10 +115,12 @@ this.subbut.value='Подождите, пожалуйста!';">
 			<input type="hidden" name="sign" value="1">
 			<input type="hidden" name="date_from" value="<?=$_GET["date_from"]?>">
 			<input type="hidden" name="date_to" value="<?=$_GET["date_to"]?>">
+			<input type="hidden" name="F_ID" value="<?=$F_ID?>">
 
 			<table style="width: 100%; table-layout: fixed;">
 				<thead>
 					<tr>
+						<th>Участок</th>
 						<th>Дата поступления</th>
 						<th>Наименование СИЗ</th>
 						<th>Количество</th>
@@ -123,6 +129,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				</thead>
 				<tbody style="text-align: center;">
 					<tr>
+						<td><b><?=$f_name?></b></td>
 						<td><input type="date" name="oa_date" max="<?=date('Y-m-d')?>" required></td>
 						<td>
 							<select name="OI_ID" style="width: 100%;" required>

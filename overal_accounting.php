@@ -19,6 +19,22 @@ if( !$_GET["date_to"] ) {
 	$_GET["date_to"] = date_format($date, 'Y-m-d');
 }
 
+// Если не выбран участок, берем из сессии
+if( !$_GET["F_ID"] ) {
+	$_GET["F_ID"] = $_SESSION['F_ID'];
+}
+$F_ID = $_GET["F_ID"];
+
+// Получаем название участка
+$query = "
+	SELECT f_name
+	FROM factory
+	WHERE F_ID = {$F_ID}
+";
+$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+$row = mysqli_fetch_array($res);
+$f_name = $row["f_name"];
+
 include "./forms/overal_accounting_form.php";
 ?>
 
@@ -66,6 +82,25 @@ include "./forms/overal_accounting_form.php";
 	<form method="get" style="position: relative;">
 		<a href="/overal_accounting.php" style="position: absolute; top: 10px; right: 10px;" class="button">Сброс</a>
 
+		<div class="nowrap" style="margin-bottom: 10px;">
+			<span>Участок:</span>
+			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
+				<?
+				$query = "
+					SELECT F_ID
+						,f_name
+					FROM factory
+					ORDER BY F_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["F_ID"] == $_GET["F_ID"]) ? "selected" : "";
+					echo "<option value='{$row["F_ID"]}' {$selected}>{$row["f_name"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+		
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span style="display: inline-block; width: 120px;">Дата между:</span>
 			<input name="date_from" type="date" value="<?=$_GET["date_from"]?>" class="<?=$_GET["date_from"] ? "filtered" : ""?>">
@@ -148,6 +183,7 @@ $query = "
 	FROM overal__Accounting OA
 	JOIN overal__Item OI ON OI.OI_ID = OA.OI_ID
 	WHERE OA.oa_cnt <> 0
+		AND OA.F_ID = {$F_ID}
 		".($_GET["date_from"] ? "AND OA.oa_date >= '{$_GET["date_from"]}'" : "")."
 		".($_GET["date_to"] ? "AND OA.oa_date <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["OI_ID"] ? "AND OA.OI_ID = {$_GET["OI_ID"]}" : "")."
@@ -179,6 +215,7 @@ while( $row = mysqli_fetch_array($res) ) {
 </table>
 
 <div>
+	<h2><?=$f_name?> баланс СИЗ:</h2>
 	<table style="font-size: 1.5em;">
 		<thead>
 			<tr>
@@ -190,9 +227,10 @@ while( $row = mysqli_fetch_array($res) ) {
 			<?
 			$query = "
 				SELECT OI.overal
-					,OI.oi_balance
-				FROM overal__Item OI
-				WHERE 1
+					,OB.oi_balance
+				FROM overal__Balance OB
+					JOIN overal__Item OI ON OI.OI_ID = OB.OI_ID
+				WHERE OB.F_ID = {$F_ID}
 					".($_GET["OI_ID"] ? "AND OI.OI_ID = {$_GET["OI_ID"]}" : "")."
 				ORDER BY OI.overal
 			";
