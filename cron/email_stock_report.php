@@ -40,6 +40,7 @@ $query = "
 	LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
 	WHERE LPP.shipment_time IS NULL AND LPP.removal_time IS NULL
 		AND LPP.F_ID = 1
+		AND IFNULL(CW.CB_ID, 0) != 5
 	GROUP BY LPP.CWP_ID
 	ORDER BY LPP.CWP_ID ASC
 ";
