@@ -100,16 +100,18 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 					if( abs($netWeight) >= 4000 and abs($netWeight) <= 14000 ) {
 						// Отмена регистрации
 						if( $netWeight < 0 ) {
-							$query = "
-								DELETE FROM list__Weight
-								WHERE weight = ABS({$netWeight})
-									AND WT_ID = {$deviceID}
-									AND goodsID = {$goodsID}
-									AND RN = {$ReceiptNumber}
-								ORDER BY nextID DESC
-								LIMIT 1
-							";
-							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+							if( $goodsID < 9000 ) {
+								$query = "
+									DELETE FROM list__Weight
+									WHERE weight = ABS({$netWeight})
+										AND WT_ID = {$deviceID}
+										AND goodsID = {$goodsID}
+										AND RN = {$ReceiptNumber}
+									ORDER BY nextID DESC
+									LIMIT 1
+								";
+								mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+							}
 
 							// Меняем ID последней регистрации
 							$query = "
@@ -120,19 +122,21 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						}
 						else {
-							// Записываем в базу регистрацию
-							$query = "
-								INSERT INTO list__Weight
-								SET weight = {$netWeight}
-									,nextID = {$nextID}
-									,WT_ID = {$deviceID}
-									,weighing_time = '{$transactionDate}'
-									,goodsID = {$goodsID}
-									,RN = {$ReceiptNumber}
-								ON DUPLICATE KEY UPDATE
-									weighing_time = '{$transactionDate}'
-							";
-							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+							if( $goodsID < 9000 ) {
+								// Записываем в базу регистрацию
+								$query = "
+									INSERT INTO list__Weight
+									SET weight = {$netWeight}
+										,nextID = {$nextID}
+										,WT_ID = {$deviceID}
+										,weighing_time = '{$transactionDate}'
+										,goodsID = {$goodsID}
+										,RN = {$ReceiptNumber}
+									ON DUPLICATE KEY UPDATE
+										weighing_time = '{$transactionDate}'
+								";
+								mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+							}
 
 							// Запоминаем ID последней регистрации
 							$query = "
