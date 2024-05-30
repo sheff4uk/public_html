@@ -9,6 +9,52 @@ if( !in_array('overal_accounting', $Rights) ) {
 	die('Недостаточно прав для совершения операции');
 }
 
+//Принудительный сбор данных с терминала выдачи СИЗ
+if( isset($_GET["download"]) ) {
+	$query = "
+		SELECT from_ip
+			,notification_group
+		FROM factory
+		WHERE F_ID = {$_GET["F_ID"]}
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$from_ip = $row["from_ip"];
+	$notification_group = $row["notification_group"];
+
+	////////////////////////////////////////////////////////
+	// функции сбора данных с весовых терминалов
+	include "functions_WT.php";
+	////////////////////////////////////////////////////////
+
+	// По этому списку терминалов собираем данные по выдаче СИЗ
+	$query = "
+		SELECT WT.WT_ID
+			,WT.port
+			,WT.last_transaction
+		FROM WeighingTerminal WT
+		WHERE WT.F_ID = {$_GET["F_ID"]}
+			AND WT.type = 5
+			AND WT.act = 1
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	while( $row = mysqli_fetch_array($res) ) {
+		// Открываем сокет и запускаем функцию чтения и записывания в БД регистраций
+		$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+		if( socket_connect($socket, $from_ip, $row["port"]) ) {
+			// Чтение регистраций
+			read_transaction_OA($row["last_transaction"]+1, 1, $socket, $mysqli);
+		}
+		else {
+			message_to_telegram("<b>Нет связи с терминалом выдачи СИЗ!</b>", $notification_group);
+		}
+		socket_close($socket);
+	}
+	////////////////////////////////////////////////////////////
+
+	exit ('<meta http-equiv="refresh" content="0; url=/overal_accounting.php?F_ID='.$_GET["F_ID"].'&date_from='.$_GET["date_from"].'&date_to='.$_GET["date_to"].'&OI_ID='.$_GET["OI_ID"].'">');
+}
+
 // Если в фильтре не установлен период, показываем последние 7 дней
 if( !$_GET["date_from"] ) {
 	$date = date_create('-6 days');
@@ -168,7 +214,7 @@ foreach ($_GET as &$value) {
 			<th>Наименование СИЗ</th>
 			<th>Поступившее кол-во</th>
 			<th>Ваданное кол-во</th>
-			<th></th>
+			<th><a href="overal_accounting.php?F_ID=<?=$F_ID?>&date_from=<?=$_GET["date_from"]?>&date_to=<?=$_GET["date_to"]?>&OI_ID=<?=$_GET["OI_ID"]?>&download" title="Собрать данные из терминала"><i class="fa-solid fa-download fa-2x"></i></a></th>
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
@@ -180,14 +226,15 @@ $query = "
 		,OI.overal
 		,IF(OA.oa_cnt > 0, IF(OA.correction, CONCAT(OA.oa_cnt, ' (корректировка)'), OA.oa_cnt), NULL) incoming
 		,IF(OA.oa_cnt < 0, IF(OA.correction, CONCAT(ABS(OA.oa_cnt), ' (корректировка)'), ABS(OA.oa_cnt)), NULL) outcoming
+		,OA.is_terminal
 	FROM overal__Accounting OA
 	JOIN overal__Item OI ON OI.OI_ID = OA.OI_ID
 	WHERE OA.oa_cnt <> 0
 		AND OA.F_ID = {$F_ID}
 		".($_GET["date_from"] ? "AND OA.oa_date >= '{$_GET["date_from"]}'" : "")."
-		".($_GET["date_to"] ? "AND OA.oa_date <= '{$_GET["date_to"]}'" : "")."
+		".($_GET["date_to"] ? "AND OA.oa_date <= '{$_GET["date_to"]} 23:59:59'" : "")."
 		".($_GET["OI_ID"] ? "AND OA.OI_ID = {$_GET["OI_ID"]}" : "")."
-	ORDER BY OA.oa_date, OI.overal
+	ORDER BY DATE(OA.oa_date), OI.overal
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
@@ -199,7 +246,16 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["overal"]?></td>
 		<td><b style="color: green;"><?=$row["incoming"]?></b></td>
 		<td><b><?=$row["outcoming"]?></b></td>
-		<td><a href='#' <?=($row["incoming"] ? "class='add_incoming'" : "class='add_outcoming'")?> OA_ID='<?=$row["OA_ID"]?>' title='Редактировать'><i class='fa fa-pencil-alt fa-lg'></i></a></td>
+		<td>
+			<?
+			if( $row["is_terminal"] == 0 ) {
+				echo "<a href='#' ".($row["incoming"] ? "class='add_incoming'" : "class='add_outcoming'")." OA_ID='".$row["OA_ID"]."' title='Редактировать'><i class='fa fa-pencil-alt fa-lg'></i></a>";
+			}
+			else {
+				echo "<i>Из терминала</i>";
+			}
+			?>
+		</td>
 	</tr>
 	<?
 }

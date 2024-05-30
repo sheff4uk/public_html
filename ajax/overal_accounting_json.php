@@ -6,7 +6,7 @@ $OA_ID = $_GET["OA_ID"];
 $query = "
 	SELECT OA.OI_ID
 		,ABS(OA.oa_cnt) oa_cnt
-		,OA.oa_date
+		,DATE(OA.oa_date) oa_date
 		,IFNULL(OA.correction, 0) correction
 	FROM overal__Accounting OA
 	WHERE OA.OA_ID = {$OA_ID}

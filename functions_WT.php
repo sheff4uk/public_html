@@ -599,6 +599,143 @@ function read_transaction_LA($ID, $curnum, $socket, $mysqli) {
 	}
 }
 
+// Функция читает регистрации с терминала выдачи СИЗ, расходников
+function read_transaction_OA($ID, $curnum, $socket, $mysqli) {
+	$hexID = sprintf("%02x%02x%02x%02x", ($ID & 0xFF), (($ID >> 8) & 0xFF), (($ID >> 16) & 0xFF), (($ID >> 24) & 0xFF));
+	$hexcurnum = sprintf("%02x%02x", ($curnum & 0xFF), (($curnum >> 8) & 0xFF));
+	$in = "\xF8\x55\xCE\x0C\x00\x92\x03\x00\x00".hex2bin($hexcurnum).hex2bin($hexID)."\x00\x00";
+	$crc = crc16(byteStr2byteArray($in));
+	$in .= hex2bin($crc);
+
+	socket_write($socket, $in);
+
+	//Заголовок
+	$result = socket_read($socket, 3);
+
+	//Длина тела сообщения
+	$length = socket_read($socket, 2);
+	$result .= $length;
+	$length = hexdec(bin2hex($length));
+	$length = (($length & 0xFF) << 8) + (($length >> 8) & 0xFF);
+
+	// Тело сообщения
+	$result .= socket_read($socket, $length);
+
+	//Читаем CRC
+	$crc = socket_read($socket, 2);
+
+	//Ответ в массив
+	$data = byteStr2byteArray($result);
+
+	//Сравниваем CRC
+	if( crc16($data) == bin2hex($crc) ) {
+
+		//Если ответ 0x52 CMD_TCP_ACK_TRANSACTION
+		if( $data[5] == 0x52 ) {
+
+			//Число частей в файле
+			$nums = $data[7] + ($data[8] << 8);
+
+			//Номер текущей части
+			$curnum = $data[9] + ($data[10] << 8);
+
+			//Длина записи
+			$curlen = $data[11] + ($data[12] << 8);
+
+			for( $i=13; $i < $curlen; $i=$i+104) {
+				// Регистрации
+				if( ($data[$i+10] >= 1) && ($data[$i+10] <= 6) ) {
+					//Идентификатор
+					$nextID = $data[$i] + ($data[$i+1] << 8) + ($data[$i+2] << 16) + ($data[$i+3] << 24);
+					//Номер терминала
+					$deviceID = $data[$i+6] + ($data[$i+7] << 8) + ($data[$i+8] << 16) + ($data[$i+9] << 24);
+					//Дата/время совершения регистрации
+					$transactionDate = sprintf("20%02d-%02d-%02d %02d:%02d:%02d", $data[$i+11], $data[$i+12], $data[$i+13], $data[$i+14], $data[$i+15], $data[$i+16]);
+					// Количество штук
+					$quantity = $data[$i+27] + ($data[$i+28] << 8) + ($data[$i+29] << 16) + ($data[$i+30] << 24);
+					//Если количество отрицательное
+					if( ($data[$i+30] >> 7) == 1 ) {
+						$quantity = ((-1 >> 32) << 32) + $quantity;
+					}
+					//ID товара
+					$goodsID = $data[$i+37] + ($data[$i+38] << 8) + ($data[$i+39] << 16) + ($data[$i+40] << 24);
+
+					// Если количество положительное
+					if( $quantity > 0 ) {
+						$quantity = $quantity * -1; // Списание со знаком "-"
+						// Записываем в базу регистрацию
+						$query = "
+							INSERT INTO overal__Accounting
+							SET oa_date = '{$transactionDate}'
+								,F_ID = (SELECT F_ID FROM WeighingTerminal WHERE WT_ID = {$deviceID})
+								,OI_ID = {$goodsID}
+								,oa_cnt = {$quantity}
+								,is_terminal = 1
+						";
+						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					}
+					else {
+						// Иначе сторнируем
+						$query = "
+							UPDATE overal__Accounting
+							SET oa_cnt = 0
+							WHERE F_ID = (SELECT F_ID FROM WeighingTerminal WHERE WT_ID = {$deviceID})
+								AND OI_ID = {$goodsID}
+								AND oa_cnt = {$quantity}
+								AND is_terminal = 1
+							ORDER BY oa_date DESC
+							LIMIT 1
+						";
+						mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					}
+
+
+					// Запоминаем ID последней регистрации
+					$query = "
+						UPDATE WeighingTerminal
+						SET last_transaction = {$nextID}
+						WHERE WT_ID = {$deviceID}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				}
+				//Закрытие партии
+				elseif( $data[$i+10] == 71 or $data[$i+10] == 72 ) {
+					//Идентификатор
+					$nextID = $data[$i] + ($data[$i+1] << 8) + ($data[$i+2] << 16) + ($data[$i+3] << 24);
+					//Номер терминала
+					$deviceID = $data[$i+6] + ($data[$i+7] << 8) + ($data[$i+8] << 16) + ($data[$i+9] << 24);
+					//Дата/время совершения регистрации
+					$receipt_end = sprintf("20%02d-%02d-%02d %02d:%02d:%02d", $data[$i+11], $data[$i+12], $data[$i+13], $data[$i+14], $data[$i+15], $data[$i+16]);
+
+					// Обновляем время закрытия последней партии
+					$query = "
+						UPDATE WeighingTerminal
+						SET last_receiptDate = '{$receipt_end}'
+						WHERE WT_ID = {$deviceID}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+					// Запоминаем ID последней регистрации
+					$query = "
+						UPDATE WeighingTerminal
+						SET last_transaction = {$nextID}
+						WHERE WT_ID = {$deviceID}
+					";
+					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				}
+			}
+
+			// Если это не последняя часть
+			if( $nums > $curnum ) {
+				read_transaction_LPP($ID, ++$curnum, $socket, $mysqli);
+			}
+		}
+	}
+	else { //Если CRC не совпали делаем попытку еще
+		read_transaction_LPP($ID, $curnum, $socket, $mysqli);
+	}
+}
+
 // Функция обновляет текст терминала
 function set_terminal_text($text, $socket, $mysqli) {
 	$text = str_pad($text, 24);

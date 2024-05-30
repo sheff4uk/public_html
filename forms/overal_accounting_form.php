@@ -189,7 +189,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Иначе очищаем форму
 			else {
 				$('#outcoming_form input[name="OA_ID"]').val('');
-				$('#outcoming_form table input[name="oa_date"]').val('');
+				$('#outcoming_form table input[name="oa_date"]').val('<?=date('Y-m-d')?>');
 				$('#outcoming_form table input[name="oa_cnt"]').val('');
 				$('#outcoming_form table select').val('');
 				$('#outcoming_form input[name="correction"]').prop('checked', 0);
@@ -231,7 +231,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 			// Иначе очищаем форму
 			else {
 				$('#incoming_form input[name="OA_ID"]').val('');
-				$('#incoming_form table input[name="oa_date"]').val('');
+				$('#incoming_form table input[name="oa_date"]').val('<?=date('Y-m-d')?>');
 				$('#incoming_form table input[name="oa_cnt"]').val('');
 				$('#incoming_form table select').val('');
 				$('#incoming_form input[name="correction"]').prop('checked', 0);
