@@ -53,23 +53,26 @@ if( isset($_POST["PB_ID"]) ) {
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				}
 
+				// Счетчик кассет в замесе
+				$cassette_counter = $_POST["fillings"];
+
 				// Записываем номера кассет
 				foreach ($_POST["cassette"][$key] as $k => $v) {
+					// Распределение недолива по кассетам
+					$cassette_counter--;
+					if( $underfilling > ($cassette_counter * $_POST["in_cassette"]) ) {
+						$underfilling_cassette = $underfilling - ($cassette_counter * $_POST["in_cassette"]);
+						$underfilling = ($cassette_counter * $_POST["in_cassette"]);
+					}
+					else {
+						$underfilling_cassette = 0;
+					}
+					
 					$query = "
 						INSERT INTO list__Filling
 						SET cassette = {$v}
 							,LB_ID = {$LB_ID}
-					";
-					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					// ID последней залитой кассеты
-					$LF_ID = mysqli_insert_id( $mysqli );
-				}
-				if( $underfilling > 0 ) {
-					// Записываем недоливы в последнюю кассету
-					$query = "
-						UPDATE list__Filling
-						SET underfilling = {$underfilling}
-						WHERE LF_ID = {$LF_ID}
+							,underfilling = {$underfilling_cassette}
 					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				}
@@ -114,25 +117,27 @@ if( isset($_POST["PB_ID"]) ) {
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				}
 
+				// Счетчик кассет в замесе
+				$cassette_counter = $_POST["fillings"];
+
 				// Редактируем номера кассет
 				foreach ($_POST["cassette"][$key] as $k => $v) {
+					// Распределение недолива по кассетам
+					$cassette_counter--;
+					if( $underfilling > ($cassette_counter * $_POST["in_cassette"]) ) {
+						$underfilling_cassette = $underfilling - ($cassette_counter * $_POST["in_cassette"]);
+						$underfilling = ($cassette_counter * $_POST["in_cassette"]);
+					}
+					else {
+						$underfilling_cassette = 0;
+					}
+
 					$query = "
 						UPDATE list__Filling
 						SET
 							cassette = {$v}
-							,underfilling = 0
+							,underfilling = {$underfilling_cassette}
 						WHERE LF_ID = {$k}
-					";
-					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-					// ID последней залитой кассеты
-					$LF_ID = $k;
-				}
-				if( isset($_POST["underfilling"][$key]) ) {
-					// Записываем недоливы в последнюю кассету
-					$query = "
-						UPDATE list__Filling
-						SET underfilling = {$underfilling}
-						WHERE LF_ID = {$LF_ID}
 					";
 					mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 				}

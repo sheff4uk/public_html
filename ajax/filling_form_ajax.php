@@ -198,7 +198,7 @@ if( $row["editable"] ) {
 					</td>
 				";
 			}
-			$fillings_cell .= "<td rowspan='{$per_batch}'><input type='number' min='0' max='{$in_cassette}' name='underfilling[{$subrow["LB_ID"]}]' value='{$subrow["underfilling"]}' style='width: 100%;' required></td>";
+			$fillings_cell .= "<td rowspan='{$per_batch}'><input type='number' min='0' max='".($in_cassette * $fillings)."' name='underfilling[{$subrow["LB_ID"]}]' value='{$subrow["underfilling"]}' style='width: 100%;' required></td>";
 
 			$html .= "
 				<tr class='batch_row' num='{$i}'>
@@ -248,7 +248,7 @@ if( $row["editable"] ) {
 				</td>
 			";
 		}
-		$fillings_cell .= "<td rowspan='{$per_batch}'><input type='number' min='0' max='{$in_cassette}' name='underfilling[n_{$i}]' style='width: 100%;' required></td>";
+		$fillings_cell .= "<td rowspan='{$per_batch}'><input type='number' min='0' max='".($in_cassette * $fillings)."' name='underfilling[n_{$i}]' style='width: 100%;' required></td>";
 
 		$html .= "
 			<tr class='batch_row' num='{$i}'>
