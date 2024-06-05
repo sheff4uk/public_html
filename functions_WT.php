@@ -390,7 +390,9 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 									,CWP_ID = {$goodsID}
 									,PN_ID = (SELECT PN_ID FROM factory WHERE F_ID = (SELECT F_ID FROM WeighingTerminal WHERE WT_ID = {$deviceID}))
 							";
-							mysqli_query( $mysqli, $query ) or die("Invalid query1: " .mysqli_error( $mysqli ));
+							echo $query;
+							die();
+							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						}
 						else {
 							// Иначе сторнируем
@@ -402,7 +404,7 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 								ORDER BY nextID DESC
 								LIMIT 1
 							";
-							mysqli_query( $mysqli, $query ) or die("Invalid query2: " .mysqli_error( $mysqli ));
+							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						}
 					}
 
