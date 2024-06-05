@@ -390,8 +390,6 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 									,CWP_ID = {$goodsID}
 									,PN_ID = (SELECT PN_ID FROM factory WHERE F_ID = (SELECT F_ID FROM WeighingTerminal WHERE WT_ID = {$deviceID}))
 							";
-							echo $query;
-							die();
 							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						}
 						else {
