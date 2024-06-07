@@ -21,7 +21,8 @@ if( !$_GET["date_to"] ) {
 		<title>Pallets report</title>
 		<link rel="stylesheet" type='text/css' href="js/ui/jquery-ui.css?v=2">
 		<link rel='stylesheet' type='text/css' href='css/style.css?v=23'>
-		<script src="https://kit.fontawesome.com/020f21ae61.js" crossorigin="anonymous"></script>
+		<!-- <script src="https://kit.fontawesome.com/020f21ae61.js" crossorigin="anonymous"></script> -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 		<link rel='stylesheet' type='text/css' href='plugins/jReject-master/css/jquery.reject.css'>
 		<script src="js/jquery-1.11.3.min.js"></script>
 		<script src="js/ui/jquery-ui.js"></script>

@@ -24,6 +24,8 @@ function src_url($src) {
 	<link rel='stylesheet' type='text/css' href='plugins/jReject-master/css/jquery.reject.css'>
 	<link rel='stylesheet' type='text/css' href='css/loading.css'>
 	<script src="https://kit.fontawesome.com/020f21ae61.js" crossorigin="anonymous"></script>
+	<!-- <link rel='stylesheet' type='text/css' href='fontawesome/css/fontawesome.css'> -->
+	<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> -->
 	<script src="js/jquery-1.11.3.min.js"></script>
 	<script src="js/ui/jquery-ui.js"></script>
 	<script src="js/script.js?v=6" type="text/javascript"></script>

@@ -276,7 +276,8 @@ if( isset($_POST["cardcode"]) ) {
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Учет рабочего времени</title>
-		<script src="https://kit.fontawesome.com/020f21ae61.js" crossorigin="anonymous"></script>
+		<!-- <script src="https://kit.fontawesome.com/020f21ae61.js" crossorigin="anonymous"></script> -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 		<script src="../js/jquery-1.11.3.min.js"></script>
 		<script src="../js/ui/jquery-ui.js"></script>
 	</head>
