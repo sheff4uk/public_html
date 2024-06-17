@@ -12,8 +12,6 @@ if( isset($_POST["ma_date"]) ) {
 	$MC_ID = $_POST["MC_ID"] ? $_POST["MC_ID"] : "NULL";
 	$invoice_number = trim($_POST["invoice_number"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["invoice_number"]))."'" : "NULL";
 	$car_number = trim($_POST["car_number"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["car_number"]))."'" : "NULL";
-	$batch_number = trim($_POST["batch_number"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["batch_number"]))."'" : "NULL";
-	$certificate_number = trim($_POST["certificate_number"]) ? "'".mysqli_real_escape_string($mysqli, convert_str($_POST["certificate_number"]))."'" : "NULL";
 	$ma_cnt = $_POST["ma_cnt"];
 	$ma_cost = $_POST["ma_cost"] ? $_POST["ma_cost"] : "NULL";
 
@@ -27,10 +25,9 @@ if( isset($_POST["ma_date"]) ) {
 				,MC_ID = {$MC_ID}
 				,invoice_number = {$invoice_number}
 				,car_number = {$car_number}
-				,batch_number = {$batch_number}
-				,certificate_number = {$certificate_number}
 				,ma_cnt = {$ma_cnt}
 				,ma_cost = {$ma_cost}
+				,USR_ID = {$_SESSION['id']}
 			WHERE MA_ID = {$_POST["MA_ID"]}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
@@ -48,10 +45,9 @@ if( isset($_POST["ma_date"]) ) {
 				,MC_ID = {$MC_ID}
 				,invoice_number = {$invoice_number}
 				,car_number = {$car_number}
-				,batch_number = {$batch_number}
-				,certificate_number = {$certificate_number}
 				,ma_cnt = {$ma_cnt}
 				,ma_cost = {$ma_cost}
+				,USR_ID = {$_SESSION['id']}
 		";
 		if( !mysqli_query( $mysqli, $query ) ) {
 			$_SESSION["error"][] = "Invalid query: ".mysqli_error( $mysqli );
@@ -68,6 +64,68 @@ if( isset($_POST["ma_date"]) ) {
 
 	// Перенаправление в журнал
 	exit ('<meta http-equiv="refresh" content="0; url=/material_accounting.php?date_from='.$ma_date.'&date_to='.$ma_date.'#'.$MA_ID.'">');
+}
+
+// Редактирование остатков
+if( isset($_POST["balance"]) ) {
+	session_start();
+
+	$F_ID = $_POST["F_ID"];
+	$MN_ID = $_POST["MN_ID"];
+	$balance = $_POST["balance"];
+
+	$query = "
+		SELECT mb_balance FROM material__Balance WHERE F_ID = {$F_ID} AND MN_ID = {$MN_ID}
+	";
+	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+	$row = mysqli_fetch_array($res);
+	$old_balance = $row["mb_balance"];
+
+	$query = "
+		INSERT INTO material__Arrival
+		SET ma_date = CURDATE()
+			,F_ID = {$F_ID}
+			,MN_ID = {$MN_ID}
+			,ma_cnt = {$balance} - {$old_balance}
+			,USR_ID = {$_SESSION['id']}
+	";
+	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+	// Перенаправление в журнал
+	exit ('<meta http-equiv="refresh" content="0; url='.$location.'">');
+}
+
+// Перемещение между участками
+if( isset($_POST["to_F_ID"]) ) {
+	session_start();
+
+	$F_ID = $_POST["F_ID"];
+	$MN_ID = $_POST["MN_ID"];
+	$ma_cnt = $_POST["ma_cnt"];
+	$to_F_ID = $_POST["to_F_ID"];
+
+	$query = "
+		INSERT INTO material__Arrival
+		SET ma_date = CURDATE()
+			,F_ID = {$F_ID}
+			,MN_ID = {$MN_ID}
+			,ma_cnt = ma_cnt - {$ma_cnt}
+			,USR_ID = {$_SESSION['id']}
+	";
+	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+	$query = "
+		INSERT INTO material__Arrival
+		SET ma_date = CURDATE()
+			,F_ID = {$to_F_ID}
+			,MN_ID = {$MN_ID}
+			,ma_cnt = ma_cnt + {$ma_cnt}
+			,USR_ID = {$_SESSION['id']}
+	";
+	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+	// Перенаправление в журнал
+	exit ('<meta http-equiv="refresh" content="0; url='.$location.'">');
 }
 
 // Сохранение/редактирование списка продукции
@@ -186,8 +244,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Перевозчик</th>
 						<th>№ттн, №тн</th>
 						<th>№ автомобиля</th>
-						<th>№ партии</th>
-						<th>№ сертификата качества</th>
 						<th>Кол-во</th>
 						<th>Стоимость</th>
 					</tr>
@@ -244,8 +300,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 						</td>
 						<td><input type='text' name='invoice_number' style="width: 100%;"></td>
 						<td><input type='text' id='car_number' name='car_number' style="width: 100%;" oninput="this.value = this.value.toUpperCase()"></td>
-						<td><input type='text' name='batch_number' style="width: 100%;"></td>
-						<td><input type='text' name='certificate_number' style="width: 100%;"></td>
 						<td><input type='number' min='0' step='0.01' name='ma_cnt' style="width: 100%;" required></td>
 						<td><input type='number' min='0' name='ma_cost' style="width: 100%;"></td>
 					</tr>
@@ -376,6 +430,86 @@ this.subbut.value='Подождите, пожалуйста!';">
 	</form>
 </div>
 
+<!-- Форма корректировки остатков сырья -->
+<div id='material_balance_form' title='Корректировка остатков сырья' style='display:none;'>
+	<form method='post' onsubmit="JavaScript:this.subbut.disabled=true;
+this.subbut.value='Подождите, пожалуйста!';">
+		<fieldset>
+			<input type="hidden" name="F_ID">
+			<input type="hidden" name="MN_ID">
+			<table style="width: 100%; table-layout: fixed;">
+				<thead>
+					<tr>
+						<th>Участок</th>
+						<th>Наименование продукции</th>
+						<th>Складской запас</th>
+					</tr>
+				</thead>
+				<tbody style="text-align: center;">
+					<tr>
+						<td><span name="f_name"></span></td>
+						<td><span name="material_name"></span></td>
+						<td><input type="number" min="0" step="0.01" name="balance" style="width: 100%;" required=""></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<div>
+			<hr>
+			<input type='submit' name="subbut" value='Записать' style='float: right;'>
+		</div>
+	</form>
+</div>
+
+<!-- Форма перемещения сырья между участками -->
+<div id='material_movement_form' title='Перемещение сырья между участками ' style='display:none;'>
+	<form method='post' onsubmit="JavaScript:this.subbut.disabled=true;
+this.subbut.value='Подождите, пожалуйста!';">
+		<fieldset>
+		<input type="hidden" name="F_ID">
+		<input type="hidden" name="MN_ID">
+		<table style="width: 100%; table-layout: fixed;">
+				<thead>
+					<tr>
+						<th>Участок отправления</th>
+						<th>Наименование продукции</th>
+						<th>Кол-во</th>
+						<th>Участок назначения</th>
+					</tr>
+				</thead>
+				<tbody style="text-align: center;">
+					<tr>
+						<td><span name="f_name"></span></td>
+						<td><span name="material_name"></span></td>
+						<td><input type='number' min='0' step='0.01' name='ma_cnt' style="width: 100%;" required></td>
+						<td>
+							<select name="to_F_ID" required>
+								<option value=""></option>
+								<?
+								$query = "
+									SELECT F_ID
+										,f_name
+									FROM factory
+									ORDER BY F_ID
+								";
+								$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+								while( $row = mysqli_fetch_array($res) ) {
+									echo "<option value='{$row["F_ID"]}'>{$row["f_name"]}</option>";
+								}
+								?>
+							</select>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<div>
+			<hr>
+			<input type='submit' name="subbut" value='Записать' style='float: right;'>
+		</div>
+	</form>
+</div>
+
 <script>
 	$(function() {
 		// Кнопка добавления
@@ -402,8 +536,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 				$('#material_arrival_form select[name="MC_ID"]').val(ma_data['MC_ID']);
 				$('#material_arrival_form input[name="invoice_number"]').val(ma_data['invoice_number']);
 				$('#material_arrival_form input[name="car_number"]').val(ma_data['car_number']);
-				$('#material_arrival_form input[name="batch_number"]').val(ma_data['batch_number']);
-				$('#material_arrival_form input[name="certificate_number"]').val(ma_data['certificate_number']);
 				$('#material_arrival_form input[name="ma_cnt"]').val(ma_data['ma_cnt']);
 				$('#material_arrival_form input[name="ma_cost"]').val(ma_data['ma_cost']);
 			}
@@ -419,6 +551,39 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#material_arrival_form').dialog({
 				resizable: false,
 				width: 1000,
+				modal: true,
+				closeText: 'Закрыть'
+			});
+
+			return false;
+		});
+
+		// Кнопка перемещения сырья между участками
+		$('.material_movement').click( function() {
+			// Проверяем сессию
+			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
+
+			var F_ID = $(this).attr("F_ID"),
+				MN_ID = $(this).attr("MN_ID"),
+				balance = $(this).attr("balance"),
+				f_name = $(this).attr("f_name"),
+				material_name = $(this).attr("material_name");
+
+			if( balance <= 0 ) {
+				balance = 0;
+			}
+
+			$('#material_movement_form input[name="F_ID"]').val(F_ID);
+			$('#material_movement_form input[name="MN_ID"]').val(MN_ID);
+			$('#material_movement_form input[name="ma_cnt"]').attr("max", balance);
+			$('#material_movement_form input[name="ma_cnt"]').val('');
+			$('#material_movement_form span[name="f_name"]').text(f_name);
+			$('#material_movement_form span[name="material_name"]').text(material_name);
+			$('#material_movement_form select[name="to_F_ID"]').val('');
+
+			$('#material_movement_form').dialog({
+				resizable: false,
+				width: 800,
 				modal: true,
 				closeText: 'Закрыть'
 			});
@@ -464,6 +629,33 @@ this.subbut.value='Подождите, пожалуйста!';">
 			$('#carrier_list_form').dialog({
 				resizable: false,
 				width: 1000,
+				modal: true,
+				closeText: 'Закрыть'
+			});
+
+			return false;
+		});
+
+		// Кнопка редактирования остатков
+		$('.edit_material_balance').click( function() {
+			// Проверяем сессию
+			$.ajax({ url: "check_session.php?script=1", dataType: "script", async: false });
+
+			var F_ID = $(this).attr("F_ID"),
+				MN_ID = $(this).attr("MN_ID"),
+				balance = $(this).attr("balance"),
+				f_name = $(this).attr("f_name"),
+				material_name = $(this).attr("material_name");
+
+			$('#material_balance_form input[name="F_ID"]').val(F_ID);
+			$('#material_balance_form input[name="MN_ID"]').val(MN_ID);
+			$('#material_balance_form input[name="balance"]').val(balance);
+			$('#material_balance_form span[name="f_name"]').text(f_name);
+			$('#material_balance_form span[name="material_name"]').text(material_name);
+
+			$('#material_balance_form').dialog({
+				resizable: false,
+				width: 600,
 				modal: true,
 				closeText: 'Закрыть'
 			});

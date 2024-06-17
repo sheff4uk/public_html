@@ -123,16 +123,6 @@ if( !$_GET["date_to"] ) {
 			<input type="text" name="CN" value="<?=$_GET["CN"]?>" class="<?=$_GET["CN"] ? "filtered" : ""?>">
 		</div>
 
-		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>№ партии:</span>
-			<input type="text" name="BN" value="<?=$_GET["BN"]?>" class="<?=$_GET["BN"] ? "filtered" : ""?>">
-		</div>
-
-		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
-			<span>№ сертификата качества:</span>
-			<input type="text" name="CEN" value="<?=$_GET["CEN"]?>" class="<?=$_GET["CEN"] ? "filtered" : ""?>">
-		</div>
-
 		<button style="float: right;">Фильтр</button>
 	</form>
 </div>
@@ -187,13 +177,15 @@ foreach ($_GET as &$value) {
 					<tr>
 						<th>Наименование</th>
 						<th>Количество, т</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 			<?
 			$query = "
 				SELECT MN.material_name
-					,ROUND(mb_balance, 3) balance
+					,ROUND(mb_balance, 2) balance
+					,MB.MN_ID
 				FROM material__Balance MB
 				JOIN material__Name MN ON MN.MN_ID = MB.MN_ID
 				WHERE F_ID = {$row["F_ID"]}
@@ -205,6 +197,10 @@ foreach ($_GET as &$value) {
 					<tr>\n
 						<td>{$subrow["material_name"]}</td>\n
 						<td>{$subrow["balance"]}</td>\n
+						<td>\n
+							<a href='#' class='edit_material_balance' F_ID='{$row["F_ID"]}' MN_ID='{$subrow["MN_ID"]}' f_name='{$row["f_name"]}' material_name='{$subrow["material_name"]}' balance='{$subrow["balance"]}' title='Коррекция остатка'><i class='fas fa-pencil-alt fa-lg'></i></a>\n
+							<a href='#' class='material_movement' F_ID='{$row["F_ID"]}' MN_ID='{$subrow["MN_ID"]}' f_name='{$row["f_name"]}' material_name='{$subrow["material_name"]}' balance='{$subrow["balance"]}' title='Перемещение между участками'><i class='fas fa-right-left fa-lg'></i></a>\n
+						</td>\n
 					</tr>\n
 				";
 			}
@@ -228,10 +224,9 @@ foreach ($_GET as &$value) {
 			<th>Перевозчик</th>
 			<th>№ттн, №тн</th>
 			<th>№ автомобиля</th>
-			<th>№ партии</th>
-			<th>№ сертификата качества</th>
 			<th>Кол-во, т</th>
 			<th>Стоимость</th>
+			<th>Автор</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -246,15 +241,15 @@ foreach ($_GET as &$value) {
 				,MC.carrier
 				,MA.invoice_number
 				,MA.car_number
-				,MA.batch_number
-				,MA.certificate_number
 				,MA.ma_cnt
 				,MA.ma_cost
-				,IF(MA.ma_date < CURDATE() - INTERVAL 1 MONTH, 0, 1) editable
+				,IF(MA.ma_date < CURDATE() - INTERVAL 1 MONTH , 0, 1) editable
+				,IF(MA.USR_ID, USR_Icon(MA.USR_ID), '') USR_Icon
+				,DATE_FORMAT(MA.last_edit, '%d.%m.%Y в %H:%i:%s') last_edit		
 			FROM material__Arrival MA
 			JOIN factory F ON F.F_ID = MA.F_ID
 			JOIN material__Name MN ON MN.MN_ID = MA.MN_ID
-			JOIN material__Supplier MS ON MS.MS_ID = MA.MS_ID
+			LEFT JOIN material__Supplier MS ON MS.MS_ID = MA.MS_ID
 			LEFT JOIN material__Carrier MC ON MC.MC_ID = MA.MC_ID
 			WHERE 1
 				".($_GET["F_ID"] ? "AND MA.F_ID = '{$_GET["F_ID"]}'" : "")."
@@ -265,8 +260,6 @@ foreach ($_GET as &$value) {
 				".($_GET["MC"] ? "AND MA.MC_ID = {$_GET["MC"]}" : "")."
 				".($_GET["IN"] ? "AND MA.invoice_number LIKE '%{$_GET["IN"]}%'" : "")."
 				".($_GET["CN"] ? "AND MA.car_number LIKE '%{$_GET["CN"]}%'" : "")."
-				".($_GET["BN"] ? "AND MA.batch_number LIKE '%{$_GET["BN"]}%'" : "")."
-				".($_GET["CEN"] ? "AND MA.certificate_number LIKE '%{$_GET["CEN"]}%'" : "")."
 			ORDER BY MA.ma_date, MA.MA_ID
 		";
 		$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -282,16 +275,18 @@ foreach ($_GET as &$value) {
 				<td><span class="nowrap"><?=$row["carrier"]?></span></td>
 				<td><?=$row["invoice_number"]?></td>
 				<td><?=$row["car_number"]?></td>
-				<td><?=$row["batch_number"]?></td>
-				<td><?=$row["certificate_number"]?></td>
-				<td><?=$row["ma_cnt"]?></td>
+				<td><?=round($row["ma_cnt"], 2)?></td>
 				<td><?=$row["ma_cost"]?></td>
+				<td><?=$row["USR_Icon"]?><?=($row["last_edit"] ? "<i class='fas fa-clock' title='Сохранено ".$row["last_edit"]."'.></i>" : "")?></td>
 				<td>
 				<?
-					if( $row["editable"] ) {
+					if( $row["supplier"] == null ) {
+						echo "Корректировка";
+					}
+					else if( $row["editable"] ) {
 						echo "<a href='#' class='add_material_arrival' MA_ID='{$row["MA_ID"]}' title='Редактировать'><i class='fa fa-pencil-alt fa-lg'></i></a>\n";
 					}
-				?>
+			?>
 				</td>
 			</tr>
 			<?
@@ -305,11 +300,10 @@ foreach ($_GET as &$value) {
 			<td></td>
 			<td></td>
 			<td></td>
-			<td></td>
-			<td></td>
 			<td>Итог:</td>
-			<td><?=$ma_cnt?></td>
+			<td><?=round($ma_cnt, 2)?></td>
 			<td><?=$ma_cost?></td>
+			<td></td>
 			<td></td>
 		</tr>
 	</tbody>
