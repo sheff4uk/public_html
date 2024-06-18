@@ -19,10 +19,10 @@ while( $row = mysqli_fetch_array($res) ) {
 	// Узнаем баланс материалов
 	$query = "
         SELECT MN.material_name
-            ,MB.mb_balance
+            ,ROUND(MB.mb_balance, 2) mb_balance
         FROM material__Balance MB
         JOIN material__Name MN ON MN.MN_ID = MB.MN_ID
-        WHERE F_ID = 1
+        WHERE F_ID = {$F_ID}
             AND MB.MN_ID = 1
 	";
 	$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
