@@ -100,7 +100,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 					if( abs($netWeight) >= 4000 and abs($netWeight) <= 14000 ) {
 						// Отмена регистрации
 						if( $netWeight < 0 ) {
-							if( $goodsID < 9000 ) {
+							//if( $goodsID < 9000 ) {
 								$query = "
 									DELETE FROM list__Weight
 									WHERE weight = ABS({$netWeight})
@@ -111,7 +111,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 									LIMIT 1
 								";
 								mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-							}
+							//}
 
 							// Меняем ID последней регистрации
 							$query = "
@@ -122,7 +122,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						}
 						else {
-							if( $goodsID < 9000 ) {
+							//if( $goodsID < 9000 ) {
 								// Записываем в базу регистрацию
 								$query = "
 									INSERT INTO list__Weight
@@ -136,7 +136,7 @@ function read_transaction_LW($ID, $curnum, $socket, $mysqli) {
 										weighing_time = '{$transactionDate}'
 								";
 								mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
-							}
+							//}
 
 							// Запоминаем ID последней регистрации
 							$query = "
