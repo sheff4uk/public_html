@@ -380,6 +380,18 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 					//if( $goodsID < 99000000 ) {
 						// Если количество положительное
 						if( $quantity > 0 ) {
+							if($goodsID == 99000000) {
+								$goodsID = 99;
+							}
+							if($goodsID == 99000001) {
+								$goodsID = 100;
+							}
+							if($goodsID == 99000002) {
+								$goodsID = 97;
+							}
+							if($goodsID == 99000002) {
+								$goodsID = 98;
+							}
 							// Записываем в базу регистрацию
 							$query = "
 								INSERT INTO list__PackingPallet
@@ -389,6 +401,8 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 									,F_ID = (SELECT F_ID FROM WeighingTerminal WHERE WT_ID = {$deviceID})
 									,CWP_ID = {$goodsID}
 									,PN_ID = (SELECT PN_ID FROM factory WHERE F_ID = (SELECT F_ID FROM WeighingTerminal WHERE WT_ID = {$deviceID}))
+								ON DUPLICATE KEY UPDATE
+									packed_time = '{$transactionDate}'
 							";
 							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						}
