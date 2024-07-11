@@ -377,7 +377,7 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 					$goodsID = $data[$i+37] + ($data[$i+38] << 8) + ($data[$i+39] << 16) + ($data[$i+40] << 24);
 
 					// Если не рейки
-					if( $goodsID < 99000000 ) {
+					//if( $goodsID < 99000000 ) {
 						// Если количество положительное
 						if( $quantity > 0 ) {
 							// Записываем в базу регистрацию
@@ -404,7 +404,7 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 							";
 							mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						}
-					}
+					//}
 
 
 					// Запоминаем ID последней регистрации
