@@ -380,17 +380,8 @@ function read_transaction_LPP($ID, $curnum, $socket, $mysqli) {
 					//if( $goodsID < 99000000 ) {
 						// Если количество положительное
 						if( $quantity > 0 ) {
-							if($goodsID == 99000000) {
-								$goodsID = 99;
-							}
-							if($goodsID == 99000001) {
-								$goodsID = 100;
-							}
-							if($goodsID == 99000002) {
-								$goodsID = 97;
-							}
-							if($goodsID == 99000002) {
-								$goodsID = 98;
+							if($goodsID == 99999998) {
+								$goodsID = 102;
 							}
 							// Записываем в базу регистрацию
 							$query = "
