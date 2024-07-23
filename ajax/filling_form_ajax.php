@@ -17,8 +17,8 @@ $query = "
 		,CONCAT(ROUND(MF.min_density/1000, 2), '&ndash;', ROUND(MF.max_density/1000, 2)) spec
 		,MF.water
 		,PB.calcium
-		,IF( IFNULL(PB.print_time, PB.change_time) < NOW() - INTERVAL 10 DAY, 0, 1 ) editable
-		#,1 editable
+		#,IF( IFNULL(PB.print_time, PB.change_time) < NOW() - INTERVAL 10 DAY, 0, 1 ) editable
+		,1 editable
 	FROM plan__Batch PB
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
 	JOIN MixFormula MF ON MF.CW_ID = CW.CW_ID AND MF.F_ID = PB.F_ID
