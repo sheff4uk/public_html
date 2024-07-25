@@ -80,15 +80,15 @@ while( $row = mysqli_fetch_array($res) ) {
     $dayly_avg = $subrow["dayly_avg"];
 
     $query = "
-        SELECT ROUND(SUM(LBM.quantity) * MN.adjustment / 30000, 2) weekly_avg
+        SELECT ROUND(SUM(LBM.quantity) * MN.adjustment / 12000, 2) weekly_avg
         FROM material__Name MN
         LEFT JOIN list__BatchMaterial LBM ON LBM.MN_ID = MN.MN_ID
             AND LBM.LB_ID IN (
                 SELECT LB_ID
                 FROM list__Batch
                 WHERE PB_ID IN (SELECT PB_ID FROM plan__Batch WHERE F_ID = {$F_ID})
-                    AND batch_date >= CURDATE() - INTERVAL 31 WEEK
-                    AND batch_date <= CURDATE() - INTERVAL 1 WEEK
+                    AND batch_date >= CURDATE() - INTERVAL 12 MONTH
+                    AND batch_date <= CURDATE() - INTERVAL 0 MONTH
             )
         WHERE MN.MN_ID = {$row["MN_ID"]}
     ";
