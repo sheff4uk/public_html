@@ -1,5 +1,4 @@
 <?
-// Скрипт выполняется каждый час
 $path = dirname(dirname($argv[0]));
 $key = $argv[1];
 include $path."/config.php";
