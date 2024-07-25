@@ -53,7 +53,7 @@ $message .= "
 $query = "
     SELECT MB.MN_ID
         ,MN.material_name
-        ,(SELECT SUM(ma_cnt) FROM material__Arrival WHERE F_ID = {$F_ID} AND MN_ID = MB.MN_ID AND ma_date = CURDATE()) income
+        ,(SELECT ROUND(SUM(ma_cnt), 2) FROM material__Arrival WHERE F_ID = {$F_ID} AND MN_ID = MB.MN_ID AND ma_date = CURDATE()) income
         ,ROUND(MB.mb_balance, 2) mb_balance
     FROM material__Balance MB
     JOIN material__Name MN ON MN.MN_ID = MB.MN_ID
