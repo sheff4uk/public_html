@@ -53,7 +53,8 @@ $query = "
 		#,ROUND(AVG(PB.fact_batches * PB.fillings / PB.per_batch * PB.in_cassette)) `often`
 		#,MAX(ROUND(PB.fact_batches * PB.fillings / PB.per_batch) * PB.in_cassette) `max`
 		,(
-			SELECT SUM(MixFormula.in_cassette)
+			#SELECT SUM(MixFormula.in_cassette)
+			SELECT MIN(MixFormula.in_cassette * MixFormula.need_cassette)
 			FROM Cassettes
 			JOIN MixFormula ON MixFormula.F_ID = Cassettes.F_ID
 				AND MixFormula.CW_ID = Cassettes.CW_ID
