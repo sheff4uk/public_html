@@ -163,6 +163,12 @@ function src_url($src) {
 		}
 	</script>
 
+	<style type="text/css" media="print">
+		.main_table td {
+			overflow: visible;
+		}
+	</style>
+
 <?
 	// Выводим собранные в сесии сообщения через noty
 	include "noty.php";
