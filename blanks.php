@@ -82,7 +82,7 @@ if( !in_array('blanks', $Rights) ) {
 		</a>
 	</section>
 	<section class="cell">
-		<a href="/files/Cube%20Test%20Report.pdf" class='print'>
+		<a href="/files/Cube%20Test%20Report.pdf?v=1" class='print'>
 			<p><i class="fas fa-file-pdf fa-5x"></i></p>
 			<p>Cube Test Report</p>
 		</a>
