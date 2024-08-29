@@ -35,7 +35,7 @@ if( !$_GET["date_to"] ) {
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Код противовеса:</span>
-			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
+			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
 				<?
 				$query = "
@@ -54,7 +54,7 @@ if( !$_GET["date_to"] ) {
 
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Клиент:</span>
-			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
+			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
 				<?
 				$query = "
@@ -66,6 +66,26 @@ if( !$_GET["date_to"] ) {
 				while( $row = mysqli_fetch_array($res) ) {
 					$selected = ($row["CB_ID"] == $_GET["CB_ID"]) ? "selected" : "";
 					echo "<option value='{$row["CB_ID"]}' {$selected}>{$row["brand"]}</option>";
+				}
+				?>
+			</select>
+		</div>
+
+		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
+			<span>Участок:</span>
+			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>">
+				<option value=""></option>
+				<?
+				$query = "
+					SELECT F_ID
+						,f_name
+					FROM factory
+					ORDER BY F_ID
+				";
+				$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+				while( $row = mysqli_fetch_array($res) ) {
+					$selected = ($row["F_ID"] == $_GET["F_ID"]) ? "selected" : "";
+					echo "<option value='{$row["F_ID"]}' {$selected}>{$row["f_name"]}</option>";
 				}
 				?>
 			</select>
@@ -150,6 +170,7 @@ $query = "
 		".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."
 		".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 		".($_GET["CB_ID"] ? "AND CW.CB_ID = {$_GET["CB_ID"]}" : "")."
+		".($_GET["F_ID"] ? "AND PB.F_ID = {$_GET["F_ID"]}" : "")."
 	GROUP BY DATE(LO.opening_time)
 	ORDER BY DATE(LO.opening_time) DESC
 ";
@@ -180,6 +201,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		WHERE DATE(LO.opening_time) LIKE '{$row["opening_date"]}'
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 			".($_GET["CB_ID"] ? "AND CW.CB_ID = {$_GET["CB_ID"]}" : "")."
+			".($_GET["F_ID"] ? "AND PB.F_ID = {$_GET["F_ID"]}" : "")."
 		GROUP BY PB.CW_ID
 		ORDER BY PB.CW_ID
 	";
@@ -263,6 +285,7 @@ if( $filter ) {
 			".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."
 			".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 			".($_GET["CB_ID"] ? "AND CW.CB_ID = {$_GET["CB_ID"]}" : "")."
+			".($_GET["F_ID"] ? "AND PB.F_ID = {$_GET["F_ID"]}" : "")."
 	";
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
@@ -293,6 +316,7 @@ if( $filter ) {
 				".($_GET["date_to"] ? "AND DATE(LO.opening_time) <= '{$_GET["date_to"]}'" : "")."
 				".($_GET["CW_ID"] ? "AND PB.CW_ID={$_GET["CW_ID"]}" : "")."
 				".($_GET["CB_ID"] ? "AND CW.CB_ID = {$_GET["CB_ID"]}" : "")."
+				".($_GET["F_ID"] ? "AND PB.F_ID = {$_GET["F_ID"]}" : "")."
 			GROUP BY PB.CW_ID
 			ORDER BY PB.CW_ID
 		";
