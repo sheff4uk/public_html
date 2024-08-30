@@ -56,9 +56,9 @@ $query = "
 		,DATE_FORMAT(LO.opening_time, '%d.%m.%Y %H:%i') opening_time_format
 		,LO.cassette
 		,CW.item
-		,SUM(1) details
-		,SUM(IF(LW.goodsID = 6, 1, NULL)) d_shell
-		,SUM(IF(LW.goodsID = 7, 1, NULL)) d_assembly
+		,SUM(PB.in_cassette - LF.underfilling) details
+		,SUM(LOD.def_form) d_shell
+		,SUM(LOD.def_assembly) d_assembly
 		,DATE_FORMAT(LA.assembling_time, '%d.%m.%Y %H:%i') assembling_time_format
 		,USR_Name(LA.assembling_master) assembling_master
 	FROM list__Opening LO
@@ -67,7 +67,7 @@ $query = "
 	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
 	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID AND PB.F_ID = 1
 	JOIN CounterWeight CW ON CW.CW_ID = PB.CW_ID
-	JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
+    LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	WHERE DATE(LO.opening_time - INTERVAL 7 HOUR) = CURDATE() - INTERVAL 1 DAY
 	GROUP BY LO.LO_ID
 	HAVING d_shell OR d_assembly

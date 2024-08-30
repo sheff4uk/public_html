@@ -45,16 +45,19 @@ $message = "
 
 $query = "
 	SELECT USR_Name(LA.assembling_master) `master`
-		,CONCAT(SUM(IF(LW.goodsID = 6, 1, 0)), ' (', ROUND(SUM(IF(LW.goodsID = 6, 1, 0)) / SUM(1) * 100, 2), '%)') def_shell
-		,CONCAT(SUM(IF(LW.goodsID = 7, 1, 0)), ' (', ROUND(SUM(IF(LW.goodsID = 7, 1, 0)) / SUM(1) * 100, 2), '%)') def_assembly
+    	,CONCAT(SUM(LOD.def_form), ' (', ROUND(SUM(LOD.def_form) / SUM(PB.in_cassette - LF.underfilling) * 100, 2), '%)') def_shell
+    	,CONCAT(SUM(LOD.def_assembly), ' (', ROUND(SUM(LOD.def_assembly) / SUM(PB.in_cassette - LF.underfilling) * 100, 2), '%)') def_assembly
 	FROM list__Assembling LA
 	JOIN list__Filling LF ON LF.LA_ID = LA.LA_ID
 	JOIN list__Opening LO ON LO.LF_ID = LF.LF_ID
-	JOIN list__Weight LW ON LW.LO_ID = LO.LO_ID
+	JOIN list__Batch LB ON LB.LB_ID = LF.LB_ID
+	JOIN plan__Batch PB ON PB.PB_ID = LB.PB_ID
+    LEFT JOIN list__Opening_def LOD ON LOD.LO_ID = LO.LO_ID
 	WHERE YEAR(LA.assembling_time) = {$year}
 		AND MONTH(LA.assembling_time) = {$month}
 		AND LA.assembling_master IS NOT NULL
-	GROUP BY LA.assembling_master";
+	GROUP BY LA.assembling_master
+";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query1: " .mysqli_error( $mysqli ));
 while( $row = mysqli_fetch_array($res) ) {
 	$message .= "
