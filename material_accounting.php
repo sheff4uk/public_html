@@ -176,33 +176,56 @@ foreach ($_GET as &$value) {
 				<thead>
 					<tr>
 						<th>Наименование</th>
-						<th>Количество, т</th>
+						<th>Количество</th>
 						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 			<?
 			$query = "
-				SELECT MN.material_name
-					,ROUND(mb_balance, 2) balance
-					,MB.MN_ID
+				SELECT M.company
+					,M.M_ID
+					,SUM(1) cnt
 				FROM material__Balance MB
 				JOIN material__Name MN ON MN.MN_ID = MB.MN_ID
-				WHERE F_ID = {$row["F_ID"]}
-				ORDER BY MN.material_name
+				JOIN Manufacturer M ON M.M_ID = MN.M_ID
+				WHERE MB.F_ID = {$row["F_ID"]}
+				GROUP BY MN.M_ID
+				ORDER BY MN.M_ID
 			";
 			$subres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 			while( $subrow = mysqli_fetch_array($subres) ) {
-				echo "
+				if( $subrow["cnt"] > 0 ) {
+					echo "
 					<tr>\n
-						<td>{$subrow["material_name"]}</td>\n
-						<td>{$subrow["balance"]}</td>\n
-						<td>\n
-							<a href='#' class='edit_material_balance' F_ID='{$row["F_ID"]}' MN_ID='{$subrow["MN_ID"]}' f_name='{$row["f_name"]}' material_name='{$subrow["material_name"]}' balance='{$subrow["balance"]}' title='Коррекция остатка'><i class='fas fa-pencil-alt fa-lg'></i></a>\n
-							<a href='#' class='material_movement' F_ID='{$row["F_ID"]}' MN_ID='{$subrow["MN_ID"]}' f_name='{$row["f_name"]}' material_name='{$subrow["material_name"]}' balance='{$subrow["balance"]}' title='Перемещение между участками'><i class='fas fa-right-left fa-lg'></i></a>\n
-						</td>\n
+						<td colspan='3' style='background-color: rgba(0, 0, 0, 0.2);'>{$subrow["company"]}</td>\n
 					</tr>\n
-				";
+					";
+
+					$query = "
+						SELECT MN.material_name
+							,ROUND(MB.mb_balance, 2) balance
+							,MB.MN_ID
+						FROM material__Balance MB
+						JOIN material__Name MN ON MN.MN_ID = MB.MN_ID
+						WHERE MB.F_ID = {$row["F_ID"]}
+							AND MN.M_ID = {$subrow["M_ID"]}
+						ORDER BY MN.material_name
+					";
+					$subsubres = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+					while( $subsubrow = mysqli_fetch_array($subsubres) ) {
+						echo "
+							<tr>\n
+								<td>{$subsubrow["material_name"]}</td>\n
+								<td>{$subsubrow["balance"]}</td>\n
+								<td>\n
+									<a href='#' class='edit_material_balance' F_ID='{$row["F_ID"]}' MN_ID='{$subsubrow["MN_ID"]}' f_name='{$row["f_name"]}' material_name='{$subsubrow["material_name"]}' balance='{$subsubrow["balance"]}' title='Коррекция остатка'><i class='fas fa-pencil-alt fa-lg'></i></a>\n
+									<a href='#' class='material_movement' F_ID='{$row["F_ID"]}' MN_ID='{$subsubrow["MN_ID"]}' f_name='{$row["f_name"]}' material_name='{$subsubrow["material_name"]}' balance='{$subsubrow["balance"]}' title='Перемещение между участками'><i class='fas fa-right-left fa-lg'></i></a>\n
+								</td>\n
+							</tr>\n
+						";
+					}	
+				}
 			}
 			?>
 				</tbody>
