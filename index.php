@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'КИС Константа главная';
 include "header.php";

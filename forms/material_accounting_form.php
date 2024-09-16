@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 include_once "../checkrights.php";
 
@@ -221,7 +221,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<span>Участок:</span>
 				<select name="F_ID" required>
 					<option value=""></option>
-					<?
+					<?php
 					$query = "
 						SELECT F_ID
 							,f_name
@@ -253,7 +253,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="MN_ID" style="width: 100%;" required>
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT MN.MN_ID, MN.material_name
 									FROM material__Name MN
@@ -269,7 +269,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="MS_ID" style="width: 100%;" required>
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT MS.MS_ID, MS.supplier
 									FROM material__Supplier MS
@@ -285,7 +285,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="MC_ID" style="width: 100%;">
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT MC.MC_ID, MC.carrier
 									FROM material__Carrier MC
@@ -325,7 +325,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					</tr>
 				</thead>
 				<tbody>
-					<?
+					<?php
 					$query = "SELECT MN_ID, material_name FROM material__Name ORDER BY material_name";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) )
@@ -364,7 +364,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					</tr>
 				</thead>
 				<tbody>
-					<?
+					<?php
 					$query = "SELECT MS_ID, supplier FROM material__Supplier ORDER BY supplier";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) )
@@ -403,7 +403,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					</tr>
 				</thead>
 				<tbody>
-					<?
+					<?php
 					$query = "SELECT MC_ID, carrier FROM material__Carrier ORDER BY carrier";
 					$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 					while( $row = mysqli_fetch_array($res) )
@@ -485,7 +485,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="to_F_ID" required>
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT F_ID
 										,f_name

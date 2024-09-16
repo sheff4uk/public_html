@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 include_once "../checkrights.php";
 
@@ -265,7 +265,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 								<option value=""></option>
 								<option value="F" class="fix">Ремонт</option>
 								<optgroup label="Возврат">
-									<?
+									<?php
 									$query = "
 										SELECT CB.CB_ID, CB.brand
 										FROM ClientBrand CB
@@ -278,7 +278,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 									?>
 								</optgroup>
 								<optgroup label="Приобретение">
-									<?
+									<?php
 									$query = "
 										SELECT PS.PS_ID
 											,PS.pallet_supplier
@@ -298,7 +298,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td class="pallet">
 							<select name="PN_ID" style="width: 200px;">
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT PN.PN_ID, PN.pallet_name
 									FROM pallet__Name PN
@@ -351,7 +351,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="PN_ID" style="width: 200px;" required>
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT PN.PN_ID, PN.pallet_name
 									FROM pallet__Name PN
@@ -367,7 +367,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="CB_ID" style="width: 200px;">
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT CB.CB_ID, CB.brand
 									FROM ClientBrand CB

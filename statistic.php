@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Статистика по браку';
 include "header.php";
@@ -37,7 +37,7 @@ if( !$_GET["date_to"] ) {
 			<span>Код противовеса:</span>
 			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CW.CW_ID, CW.item
 					FROM CounterWeight CW
@@ -56,7 +56,7 @@ if( !$_GET["date_to"] ) {
 			<span>Клиент:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CB.CB_ID, CB.brand
 					FROM ClientBrand CB
@@ -75,7 +75,7 @@ if( !$_GET["date_to"] ) {
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -95,7 +95,7 @@ if( !$_GET["date_to"] ) {
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -142,7 +142,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 // Получаем список дат и список расформованных деталей на эти даты
 $query = "
 	SELECT DATE(LO.opening_time) opening_date
@@ -376,6 +376,6 @@ if( $filter ) {
 	</tbody>
 </table>
 
-<?
+<?php
 include "footer.php";
 ?>

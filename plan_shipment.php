@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'График отгрузки';
 include "header.php";
@@ -34,7 +34,7 @@ $ps_data = array(); // Список паллет и их кол-во
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -53,7 +53,7 @@ $ps_data = array(); // Список паллет и их кол-во
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Неделя:</span>
 			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
 					UNION
@@ -104,7 +104,7 @@ $ps_data = array(); // Список паллет и их кол-во
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -142,7 +142,7 @@ foreach ($_GET as &$value) {
 			<th></th>
 		</tr>
 	</thead>
-<?
+<?php
 
 $query = "
 	SELECT SUM(1) cnt
@@ -252,7 +252,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	});
 </script>
 
-<?
+<?php
 include "./forms/plan_shipment_form.php";
 include "footer.php";
 ?>

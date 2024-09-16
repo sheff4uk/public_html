@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 $title = 'Отгрузка';
 
@@ -141,7 +141,7 @@ include "header.php";
 			});
 		</script>
 		<h3>Отсканируйте паллет</h3>
-			<?
+			<?php
 			if( $_GET["WT_ID"] ) {
 				$WT_ID = str_pad($_GET["WT_ID"], 8, "0", STR_PAD_LEFT);
 				$nextID = str_pad($_GET["nextID"], 8, "0", STR_PAD_LEFT);
@@ -157,7 +157,7 @@ include "header.php";
 			</fieldset>
 			<br>
 
-		<?
+		<?php
 		if( $_GET["WT_ID"] ) {
 			// Если было сканирование
 			$query = "
@@ -204,7 +204,7 @@ include "header.php";
 						<input type="hidden" name="WT_ID" value="<?=$_GET["WT_ID"]?>">
 						<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
 						<input type="submit" name="subbut" value="Из списка" style="background-color: red; font-size: 2em; color: white;">
-						<?
+						<?php
 					}
 				}
 				else {
@@ -217,7 +217,7 @@ include "header.php";
 						<input type="hidden" name="WT_ID" value="<?=$_GET["WT_ID"]?>">
 						<input type="hidden" name="nextID" value="<?=$_GET["nextID"]?>">
 						<input type="submit" name="subbut" value="В список" style="background-color: green; font-size: 2em; color: white;">
-					<?
+					<?php
 					}
 				}
 				echo "</form>\n";

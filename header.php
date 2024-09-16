@@ -1,4 +1,4 @@
-<?
+<?php
 //ini_set('display_errors', 1);
 //error_reporting(E_ALL);
 
@@ -169,7 +169,7 @@ function src_url($src) {
 		}
 	</style>
 
-<?
+<?php
 	// Выводим собранные в сесии сообщения через noty
 	include "noty.php";
 ?>
@@ -185,7 +185,7 @@ function src_url($src) {
 		<div class="navbar-header" id="main">
 			<a class="navbar-brand" href="/" title="На главную" style="position: relative;"><?=$company_name?> <sub>β</sub></a>
 		</div>
-<?
+<?php
 	if( !empty($_SESSION['id']) ) {
 		if( in_array('blanks', $Rights) ) {
 			$menu["Бланки"] = "blanks.php";

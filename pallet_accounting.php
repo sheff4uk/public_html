@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Учет поддонов';
 include "header.php";
@@ -77,7 +77,7 @@ include "./forms/pallet_accounting_form.php";
 			<span>Клиент:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CB.CB_ID, CB.brand
 					FROM ClientBrand CB
@@ -96,7 +96,7 @@ include "./forms/pallet_accounting_form.php";
 			<span>Поддон:</span>
 			<select name="PN_ID" class="<?=$_GET["PN_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT PN.PN_ID
 						,PN.pallet_name
@@ -116,7 +116,7 @@ include "./forms/pallet_accounting_form.php";
 			<span>Поставщик поддонов:</span>
 			<select name="PS_ID" class="<?=$_GET["PS_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT PS.PS_ID, PS.pallet_supplier
 					FROM pallet__Supplier PS
@@ -135,7 +135,7 @@ include "./forms/pallet_accounting_form.php";
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -182,7 +182,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT 'R' type
 		,PR.PR_ID ID
@@ -341,7 +341,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=(isset($row["sum_cost"]) ? number_format($row["sum_cost"], 0, '', ' ') : "")?></td>
 		<td><?=($row["type"] ? "<a href='#' ".($row["type"] == "D" ? "class='add_disposal' PD_ID='{$row["ID"]}'" : "class='add_incoming' incoming_ID='{$row["ID"]}' type='{$row["type"]}'")."><i class='fa fa-pencil-alt fa-lg'></i></a>" : "")?></td>
 	</tr>
-	<?
+	<?php
 }
 	if( isset($_GET["CB_ID"]) && isset($_GET["PN_ID"]) ) {
 		if( $_GET["CB_ID"] && $_GET["PN_ID"] && $pallets_shipment ) {
@@ -375,7 +375,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			</tr>
 		</thead>
 		<tbody>
-			<?
+			<?php
 			$query = "
 				SELECT PN.PN_ID
 					,PN.pallet_name
@@ -390,7 +390,7 @@ while( $row = mysqli_fetch_array($res) ) {
 						<td style="text-align: center;"><?=$row["pallet_name"]?></td>
 						<td style="text-align: center;"><?=$row["pn_balance"]?></td>
 					</tr>
-				<?
+				<?php
 			}
 			?>
 		</tbody>
@@ -408,7 +408,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			</tr>
 		</thead>
 		<tbody>
-			<?
+			<?php
 			$query = "
 				SELECT PCB.PN_ID
 					,PN.pallet_name
@@ -439,7 +439,7 @@ while( $row = mysqli_fetch_array($res) ) {
 						<td style="text-align: center;"><?=$row["pallet_name"]?></td>
 						<td style="text-align: center;"><?=$row["pallet_balance"]." шт, на сумму <b>".number_format(( $row["pallet_balance"] * $actual_pallet_cost ), 0, '', ' ')."</b> руб."?></td>
 					</tr>
-				<?
+				<?php
 			}
 			?>
 		</tbody>
@@ -449,6 +449,6 @@ while( $row = mysqli_fetch_array($res) ) {
 <div id="incoming_btn" class="add_incoming" title="Поступление поддонов"><i class="fas fa-2x fa-plus"></i></div>
 <div id="disposal_btn" class="add_disposal" title="Списание поддонов"><i class="fas fa-2x fa-minus"></i></div>
 
-<?
+<?php
 include "footer.php";
 ?>

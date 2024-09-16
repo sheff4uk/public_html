@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Склад противовесов';
 include "header.php";
@@ -136,7 +136,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -154,7 +154,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -244,7 +244,7 @@ foreach ($_GET as &$value) {
 			</tr>
 		</thead>
 		<tbody>
-		<?
+		<?php
 			$query = "
 				SELECT CONCAT(IFNULL(CW.item, CWP.cwp_name), ' (', CWP.in_pallet, 'шт)') item
 					,CWP.in_pallet
@@ -332,7 +332,7 @@ foreach ($_GET as &$value) {
 			</tr>
 		</thead>
 		<tbody>
-		<?
+		<?php
 			$query = "
 				SELECT DATE_FORMAT(LPP.shipment_time, '%d.%m.%Y %H:%i') shipment_time_format
 					,LPP.shipment_time
@@ -399,7 +399,7 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th>Время упаковки</th>
-			<?
+			<?php
 			$query = "
 				SELECT LPP.CWP_ID
 					,CONCAT(IFNULL(CW.item, CWP.cwp_name), ' (', CWP.in_pallet, 'шт)') item
@@ -423,7 +423,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center; font-size: 1px;">
 
-<?
+<?php
 $query = "
 	SELECT LPP.LPP_ID
 		,DATE_FORMAT(LPP.packed_time, '%d.%m.%Y %H:%i') packed_time_format
@@ -461,6 +461,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<?
+<?php
 include "footer.php";
 ?>

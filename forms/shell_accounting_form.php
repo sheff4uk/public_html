@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 
 // Сохранение/редактирование списания
@@ -162,7 +162,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="CW_ID" style="width: 100%;" required>
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT CW.CW_ID, CW.item
 									FROM CounterWeight CW
@@ -215,7 +215,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="CW_ID" style="width: 100%;" required>
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT CW.CW_ID, CW.item
 									FROM CounterWeight CW

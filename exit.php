@@ -1,4 +1,4 @@
-<?
+<?php
 	session_start();
 	// уничтожаем переменные в сессиях
 	unset($_SESSION['id']);

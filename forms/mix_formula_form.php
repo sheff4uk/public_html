@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 
 // Сохранение/редактирование рецепта
@@ -78,7 +78,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 		<fieldset>
 			<input type="hidden" name="MF_ID">
 			<input type="hidden" name="F_ID">
-			<?
+			<?php
 			$query = "
 				SELECT MN.MN_ID
 					,MN.material_name

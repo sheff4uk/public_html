@@ -1,4 +1,4 @@
-<?
+<?php
 $path = dirname(dirname($argv[0]));
 $key = $argv[1];
 $to = $argv[2];

@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../checkrights.php";
 
 $max_batches = 80; // Максимально возможное число замесов

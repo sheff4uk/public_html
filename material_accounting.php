@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Приемка сырья';
 include "header.php";
@@ -40,7 +40,7 @@ if( !$_GET["date_to"] ) {
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -60,7 +60,7 @@ if( !$_GET["date_to"] ) {
 			<span>Наименование продукции:</span>
 			<select name="MN" class="<?=$_GET["MN"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT MN.MN_ID, MN.material_name
 					FROM material__Name MN
@@ -79,7 +79,7 @@ if( !$_GET["date_to"] ) {
 			<span><a href="#" id="add_supplier_list">Поставщик:</a></span>
 			<select name="MS" class="<?=$_GET["MS"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT MS.MS_ID, MS.supplier
 					FROM material__Supplier MS
@@ -98,7 +98,7 @@ if( !$_GET["date_to"] ) {
 			<span><a href="#" id="add_carrier_list">Перевозчик:</a></span>
 			<select name="MC" class="<?=$_GET["MC"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT MC.MC_ID, MC.carrier
 					FROM material__Carrier MC
@@ -127,7 +127,7 @@ if( !$_GET["date_to"] ) {
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -161,7 +161,7 @@ foreach ($_GET as &$value) {
 <div id="summary">
 	<h3>Остатки сырья</h3>
 	<div>
-		<?
+		<?php
 		$query = "
 			SELECT F_ID
 				,f_name
@@ -181,7 +181,7 @@ foreach ($_GET as &$value) {
 					</tr>
 				</thead>
 				<tbody>
-			<?
+			<?php
 			$query = "
 				SELECT M.company
 					,M.M_ID
@@ -231,7 +231,7 @@ foreach ($_GET as &$value) {
 				</tbody>
 			</table>
 			</div>
-			<?
+			<?php
 		}
 		?>
 	</div>
@@ -254,7 +254,7 @@ foreach ($_GET as &$value) {
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
-		<?
+		<?php
 		$query = "
 			SELECT MA.MA_ID
 				,DATE_FORMAT(MA.ma_date,'%d.%m.%Y') ma_date_format
@@ -302,7 +302,7 @@ foreach ($_GET as &$value) {
 				<td><?=$row["ma_cost"]?></td>
 				<td><?=$row["USR_Icon"]?><?=($row["last_edit"] ? "<i class='fas fa-clock' title='Сохранено ".$row["last_edit"]."'.></i>" : "")?></td>
 				<td>
-				<?
+				<?php
 					if( $row["supplier"] == null ) {
 						echo "Корректировка";
 					}
@@ -312,7 +312,7 @@ foreach ($_GET as &$value) {
 			?>
 				</td>
 			</tr>
-			<?
+			<?php
 		}
 		?>
 
@@ -334,6 +334,6 @@ foreach ($_GET as &$value) {
 
 <div id="add_btn" class="add_material_arrival" title="Внести данные приемки сырья"></div>
 
-<?
+<?php
 include "footer.php";
 ?>

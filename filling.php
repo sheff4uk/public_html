@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Заливка';
 include "header.php";
@@ -35,7 +35,7 @@ if( !$_GET["F_ID"] ) {
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -54,7 +54,7 @@ if( !$_GET["F_ID"] ) {
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Неделя:</span>
 			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
 					UNION
@@ -105,7 +105,7 @@ if( !$_GET["F_ID"] ) {
 			<span>Код противовеса:</span>
 			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CW.CW_ID, CW.item
 					FROM CounterWeight CW
@@ -131,7 +131,7 @@ if( !$_GET["F_ID"] ) {
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -174,7 +174,7 @@ foreach ($_GET as &$value) {
 			<th>Куб раствора, кг</th>
 			<th>t, ℃ 22±8</th>
 
-			<?
+			<?php
 				$query = "
 					SELECT MN.MN_ID
 						,MN.material_name
@@ -206,7 +206,7 @@ foreach ($_GET as &$value) {
 		</tr>
 	</thead>
 
-<?
+<?php
 // Получаем список дат и противовесов и кол-во замесов на эти даты
 $query = "
 	SELECT PB.PB_ID
@@ -346,7 +346,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td><?=$subrow["mix_density"]/1000?> <?=$subrow["test"] ? "&nbsp;<i class='fas fa-cube'></i>" : ""?><?=($subrow["mix_diff"] ? "<font class='diff_alert'>".($subrow["mix_diff"] > 0 ? " +" : " ").($subrow["mix_diff"]/1000)."</font>" : "")?></td>
 				<td><?=$subrow["temp"]?><?=($subrow["temp_diff"] ? "<font class='diff_alert'>".($subrow["temp_diff"] > 0 ? " +" : " ").($subrow["temp_diff"])."</font>" : "")?></td>
 
-		<?
+		<?php
 			$query = "
 				SELECT LBM.quantity
 					,mix_ingredient_diff({$row["MF_ID"]}, MN.MN_ID, LBM.quantity) diff
@@ -365,7 +365,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<td style="background: #1e90ff85;"><?=$subrow["water"]?><?=($subrow["wt_diff"] ? "<font class='diff_alert'>".($subrow["wt_diff"])."</font>" : "")?></td>
 				<?=($j == 0 ? $cassette : "")?>
 				<td><?=$subrow["name"]?></td>
-				<?
+				<?php
 				// Выводим общую ячейку с кнопкой редактирования
 				if( $cnt ) {
 					echo "<td rowspan='{$cnt}'>\n";
@@ -377,7 +377,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				}
 				?>
 			</tr>
-		<?
+		<?php
 		$j++;
 		$j = ($j == $subrow["per_batch"] ? 0 : $j);
 	}
@@ -386,6 +386,6 @@ while( $row = mysqli_fetch_array($res) ) {
 ?>
 </table>
 
-<?
+<?php
 include "footer.php";
 ?>

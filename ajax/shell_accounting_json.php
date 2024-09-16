@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../checkrights.php";
 
 if( isset($_GET["SR_ID"]) ) {

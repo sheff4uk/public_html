@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 $ip = $_SERVER['REMOTE_ADDR'];
 // Узнаем участок
@@ -149,12 +149,12 @@ if( isset($_POST["cardcode"]) ) {
 			<input type="submit" name="subbut">
 		</form>
 
-		<?
+		<?php
 		if( isset($_GET["id"]) ) {
 			?>
 			<div id="shift_info" style="width: 100%; position: fixed;">
 				<form method="post">
-					<?
+					<?php
 						if( $_GET["id"] > 0 ) {
 							// Узнаем имя работника
 							$query = "
@@ -226,7 +226,7 @@ if( isset($_POST["cardcode"]) ) {
 									});
 								</script>
 
-							<?
+							<?php
 							}
 							else {
 								echo "<p class='title' style='color: #911;'>Регистрация не удалась!</p>";
@@ -246,7 +246,7 @@ if( isset($_POST["cardcode"]) ) {
 					</script>
 				</form>
 			</div>
-			<?
+			<?php
 		}
 		else {
 			?>
@@ -279,7 +279,7 @@ if( isset($_POST["cardcode"]) ) {
 				});
 			</script>
 			<div style="display: flex; flex-direction: row; flex-wrap: wrap; padding: 5px; margin: 5px;">
-			<?
+			<?php
 			// Выводим список зарегистрированных сегодня работников
 			$query = "
 				SELECT USR_Name(TS.USR_ID) `name`
@@ -298,7 +298,7 @@ if( isset($_POST["cardcode"]) ) {
 					<span style="-webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff; position: absolute; top: 10px; right: 10px;"><?=$row["tr_time"]?></span>
 					<span style="align-self: flex-end; margin: 10px; -webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff;"><?=$row["name"]?></span>
 				</div>
-				<?
+				<?php
 			}
 			?>
 			</div>
@@ -307,7 +307,7 @@ if( isset($_POST["cardcode"]) ) {
 					<h2>Приложите карту к считывателю</h2>
 				</form>
 			</div>
-			<?
+			<?php
 		}
 		?>
 	</body>

@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'История кассет';
 include "header.php";
@@ -14,7 +14,7 @@ if( !in_array('history', $Rights) ) {
 	<span>Код противовеса:</span>
 	<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;" onchange="this.form.submit()">
 		<option value="">Все коды</option>
-		<?
+		<?php
 		$query = "
 			SELECT CW.CW_ID, CW.item
 			FROM CounterWeight CW
@@ -29,7 +29,7 @@ if( !in_array('history', $Rights) ) {
 	</select>
 </form>
 
-<?
+<?php
 // Ранняя дата
 $query = "SELECT DATE_FORMAT(NOW() - INTERVAL 7 DAY, '%d.%m.%Y %H:%i') start";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
@@ -323,6 +323,6 @@ for ($i = 1; $i <= $cassetts; $i++) {
 
 </script>
 
-<?
+<?php
 include "footer.php";
 ?>

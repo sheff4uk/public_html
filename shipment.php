@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Отгрузка';
 include "header.php";
@@ -39,7 +39,7 @@ if( !$_GET["date_to"] ) {
 			<span>Код:</span>
 			<select name="CWP_ID" class="<?=$_GET["CWP_ID"] ? "filtered" : ""?>" style="width: 200px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CWP.CWP_ID
 						,IFNULL(CW.item, CWP.cwp_name) item
@@ -61,7 +61,7 @@ if( !$_GET["date_to"] ) {
 			<span>Продукт:</span>
 			<select name="product" class="<?=$_GET["product"] ? "filtered" : ""?>" style="width: 200px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CWP.product
 					FROM CounterWeightPallet CWP
@@ -81,7 +81,7 @@ if( !$_GET["date_to"] ) {
 			<span>Клиент:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CB.CB_ID, CB.brand
 					FROM ClientBrand CB
@@ -100,7 +100,7 @@ if( !$_GET["date_to"] ) {
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -144,7 +144,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT SUM(1) cnt
 		,DATE_FORMAT(LS.ls_date, '%d.%m.%y') ls_date_format
@@ -213,7 +213,7 @@ while( $row = mysqli_fetch_array($res) ) {
 				<a href='#' class='add_ps' LS_ID='<?=$subrow["LS_ID"]?>' title='Изменить данные плана отгрузки'><i class='fa fa-pencil-alt fa-lg'></i></a>
 			</td>
 		</tr>
-		<?
+		<?php
 
 	}
 ?>
@@ -225,7 +225,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=$row["details"]?></td>
 			<td></td>
 		</tr>
-<?
+<?php
 }
 ?>
 		<tr class="total">
@@ -248,6 +248,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	});
 </script>
 
-<?
+<?php
 include "footer.php";
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Учет дизтоплива';
 include "header.php";
@@ -111,7 +111,7 @@ echo "<h3>Баланс дизтоплива: <span style='font-size: 2em; color:
 			<span>Техника:</span>
 			<select name="FD_ID" class="<?=$_GET["FD_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT FD.FD_ID
 						,FD.fuel_device
@@ -132,7 +132,7 @@ echo "<h3>Баланс дизтоплива: <span style='font-size: 2em; color:
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -175,7 +175,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT 'F' type
 		,FF.FF_ID ID
@@ -244,7 +244,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["USR_Icon"]?><?=($row["last_edit"] ? "<i class='fas fa-clock' title='Сохранено ".$row["last_edit"]."'.></i>" : "")?></td>
 		<td><a href="#" <?=($row["last"] ? ($row["type"] == "A" ? "class='add_arrival' FA_ID='{$row["ID"]}'" : "class='add_filling' FF_ID='{$row["ID"]}'") : "style='display: none;'")?> title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
-	<?
+	<?php
 }
 ?>
 		<tr class="total">
@@ -273,6 +273,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	});
 </script>
 
-<?
+<?php
 include "footer.php";
 ?>

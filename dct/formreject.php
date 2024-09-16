@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 $ip = $_SERVER['REMOTE_ADDR'];
 if( $ip != $from_ip ) die("Access denied");
@@ -62,7 +62,7 @@ if( isset($_POST["SI_ID"]) ) {
 	<body>
 		<h3>Отсканируйте штрихкод</h3>
 		<h3>Или введите номер <form method="get"><input type="number" name="SI_ID"><input type="submit" value="->>"></form></h3>
-		<?
+		<?php
 		if( isset($_GET["SI_ID"]) ) {
 			$query = "
 				SELECT DATE_FORMAT(SA.sa_date, '%d.%m.%Y') sa_date_format
@@ -97,7 +97,7 @@ if( isset($_POST["SI_ID"]) ) {
 						<span style="color: red; font-size: .5em;">Это действие отменить невозможно!</span>
 					</form>
 				</fieldset>
-				<?
+				<?php
 			}
 
 			echo "Код формы: <b>{$row["item"]}</b><br>";

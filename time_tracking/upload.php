@@ -1,4 +1,4 @@
-<?
+<?php
 // new filename
 $filename = $_GET["tr_id"].'_'.date('YmdHis').'.jpeg';
 

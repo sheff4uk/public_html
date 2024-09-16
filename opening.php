@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Расформовка';
 include "header.php";
@@ -62,7 +62,7 @@ if( !$_GET["F_ID"] ) {
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -81,7 +81,7 @@ if( !$_GET["F_ID"] ) {
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Неделя:</span>
 			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
 					UNION
@@ -132,7 +132,7 @@ if( !$_GET["F_ID"] ) {
 			<span>Код противовеса:</span>
 			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CW.CW_ID, CW.item
 					FROM CounterWeight CW
@@ -154,7 +154,7 @@ if( !$_GET["F_ID"] ) {
 			<span>Клиент:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CB.CB_ID, CB.brand
 					FROM ClientBrand CB
@@ -173,7 +173,7 @@ if( !$_GET["F_ID"] ) {
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>№№ Кассет:</span>
 			<select name="CAS[]" class="<?=$_GET["CAS"] ? "filtered" : ""?>" style="width: 350px;" multiple>
-				<?
+				<?php
 				for ($i = 1; $i <= $cassetts; $i++) {
 					$selected = ( isset($_GET["CAS"]) && in_array($i, $_GET["CAS"]) ) ? "selected" : "";
 					echo "<option value='{$i}' {$selected}>{$i}</option>";
@@ -258,7 +258,7 @@ if( !$_GET["F_ID"] ) {
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -322,7 +322,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT LO.LO_ID
 		,DATE_FORMAT(LO.opening_time, '%d.%m.%y') o_date
@@ -436,7 +436,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		</td>
 -->
 	</tr>
-	<?
+	<?php
 	$o_date = $row["o_date"];
 }
 
@@ -472,13 +472,13 @@ if( $errors ) {
 		$('#errors').show('fast');
 	});
 </script>
-<?
+<?php
 }
 ?>
 
 	</tbody>
 </table>
 
-<?
+<?php
 include "footer.php";
 ?>

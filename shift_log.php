@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Журнал смен';
 include "header.php";
@@ -36,7 +36,7 @@ $F_ID = $_GET["F_ID"];
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -55,7 +55,7 @@ $F_ID = $_GET["F_ID"];
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Неделя:</span>
 			<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
 					UNION
@@ -106,7 +106,7 @@ $F_ID = $_GET["F_ID"];
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -142,7 +142,7 @@ foreach ($_GET as &$value) {
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
-	<?
+	<?php
 	// Узнаем первый день выбранной недели
 	$query = "
 		SELECT ADDDATE(CURDATE(), 0-WEEKDAY(CURDATE())) first_day
@@ -208,14 +208,14 @@ foreach ($_GET as &$value) {
 			<td><?=$subrow["master"]?></td>
 			<td><?=$subrow["operator"]?></td>
 			<td rowspan="<?=($num_rows ? $num_rows : 1)?>">
-				<?
+				<?php
 				if ($row["date_diff"] <= 0) {
 					echo "<a href='#' class='add_shift_log' f_id='{$F_ID}' day='{$row["next_day_format"]}' week='{$_GET["week"]}' title='Редактировать смены'><i class='fa fa-pencil-alt fa-lg'></i></a>";
 				}
 				?>
 			</td>
 		</tr>
-		<?
+		<?php
 		while( $subrow = mysqli_fetch_array($subres) ) {
 			?>
 			<tr>
@@ -223,13 +223,13 @@ foreach ($_GET as &$value) {
 				<td><?=$subrow["master"]?></td>
 				<td><?=$subrow["operator"]?></td>
 			</tr>
-			<?	
+			<?php	
 		}
 	}
 	?>
 	</tbody>
 </table>
 
-<?
+<?php
 include "footer.php";
 ?>

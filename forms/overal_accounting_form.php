@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 
 // Сохранение/редактирование операции
@@ -80,7 +80,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="OI_ID" style="width: 100%;" required>
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT OI.OI_ID
 										,OI.overal
@@ -134,7 +134,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="OI_ID" style="width: 100%;" required>
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT OI.OI_ID
 										,OI.overal

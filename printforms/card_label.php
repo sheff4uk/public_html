@@ -1,4 +1,4 @@
-<?
+<?php
 include "../config.php";
 ?>
 
@@ -54,7 +54,7 @@ include "../config.php";
 	</style>
 </head>
 <body>
-<?
+<?php
 	$query = "
 		SELECT USR_Name(USR_ID) name
 			,USR_Icon(USR_ID) icon
@@ -71,7 +71,7 @@ include "../config.php";
 		<span><?=$row["name"]?></span>
 		<div style="position: absolute; top: 15px; left: 10px; transform: scale(1.5);"><?=$row["icon"]?></div>
 	</div>
-<?
+<?php
 	}
 ?>
 </body>

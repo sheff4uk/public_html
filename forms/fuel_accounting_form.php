@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 
 // Сохранение/редактирование заправки
@@ -156,7 +156,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="FD_ID" style="width: 100%;" required>
 								<option value="" hm="0"></option>
-								<?
+								<?php
 								$query = "
 									SELECT FD.FD_ID
 										,FD.fuel_device

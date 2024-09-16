@@ -1,4 +1,4 @@
-<?
+<?php
 // Двоичная строка в массив отдельных байт
 function byteStr2byteArray($s) {
 	return array_slice(unpack("C*", "\0".$s), 1);

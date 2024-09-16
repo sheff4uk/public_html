@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Рецепты';
 include "header.php";
@@ -26,7 +26,7 @@ if( !$_GET["F_ID"] ) {
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -45,7 +45,7 @@ if( !$_GET["F_ID"] ) {
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -74,7 +74,7 @@ foreach ($_GET as &$value) {
 	<thead>
 		<tr>
 			<th>Противовес</th>
-<?
+<?php
 	$query = "
 		SELECT MN.MN_ID
 			,MN.material_name
@@ -98,7 +98,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT CW.CW_ID
 		,CW.item
@@ -114,7 +114,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	?>
 	<tr id="<?=$row["MF_ID"]?>">
 		<td><b><?=$row["item"]?></b></td>
-		<?
+		<?php
 		$query = "
 			SELECT MFM.quantity
 				,MN.color
@@ -133,13 +133,13 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td style="background: #1e90ff85;"><?=$row["water"]?></td>
 		<td><a href="#" class="add_formula" MF_ID="<?=$row["MF_ID"]?>" item="<?=$row["item"]?>" F_ID="<?=$_GET["F_ID"]?>" title="Изменить рецепт"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
-	<?
+	<?php
 }
 ?>
 
 	</tbody>
 </table>
 
-<?
+<?php
 include "footer.php";
 ?>

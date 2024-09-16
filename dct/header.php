@@ -59,7 +59,7 @@
 	<!-- NAVBAR -->
 	<nav class="navbar">
 		<div>
-<?
+<?php
 	$menu["Отгрузка"] = "shipment.php";
     $menu["Брак"] = "cwreject.php";
 

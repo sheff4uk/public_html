@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 
 // Сохранение/редактирование отгрузки
@@ -93,7 +93,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="CWP_ID" style="width: 150px;" required>
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT CWP.CWP_ID
 										,IFNULL(CW.item, CWP.cwp_name) item
@@ -112,7 +112,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td>
 							<select name="PN_ID" style="width: 150px;" required>
 								<option value=""></option>
-								<?
+								<?php
 								$query = "
 									SELECT PN.PN_ID
 										,PN.pallet_name

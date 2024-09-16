@@ -1,4 +1,4 @@
-<?
+<?php
 include "../config.php";
 ?>
 
@@ -60,7 +60,7 @@ include "../config.php";
 	</style>
 </head>
 <body>
-<?
+<?php
 	$count = 0;
 	for ($i = 1; $i <= 100; $i++) {
 		if( $count == 0 ) {
@@ -73,7 +73,7 @@ include "../config.php";
 			<span style="position: absolute; left: calc(50% - 150px); top: 0px; width: 300px; text-align: center; font-weight: bold; background: #fff; font-size: 60px; letter-spacing: 50px;"><?=$i?></span>
 			<img src="../barcode.php?code=<?=$code?>&w=1020&h=650" alt="barcode" style="position: absolute; top: 60px;">
 		</span>
-		<?
+		<?php
 		if( $count == 1 ) {
 			$count = 0;
 			echo "</div>";

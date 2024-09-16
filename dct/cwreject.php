@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 $title = 'Брак';
 
@@ -62,7 +62,7 @@ include "header.php";
 			});
 		</script>
 		<h3>Отсканируйте противовес</h3>
-		<?
+		<?php
 		if( isset($_GET["WT_ID"]) ) {
 			$WT_ID = str_pad($_GET["WT_ID"], 8, "0", STR_PAD_LEFT);
 			$nextID = str_pad($_GET["nextID"], 8, "0", STR_PAD_LEFT);
@@ -78,7 +78,7 @@ include "header.php";
 		</form>
 		<br>
 
-		<?
+		<?php
 		if( isset($_GET["WT_ID"]) ) {
 			$query = "
 				SELECT CW.item
@@ -127,7 +127,7 @@ include "header.php";
 					$('select[name="goodsID"]').val(<?=$row["goodsID"]?>);
 				});
 			</script>
-			<?
+			<?php
 
 			echo "Код: <b>{$row["item"]}</b><br>";
 			echo "Заливка: <b>{$row["filling_time_format"]}</b><br>";

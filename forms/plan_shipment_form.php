@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 
 // Сохранение/редактирование плана отгрузки
@@ -91,7 +91,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
-					<?
+					<?php
 					$query = "
 						SELECT CWP.CWP_ID
 							,IFNULL(CW.item, CWP.cwp_name) item
@@ -116,7 +116,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							</td>
 							<td><input type="number" class="amount" style="width: 70px;" readonly></td>
 						</tr>
-						<?
+						<?php
 					}
 					?>
 					<tr class="total">

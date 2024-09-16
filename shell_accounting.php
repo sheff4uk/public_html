@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Списание форм';
 include "header.php";
@@ -93,7 +93,7 @@ include "./forms/shell_accounting_form.php";
 			<span>Код противовеса:</span>
 			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CW.CW_ID, CW.item
 					FROM CounterWeight CW
@@ -112,7 +112,7 @@ include "./forms/shell_accounting_form.php";
 			<span>Клиент:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CB.CB_ID, CB.brand
 					FROM ClientBrand CB
@@ -131,7 +131,7 @@ include "./forms/shell_accounting_form.php";
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -179,7 +179,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT 'A' type
 		,SA.SA_ID ID
@@ -254,7 +254,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["chipped"]?></td>
 		<td><?=$row["batch"]?></td>
 		<td>
-			<?
+			<?php
 			if( $row["edit"] ) {
 				echo "<a href='#' ".($row["type"] == "A" ? "class='add_arrival' SA_ID='{$row["ID"]}'" : "class='add_reject' SR_ID='{$row["ID"]}'")." title='Редактировать'><i class='fa fa-pencil-alt fa-lg'></i></a>";
 			}
@@ -264,7 +264,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			?>
 		</td>
 	</tr>
-	<?
+	<?php
 }
 ?>
 		<tr class="total">
@@ -298,7 +298,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			</tr>
 		</thead>
 		<tbody>
-			<?
+			<?php
 			$query = "
 				SELECT CW.item
 					,CW.shell_balance
@@ -370,7 +370,7 @@ while( $row = mysqli_fetch_array($res) ) {
 						<td style="text-align: center; color: red;"><?=($need > 0 ? $need : "")?></td>
 						<td style="text-align: center;"><?=($days_max < 0 ? "" : $days_max)?></td>
 					</tr>
-				<?
+				<?php
 			}
 			?>
 		</tbody>
@@ -388,6 +388,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	});
 </script>
 
-<?
+<?php
 include "footer.php";
 ?>

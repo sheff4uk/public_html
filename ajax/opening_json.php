@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../checkrights.php";
 
 $LO_ID = $_GET["LO_ID"];

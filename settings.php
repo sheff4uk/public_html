@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 
 //Редактирование времени выдержки
@@ -43,7 +43,7 @@ if( !in_array('settings', $Rights) ) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT CB.CB_ID
 		,CB.brand
@@ -60,7 +60,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["holding_time_friendly"]?></td>
 		<td><a href="#" class="holding_time_edit" CB_ID="<?=$row["CB_ID"]?>" brand="<?=$row["brand"]?>" holding_time="<?=$row["holding_time"]?>" title="Редактировать"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
-	<?
+	<?php
 }
 ?>
 	</tbody>
@@ -125,6 +125,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	});
 </script>
 
-<?
+<?php
 include "footer.php";
 ?>

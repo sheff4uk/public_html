@@ -1,4 +1,4 @@
-<?
+<?php
 // new filename
 $filename = 'pic_'.date('YmdHis') . '.jpeg';
 

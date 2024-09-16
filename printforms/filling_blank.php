@@ -1,4 +1,4 @@
-<?
+<?php
 include "../config.php";
 ?>
 
@@ -10,7 +10,7 @@ include "../config.php";
 	<!-- <script src="https://kit.fontawesome.com/020f21ae61.js" crossorigin="anonymous"></script> -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-<?
+<?php
 $PB_ID = $_GET["PB_ID"];
 
 $query = "
@@ -147,7 +147,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 				<span style="position: absolute; background: white; left: calc(50% - 40px); top: 48px; width: 80px;"><?=str_pad($PB_ID, 8, "0", STR_PAD_LEFT)?></span>
 			</th>
 		</tr>
-<?
+<?php
 	// Формируем список зарезервированных кассет
 	$query = "
 		SELECT cassette
@@ -171,7 +171,7 @@ echo "<title>Чеклист оператора для {$item} цикл {$year}/{
 	</thead>
 </table>
 
-<?
+<?php
 // Данные рецепта
 $query = "
 	SELECT MN.material_name
@@ -201,7 +201,7 @@ $query = "
 			<th  rowspan="2">Масса куба раствора</th>
 			<th rowspan="3" width="30" style="border-right: 4px solid;">t, ℃ 22±8</th>
 
-<?
+<?php
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
 		echo "<th rowspan='{$row["rowspan"]}'>{$row["material_name"]}, кг</th>";
@@ -215,7 +215,7 @@ $query = "
 		</tr>
 		<tr>
 
-<?
+<?php
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
 		if ($row["checkbox_density"]) {
@@ -229,7 +229,7 @@ $query = "
 		<tr>
 			<th>Время<br>замеса</th>
 			<th class="nowrap"><?=$spec?> кг</th>
-<?
+<?php
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
 		echo "<th class='nowrap'>{$row["quantity"]}±{$row["admission"]}</th>";
@@ -240,7 +240,7 @@ $query = "
 		</tr>
 	</thead>
 	<tbody>
-<?
+<?php
 $fillings_cell = "<td rowspan='{$per_batch}' style='border-left: 4px solid;'></td>";
 for ($i = 1; $i <= $fillings; $i++) {
 	$fillings_cell .= "<td rowspan='{$per_batch}'></td>";

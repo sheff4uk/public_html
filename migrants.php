@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 include "checkrights.php";
 
@@ -86,7 +86,7 @@ if( !in_array('migrants', $Rights) ) {
 	}
 </style>
 
-<?
+<?php
 // Если не выбран участок, берем из сессии
 if( !$_GET["F_ID"] ) {
 	$_GET["F_ID"] = $_SESSION['F_ID'];
@@ -102,7 +102,7 @@ if( !$_GET["F_ID"] ) {
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -121,7 +121,7 @@ if( !$_GET["F_ID"] ) {
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -179,7 +179,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT USR.USR_ID
         ,USR_Icon(USR.USR_ID) icon
@@ -243,7 +243,7 @@ while( $row = mysqli_fetch_array($res) ) {
         <td colspan="2"><span><?=$row["comment"]?></span></td>
 		<td><a href="#" class="edit_migrant" usr="<?=$row["USR_ID"]?>" title='Изменить данные'><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
-	<?
+	<?php
 }
 ?>
 	</tbody>
@@ -347,7 +347,7 @@ while( $row = mysqli_fetch_array($res) ) {
 
 	$(function() {
 		// Автокомплит гражданства
-		<?
+		<?php
 			$query = "
 				SELECT MG.citizenship
 				FROM Migrants MG
@@ -372,7 +372,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		});
 
 		// Автокомплит должностей
-		<?
+		<?php
 			$query = "
 				SELECT MG.post
 				FROM Migrants MG
@@ -435,6 +435,6 @@ while( $row = mysqli_fetch_array($res) ) {
 
 </script>
 
-<?
+<?php
 include "footer.php";
 ?>

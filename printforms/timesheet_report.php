@@ -1,4 +1,4 @@
-<?
+<?php
 include "../config.php";
 ?>
 
@@ -7,7 +7,7 @@ include "../config.php";
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<?
+<?php
 //// Проверка прав на доступ к экрану
 //if( !in_array('timesheet', $Rights) ) {
 //	header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
@@ -99,7 +99,7 @@ echo "<title>Табель версия для печати</title>";
 		<tr class="nowrap">
 			<th colspan="2">Работник</th>
 			<th colspan="2">Тариф</th>
-			<?
+			<?php
 				// Получаем производственный календарь на выбранный год
 				$xml = simplexml_load_file("http://xmlcalendar.ru/data/ru/".$year."/calendar.xml");
 				$json = json_encode($xml);
@@ -131,7 +131,7 @@ echo "<title>Табель версия для печати</title>";
 		</tr>
 	</thead>
 	<tbody>
-	<?
+	<?php
 		// Суммарные результаты за день
 		$daypay = array();
 		$daycnt = array();
@@ -203,7 +203,7 @@ echo "<title>Табель версия для печати</title>";
 			<td colspan="2" style="font-size: .8em;" class="nowrap">
 				<?=$list_tariff?>
 			</td>
-			<?
+			<?php
 
 			// Получаем список начислений по работнику за месяц
 			$query = "

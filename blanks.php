@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Бланки';
 include "header.php";
@@ -189,6 +189,6 @@ if( !in_array('blanks', $Rights) ) {
 	});
 </script>
 
-<?
+<?php
 include "footer.php";
 ?>

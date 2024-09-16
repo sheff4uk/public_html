@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Статистика брака';
 include "header.php";
@@ -50,7 +50,7 @@ if( !$_GET["detailing"] ) {
 			<span>Код противовеса:</span>
 			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CW.CW_ID, CW.item
 					FROM CounterWeight CW
@@ -69,7 +69,7 @@ if( !$_GET["detailing"] ) {
 			<span>Клиент:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CB.CB_ID, CB.brand
 					FROM ClientBrand CB
@@ -88,7 +88,7 @@ if( !$_GET["detailing"] ) {
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -108,7 +108,7 @@ if( !$_GET["detailing"] ) {
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -145,7 +145,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT
 		".($_GET["detailing"] == "day" ? "DATE_FORMAT(LO.opening_time, '%d.%m.%Y') reject_date_format" : "")."
@@ -186,7 +186,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=($row["o_details"] > 0 ? round($row["o_reject"] / $row["o_details"] * 100, 2) : "")?></td>
 		<td><?=($row["o_reject"] * $row["CBD"])?></td>
 	</tr>
-	<?
+	<?php
 }
 ?>
 		<tr class="total">
@@ -199,6 +199,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<?
+<?php
 include "footer.php";
 ?>

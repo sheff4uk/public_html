@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../checkrights.php";
 
 $MA_ID = $_GET["MA_ID"];

@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 
 // Если в фильтре не установлен период, показываем последние 7 дней
@@ -77,7 +77,7 @@ if( !$_GET["date_to"] ) {
 					<span>Part-number:</span>
 					<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>">
 						<option value=""></option>
-						<?
+						<?php
 						$query = "
 							SELECT CW.CW_ID, CW.item
 							FROM CounterWeight CW
@@ -98,7 +98,7 @@ if( !$_GET["date_to"] ) {
 			</form>
 		</fieldset>
 
-		<?
+		<?php
 		// Узнаем есть ли фильтр
 		$filter = 0;
 		foreach ($_GET as &$value) {
@@ -128,7 +128,7 @@ if( !$_GET["date_to"] ) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT 'A' type
 		,DATE_FORMAT(SA.sa_date, '%d/%m/%Y') date_format
@@ -194,7 +194,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["crack"]?></td>
 		<td><?=$row["chipped"]?></td>
 	</tr>
-	<?
+	<?php
 }
 ?>
 		<tr class="total">
@@ -211,6 +211,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<?
+<?php
 include "footer.php";
 ?>

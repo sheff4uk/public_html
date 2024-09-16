@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Учет СИЗ';
 include "header.php";
@@ -131,7 +131,7 @@ include "./forms/overal_accounting_form.php";
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -158,7 +158,7 @@ include "./forms/overal_accounting_form.php";
 			<span>Наименование СИЗ:</span>
 			<select name="OI_ID" class="<?=$_GET["OI_ID"] ? "filtered" : ""?>">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT OI.OI_ID, OI.overal
 					FROM overal__Item OI
@@ -177,7 +177,7 @@ include "./forms/overal_accounting_form.php";
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -219,7 +219,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT OA.OA_ID
 		,DATE_FORMAT(OA.oa_date, '%d.%m.%Y') date_format
@@ -247,7 +247,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><b style="color: green;"><?=$row["incoming"]?></b></td>
 		<td><b><?=$row["outcoming"]?></b></td>
 		<td>
-			<?
+			<?php
 			if( $row["is_terminal"] == 0 ) {
 				echo "<a href='#' ".($row["incoming"] ? "class='add_incoming'" : "class='add_outcoming'")." OA_ID='".$row["OA_ID"]."' title='Редактировать'><i class='fa fa-pencil-alt fa-lg'></i></a>";
 			}
@@ -257,7 +257,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			?>
 		</td>
 	</tr>
-	<?
+	<?php
 }
 ?>
 		<tr class="total">
@@ -280,7 +280,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			</tr>
 		</thead>
 		<tbody>
-			<?
+			<?php
 			$query = "
 				SELECT OI.overal
 					,OB.oi_balance
@@ -297,7 +297,7 @@ while( $row = mysqli_fetch_array($res) ) {
 						<td><?=$row["overal"]?></td>
 						<td style="text-align: center;"><?=$row["oi_balance"]?></td>
 					</tr>
-				<?
+				<?php
 			}
 			?>
 		</tbody>
@@ -307,6 +307,6 @@ while( $row = mysqli_fetch_array($res) ) {
 <div id="incoming_btn" class="add_incoming" title="Приход СИЗ"><i class="fas fa-2x fa-plus"></i></div>
 <div id="outcoming_btn" class="add_outcoming" title="Выдача СИЗ"><i class="fas fa-2x fa-minus"></i></div>
 
-<?
+<?php
 include "footer.php";
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 include "checkrights.php";
 
@@ -258,7 +258,7 @@ if( !in_array('users', $Rights) ) {
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -278,7 +278,7 @@ if( !in_array('users', $Rights) ) {
 			<span>Тип:</span>
 			<select name="user_type" class="<?=($_GET["user_type"] != '') ? "filtered" : ""?>" onchange="this.form.submit()">
 				<option value=""></option>
-			<?
+			<?php
 				$query = "
 					SELECT USR.user_type
 					FROM Users USR
@@ -307,7 +307,7 @@ if( !in_array('users', $Rights) ) {
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -368,7 +368,7 @@ foreach ($_GET as &$value) {
 		</tr>
 	</thead>
 	<tbody style="text-align: center;">
-		<?
+		<?php
 		$usr_photo = array();
 
 		$query = "
@@ -501,7 +501,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<div>
 					<select name="F_ID" required>
 						<option value=""></option>
-						<?
+						<?php
 						$query = "SELECT F_ID, f_name FROM factory";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						while( $row = mysqli_fetch_array($res) ) {
@@ -516,7 +516,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 				<div>
 					<select name="RL_ID" required>
 						<option value=""></option>
-						<?
+						<?php
 						$query = "SELECT RL_ID, Role FROM Roles";
 						$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 						while( $row = mysqli_fetch_array($res) ) {
@@ -587,7 +587,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 
 	$(function() {
 		// Автокомплит типов в форме
-		<?
+		<?php
 			$query = "
 				SELECT USR.user_type
 				FROM Users USR
@@ -612,7 +612,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 		});
 
 		// Автокомплит постов в форме
-		<?
+		<?php
 			$query = "
 				SELECT USR.post
 				FROM Users USR
@@ -720,6 +720,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 	});
 
 </script>
-<?
+<?php
 include "footer.php";
 ?>

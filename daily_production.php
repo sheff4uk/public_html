@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Заливки по суткам';
 include "header.php";
@@ -36,7 +36,7 @@ if( !$_GET["date_to"] ) {
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -63,7 +63,7 @@ if( !$_GET["date_to"] ) {
 			<span>Код противовеса:</span>
 			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CW.CW_ID, CW.item
 					FROM CounterWeight CW
@@ -83,7 +83,7 @@ if( !$_GET["date_to"] ) {
 </div>
 
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -124,7 +124,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $batches = 0;
 $fillings = 0;
 $details = 0;
@@ -199,7 +199,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=($subrow["details"] - $subrow["underfilling"])?></td>
 			<td><?=$subrow["underfilling"]?></td>
 		</tr>
-		<?
+		<?php
 
 	}
 ?>
@@ -212,7 +212,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td><?=($row["details"] - $d_underfilling)?></td>
 			<td><?=$d_underfilling?></td>
 		</tr>
-<?
+<?php
 }
 ?>
 		<tr class="total">
@@ -228,6 +228,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<?
+<?php
 include "footer.php";
 ?>

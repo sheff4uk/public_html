@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../checkrights.php";
 
 // Возврат поддонов

@@ -1,4 +1,4 @@
-<?
+<?php
 include "../config.php";
 ?>
 
@@ -61,7 +61,7 @@ include "../config.php";
 </head>
 <body>
 	<div class="page">
-<?
+<?php
 	$count = 0;
 	$query = "
 		SELECT SI.SI_ID
@@ -84,7 +84,7 @@ include "../config.php";
 			<span style="position: absolute; left: 10px; text-align: center;"><?=substr($row["Item"], -3)?></span>
 			<span style="position: absolute; right: 10px; text-align: center;"><?=$row["sa_date_format"]?></span>
 		</span>
-		<?
+		<?php
 		if( $count == 40 ) {
 			$count = 0;
 			echo "</div><div class='page'>";

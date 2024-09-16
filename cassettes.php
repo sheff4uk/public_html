@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 
 // Запись принадлежности кассеты аяксом
@@ -102,7 +102,7 @@ if( !in_array('cassettes', $Rights) ) {
 </script>
 <h3>Чтобы изменить принадлежность кассеты, перетащите блок с номером кассеты в соответствующий контейнер.</h3>
 
-<?
+<?php
 $query = "
 	SELECT F_ID
 		,f_name
@@ -116,7 +116,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	<div style="position: relative; width: 100%; margin-bottom: 10px;">
 		<ul cw_id="0" class="connectedSortable" style="width: 100%;">
 			<div class="legend">Резерв</div>
-<?
+<?php
 			$cassette_num = 0;
 
 			$query = "
@@ -138,7 +138,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<span class="cassette_num"><?=$cassette_num?></span>
 	</div>
 
-<?
+<?php
 	$query = "
 		SELECT MF.CW_ID
 			,CW.item

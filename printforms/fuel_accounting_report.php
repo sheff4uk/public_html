@@ -1,4 +1,4 @@
-<?
+<?php
 include "../config.php";
 ?>
 
@@ -7,7 +7,7 @@ include "../config.php";
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<?
+<?php
 $date = date_create('-1 month');
 $year = date_format($date, 'Y');
 $month = date_format($date, 'm');
@@ -77,7 +77,7 @@ echo "<title>Журнал учета дизельного топлива {$date_
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT 'F' type
 		,FF.FF_ID ID
@@ -133,7 +133,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["hour_meter_value"]?></td>
 		<td><?=$row["hours_cnt"]?></td>
 	</tr>
-	<?
+	<?php
 }
 ?>
 		<tr class="total">
@@ -150,7 +150,7 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<?
+<?php
 // Узнаем баланс топлива на начало и конец месяца
 $query = "
 	SELECT SUM(FT.ft_balance) ft_balance

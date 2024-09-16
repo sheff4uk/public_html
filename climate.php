@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Климат';
 include "header.php";
@@ -35,7 +35,7 @@ $h2 = $row["h2"];
 <form method="get" style="font-size: 1.5em;">
 	<span>Неделя:</span>
 	<select name="week" class="<?=$_GET["week"] ? "filtered" : ""?>" onchange="this.form.submit()">
-		<?
+		<?php
 		$query = "
 			SELECT LEFT(YEARWEEK(CURDATE(), 1), 4) year
 			UNION
@@ -81,7 +81,7 @@ $h2 = $row["h2"];
 	</select>
 </form>
 
-<?
+<?php
 echo "<h2>Текущие показания: <span style='color: rgba(255, 100, 50, 1);' title='t_1'>{$t1}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(255, 200, 0, 1);' title='t_2'>{$t2}&#8451;</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(100, 100, 255, 1);' title='h_1'>{$h1}%</span>&nbsp;&nbsp;&nbsp;<span style='color: rgba(200, 0, 255, 1);' title='h_2'>{$h2}%</span></h2>";
 
 // Узнаем время начала и время окончания
@@ -146,7 +146,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		type: 'line',
 		data: {
 			labels: [ // Date Objects
-			<?
+			<?php
 				for ($i = 0; $i <= 6; $i++) {
 					echo "newDate(".($diff + $i)."),";
 				}
@@ -238,6 +238,6 @@ while( $row = mysqli_fetch_array($res) ) {
 
 </script>
 
-<?
+<?php
 include "footer.php";
 ?>

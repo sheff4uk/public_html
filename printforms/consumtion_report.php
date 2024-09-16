@@ -1,4 +1,4 @@
-<?
+<?php
 include "../config.php";
 ?>
 
@@ -7,7 +7,7 @@ include "../config.php";
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-<?
+<?php
 $date_from = date("d.m.Y", strtotime($_GET["date_from"]));
 $date_to = date("d.m.Y", strtotime($_GET["date_to"]));
 
@@ -99,7 +99,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 		<tr>
 			<th rowspan="2" colspan="3">Противовес</th>
 			<th rowspan="2">Кол-во залитых деталей</th>
-<?
+<?php
 	$query = "
 		SELECT MN.MN_ID
 			,MN.material_name
@@ -125,7 +125,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<th colspan="2" class="reinforcement">Арматура</th>
 		</tr>
 		<tr>
-<?
+<?php
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
 		echo "<th>Расход, кг</th>";
@@ -139,7 +139,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 		</tr>
 	</thead>
 	<tbody style="text-align: center;" class="nowrap">
-		<?
+		<?php
 		$query = "
 			SELECT CW.CW_ID
 				,CW.item
@@ -166,7 +166,7 @@ echo "<title>Расход сырья {$date_format}</title>";
 			<tr>
 				<td colspan="3"><b><?=$row["drawing_item"]?></b><br><i style="font-size: .8em;"><?=$row["item"]?></i></td>
 				<td><?=$row["details"]?></td>
-			<?
+			<?php
 			$query = "
 				SELECT SUM(LBM.quantity) * MN.adjustment quantity
 				FROM material__Name MN
@@ -196,14 +196,14 @@ echo "<title>Расход сырья {$date_format}</title>";
 				<td class="reinforcement"><?=round($row["reinforcement"] * $row["details"], 3)?></td>
 				<td class="reinforcement"><?=round($row["reinforcement"] * 1000, 3)?></td>
 			</tr>
-			<?
+			<?php
 		}
 		?>
 
 		<tr class="total">
 			<td colspan="3">Итог:</td>
 			<td><?=$details?></td>
-		<?
+		<?php
 		foreach ($quantity as $subvalue) {
 			echo "<td>".round($subvalue, 3)."</td>";
 			echo "<td></td>";

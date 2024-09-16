@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 //include "header.php";
 
@@ -66,7 +66,7 @@ if( !$_GET["date_to"] ) {
 
 		<div id="body_wraper" style="display: none;" class="page">
 
-<?
+<?php
 // Узнаем актуальную стоимость поддона
 $query = "
 	SELECT PA.pallet_cost
@@ -109,7 +109,7 @@ $pallet_balance = $row["pallet_balance"];
 			</form>
 		</fieldset>
 
-		<?
+		<?php
 		// Узнаем есть ли фильтр
 		$filter = 0;
 		foreach ($_GET as &$value) {
@@ -133,7 +133,7 @@ $pallet_balance = $row["pallet_balance"];
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT SUB.date_format
 		,SUM(SUB.pallets_shipment) pallets_shipment
@@ -174,7 +174,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["pallets_shipment"]?></td>
 		<td><?=$row["pr_cnt"]?></td>
 	</tr>
-	<?
+	<?php
 }
 ?>
 		<tr class="total">
@@ -185,6 +185,6 @@ while( $row = mysqli_fetch_array($res) ) {
 	</tbody>
 </table>
 
-<?
+<?php
 include "footer.php";
 ?>

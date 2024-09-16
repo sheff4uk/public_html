@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 
 // Сохранение/редактирование плана заливки
@@ -69,7 +69,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
-					<?
+					<?php
 					$query = "
 						SELECT CW.CW_ID
 							,CW.item
@@ -91,13 +91,13 @@ this.subbut.value='Подождите, пожалуйста!';">
 							<td><input type="number" name="fillings" class="fillings" style="width: 70px;" readonly></td>
 							<td><input type="number" name="details" class="details" style="width: 70px;" readonly></td>
 						</tr>
-						<?
+						<?php
 					}
 					?>
 					<tr class="total">
 						<td colspan="5"><b>Архив</b></td>
 					</tr>
-					<?
+					<?php
 					$query = "
 						SELECT CW.CW_ID
 							,CW.item
@@ -120,7 +120,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 							<td><input type="number" name="fillings" class="fillings" style="width: 70px;" readonly></td>
 							<td><input type="number" name="details" class="details" style="width: 70px;" readonly></td>
 						</tr>
-						<?
+						<?php
 					}
 					?>
 					<tr class="total">

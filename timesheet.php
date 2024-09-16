@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 include "checkrights.php";
 
@@ -176,7 +176,7 @@ $user_type = $_GET["user_type"];
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -195,7 +195,7 @@ $user_type = $_GET["user_type"];
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Месяц:</span>
 			<select name="month" class="<?=$_GET["month"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT YEAR(CURDATE()) year
 					UNION
@@ -242,7 +242,7 @@ $user_type = $_GET["user_type"];
 			<span>Тип:</span>
 			<select name="user_type" class="<?=($_GET["user_type"] != '') ? "filtered" : ""?>" onchange="this.form.submit()">
 				<option value=""></option>
-			<?
+			<?php
 				$query = "
 					SELECT USR.user_type
 					FROM Users USR
@@ -262,7 +262,7 @@ $user_type = $_GET["user_type"];
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -322,7 +322,7 @@ foreach ($_GET as &$value) {
 		<tr class="nowrap">
 			<th colspan="2">Работник</th>
 			<th colspan="2">Тариф</th>
-			<?
+			<?php
 				// Получаем из базы список выходных дней
 				$holidays = array();
 				$query = "
@@ -360,7 +360,7 @@ foreach ($_GET as &$value) {
 		</tr>
 	</thead>
 	<tbody>
-	<?
+	<?php
 		// Суммарные результаты за день
 		$daypay = array();
 		$daycnt = array();
@@ -451,7 +451,7 @@ foreach ($_GET as &$value) {
 			<td colspan="2" class='tariff_edit' tst_id='<?=$row["TST_ID"]?>' valid_from='<?=$row["valid_from"]?>' tariff='<?=$row["tariff"]?>' type='<?=$row["type"]?>' USR_ID='<?=$row["USR_ID"]?>' name='<?=$row["Name"]?>' style="overflow: hidden; cursor: pointer;<?=($list_tariff == '' ? " background: #f006;" : "")?>">
 				<a href='#'><?=$list_tariff?></a>
 			</td>
-			<?
+			<?php
 
 			// Получаем список начислений по работнику за месяц
 			$query = "
@@ -801,6 +801,6 @@ this.subbut.value='Подождите, пожалуйста!';">
 	});
 </script>
 
-<?
+<?php
 	include "footer.php";
 ?>

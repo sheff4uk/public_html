@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'График заливки';
 include "header.php";
@@ -94,7 +94,7 @@ $next_cycle = $row["next_cycle"];
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -113,7 +113,7 @@ $next_cycle = $row["next_cycle"];
 		<div class="nowrap" style="display: inline-block; margin-bottom: 10px; margin-right: 30px;">
 			<span>Год:</span>
 			<select name="year" class="<?=$_GET["year"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT YEAR(CURDATE()) year
 					UNION
@@ -136,7 +136,7 @@ $next_cycle = $row["next_cycle"];
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -182,7 +182,7 @@ foreach ($_GET as &$value) {
 		</tr>
 	</thead>
 
-<?
+<?php
 $batches = 0;
 $fillings = 0;
 $plan = 0;
@@ -274,7 +274,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		?>
 			<td><?=$subrow["item"]?></td>
 			<td colspan="2"><div style="transform: scale(.8);">
-				<?
+				<?php
 				// Журнал изменений кол-ва замесов
 				$query = "
 					SELECT batches
@@ -298,7 +298,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td class='bg-gray'><?=$subrow["underfilling"]?></td>
 <!--			<td class='bg-gray'><?=($intdiv > 0 ? $intdiv : "")?><?=($mod == 1 ? "&frac14;" : ($mod == 2 ? "&frac12;" : ($mod == 3 ? "&frac34;" : "")))?></td>-->
 			<td>
-				<?
+				<?php
 				if($subrow["printable"]) {
 					if( $subrow["PB_ID"] == $subrow["current_PB_ID"] ) {
 						echo "<a href='printforms/filling_blank.php?PB_ID={$subrow["PB_ID"]}' class='print' title='Бланк чеклиста оператора'><i class='fas fa-print fa-lg'></i></a>";
@@ -310,14 +310,14 @@ while( $row = mysqli_fetch_array($res) ) {
 				?>
 			</td>
 			<td class="nowrap" style="transform: scale(.8); overflow: unset;"><?=($subrow["friendly_print_date"] ? $subrow["icon_print_author"]." ".$subrow["friendly_print_date"]." ".$subrow["friendly_print_time"] : "")?></td>
-			<?
+			<?php
 			// Выводим общую ячейку с кнопками действий
 			if( $last_cycle != $row["cycle"] ) {
 				echo "<td rowspan='{$cnt}'><a href='#' class='add_pb' cycle='{$row["cycle"]}' year='{$_GET["year"]}' f_id='{$_GET["F_ID"]}' title='Изменить данные плана заливки'><i class='fa fa-pencil-alt fa-lg'></i></a></td>";
 			}
 			?>
 		</tr>
-		<?
+		<?php
 		$last_cycle = $row["cycle"];
 
 	}
@@ -341,7 +341,7 @@ while( $row = mysqli_fetch_array($res) ) {
 			<td></td>
 			<td></td>
 		</tr>
-<?
+<?php
 	echo "</tbody>";
 }
 if($w_batches > 0) {
@@ -387,6 +387,6 @@ else {
 	});
 </script>
 
-<?
+<?php
 include "footer.php";
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Протокол испытаний куба';
 include "header.php";
@@ -86,7 +86,7 @@ if( !$_GET["F_ID"] ) {
 				</tr>
 			</thead>
 			<tbody style="text-align: center;">
-		<?
+		<?php
 		$query = "
 			SELECT LB.LB_ID
 				,PB.CW_ID
@@ -143,7 +143,7 @@ if( !$_GET["F_ID"] ) {
 				<td><?=$row["delay"]?></td>
 				<td><a href="#" class="add_cubetest" LB_ID="<?=$row["LB_ID"]?>" delay="<?=$row["delay"]?>" test_date="<?=$row["test_date"]?>" title="Внести данные испытания куба"><i class="fa fa-plus-square fa-lg"></i></a></td>
 			</tr>
-			<?
+			<?php
 		}
 		?>
 			</tbody>
@@ -160,7 +160,7 @@ if( !$_GET["F_ID"] ) {
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -191,7 +191,7 @@ if( !$_GET["F_ID"] ) {
 			<span>Код противовеса:</span>
 			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CW.CW_ID, CW.item
 					FROM CounterWeight CW
@@ -219,7 +219,7 @@ if( !$_GET["F_ID"] ) {
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -268,7 +268,7 @@ foreach ($_GET as &$value) {
 	</thead>
 	<tbody style="text-align: center;">
 
-<?
+<?php
 $query = "
 	SELECT LCT.LCT_ID
 		,LCT.LB_ID
@@ -319,7 +319,7 @@ while( $row = mysqli_fetch_array($res) ) {
 		<td><?=$row["USR_Icon"]?><?=($row["last_edit"] ? "<i class='fas fa-clock' title='Сохранено ".$row["last_edit"]."'.></i>" : "")?></td>
 		<td><a href="#" class="add_cubetest" LCT_ID="<?=$row["LCT_ID"]?>" title="Изменить данные испытания куба"><i class="fa fa-pencil-alt fa-lg"></i></a></td>
 	</tr>
-	<?
+	<?php
 }
 ?>
 
@@ -340,6 +340,6 @@ while( $row = mysqli_fetch_array($res) ) {
 		});
 	});
 </script>
-<?
+<?php
 include "footer.php";
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 include "config.php";
 $title = 'Расход сырья';
 include "header.php";
@@ -56,7 +56,7 @@ if( !$_GET["date_to"] ) {
 		<div class="nowrap" style="margin-bottom: 10px;">
 			<span>Участок:</span>
 			<select name="F_ID" class="<?=$_GET["F_ID"] ? "filtered" : ""?>" onchange="this.form.submit()">
-				<?
+				<?php
 				$query = "
 					SELECT F_ID
 						,f_name
@@ -84,7 +84,7 @@ if( !$_GET["date_to"] ) {
 			<span>Код противовеса:</span>
 			<select name="CW_ID" class="<?=$_GET["CW_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CW.CW_ID, CW.item, CW.drawing_item
 					FROM CounterWeight CW
@@ -103,7 +103,7 @@ if( !$_GET["date_to"] ) {
 			<span>Бренд:</span>
 			<select name="CB_ID" class="<?=$_GET["CB_ID"] ? "filtered" : ""?>" style="width: 100px;">
 				<option value=""></option>
-				<?
+				<?php
 				$query = "
 					SELECT CB.CB_ID, CB.brand
 					FROM ClientBrand CB
@@ -123,7 +123,7 @@ if( !$_GET["date_to"] ) {
 	</form>
 </div>
 
-<?
+<?php
 // Узнаем есть ли фильтр
 $filter = 0;
 foreach ($_GET as &$value) {
@@ -154,7 +154,7 @@ foreach ($_GET as &$value) {
 			<th rowspan="2" colspan = "2">Противовес</th>
 			<th rowspan="2">Кол-во залитых деталей</th>
 			<th rowspan="2">Объем деталей, л</th>
-<?
+<?php
 	$query = "
 		SELECT MN.MN_ID
 			,MN.material_name
@@ -180,7 +180,7 @@ foreach ($_GET as &$value) {
 			<th colspan="2" class="reinforcement">Арматура</th>
 		</tr>
 		<tr>
-<?
+<?php
 	$res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 	while( $row = mysqli_fetch_array($res) ) {
 		echo "<th>Расход, кг</th>";
@@ -194,7 +194,7 @@ foreach ($_GET as &$value) {
 		</tr>
 	</thead>
 	<tbody style="text-align: center;" class="nowrap">
-		<?
+		<?php
 		$query = "
 			SELECT CW.CW_ID
 				,CW.item
@@ -226,7 +226,7 @@ foreach ($_GET as &$value) {
 				<td colspan="2" class="nowrap"><span style="font-size: 1.5em; font-weight: bold;"><?=$row["item"]?></span><br><i style="font-size: .8em;"><?=$row["drawing_item"]?></i></td>
 				<td><?=$row["details"]?></td>
 				<td><?=round($row["details"] * $row["drawing_volume"] / 1000, 3)?></td>
-			<?
+			<?php
 			$query = "
 				SELECT SUM(LBM.quantity) * MN.adjustment quantity
 					,MN.color
@@ -257,7 +257,7 @@ foreach ($_GET as &$value) {
 				<td style="background: #ffff6688;" class="reinforcement"><?=round($row["reinforcement"] * $row["details"], 3)?></td>
 				<td style="background: #ffff6688;" class="reinforcement"><?=round($row["reinforcement"] * 1000, 3)?></td>
 			</tr>
-			<?
+			<?php
 		}
 		?>
 
@@ -266,7 +266,7 @@ foreach ($_GET as &$value) {
 			<td>Итог:</td>
 			<td><?=$details?></td>
 			<td><?=round($drawing_volume / 1000, 3)?></td>
-		<?
+		<?php
 		foreach ($quantity as $subvalue) {
 			echo "<td>".round($subvalue, 3)."</td>";
 			echo "<td></td>";
@@ -293,6 +293,6 @@ foreach ($_GET as &$value) {
 	<?=($reinforcement ? "" : ".reinforcement{ display: none; }")?>
 </style>
 
-<?
+<?php
 include "footer.php";
 ?>

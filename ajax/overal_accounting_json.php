@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../checkrights.php";
 
 $OA_ID = $_GET["OA_ID"];

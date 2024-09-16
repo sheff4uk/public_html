@@ -1,4 +1,4 @@
-<?
+<?php
 include "../config.php";
 ?>
 
@@ -10,7 +10,7 @@ include "../config.php";
 	<!-- <script src="https://kit.fontawesome.com/020f21ae61.js" crossorigin="anonymous"></script> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-<?
+<?php
 $PS_ID = $_GET["PS_ID"];
 echo "<title>Накладная №{$PS_ID}</title>";
 ?>
@@ -51,7 +51,7 @@ echo "<title>Накладная №{$PS_ID}</title>";
 </head>
 <body>
 
-<?
+<?php
     // Получаем дату планируемой отгрузки
     $query = "
         SELECT DATE_FORMAT(PS.ps_date, '%d.%m.%Y') ps_date_format

@@ -1,4 +1,4 @@
-<?
+<?php
 include_once "../config.php";
 $ip = $_SERVER['REMOTE_ADDR'];
 // Узнаем участок
@@ -321,12 +321,12 @@ if( isset($_POST["cardcode"]) ) {
 			<input type="submit" name="subbut">
 		</form>
 
-		<?
+		<?php
 		if( isset($_GET["id"]) ) {
 			?>
 			<div id="shift_info" style="width: 100%; position: fixed;">
 				<form method="post">
-					<?
+					<?php
 						if( $_GET["id"] > 0 ) {
 							// Узнаем имя работника
 							$query = "
@@ -421,7 +421,7 @@ if( isset($_POST["cardcode"]) ) {
 									});
 								</script>
 
-								<?
+								<?php
 								if( isset($_GET["duration"]) ) {
 									if( $_GET["duration"] < 30 ) {
 										echo "<p class='title' style='color: #911;'>Продолжительность рабочего времени составила менее 30 минут.</p>";
@@ -442,7 +442,7 @@ if( isset($_POST["cardcode"]) ) {
 					</script>
 				</form>
 			</div>
-			<?
+			<?php
 		}
 		else {
 			?>
@@ -478,7 +478,7 @@ if( isset($_POST["cardcode"]) ) {
 				<h2>Приложите карту к считывателю</h2>
 			</div>
 			<div style="display: flex; flex-direction: row; flex-wrap: wrap;">
-			<?
+			<?php
 			// Получаем список активных смен
 			$query = "
 				SELECT TS.ts_date
@@ -535,7 +535,7 @@ if( isset($_POST["cardcode"]) ) {
 						<span style="-webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff; position: absolute; top: 10px; right: 10px;"><?=$subrow["tr_time"]?></span>
 						<span style="align-self: flex-end; margin: 10px; -webkit-filter: drop-shadow(0px 0px 2px #000); filter: drop-shadow(0px 0px 2px #000); color: #fff;"><?=$subrow["name"]?></span>
 					</div>
-					<?
+					<?php
 				}
 				if( $total > 0 ) {
 					echo "<div style='display: flex; background-color: #fdce46bf; box-shadow: 0px 5px 5px 0px rgb(0 0 0 / 30%); border-radius: 5px; margin: 10px;'>";
@@ -552,7 +552,7 @@ if( isset($_POST["cardcode"]) ) {
 
 			?>
 			</div>
-			<?
+			<?php
 		}
 		?>
 	</body>
