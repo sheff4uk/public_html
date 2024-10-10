@@ -285,7 +285,7 @@ foreach ($_GET as &$value) {
 					,0
 					,0
 					,0
-					,ROUND(SUM(IF((SELECT LF_ID FROM list__Filling WHERE cassette = LF.cassette AND filling_time > LF.filling_time LIMIT 1) IS NULL, (PB.in_cassette - LF.underfilling), 0)) / CWP.in_pallet) in_cass
+					,FLOOR(SUM(IF((SELECT LF_ID FROM list__Filling WHERE cassette = LF.cassette AND filling_time > LF.filling_time LIMIT 1) IS NULL, (PB.in_cassette - LF.underfilling), 0)) / CWP.in_pallet) in_cass
 					,SUM(IF((SELECT LF_ID FROM list__Filling WHERE cassette = LF.cassette AND filling_time > LF.filling_time LIMIT 1) IS NULL, (PB.in_cassette - LF.underfilling), 0)) in_cassette
 					FROM CounterWeightPallet CWP
 					JOIN plan__Batch PB ON PB.CW_ID = CWP.CW_ID
