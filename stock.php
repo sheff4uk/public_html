@@ -92,19 +92,27 @@ if( isset($_GET["download"]) ) {
 	exit ('<meta http-equiv="refresh" content="0; url=/stock.php?F_ID='.$_GET["F_ID"].'">');
 }
 
-// Узнаем время упаковки самого старого поддона на складе
-// $query = "
-// 	SELECT IFNULL(DATE(MIN(LPP.packed_time)), CURDATE()) date_from
-// 	FROM list__PackingPallet LPP
-// 	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
-// 	LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
-// 	WHERE LPP.shipment_time IS NULL
-// 		AND LPP.removal_time IS NULL
-// 		AND LPP.F_ID = {$_GET["F_ID"]}
-// 		AND IFNULL(CW.CB_ID, 0) != 5
-// ";
+//Удаляем неотгруженные регистрации старше 2-х месяцев
 $query = "
-	SELECT CURDATE() - INTERVAL 2 month date_from
+	UPDATE list__PackingPallet
+	SET removal_time = CURDATE()
+	WHERE F_ID = {$_GET["F_ID"]}
+		AND scan_time IS NULL
+		AND shipment_time IS NULL
+		AND packed_time < CURDATE() - INTERVAL 2 month
+";
+mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+// Узнаем время упаковки самого старого поддона на складе
+$query = "
+	SELECT IFNULL(DATE(MIN(LPP.packed_time)), CURDATE()) date_from
+	FROM list__PackingPallet LPP
+	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+	LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+	WHERE LPP.shipment_time IS NULL
+		AND LPP.removal_time IS NULL
+		AND LPP.F_ID = {$_GET["F_ID"]}
+		AND IFNULL(CW.CB_ID, 0) != 5
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
