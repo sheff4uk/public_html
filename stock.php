@@ -93,15 +93,18 @@ if( isset($_GET["download"]) ) {
 }
 
 // Узнаем время упаковки самого старого поддона на складе
+// $query = "
+// 	SELECT IFNULL(DATE(MIN(LPP.packed_time)), CURDATE()) date_from
+// 	FROM list__PackingPallet LPP
+// 	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
+// 	LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
+// 	WHERE LPP.shipment_time IS NULL
+// 		AND LPP.removal_time IS NULL
+// 		AND LPP.F_ID = {$_GET["F_ID"]}
+// 		AND IFNULL(CW.CB_ID, 0) != 5
+// ";
 $query = "
-	SELECT IFNULL(DATE(MIN(LPP.packed_time)), CURDATE()) date_from
-	FROM list__PackingPallet LPP
-	JOIN CounterWeightPallet CWP ON CWP.CWP_ID = LPP.CWP_ID
-	LEFT JOIN CounterWeight CW ON CW.CW_ID = CWP.CW_ID
-	WHERE LPP.shipment_time IS NULL
-		AND LPP.removal_time IS NULL
-		AND LPP.F_ID = {$_GET["F_ID"]}
-		AND IFNULL(CW.CB_ID, 0) != 5
+	SELECT CURDATE() - INTERVAL 2 month date_from
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 $row = mysqli_fetch_array($res);
