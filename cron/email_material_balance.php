@@ -56,7 +56,7 @@ $query = "
         ,MN.material_name
         ,(SELECT ROUND(SUM(ma_cnt), 2) FROM material__Arrival WHERE F_ID = {$F_ID} AND MN_ID = MB.MN_ID AND ma_date = CURDATE()) income
         ,ROUND(MB.mb_balance, 2) mb_balance
-        ,IF(MB.MN_ID = 16, FLOOR(MB.mb_balance * 30 / 1875), IF(MB.MN_ID = 17, FLOOR(MB.mb_balance * 220 / 5000), NULL)) inDays
+        ,FLOOR(MB.mb_balance / MB.daily_consumption) inDays
     FROM material__Balance MB
     JOIN material__Name MN ON MN.MN_ID = MB.MN_ID
     WHERE MB.F_ID = {$F_ID}

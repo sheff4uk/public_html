@@ -73,6 +73,7 @@ if( isset($_POST["balance"]) ) {
 	$F_ID = $_POST["F_ID"];
 	$MN_ID = $_POST["MN_ID"];
 	$balance = $_POST["balance"];
+	$daily_consumption = $_POST["daily_consumption"] ? $_POST["daily_consumption"] : "NULL";
 
 	$query = "
 		SELECT mb_balance FROM material__Balance WHERE F_ID = {$F_ID} AND MN_ID = {$MN_ID}
@@ -88,6 +89,13 @@ if( isset($_POST["balance"]) ) {
 			,MN_ID = {$MN_ID}
 			,ma_cnt = {$balance} - {$old_balance}
 			,USR_ID = {$_SESSION['id']}
+	";
+	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
+	$query = "
+		UPDATE material__Balance
+		SET daily_consumption = {$daily_consumption}
+		WHERE F_ID = {$F_ID} AND MN_ID = {$MN_ID}
 	";
 	mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
 
@@ -443,6 +451,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<th>Участок</th>
 						<th>Наименование продукции</th>
 						<th>Складской запас</th>
+						<th>Ежедневный расход</th>
 					</tr>
 				</thead>
 				<tbody style="text-align: center;">
@@ -450,6 +459,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td><span name="f_name"></span></td>
 						<td><span name="material_name"></span></td>
 						<td><input type="number" min="0" step="0.01" name="balance" style="width: 100%;" required=""></td>
+						<td><input type="number" min="0" step="0.01" name="daily_consumption" style="width: 100%;"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -644,12 +654,14 @@ this.subbut.value='Подождите, пожалуйста!';">
 			var F_ID = $(this).attr("F_ID"),
 				MN_ID = $(this).attr("MN_ID"),
 				balance = $(this).attr("balance"),
+				daily_consumption = $(this).attr("daily_consumption"),
 				f_name = $(this).attr("f_name"),
 				material_name = $(this).attr("material_name");
 
 			$('#material_balance_form input[name="F_ID"]').val(F_ID);
 			$('#material_balance_form input[name="MN_ID"]').val(MN_ID);
 			$('#material_balance_form input[name="balance"]').val(balance);
+			$('#material_balance_form input[name="daily_consumption"]').val(daily_consumption);
 			$('#material_balance_form span[name="f_name"]').text(f_name);
 			$('#material_balance_form span[name="material_name"]').text(material_name);
 

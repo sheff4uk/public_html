@@ -177,6 +177,7 @@ foreach ($_GET as &$value) {
 					<tr>
 						<th>Наименование</th>
 						<th>Количество</th>
+						<th>Запас в днях</th>
 						<th></th>
 					</tr>
 				</thead>
@@ -198,13 +199,15 @@ foreach ($_GET as &$value) {
 				if( $subrow["cnt"] > 0 ) {
 					echo "
 					<tr>\n
-						<td colspan='3' style='background-color: rgba(0, 0, 0, 0.2);'>{$subrow["company"]}</td>\n
+						<td colspan='4' style='background-color: rgba(0, 0, 0, 0.2);'>{$subrow["company"]}</td>\n
 					</tr>\n
 					";
 
 					$query = "
 						SELECT MN.material_name
 							,ROUND(MB.mb_balance, 2) balance
+							,FLOOR(MB.mb_balance / MB.daily_consumption) inDays
+							,MB.daily_consumption
 							,MB.MN_ID
 						FROM material__Balance MB
 						JOIN material__Name MN ON MN.MN_ID = MB.MN_ID
@@ -218,8 +221,9 @@ foreach ($_GET as &$value) {
 							<tr>\n
 								<td>{$subsubrow["material_name"]}</td>\n
 								<td>{$subsubrow["balance"]}</td>\n
+								<td>{$subsubrow["inDays"]}</td>\n
 								<td>\n
-									<a href='#' class='edit_material_balance' F_ID='{$row["F_ID"]}' MN_ID='{$subsubrow["MN_ID"]}' f_name='{$row["f_name"]}' material_name='{$subsubrow["material_name"]}' balance='{$subsubrow["balance"]}' title='Коррекция остатка'><i class='fas fa-pencil-alt fa-lg'></i></a>\n
+									<a href='#' class='edit_material_balance' F_ID='{$row["F_ID"]}' MN_ID='{$subsubrow["MN_ID"]}' f_name='{$row["f_name"]}' material_name='{$subsubrow["material_name"]}' balance='{$subsubrow["balance"]}' daily_consumption='{$subsubrow["daily_consumption"]}' title='Коррекция остатка'><i class='fas fa-pencil-alt fa-lg'></i></a>\n
 									<a href='#' class='material_movement' F_ID='{$row["F_ID"]}' MN_ID='{$subsubrow["MN_ID"]}' f_name='{$row["f_name"]}' material_name='{$subsubrow["material_name"]}' balance='{$subsubrow["balance"]}' title='Перемещение между участками'><i class='fas fa-right-left fa-lg'></i></a>\n
 								</td>\n
 							</tr>\n
