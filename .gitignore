@@ -1,7 +1,6 @@
 config.php
 /.htaccess
 /socket.php
-socket_.php
 /time_tracking/upload/
 /uploads/
 /test.php
