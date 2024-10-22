@@ -459,7 +459,7 @@ this.subbut.value='Подождите, пожалуйста!';">
 						<td><span name="f_name"></span></td>
 						<td><span name="material_name"></span></td>
 						<td><input type="number" min="0" step="0.01" name="balance" style="width: 100%;" required=""></td>
-						<td><input type="number" min="0" step="0.01" name="daily_consumption" style="width: 100%;"></td>
+						<td><input type="number" min="0" step="0.01" name="daily_consumption"  style="width: 100%;"></td>
 					</tr>
 				</tbody>
 			</table>

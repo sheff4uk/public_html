@@ -62,6 +62,7 @@ $query = "
     WHERE MB.F_ID = {$F_ID}
 ";
 $res = mysqli_query( $mysqli, $query ) or die("Invalid query: " .mysqli_error( $mysqli ));
+
 while( $row = mysqli_fetch_array($res) ) {
 
     $query = "
