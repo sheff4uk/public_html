@@ -1,5 +1,4 @@
 <?php
-
 include "config.php";
 $title = 'Приемка сырья';
 include "header.php";
