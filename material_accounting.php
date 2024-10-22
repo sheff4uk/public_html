@@ -206,7 +206,7 @@ foreach ($_GET as &$value) {
 					$query = "
 						SELECT MN.material_name
 							,ROUND(MB.mb_balance, 2) balance
-							,FLOOR(MB.mb_balance / MB.daily_consumption) inDays
+							,FLOOR(MB.mb_balance / MB.daily_consumption)  inDays
 							,MB.daily_consumption
 							,MB.MN_ID
 						FROM material__Balance MB
